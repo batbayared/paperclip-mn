@@ -59,8 +59,7 @@ import type { Agent, IssueLabel, Project } from "@paperclipai/shared";
 const SEARCH_DEBOUNCE_MS = 250;
 const IDENTIFIER_PATTERN = /^[A-Z]+-\d+$/;
 
-// Upstream-ийн SCOPE_LABELS тогтмол import үед нэг удаа үнэлэгдэж i18n init-ийн дарааллаас хамаарна; функц нь tx()-г render үед дуудна.
-// (Локал солиход хуудас дахин ачаалагддаг тул reactivity-ийн шалтгаан биш.)
+// Upstream-ийн SCOPE_LABELS тогтмолын оронд: tx()-г render үед дуудна. (Локал солиход хуудас дахин ачаалагдана.)
 function scopeLabel(scope: CompanySearchScope): string {
   switch (scope) {
     case "all":
