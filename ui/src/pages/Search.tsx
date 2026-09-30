@@ -59,8 +59,8 @@ import type { Agent, IssueLabel, Project } from "@paperclipai/shared";
 const SEARCH_DEBOUNCE_MS = 250;
 const IDENTIFIER_PATTERN = /^[A-Z]+-\d+$/;
 
-// Локал солиход хуудас дахин ачаалагддаг тул reactivity-д энэ хэлбэр хэрэггүй; upstream-ийн SCOPE_LABELS Record-ыг tx() literal-тай функц болгосон нь
-// xo:i18n:extract түлхүүрийг шууд цуглуулахад зориулсан.
+// Upstream-ийн SCOPE_LABELS тогтмол import үед нэг удаа үнэлэгдэж i18n init-ийн дарааллаас хамаарна; функц нь tx()-г render үед дуудна.
+// (Локал солиход хуудас дахин ачаалагддаг тул reactivity-ийн шалтгаан биш.)
 function scopeLabel(scope: CompanySearchScope): string {
   switch (scope) {
     case "all":
