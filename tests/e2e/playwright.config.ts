@@ -48,6 +48,11 @@ export default defineConfig({
     headless: true,
     screenshot: "only-on-failure",
     trace: "on-first-retry",
+    // XO: одоо байгаа spec-үүд англи UI-г шалгадаг тул хэлийг en-д тогтооно (xo-mn.spec.ts өөрөө mn болгоно).
+    storageState: {
+      cookies: [],
+      origins: [{ origin: BASE_URL, localStorage: [{ name: "xo.locale", value: "en" }] }],
+    },
   },
   projects: [
     {

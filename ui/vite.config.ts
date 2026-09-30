@@ -5,11 +5,12 @@ import tailwindcss from "@tailwindcss/vite";
 import { createUiDevWatchOptions } from "./src/lib/vite-watch";
 import { createApiProxy } from "./src/lib/vite-api-proxy";
 import { serviceWorkerBuildIdPlugin } from "./src/lib/vite-sw-build-id";
+import { xoI18nTransformPlugin } from "../scripts/xo-i18n/vite-plugin";
 
 const apiProxy = createApiProxy();
 
 export default defineConfig(({ mode }) => ({
-  plugins: [react(), tailwindcss(), serviceWorkerBuildIdPlugin()],
+  plugins: [xoI18nTransformPlugin(), react(), tailwindcss(), serviceWorkerBuildIdPlugin()],
   build: {
     minify: "esbuild",
   },
