@@ -1,14 +1,28 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { tx } from "@/i18n/xo";
 
 export type DatePreset = "mtd" | "7d" | "30d" | "ytd" | "all" | "custom";
 
+// Getters so tx() runs at read time (after i18n init) while consumers keep indexing PRESET_LABELS[key].
 export const PRESET_LABELS: Record<DatePreset, string> = {
-  mtd: "Month to Date",
-  "7d": "Last 7 Days",
-  "30d": "Last 30 Days",
-  ytd: "Year to Date",
-  all: "All Time",
-  custom: "Custom",
+  get mtd() {
+    return tx("Month to Date");
+  },
+  get "7d"() {
+    return tx("Last 7 Days");
+  },
+  get "30d"() {
+    return tx("Last 30 Days");
+  },
+  get ytd() {
+    return tx("Year to Date");
+  },
+  get all() {
+    return tx("All Time");
+  },
+  get custom() {
+    return tx("Custom");
+  },
 };
 
 export const PRESET_KEYS: DatePreset[] = ["mtd", "7d", "30d", "ytd", "all", "custom"];

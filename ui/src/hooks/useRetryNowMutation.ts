@@ -5,6 +5,7 @@ import { ApiError } from "../api/client";
 import { issuesApi } from "../api/issues";
 import { useToastActions } from "../context/ToastContext";
 import { queryKeys } from "../lib/queryKeys";
+import { tx } from "@/i18n/xo";
 
 export type RetryNowError = {
   message: string;
@@ -15,17 +16,17 @@ export type RetryNowError = {
 function readErrorMessage(error: unknown): string {
   if (error instanceof ApiError) {
     if (typeof error.message === "string" && error.message.trim().length > 0) return error.message;
-    return `Request failed (${error.status})`;
+    return tx("Request failed ({{status}})", { status: error.status });
   }
   if (error instanceof Error && error.message) return error.message;
-  return "The request failed. Try again in a moment.";
+  return tx("The request failed. Try again in a moment.");
 }
 
-export const RETRY_NOW_OUTCOME_HEADLINE: Record<IssueRetryNowOutcome, string> = {
-  promoted: "Retry promoted",
-  already_promoted: "Retry already running",
-  no_scheduled_retry: "No scheduled retry",
-  gate_suppressed: "Couldn't retry now",
+export const RETRY_NOW_OUTCOME_HEADLINE: Record<IssueRetryNowOutcome, () => string> = {
+  promoted: () => tx("Retry promoted"),
+  already_promoted: () => tx("Retry already running"),
+  no_scheduled_retry: () => tx("No scheduled retry"),
+  gate_suppressed: () => tx("Couldn't retry now"),
 };
 
 export function useRetryNowMutation(
@@ -51,13 +52,13 @@ export function useRetryNowMutation(
       }
       if (response.outcome === "promoted") {
         pushToast({
-          title: RETRY_NOW_OUTCOME_HEADLINE.promoted,
+          title: RETRY_NOW_OUTCOME_HEADLINE.promoted(),
           body: response.message,
           tone: "success",
         });
       } else if (response.outcome === "gate_suppressed") {
         pushToast({
-          title: RETRY_NOW_OUTCOME_HEADLINE.gate_suppressed,
+          title: RETRY_NOW_OUTCOME_HEADLINE.gate_suppressed(),
           body: response.message,
           tone: "error",
         });
@@ -65,7 +66,7 @@ export function useRetryNowMutation(
     },
     onError: (error) => {
       pushToast({
-        title: "Couldn't retry now",
+        title: tx("Couldn't retry now"),
         body: readErrorMessage(error),
         tone: "error",
       });

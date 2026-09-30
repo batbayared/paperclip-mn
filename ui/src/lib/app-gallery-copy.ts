@@ -1,3 +1,4 @@
+import { tx } from "@/i18n/xo";
 /**
  * Prosumer copy for the Apps surface (PAP-10856).
  *
@@ -49,103 +50,105 @@ export interface AppCopy {
  * (https://happy-grove-jzyc.here.now/). Apps without an entry fall back to a
  * generic, gate-safe line.
  */
-const APP_COPY: Record<string, AppCopy> = {
-  zapier: {
-    tagline: "Reach 9,000+ apps your team already uses.",
-    short: "Reach 9,000+ apps from your agents.",
-  },
-  github: {
-    tagline: "Read code and pull requests, comment on issues.",
-    short: "Read code and pull requests, comment on issues.",
-  },
-  slack: {
-    tagline: "Send and read messages in your team's channels.",
-    short: "Send and read messages in your channels.",
-  },
-  notion: {
-    tagline: "Read and update pages in your workspace.",
-    short: "Read and update pages in your workspace.",
-  },
-  posthog: {
-    tagline: "Explore product usage, errors, flags, and experiments.",
-    short: "Sign in with PostHog. Project pinning and access controls are optional.",
-  },
-  linear: {
-    tagline: "Create, update and read tickets.",
-    short: "Create, update and read tickets.",
-  },
-  "google-sheets": {
-    tagline: "Read and update selected spreadsheets.",
-    short: "Read spreadsheets or update the files you choose.",
-  },
-  gmail: {
-    tagline: "Read mail and create drafts for your review.",
-    short: "Read mail and create drafts for your review.",
-  },
-  "google-drive": {
-    tagline: "Find, read, and create files in Drive.",
-    short: "Find, read, and create files in Drive.",
-  },
-  "google-docs": {
-    tagline: "Read and update documents.",
-    short: "Read and update documents.",
-  },
-  "google-slides": {
-    tagline: "Read and update presentations.",
-    short: "Read and update presentations.",
-  },
-  "google-calendar": {
-    tagline: "Review calendars and manage events.",
-    short: "Review calendars and manage events.",
-  },
-  "google-chat": {
-    tagline: "Read conversations and send messages.",
-    short: "Read conversations and send messages.",
-  },
-  "google-people": {
-    tagline: "Look up contacts and people in your directory.",
-    short: "Look up contacts and people in your directory.",
-  },
-  "google-workspace-search": {
-    tagline: "Search across your Google workspace.",
-    short: "Search across your Google workspace.",
-  },
-  hubspot: {
-    tagline: "Look up contacts and update deal stages.",
-    short: "Look up contacts and update deal stages.",
-  },
-  intercom: {
-    tagline: "Read and reply to customer conversations.",
-    short: "Read and reply to customer conversations.",
-  },
-  figma: {
-    tagline: "Read files and post comments on frames.",
-    short: "Read files and post comments on frames.",
-  },
-  stripe: {
-    tagline: "Read customers, invoices, and payouts.",
-    short: "Read customers, invoices, and payouts.",
-  },
-  context7: {
-    tagline: "Look up up-to-date docs for your libraries.",
-    short: "Look up up-to-date docs for your libraries.",
-  },
+const APP_COPY: Record<string, () => AppCopy> = {
+  zapier: () => ({
+    tagline: tx("Reach 9,000+ apps your team already uses."),
+    short: tx("Reach 9,000+ apps from your agents."),
+  }),
+  github: () => ({
+    tagline: tx("Read code and pull requests, comment on issues."),
+    short: tx("Read code and pull requests, comment on issues."),
+  }),
+  slack: () => ({
+    tagline: tx("Send and read messages in your team's channels."),
+    short: tx("Send and read messages in your channels."),
+  }),
+  notion: () => ({
+    tagline: tx("Read and update pages in your workspace."),
+    short: tx("Read and update pages in your workspace."),
+  }),
+  posthog: () => ({
+    tagline: tx("Explore product usage, errors, flags, and experiments."),
+    short: tx("Sign in with PostHog. Project pinning and access controls are optional."),
+  }),
+  linear: () => ({
+    tagline: tx("Create, update and read tickets."),
+    short: tx("Create, update and read tickets."),
+  }),
+  "google-sheets": () => ({
+    tagline: tx("Read and update selected spreadsheets."),
+    short: tx("Read spreadsheets or update the files you choose."),
+  }),
+  gmail: () => ({
+    tagline: tx("Read mail and create drafts for your review."),
+    short: tx("Read mail and create drafts for your review."),
+  }),
+  "google-drive": () => ({
+    tagline: tx("Find, read, and create files in Drive."),
+    short: tx("Find, read, and create files in Drive."),
+  }),
+  "google-docs": () => ({
+    tagline: tx("Read and update documents."),
+    short: tx("Read and update documents."),
+  }),
+  "google-slides": () => ({
+    tagline: tx("Read and update presentations."),
+    short: tx("Read and update presentations."),
+  }),
+  "google-calendar": () => ({
+    tagline: tx("Review calendars and manage events."),
+    short: tx("Review calendars and manage events."),
+  }),
+  "google-chat": () => ({
+    tagline: tx("Read conversations and send messages."),
+    short: tx("Read conversations and send messages."),
+  }),
+  "google-people": () => ({
+    tagline: tx("Look up contacts and people in your directory."),
+    short: tx("Look up contacts and people in your directory."),
+  }),
+  "google-workspace-search": () => ({
+    tagline: tx("Search across your Google workspace."),
+    short: tx("Search across your Google workspace."),
+  }),
+  hubspot: () => ({
+    tagline: tx("Look up contacts and update deal stages."),
+    short: tx("Look up contacts and update deal stages."),
+  }),
+  intercom: () => ({
+    tagline: tx("Read and reply to customer conversations."),
+    short: tx("Read and reply to customer conversations."),
+  }),
+  figma: () => ({
+    tagline: tx("Read files and post comments on frames."),
+    short: tx("Read files and post comments on frames."),
+  }),
+  stripe: () => ({
+    tagline: tx("Read customers, invoices, and payouts."),
+    short: tx("Read customers, invoices, and payouts."),
+  }),
+  context7: () => ({
+    tagline: tx("Look up up-to-date docs for your libraries."),
+    short: tx("Look up up-to-date docs for your libraries."),
+  }),
 };
 
-const GENERIC: AppCopy = {
-  tagline: "Give your agents access to this app.",
-  short: "Give your agents access to this app.",
-};
+function genericCopy(): AppCopy {
+  return {
+    tagline: tx("Give your agents access to this app."),
+    short: tx("Give your agents access to this app."),
+  };
+}
 
 /** Curated, gate-safe copy for a gallery app. */
 export function appCopyFor(key: string, fallbackTagline?: string | null): AppCopy {
   const curated = APP_COPY[key];
-  if (curated) return curated;
+  if (curated) return curated();
   if (fallbackTagline) {
     const cleaned = sanitizeProsumerCopy(fallbackTagline);
     if (cleaned) return { tagline: cleaned, short: cleaned };
   }
-  return GENERIC;
+  return genericCopy();
 }
 
 /**
@@ -159,7 +162,7 @@ export function credentialFieldLabel(
   rawLabel: string,
   fieldCount: number,
 ): string {
-  if (fieldCount <= 1) return `Your ${appName} key`;
+  if (fieldCount <= 1) return tx("Your {{app}} key", { app: appName });
   const cleaned = sanitizeProsumerCopy(rawLabel);
-  return cleaned || `Your ${appName} key`;
+  return cleaned || tx("Your {{app}} key", { app: appName });
 }
