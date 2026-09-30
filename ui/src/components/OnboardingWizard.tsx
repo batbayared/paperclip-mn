@@ -3051,20 +3051,20 @@ function OnboardingWizardInner({
                   // prototype's own local flow draws with "Next".
                   primaryLabel={
                     step === 1
-                      ? "Continue"
+                      ? tx("Continue")
                       : step === 5
-                        ? "Get started"
+                        ? tx("Get started")
                         : step === 4
                           ? connectCta.label
-                          : "Next"
+                          : tx("Next")
                   }
                   primaryIcon={step === 4 ? connectCta.icon : undefined}
                   loadingLabel={
                     step === 1
-                      ? "Creating..."
+                      ? tx("Creating...")
                       : step === 4
-                        ? "Connecting"
-                        : "Launching..."
+                        ? tx("Connecting")
+                        : tx("Launching...")
                   }
                   // The browser-code login is finished on this screen, so the
                   // button is genuinely busy for its duration and shows it. The

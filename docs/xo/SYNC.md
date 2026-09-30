@@ -20,7 +20,39 @@
 
 ## Ү2-д нэмэгдсэн файлууд
 
-Task 11 (Step 4, 5) `tx()`/`XoTrans` нэмсэн upstream файлууд — Task 11 Step 15-д жагсаана.
+Task 11-д `tx()`/`XoTrans` нэмсэн upstream файлууд (толь бичгийн commit-оос хойш өөрчлөгдсөн `ui/src`, XO-ийн өөрийн `ui/src/xo/`, `ui/src/i18n/xo/` хасагдсан):
+
+- `ui/src/components/ApprovalPayload.tsx`
+- `ui/src/components/OnboardingWizard.tsx`
+- `ui/src/components/onboarding/SavedProviderKeySelect.tsx`
+- `ui/src/components/ui/command.tsx`
+- `ui/src/hooks/useComposerStop.ts`
+- `ui/src/hooks/useDateRange.ts`
+- `ui/src/hooks/useRetryNowMutation.ts`
+- `ui/src/lib/activity-format.ts`
+- `ui/src/lib/agent-setup-fields.ts`
+- `ui/src/lib/announcement-preview.ts`
+- `ui/src/lib/app-gallery-copy.ts`
+- `ui/src/lib/built-in-agent-toast.ts`
+- `ui/src/pages/AgentDetail.production.tsx`
+- `ui/src/pages/AgentDetail.tsx`
+- `ui/src/pages/ApprovalDetail.tsx`
+- `ui/src/pages/CompanyAccess.tsx`
+- `ui/src/pages/CompanyEnvironments.tsx`
+- `ui/src/pages/CompanyExport.tsx`
+- `ui/src/pages/CompanyImport.tsx`
+- `ui/src/pages/CompanySettingsPluginPage.tsx`
+- `ui/src/pages/Costs.production.tsx`
+- `ui/src/pages/Costs.tsx`
+- `ui/src/pages/Dashboard.tsx`
+- `ui/src/pages/Inbox.tsx`
+- `ui/src/pages/InstanceExperimentalSettings.tsx`
+- `ui/src/pages/IssueDetail.tsx`
+- `ui/src/pages/Projects.tsx`
+- `ui/src/pages/Search.tsx`
+- `ui/src/pages/WhatNeedsMe.tsx`
+
+Нэмэлт тэмдэглэл: `scripts/xo-i18n/transform.ts`-ийн allowlist-д `message`, `action`, `subtitle` нэмэгдсэн (энэ файл XO-ийн өөрийнх тул upstream merge-д нөлөөгүй).
 
 ## Түүх
 

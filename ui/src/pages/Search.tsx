@@ -59,23 +59,33 @@ import type { Agent, IssueLabel, Project } from "@paperclipai/shared";
 const SEARCH_DEBOUNCE_MS = 250;
 const IDENTIFIER_PATTERN = /^[A-Z]+-\d+$/;
 
-const SCOPE_LABELS: Record<CompanySearchScope, string> = {
-  all: "All",
-  issues: "Tasks",
-  comments: "Comments",
-  documents: "Documents",
-  artifacts: "Artifacts",
-  agents: "Agents",
-  projects: "Projects",
-};
+// Локал шилжихэд шинэчлэгдэхийн тулд module түвшний тогтмол биш, дуудах бүрд tx() ажиллуулна.
+function scopeLabel(scope: CompanySearchScope): string {
+  switch (scope) {
+    case "all":
+      return tx("All");
+    case "issues":
+      return tx("Tasks");
+    case "comments":
+      return tx("Comments");
+    case "documents":
+      return tx("Documents");
+    case "artifacts":
+      return tx("Artifacts");
+    case "agents":
+      return tx("Agents");
+    case "projects":
+      return tx("Projects");
+  }
+}
 
 function isCompanySearchScope(value: string | null): value is CompanySearchScope {
   return Boolean(value) && (COMPANY_SEARCH_SCOPES as readonly string[]).includes(value as string);
 }
 
 function describeScope(scope: CompanySearchScope) {
-  if (scope === "all") return "All scopes";
-  return SCOPE_LABELS[scope];
+  if (scope === "all") return tx("All scopes");
+  return scopeLabel(scope);
 }
 
 function totalMatchCount(counts: Partial<Record<CompanySearchCountType, number>>): number {
@@ -483,7 +493,7 @@ export function Search() {
         value,
         label: (
           <span className="flex items-center">
-            {SCOPE_LABELS[value as CompanySearchScope]}
+            {scopeLabel(value as CompanySearchScope)}
             {dashOut ? (
               <span className="ml-1.5 text-(length:--text-nano) text-muted-foreground">—</span>
             ) : count !== null ? (

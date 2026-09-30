@@ -610,7 +610,7 @@ export function Costs({
             <MetricTile
               label="Inference spend"
               value={formatCents(spendData?.summary.spendCents ?? 0)}
-              subtitle={`${formatTokens(inferenceTokenTotal)} tokens across request-scoped events`}
+              subtitle={tx("{{tokens}} tokens across request-scoped events", { tokens: formatTokens(inferenceTokenTotal) })}
               icon={DollarSign}
             />
             <MetricTile
@@ -622,9 +622,9 @@ export function Costs({
               )}
               subtitle={
                 activeBudgetIncidents.length > 0
-                  ? `${budgetData?.pausedAgentCount ?? 0} agents paused · ${budgetData?.pausedProjectCount ?? 0} projects paused`
+                  ? tx("{{agents}} agents paused · {{projects}} projects paused", { agents: budgetData?.pausedAgentCount ?? 0, projects: budgetData?.pausedProjectCount ?? 0 })
                   : spendData?.summary.budgetCents && spendData.summary.budgetCents > 0
-                    ? `${formatCents(spendData.summary.spendCents)} of ${formatCents(spendData.summary.budgetCents)}`
+                    ? tx("{{spend}} of {{budget}}", { spend: formatCents(spendData.summary.spendCents), budget: formatCents(spendData.summary.budgetCents) })
                     : "No monthly cap configured"
               }
               icon={Coins}
@@ -632,13 +632,13 @@ export function Costs({
             <MetricTile
               label="Finance net"
               value={formatCents(financeData?.summary.netCents ?? 0)}
-              subtitle={`${formatCents(financeData?.summary.debitCents ?? 0)} debits · ${formatCents(financeData?.summary.creditCents ?? 0)} credits`}
+              subtitle={tx("{{debits}} debits · {{credits}} credits", { debits: formatCents(financeData?.summary.debitCents ?? 0), credits: formatCents(financeData?.summary.creditCents ?? 0) })}
               icon={ReceiptText}
             />
             <MetricTile
               label="Finance events"
               value={String(financeData?.summary.eventCount ?? 0)}
-              subtitle={`${formatCents(financeData?.summary.estimatedDebitCents ?? 0)} estimated in range`}
+              subtitle={tx("{{amount}} estimated in range", { amount: formatCents(financeData?.summary.estimatedDebitCents ?? 0) })}
               icon={ArrowUpRight}
             />
           </div>

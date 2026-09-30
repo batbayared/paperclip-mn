@@ -85,6 +85,30 @@ describe("transformSource", () => {
     expect(result.code).toContain(`{tx("Hello")}`);
   });
 
+  it("wraps EmptyState message/action and card subtitle props", () => {
+    const result = transformSource(
+      tsx(`<><EmptyState message="No goals yet." action="Add Goal" onAction={go} /><ChartCard title="Runs" subtitle="Last 14 days" /></>`),
+      FILE,
+    );
+    expect(result.code).toContain(`message={tx("No goals yet.")} action={tx("Add Goal")}`);
+    expect(result.code).toContain(`subtitle={tx("Last 14 days")}`);
+  });
+
+  it("leaves message/action values that are URLs, enum ids or expressions alone", () => {
+    const body = [
+      `<form action="/api/auth/sign-in/email" />`,
+      `<form action={mode === "sign_up" ? "/api/auth/sign-up/email" : "/api/auth/sign-in/email"} />`,
+      `<Row action={selectedAction} message={error.message} />`,
+    ].join("\n");
+    const result = transformSource(tsx(`<>${body}</>`), FILE);
+    expect(result.changed).toBe(false);
+    const ids = transformSource(
+      `mutate({ incidentId, action: "keep_paused" });\nconst x = { action: ap.action === "update" ? "update" : "rename" };\n`,
+      "ui/src/lib/example.ts",
+    );
+    expect(ids.changed).toBe(false);
+  });
+
   it("does not duplicate an existing tx import", () => {
     const input = `import { tx } from "@/i18n/xo";\n\nexport function Example() {\n  return <p title="Hello there" />;\n}\n`;
     const result = transformSource(input, FILE);

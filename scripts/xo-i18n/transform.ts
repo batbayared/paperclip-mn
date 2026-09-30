@@ -49,6 +49,11 @@ export const DEFAULT_ATTR_ALLOWLIST: readonly string[] = [
   "detail",
   "tooltip",
   "emptyText",
+  // EmptyState message/action, ChartCard/MetricCard subtitle. T1 файлуудад эдгээр нэр
+  // зөвхөн харагдах текст авдаг; ID/enum утга (action: "keep_paused") нь looksLikeCopy-д шүүгдэнэ.
+  "message",
+  "action",
+  "subtitle",
 ];
 export const DEFAULT_PROP_ALLOWLIST: readonly string[] = DEFAULT_ATTR_ALLOWLIST;
 
