@@ -1,6 +1,8 @@
 # T1 орчуулгын хяналт (Ү2, 2026-09-30)
 
-Extract: files=102 keys=1568. check: OK. keep-en: 13 түлхүүр.
+Extract: files=102 keys=1568 (Step 3-т 1166; батчууд, App.tsx-ийг T1-д нэмсэн, Step 14-ийн allowlist өргөтгөлөөр 1568 болсон). check: OK. keep-en: 13 түлхүүр.
+
+Шалгалт: эхний шалгалт 30bf3d28c дээр; дахин шалгалт Step 14-ийн засвар бүхий UI build дээр (агуулга нь 3e212808a-тай ижил), 2026-09-30, controller built-in browser-оор 11 маршрутыг шалгасан. Хоёр шалгалтын «Board» нь local-board хэрэглэгчийн нэр (хэрэглэгчийн өгөгдөл).
 
 "Board" бүх маршрутад local-board хэрэглэгчийн харагдах нэр (хэрэглэгчийн өгөгдөл) тул үлдэгдэл биш.
 
@@ -18,7 +20,7 @@ Extract: files=102 keys=1568. check: OK. keep-en: 13 түлхүүр.
 | /company/settings | Interaction governance, Deployment and auth, Backup retention, AI feedback sharing, Keyboard shortcuts, Sign out, "Sign out of this Paperclip instance." | байхгүй (T2) | InstanceGeneralSettings.tsx, InteractionGovernancePanel.tsx: том англи хэсгүүд | Paperclip брэндийн алдагдал, доор |
 | /onboarding | "Continue" (мөн Next, Get started, Creating..., Connecting, Launching...) | OnboardingWizard.tsx FooterNav primaryLabel, loadingLabel салбар бүрд tx() | байхгүй | "Анхны агентаа үүсгэх" зөв харагдсан |
 
-Console алдаа: байхгүй (11 маршрут). Одоогийн ачаалалтад API хүсэлт бүр 200; dev server дахин ачаалж байх үеийн ERR_CONNECTION_REFUSED мөрүүд л байсан. Ө/Ү/Ё: зөв (screenshot, onboarding "Анхны агентаа үүсгэх").
+Console алдаа: аппын алдаа байхгүй (11 маршрут, дахин шалгалт). Одоогийн ачаалалтад API хүсэлт бүр 200; dev server дахин ачаалж байх үеийн ERR_CONNECTION_REFUSED мөрүүд л байсан. Ө/Ү/Ё: зөв (screenshot, onboarding "Анхны агентаа үүсгэх").
 
 ## Ү6-д (T2) үлдээсэн мөрүүд
 
