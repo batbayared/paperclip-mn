@@ -24,7 +24,7 @@ export function xoI18nTransformPlugin(): XoI18nPlugin {
         result = transformSource(code, target.rel);
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
-        throw new Error(`xo-i18n-transform: ${target.rel}: ${msg}`);
+        throw new Error(`xo-i18n-transform: ${target.rel}: ${msg}`, { cause: err });
       }
       if (!result.changed) return null;
       return { code: result.code, map: result.map?.toString() ?? null };
