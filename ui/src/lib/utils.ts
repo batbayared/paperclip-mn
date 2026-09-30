@@ -2,6 +2,7 @@ import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { deriveAgentUrlKey, deriveProjectUrlKey, normalizeProjectUrlKey, hasNonAsciiContent } from "@paperclipai/shared";
 import type { BillingType, FinanceDirection, FinanceEventKind } from "@paperclipai/shared";
+import { localeTag } from "@/xo/locale";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -38,7 +39,7 @@ export function formatCents(cents: number): string {
 }
 
 export function formatNumber(n: number): string {
-  return n.toLocaleString("en-US");
+  return n.toLocaleString(localeTag());
 }
 
 /**
@@ -51,7 +52,7 @@ export function formatProjectBudget(budget: { amountCents: number; windowKind: s
 }
 
 export function formatDate(date: Date | string): string {
-  return new Date(date).toLocaleDateString("en-US", {
+  return new Date(date).toLocaleDateString(localeTag(), {
     month: "short",
     day: "numeric",
     year: "numeric",
@@ -62,7 +63,7 @@ export function formatDateTime(
   date: Date | string,
   options: { includeSeconds?: boolean } = {},
 ): string {
-  return new Date(date).toLocaleString("en-US", {
+  return new Date(date).toLocaleString(localeTag(), {
     month: "short",
     day: "numeric",
     year: "numeric",
@@ -73,23 +74,41 @@ export function formatDateTime(
 }
 
 export function formatShortDate(date: Date | string): string {
-  return new Date(date).toLocaleString("en-US", {
+  return new Date(date).toLocaleString(localeTag(), {
     month: "short",
     day: "numeric",
   });
 }
 
+const JUST_NOW: Record<ReturnType<typeof localeTag>, string> = {
+  "mn-MN": "саяхан",
+  "en-US": "just now",
+};
+
+const relativeFormatters = new Map<string, Intl.RelativeTimeFormat>();
+
+function relativeFormatter(tag: string): Intl.RelativeTimeFormat {
+  let formatter = relativeFormatters.get(tag);
+  if (!formatter) {
+    formatter = new Intl.RelativeTimeFormat(tag, { numeric: "always", style: "narrow" });
+    relativeFormatters.set(tag, formatter);
+  }
+  return formatter;
+}
+
 export function relativeTime(date: Date | string): string {
+  const tag = localeTag();
   const now = Date.now();
   const then = new Date(date).getTime();
   const diffSec = Math.round((now - then) / 1000);
-  if (diffSec < 60) return "just now";
+  if (diffSec < 60) return JUST_NOW[tag];
+  const rtf = relativeFormatter(tag);
   const diffMin = Math.round(diffSec / 60);
-  if (diffMin < 60) return `${diffMin}m ago`;
+  if (diffMin < 60) return rtf.format(-diffMin, "minute");
   const diffHr = Math.round(diffMin / 60);
-  if (diffHr < 24) return `${diffHr}h ago`;
+  if (diffHr < 24) return rtf.format(-diffHr, "hour");
   const diffDay = Math.round(diffHr / 24);
-  if (diffDay < 30) return `${diffDay}d ago`;
+  if (diffDay < 30) return rtf.format(-diffDay, "day");
   return formatDate(date);
 }
 
