@@ -7,6 +7,12 @@ const BASE = process.env.PAPERCLIP_E2E_BASE_URL ?? "http://127.0.0.1:3105";
 const DATA_DIR = process.env.PAPERCLIP_E2E_DATA_DIR ?? process.env.PAPERCLIP_HOME;
 const CONFIG_PATH = process.env.PAPERCLIP_E2E_CONFIG_PATH ?? path.resolve(process.cwd(), ".paperclip/config.json");
 const BOOTSTRAP_SCRIPT_PATH = path.resolve(process.cwd(), "packages/db/scripts/create-auth-bootstrap-invite.ts");
+// XO: анхдагч хэл нь mn тул энэ spec-ийн англи текстийн assertion-д en locale тогтооно.
+const EN_STORAGE_STATE = {
+  cookies: [],
+  origins: [{ origin: new URL(BASE).origin, localStorage: [{ name: "xo.locale", value: "en" }] }],
+};
+test.use({ storageState: EN_STORAGE_STATE });
 const OWNER_PASSWORD = "paperclip-owner-password";
 const INVITED_PASSWORD = "paperclip-invited-password";
 
@@ -253,7 +259,7 @@ async function waitForMemberRole(
 }
 
 async function newPage(browser: Browser) {
-  const context = await browser.newContext();
+  const context = await browser.newContext({ storageState: EN_STORAGE_STATE });
   const page = await context.newPage();
   return { context, page };
 }
