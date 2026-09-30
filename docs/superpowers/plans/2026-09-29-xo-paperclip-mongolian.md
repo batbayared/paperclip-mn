@@ -1545,7 +1545,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>" && git log --oneline -
   - `harvestExplicitKeys(code: string, filePath: string): ExtractedString[]`
   - `looksLikeCopy(text: string, opts?: { jsxText?: boolean }): boolean`
   - `interface ExtractedString { key: string; file: string; line: number; plural?: { one: string; other: string } }`
-  - `interface ManualCase { file: string; line: number; reason: "mixed-jsx" | "template-complex"; snippet: string }`
+  - `interface ManualCase { file: string; line: number; reason: "mixed-jsx" | "template-complex" | "literal-braces"; snippet: string }` (`literal-braces` — 2026-09-30-ны нэмэлт, доорх «Нэмэлт өөрчлөлт»-ийг үз)
   - `interface TransformOptions { attrAllowlist?: readonly string[]; propAllowlist?: readonly string[]; brandName?: string }`
   - `interface TransformResult { code: string; map: SourceMap | null; strings: ExtractedString[]; manual: ManualCase[]; changed: boolean }`
   - `DEFAULT_ATTR_ALLOWLIST`, `DEFAULT_PROP_ALLOWLIST` (readonly string[])
@@ -1564,6 +1564,16 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>" && git log --oneline -
 9. **Байгаа `tx("…")` дуудлага ба `XoTrans i18nKey`** дахин ороохгүй, зөвхөн бүртгэнэ (`strings`-д орно → extract тэднийг "хоцрогдсон" гэж үзэхгүй).
 10. **Импорт:** нэг ч засвар хийсэн бол `import { tx } from "@/i18n/xo";` сүүлийн import-ын дараа (import байхгүй бол файлын эхэнд) нэмнэ; аль хэдийн байвал давхардуулахгүй.
 11. Vitest трансформерийг ажиллуулдаггүй (ui/vitest.config.ts-д plugin байхгүй) тул UI-ийн component тестүүд англи эхээ хэвээр хардаг.
+
+**Нэмэлт өөрчлөлт (2026-09-30, Task 8 review-ийн засвар d6f1db461).** Анхны дүрмүүд en locale дээр upstream-аас өөр англи текст гаргаж байсан тул spec §7 (:84/:86/:88/:92)-ын дагуу доорх дүрмүүд дээрхийг давамгайлна:
+
+- **F1 whitespace:** 1-р дүрмийн «нэг зайд шахна» зөвхөн JSX текстийн run-д хамаарна, мөн зөвхөн ASCII whitespace-ийг шахна (NBSP хэвээр). String literal ба template-ийн захын зай түлхүүрээс гадна үлдэнэ: `" then come back"` → `(" " + tx("then come back"))`; дотоод зай өөрчлөгдөхгүй.
+- **F2 literal-braces:** `{{` эсвэл `}}` агуулсан string literal / template quasi-г хөндөхгүй, `manual`-д `literal-braces` гэж бүртгэнэ (i18next interpolation-оор эвдрэхээс сэргийлнэ).
+- **F3a:** зөвхөн олон тооны ternary-гаас бүрдсэн template (`` `${n === 1 ? "run" : "runs"}` ``) мөн `_one`/`_other` хос түлхүүр болно.
+- **F3b холимог JSX өргөссөн:** нэг эцэг дотор хуулбарын run-ийг элемент эсвэл текст агуулсан нөхцөлт илэрхийлэл (`{ok ? "Yes" : "No"}`, `{x && "Label"}`) таславал эцгийг хөндөхгүй, `mixed-jsx` гэж нэг бичлэг хийнэ. Эцэг бүрд нэг л бичлэг; mixed-jsx давамгайлна.
+- **F3c олон тоо JSX-д:** JSX хүүхэд дэх `{n === 1 ? "a" : "b"}` хөрш текстийн run-тай нэгдэж `tx("…", { count: n })` болно; нэг эцэгт хоёр өөр тоолуур байвал `mixed-jsx`.
+
+Үр дүн T1 дээр: түлхүүртэй мөр 1875 → 1771, `manual` 42 → 73 (mixed-jsx 54, template-complex 19), тасарсан эцэг 0. Sidebar-ын хүлээгдэх утга (27 түлхүүр, manual=0) өөрчлөгдөөгүй.
 
 - [ ] **Step 1: Хамаарлыг суулгах**
 
@@ -3140,7 +3150,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>" && git log --oneline -
 - Modify: `docs/xo/SYNC.md` (Task 1-д үүсгэсэн; «Ү2-д нэмэгдсэн файлууд» хэсгийг бөглөнө)
 - Modify: `scripts/xo-i18n/tiers.ts` (2 файл → 101 файл)
 - Modify: `ui/src/i18n/xo/en.json`, `ui/src/i18n/xo/mn.json`, `ui/src/i18n/xo/keep-en.json` (зөвхөн CLI-ээр: `extract`, `merge`; `keep-en.json` гараар)
-- Modify: `check`-ийн `гараар:` мөрөнд заагдах T1 `.tsx` файлууд (mixed-jsx → `XoTrans`, template-complex → `tx()`)
+- Modify: `check`-ийн `гараар:` мөрөнд заагдах T1 `.tsx` файлууд (mixed-jsx → `XoTrans` эсвэл бүтэн өгүүлбэрийн `tx()` ternary, template-complex → `tx()`, literal-braces → хувьсагчтай `tx()`)
 - Modify: `ui/src/lib/activity-format.ts`, `ui/src/lib/built-in-agent-toast.ts`, `ui/src/hooks/useComposerStop.ts`, `ui/src/hooks/useRetryNowMutation.ts`, `ui/src/lib/agent-setup-fields.ts`, `ui/src/lib/announcement-preview.ts`, `ui/src/lib/app-gallery-copy.ts`, `ui/src/hooks/useDateRange.ts`
 
 **Interfaces:**
@@ -3412,9 +3422,9 @@ cd ~/dev/paperclip-mn && grep -c "Paperclip" ui/src/i18n/xo/en.json; grep -c "{{
 cd ~/dev/paperclip-mn && (pnpm -s xo:i18n:check 2>&1 || true) | grep '^гараар:' | sort
 ```
 
-Мөр бүр `гараар: <файл>:<мөр> <шалтгаан> <снипет>` (Task 9-ийн `check`). Хоёр шалтгаан, хоёр засвар:
+Мөр бүр `гараар: <файл>:<мөр> <шалтгаан> <снипет>` (Task 9-ийн `check`). Гурван шалтгаан (Task 8-ын 2026-09-30-ны нэмэлт өөрчлөлтийг үз), тус бүрийн засвар:
 
-**mixed-jsx** (текст дунд JSX элемент) → `XoTrans`. Жишээ (үлгэр загвар; бодит мөрүүд `check`-ийн жагсаалтаас):
+**mixed-jsx** (текст дунд JSX элемент; мөн текст агуулсан нөхцөлт илэрхийлэл хуулбарыг таслах, эсвэл нэг эцэгт хоёр тоолуур) → `XoTrans`, эсвэл нөхцөлт хэсгийг бүтэн өгүүлбэрийн хоёр `tx()`-ийн ternary болгоно (`{ok ? tx("Saved. Close the dialog.") : tx("Failed. Try again.")}`). Жишээ (үлгэр загвар; бодит мөрүүд `check`-ийн жагсаалтаас):
 
 ```tsx
 // Өмнө
@@ -3441,6 +3451,10 @@ const title = `${n} agent${n === 1 ? "" : "s"} paused`;
 const label = tx("{{selected}} of {{total}} agents selected", { selected, total });
 const title = n === 1 ? tx("{{n}} agent paused", { n }) : tx("{{n}} agents paused", { n });
 ```
+
+**literal-braces** (англи эх `{{` / `}}`-ийг шууд агуулна, жишээ нь `{{variable}}` загварын тайлбар) → хаалтыг хувьсагчаар дамжуулсан тодорхой `tx()`: `tx("Use {{token}} in the prompt", { token: "{{variable}}" })`. (2026-09-30-нд T1-д ийм тохиолдол 0 байсан; T2/T3-т гарвал энэ загвараар засна.)
+
+Анхааруулга: codemod-ийн автоматаар үүсгэсэн олон тооны түлхүүр (`tx("{{count}} runs", { count: n })`) `count` дамжуулдаг нь зөв — extract `_one`/`_other` хосыг бичдэг. Дээрх «`count` дамжуулахгүй» дүрэм зөвхөн гараар бичих ternary загварт хамаарна.
 
 Засвар бүрийн дараа дахин extract; `manual=0` болтол давтана:
 
