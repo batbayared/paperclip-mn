@@ -13,6 +13,7 @@
    `docs/docs.json`, `tests/e2e/playwright.config.ts`, `package.json`, `.gitignore`, `server/src/config.ts`.
    Upstream-ийн шинэ хувилбарыг авч XO-ийн мөрүүдийг дахин нэм.
    Ү2-оос хойш мөн доорх «Ү2-д нэмэгдсэн файлууд» хэсгийн файлууд (`tx()`/`XoTrans` нэмсэн мөрүүд).
+   Мөн доорх «Upstream хавтас дахь XO файлууд» ба «Lockfile» хэсгийн файлууд.
 6. Толь шинэчлэх: `pnpm xo:i18n:extract && pnpm xo:i18n:check` → шинэ/өөрчлөгдсөн түлхүүрийг `ui/src/i18n/xo/mn.json`-д орчуул, `check` OK болтол.
 7. Шалгалт: `pnpm --filter @paperclipai/ui typecheck && (cd ui && pnpm exec vitest run) && pnpm build && pnpm test:e2e`
 8. Таг: `git tag "xo-$TAG" && git push origin xo-main "xo-$TAG"` (ED зөвшөөрсний дараа).
@@ -53,6 +54,38 @@ Task 11-д `tx()`/`XoTrans` нэмсэн upstream файлууд (толь би�
 - `ui/src/pages/WhatNeedsMe.tsx`
 
 Нэмэлт тэмдэглэл: `scripts/xo-i18n/transform.ts`-ийн allowlist-д `message`, `action`, `subtitle` нэмэгдсэн (энэ файл XO-ийн өөрийнх тул upstream merge-д нөлөөгүй).
+
+## Upstream хавтас дахь XO файлууд
+
+Fork-ийн өөрийн хавтас (`ui/src/xo/`, `ui/src/i18n/xo/`, `scripts/xo-i18n/`, `docs/xo/`, `tests/e2e/xo-*.spec.ts`, `docs/superpowers/`)-аас гадуур XO-ийн өөрчилсөн буюу нэмсэн бусад upstream зам. `git diff --name-status d554c4789..HEAD`-ээр баталгаажуулсан.
+
+Өөрчилсөн (M):
+
+- `.gitignore`, `package.json`, `docs/docs.json`
+- `ui/index.html`, `ui/public/site.webmanifest`, `ui/vite.config.ts`, `ui/vitest.config.ts`, `ui/src/i18n/index.ts`
+- `ui/src/lib/utils.ts`, `ui/src/context/BreadcrumbContext.tsx`, `ui/src/context/BreadcrumbContext.test.tsx`, `ui/src/pages/Auth.tsx`
+- `ui/src/components/SidebarAccountMenu.tsx`, `ui/src/components/SidebarAccountMenu.production.tsx`
+- `ui/src/components/BreadcrumbBar.tsx`, `ui/src/components/BreadcrumbBar.test.tsx` (Ү2 fix: mobile compact header нь орчуулсан "Tasks" шошгыг мөн таних)
+- `tests/e2e/playwright.config.ts`
+- `tests/e2e/multi-user-authenticated.spec.ts` (S-set-ээс гадуурх онцгой тохиолдол (ED S-set-д нэмэх эсэхээ шийдэх хүртэл энд бүртгэв): default локал mn тул `EN_STORAGE_STATE` + `test.use` нэмж `browser.newContext()`-д дамжуулсан)
+
+Нэмсэн (A), upstream хавтас дотор:
+
+- `ui/src/i18n/locales/mn.json` (upstream өөрөө `mn.json` нийтэлбэл add/add зөрчил гарна)
+- `ui/src/i18n/xo.ts`, `ui/src/i18n/xo.test.ts`
+- `ui/src/lib/utils.locale.test.ts`
+
+Sync бүрд `ThemeToggle`-ийг `ui/src/xo/XoLocaleMenuAction.tsx`-ийн markup-тай дахин харьцуул: XO-ийн цэсийн үйлдэл нь ThemeToggle-ийн markup-ийг санаатайгаар давхардуулдаг, upstream ThemeToggle өөрчлөгдвөл гараар дагуулна.
+
+## Lockfile
+
+`pnpm-lock.yaml` XO-ийн dependency өөрчлөлт (root `package.json`)-өөс болж sync-д ихэвчлэн зөрчилдөнө. Гараар merge хийхгүй:
+
+```bash
+git checkout --theirs pnpm-lock.yaml && pnpm install
+```
+
+`pnpm install` нь lockfile-ийг `package.json`-уудаас дахин үүсгэнэ. Дараа нь `git add pnpm-lock.yaml`.
 
 ## Түүх
 
