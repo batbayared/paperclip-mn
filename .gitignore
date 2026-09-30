@@ -78,3 +78,8 @@ tests/storybook-visual/playwright-report/
 .vercel/
 .env.local
 test-results/
+
+# XO i18n working files
+scripts/xo-i18n/.emit/
+scripts/xo-i18n/status.json
+scripts/xo-i18n/.batches/
