@@ -1,3 +1,4 @@
+import { tx } from "@/i18n/xo";
 import { Link } from "@/lib/router";
 import { Menu, PanelRightClose, PanelRightOpen } from "lucide-react";
 import { useBreadcrumbs } from "../context/BreadcrumbContext";
@@ -109,7 +110,10 @@ export function BreadcrumbBar({ taskDetailLayout = false }: { taskDetailLayout?:
   );
 
   const currentCrumb = breadcrumbs[breadcrumbs.length - 1];
-  if (isMobile && breadcrumbs[0]?.label === "Tasks" && currentCrumb.identifier) {
+  // XO: IssueDetail-ийн fallback "Tasks" шошго build-д tx("Tasks") болдог тул хоёр хэлбэрийг хоёуланг нь таних.
+  const firstLabel = breadcrumbs[0]?.label;
+  const isTasksCrumb = firstLabel === "Tasks" || firstLabel === tx("Tasks");
+  if (isMobile && isTasksCrumb && currentCrumb.identifier) {
     return (
       <div className="h-(--sz-60px) shrink-0 flex items-center border-b border-border px-4">
         {menuButton}

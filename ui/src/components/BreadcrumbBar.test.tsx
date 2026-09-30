@@ -3,6 +3,8 @@
 import { act, useEffect, type ReactNode } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { i18n } from "@/i18n";
+import { tx } from "@/i18n/xo";
 import { BreadcrumbProvider, useBreadcrumbs } from "../context/BreadcrumbContext";
 import { BreadcrumbBar } from "./BreadcrumbBar";
 
@@ -42,12 +44,14 @@ vi.mock("@/plugins/launchers", () => ({
 }));
 
 function TaskBreadcrumbs({
+  tasksLabel = "Tasks",
   onOpen,
   panelControl,
   taskDetailLayout = false,
   identifier = "PAP-16679",
   sourceHref = "/issues",
 }: {
+  tasksLabel?: string;
   onOpen?: () => void;
   panelControl?: { open: boolean; onToggle: () => void };
   taskDetailLayout?: boolean;
@@ -62,7 +66,7 @@ function TaskBreadcrumbs({
 
   useEffect(() => {
     setBreadcrumbs([
-      { label: "Tasks", href: sourceHref },
+      { label: tasksLabel, href: sourceHref },
       {
         label: "Hire your first engineer and create a hiring plan",
         identifier,
@@ -85,6 +89,7 @@ function TaskBreadcrumbs({
     identifier,
     onOpen,
     panelControl,
+    tasksLabel,
     setBreadcrumbPanelControl,
     setBreadcrumbToolbar,
     setBreadcrumbs,
@@ -108,9 +113,10 @@ describe("BreadcrumbBar", () => {
     root = createRoot(container);
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     act(() => root.unmount());
     container.remove();
+    await i18n.changeLanguage("en");
   });
 
   it("keeps a single task breadcrumb compact with adjacent identity and settings action", async () => {
@@ -155,6 +161,24 @@ describe("BreadcrumbBar", () => {
     expect(identifier?.previousElementSibling?.textContent).toBe("Hire your first engineer and create a hiring plan");
     expect(identifier?.previousElementSibling?.className).toContain("truncate");
     expect(container.querySelector('button[aria-label="Open sidebar"]')).not.toBeNull();
+  });
+
+  it("keeps the compact mobile task header when the tasks crumb label is translated (mn)", async () => {
+    await i18n.changeLanguage("mn");
+    const translated = tx("Tasks");
+    expect(translated).not.toBe("Tasks");
+    viewport.isMobile = true;
+    await act(async () => {
+      root.render(
+        <BreadcrumbProvider>
+          <TaskBreadcrumbs tasksLabel={translated} identifier="TES-3" sourceHref="/TES/issues" />
+        </BreadcrumbProvider>,
+      );
+    });
+    expect(container.querySelector('a[href="/TES/issues"]')).toBeNull();
+    const identifier = container.querySelector('[data-slot="task-title-identifier"]');
+    expect(identifier?.textContent).toBe("TES-3");
+    expect(container.querySelector("h1")).not.toBeNull();
   });
 
   it("renders a page toolbar in the same persistent row as the task breadcrumb", async () => {
