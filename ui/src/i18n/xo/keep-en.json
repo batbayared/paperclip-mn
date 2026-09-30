@@ -6,5 +6,8 @@
   "{{effectiveAdapterCommand}} -p \"Respond with hello.\" --output-format stream-json",
   "{{effectiveAdapterCommand}} -p --mode ask --output-format json \"Respond with hello.\"",
   "{{effectiveAdapterCommand}} exec --json -",
-  "{{effectiveAdapterCommand}} run --format json \"Respond with hello.\""
+  "{{effectiveAdapterCommand}} run --format json \"Respond with hello.\"",
+  "stderr",
+  "stdout",
+  "TOOLS.md"
 ]
