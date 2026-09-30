@@ -22,7 +22,8 @@ export function XoTrans({
       defaults={i18nKey}
       values={values}
       components={components}
-      tOptions={{ keySeparator: false, nsSeparator: false }}
+      shouldUnescape
+      tOptions={{ keySeparator: false, nsSeparator: false, interpolation: { escapeValue: true } }}
     />
   );
 }
