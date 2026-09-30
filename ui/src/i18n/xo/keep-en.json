@@ -9,5 +9,7 @@
   "{{effectiveAdapterCommand}} run --format json \"Respond with hello.\"",
   "stderr",
   "stdout",
-  "TOOLS.md"
+  "TOOLS.md",
+  "SSH",
+  "Smoke Lab"
 ]
