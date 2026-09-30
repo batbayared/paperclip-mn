@@ -1,3 +1,4 @@
+import { tx } from "@/i18n/xo";
 import {
   useCallback,
   useEffect,
@@ -1203,7 +1204,7 @@ function EnvironmentImageTemplatePanel({
                   ? `Provider ${activeTemplate.templateKind} ref ${templateRef} (Paperclip template ${activeTemplate.id})`
                   : activeTemplate.id}
               >
-                {templateRef ?? `id ${formatShortId(activeTemplate.id)}`}
+                {templateRef ?? tx("id {{id}}", { id: formatShortId(activeTemplate.id) })}
               </span>
               {capturedAt ? ` · captured ${capturedAt}` : ""}
               {lastUsedAt ? ` · last used ${lastUsedAt}` : ""}
@@ -1570,8 +1571,13 @@ export function CompanyEnvironments({ mode = "list" }: CompanyEnvironmentsProps)
         title: "Environment deleted",
         body:
           destroyedCount > 0
-            ? `${environment.name} was deleted. Destroyed ${destroyedCount === 1 ? "1 reusable sandbox" : `${destroyedCount} reusable sandboxes`}.`
-            : `${environment.name} was deleted.`,
+            ? destroyedCount === 1
+              ? tx("{{name}} was deleted. Destroyed 1 reusable sandbox.", { name: environment.name })
+              : tx("{{name}} was deleted. Destroyed {{n}} reusable sandboxes.", {
+                  name: environment.name,
+                  n: destroyedCount,
+                })
+            : tx("{{name}} was deleted.", { name: environment.name }),
         tone: "success",
       });
     },
@@ -2569,9 +2575,11 @@ export function CompanyEnvironments({ mode = "list" }: CompanyEnvironmentsProps)
                           onChange={(event) => setReassignEnvironmentTargetId(event.target.value)}
                         >
                           <option value="">
-                            Default: {instanceDefaultEnvironment
-                              ? `${instanceDefaultEnvironment.name} · ${instanceDefaultEnvironment.driver}`
-                              : "Local"}
+                            {tx("Default: {{name}}", {
+                              name: instanceDefaultEnvironment
+                                ? `${instanceDefaultEnvironment.name} · ${instanceDefaultEnvironment.driver}`
+                                : tx("Local"),
+                            })}
                           </option>
                           {reassignTargetEnvironments.map((environment) => (
                             <option key={environment.id} value={environment.id}>
@@ -2617,7 +2625,11 @@ export function CompanyEnvironments({ mode = "list" }: CompanyEnvironmentsProps)
                     {deleteEnvironmentMutation.isPending
                       ? "Deleting..."
                       : reusableLeaseOnlyBlock && deleteBlastRadius
-                        ? `Destroy ${deleteBlastRadius.reusableSandboxLeaseCount === 1 ? "1 sandbox" : `${deleteBlastRadius.reusableSandboxLeaseCount} sandboxes`} and delete`
+                        ? deleteBlastRadius.reusableSandboxLeaseCount === 1
+                          ? tx("Destroy 1 sandbox and delete")
+                          : tx("Destroy {{n}} sandboxes and delete", {
+                              n: deleteBlastRadius.reusableSandboxLeaseCount,
+                            })
                         : "Delete environment"}
                   </AlertDialogAction>
                 </AlertDialogFooter>

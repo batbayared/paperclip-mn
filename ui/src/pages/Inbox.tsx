@@ -1,3 +1,5 @@
+import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
 import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "@/lib/router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -704,7 +706,12 @@ function JoinRequestInboxRow({
               {label}
             </span>
             <span className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
-              <span>requested {timeAgo(joinRequest.createdAt)} from IP {joinRequest.requestIp}</span>
+              <span>
+                {tx("requested {{time}} from IP {{ip}}", {
+                  time: timeAgo(joinRequest.createdAt),
+                  ip: joinRequest.requestIp,
+                })}
+              </span>
               {joinRequest.adapterType && <span>adapter: {joinRequest.adapterType}</span>}
             </span>
           </span>
@@ -3278,8 +3285,19 @@ function StreamlinedInbox() {
                   >
                     <AlertTriangle className="h-4 w-4 shrink-0 text-red-600 dark:text-red-400" />
                     <span className="text-sm">
-                      <span className="font-medium">{dashboard!.agents.error}</span>{" "}
-                      {dashboard!.agents.error === 1 ? "agent has" : "agents have"} errors
+                      {dashboard!.agents.error === 1 ? (
+                        <XoTrans
+                          i18nKey="<count>{{n}}</count> agent has errors"
+                          values={{ n: dashboard!.agents.error }}
+                          components={{ count: <span className="font-medium" /> }}
+                        />
+                      ) : (
+                        <XoTrans
+                          i18nKey="<count>{{n}}</count> agents have errors"
+                          values={{ n: dashboard!.agents.error }}
+                          components={{ count: <span className="font-medium" /> }}
+                        />
+                      )}
                     </span>
                   </Link>
                   <button
@@ -3300,9 +3318,11 @@ function StreamlinedInbox() {
                   >
                     <AlertTriangle className="h-4 w-4 shrink-0 text-yellow-400" />
                     <span className="text-sm">
-                      Budget at{" "}
-                      <span className="font-medium">{dashboard!.costs.monthUtilizationPercent}%</span>{" "}
-                      utilization this month
+                      <XoTrans
+                        i18nKey="Budget at <percent>{{percent}}%</percent> utilization this month"
+                        values={{ percent: dashboard!.costs.monthUtilizationPercent }}
+                        components={{ percent: <span className="font-medium" /> }}
+                      />
                     </span>
                   </Link>
                   <button

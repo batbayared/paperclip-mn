@@ -1,3 +1,4 @@
+import { tx } from "@/i18n/xo";
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -320,7 +321,7 @@ export function CompanyAccess() {
                       ? `${request.invite.allowedJoinTypes} join invite${request.invite.humanRole ? ` • default role ${request.invite.humanRole}` : ""}`
                       : "Invite metadata unavailable"
                   }
-                  detail={`Submitted ${new Date(request.createdAt).toLocaleString()}`}
+                  detail={tx("Submitted {{date}}", { date: new Date(request.createdAt).toLocaleString() })}
                   approveLabel="Approve human"
                   rejectLabel="Reject human"
                   disabled={joinRequestActionPending}
@@ -479,7 +480,9 @@ export function CompanyAccess() {
           <DialogHeader>
             <DialogTitle>Remove member</DialogTitle>
             <DialogDescription>
-              Archive {memberDisplayName(removingMember)} and move active assignments before hiding this user from assignment fields.
+              {tx("Archive {{name}} and move active assignments before hiding this user from assignment fields.", {
+                name: memberDisplayName(removingMember),
+              })}
             </DialogDescription>
           </DialogHeader>
           {removingMember && (
@@ -531,7 +534,9 @@ export function CompanyAccess() {
                     ))}
                     {assignedIssues.length > 6 ? (
                       <div className="px-3 py-2 text-sm text-muted-foreground">
-                        {assignedIssues.length - 6} more task{assignedIssues.length - 6 === 1 ? "" : "s"}
+                        {assignedIssues.length - 6 === 1
+                          ? tx("{{n}} more task", { n: assignedIssues.length - 6 })
+                          : tx("{{n}} more tasks", { n: assignedIssues.length - 6 })}
                       </div>
                     ) : null}
                   </div>

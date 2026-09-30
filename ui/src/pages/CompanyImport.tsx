@@ -1,3 +1,5 @@
+import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
 import { useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type {
@@ -1670,8 +1672,14 @@ export function CompanyImport() {
           <h2 className="text-base font-semibold">Import completed</h2>
           <p className="text-xs text-muted-foreground mt-1">
             {importOutcome.companyName
-              ? <>The import finished and <span className="font-medium text-foreground">{importOutcome.companyName}</span> is ready. Its detailed summary is no longer available.</>
-              : "The import finished and your organization is ready. Its detailed summary is no longer available, but the organization has been added — select it from the organization switcher to view it."}
+              ? (
+                <XoTrans
+                  i18nKey="The import finished and <name>{{name}}</name> is ready. Its detailed summary is no longer available."
+                  values={{ name: importOutcome.companyName }}
+                  components={{ name: <span className="font-medium text-foreground" /> }}
+                />
+              )
+              : tx("The import finished and your organization is ready. Its detailed summary is no longer available, but the organization has been added — select it from the organization switcher to view it.")}
           </p>
           {importOutcome.pausedAutomations ? (
             <p className="text-xs text-muted-foreground mt-1">
@@ -1709,10 +1717,25 @@ export function CompanyImport() {
         <div>
           <h2 className="text-base font-semibold">Import complete</h2>
           <p className="text-xs text-muted-foreground mt-1">
-            {result.company.name}: {result.agents.length} agent{result.agents.length === 1 ? "" : "s"},{" "}
-            {skillResults.length} skill{skillResults.length === 1 ? "" : "s"},{" "}
-            {result.projects.length} project{result.projects.length === 1 ? "" : "s"}, and{" "}
-            {result.routines.length} routine{result.routines.length === 1 ? "" : "s"} processed.
+            {tx("{{name}}: {{agents}}, {{skills}}, {{projects}}, and {{routines}} processed.", {
+              name: result.company.name,
+              agents:
+                result.agents.length === 1
+                  ? tx("1 agent")
+                  : tx("{{n}} agents", { n: result.agents.length }),
+              skills:
+                skillResults.length === 1
+                  ? tx("1 skill")
+                  : tx("{{n}} skills", { n: skillResults.length }),
+              projects:
+                result.projects.length === 1
+                  ? tx("1 project")
+                  : tx("{{n}} projects", { n: result.projects.length }),
+              routines:
+                result.routines.length === 1
+                  ? tx("1 routine")
+                  : tx("{{n}} routines", { n: result.routines.length }),
+            })}
           </p>
         </div>
 
@@ -1902,10 +1925,15 @@ export function CompanyImport() {
               </Button>
               {localPackage && (
                 <span className="text-xs text-muted-foreground">
-                  {localPackage.name} with{" "}
-                  {Object.keys(localPackage.files).length} file
-                  {Object.keys(localPackage.files).length === 1 ? "" : "s"}
-                  {localCompressedBytes !== null ? ` (${formatMegabytes(localCompressedBytes)} zip)` : ""}
+                  {Object.keys(localPackage.files).length === 1
+                    ? tx("{{name}} with 1 file", { name: localPackage.name })
+                    : tx("{{name}} with {{n}} files", {
+                        name: localPackage.name,
+                        n: Object.keys(localPackage.files).length,
+                      })}
+                  {localCompressedBytes !== null
+                    ? ` ${tx("({{size}} zip)", { size: formatMegabytes(localCompressedBytes) })}`
+                    : ""}
                 </span>
               )}
             </div>
@@ -2015,10 +2043,15 @@ export function CompanyImport() {
             <Loader2 className="mt-0.5 h-3.5 w-3.5 shrink-0 animate-spin text-muted-foreground" />
             <p className="text-xs text-muted-foreground">
               {transferProgress
-                ? `${formatTransferProgress(transferProgress)} An interrupted upload resumes from the finished parts.`
-                : `Uploading and analyzing your package${
-                    localCompressedBytes !== null ? ` (${formatMegabytes(localCompressedBytes)} zip)` : ""
-                  } — large packages can take a few minutes. Keep this page open.`}
+                ? tx("{{progress}} An interrupted upload resumes from the finished parts.", {
+                    progress: formatTransferProgress(transferProgress),
+                  })
+                : localCompressedBytes !== null
+                  ? tx(
+                      "Uploading and analyzing your package ({{size}} zip) — large packages can take a few minutes. Keep this page open.",
+                      { size: formatMegabytes(localCompressedBytes) },
+                    )
+                  : tx("Uploading and analyzing your package — large packages can take a few minutes. Keep this page open.")}
             </p>
           </div>
         )}
@@ -2027,11 +2060,12 @@ export function CompanyImport() {
           previewMutation.variables === previewGenerationRef.current && (
           <div className="mt-3 rounded-md border border-destructive/40 bg-destructive/5 px-3 py-2.5">
             <p className="text-xs text-destructive">
-              Preview failed:{" "}
-              {previewMutation.error instanceof Error
-                ? previewMutation.error.message
-                : "the request did not complete."}{" "}
-              Retry, or re-export the package without large attachments to shrink it.
+              {tx("Preview failed: {{reason}} Retry, or re-export the package without large attachments to shrink it.", {
+                reason:
+                  previewMutation.error instanceof Error
+                    ? previewMutation.error.message
+                    : tx("the request did not complete."),
+              })}
             </p>
           </div>
         )}
@@ -2115,7 +2149,9 @@ export function CompanyImport() {
               <Loader2 className="mt-0.5 h-3.5 w-3.5 shrink-0 animate-spin text-muted-foreground" />
               <p className="text-xs text-muted-foreground">
                 {transferProgress
-                  ? `${formatTransferProgress(transferProgress)} An interrupted upload resumes from the finished parts.`
+                  ? tx("{{progress}} An interrupted upload resumes from the finished parts.", {
+                      progress: formatTransferProgress(transferProgress),
+                    })
                   : "Import running on the server — safe to keep waiting; reconnecting won't lose it. Large packages can take several minutes."}
               </p>
             </div>
@@ -2123,12 +2159,15 @@ export function CompanyImport() {
           {importMutation.isError && !importMutation.isPending && (
             <div className="mx-5 mt-3 rounded-md border border-destructive/40 bg-destructive/5 px-3 py-2.5">
               <p className="text-xs text-destructive">
-                Import failed:{" "}
-                {importMutation.error instanceof Error
-                  ? importMutation.error.message
-                  : "the request did not complete."}{" "}
-                Nothing may have been created, or the import stopped partway — check the target company
-                before retrying.
+                {tx(
+                  "Import failed: {{reason}} Nothing may have been created, or the import stopped partway — check the target company before retrying.",
+                  {
+                    reason:
+                      importMutation.error instanceof Error
+                        ? importMutation.error.message
+                        : tx("the request did not complete."),
+                  },
+                )}
               </p>
             </div>
           )}

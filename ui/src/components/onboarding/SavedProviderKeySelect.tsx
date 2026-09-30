@@ -1,3 +1,4 @@
+import { tx } from "@/i18n/xo";
 import { aiConnectionsApi } from "@/api/ai-connections";
 import type { AiProvider } from "@paperclipai/shared";
 import { useQuery } from "@tanstack/react-query";
@@ -124,8 +125,9 @@ export function SavedProviderKeySelect({
       )}
       {value && (
         <p className="text-sm text-muted-foreground">
-          Reuse this saved {kind === "api" ? "key" : "subscription"} for this
-          agent.
+          {kind === "api"
+            ? tx("Reuse this saved key for this agent.")
+            : tx("Reuse this saved subscription for this agent.")}
         </p>
       )}
     </div>

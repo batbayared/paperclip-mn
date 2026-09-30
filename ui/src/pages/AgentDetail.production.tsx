@@ -1,3 +1,5 @@
+import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
 import { mergeRunLogChunks, readChunkSeq } from "../lib/run-log-chunks";
 import { getPageVisibility, usePageVisibility } from "../lib/page-visibility";
 import { useCallback, useEffect, useMemo, useState, useRef } from "react";
@@ -679,8 +681,12 @@ function WorkspaceOperationsSection({
                 <div className="text-sm font-medium">{workspaceOperationPhaseLabel(operation.phase)}</div>
                 <WorkspaceOperationStatusBadge status={operation.status} />
                 <div className="text-(length:--text-micro) text-muted-foreground">
-                  {relativeTime(operation.startedAt)}
-                  {operation.finishedAt && ` to ${relativeTime(operation.finishedAt)}`}
+                  {operation.finishedAt
+                    ? tx("{{start}} to {{end}}", {
+                        start: relativeTime(operation.startedAt),
+                        end: relativeTime(operation.finishedAt),
+                      })
+                    : relativeTime(operation.startedAt)}
                 </div>
               </div>
               {operation.command && (
@@ -1075,7 +1081,7 @@ export function AgentDetail() {
       crumbs.push({ label: agentName, href: `/agents/${canonicalAgentRef}/dashboard` });
       if (urlRunId) {
         crumbs.push({ label: "Runs", href: `/agents/${canonicalAgentRef}/runs` });
-        crumbs.push({ label: `Run ${urlRunId.slice(0, 8)}` });
+        crumbs.push({ label: tx("Run {{id}}", { id: urlRunId.slice(0, 8) }) });
       } else if (activeView === "instructions") {
         crumbs.push({ label: "Instructions" });
       } else if (activeView === "configuration") {
@@ -1331,12 +1337,9 @@ export function AgentDetail() {
               builtInState
                 ? {
                     title: `Pause the ${builtInState.definition.displayName}?`,
-                    description: (
-                      <>
-                        {builtInFeatureLabel} depends on this agent. While paused,{" "}
-                        {builtInFeatureLabel.toLowerCase()} generation is skipped and the{" "}
-                        {builtInFeatureLabel} page shows a warning.
-                      </>
+                    description: tx(
+                      "{{feature}} depends on this agent. While paused, {{featureLower}} generation is skipped and the {{feature}} page shows a warning.",
+                      { feature: builtInFeatureLabel, featureLower: builtInFeatureLabel.toLowerCase() },
                     ),
                   }
                 : undefined
@@ -1373,9 +1376,11 @@ export function AgentDetail() {
             </Button>
           }
         >
-          Ships with Paperclip and powers <strong>{builtInFeatureLabel}</strong>. Configure it like
-          any agent — model, instructions, budget. It can be paused but not deleted; pausing it
-          pauses {builtInFeatureLabel}.
+          <XoTrans
+            i18nKey="Ships with {{brand}} and powers <strong>{{feature}}</strong>. Configure it like any agent — model, instructions, budget. It can be paused but not deleted; pausing it pauses {{feature}}."
+            values={{ feature: builtInFeatureLabel }}
+            components={{ strong: <strong /> }}
+          />
         </InlineBanner>
       )}
 
@@ -2060,8 +2065,12 @@ function AgentConfigurePage({
                       </Button>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      Changed:{" "}
-                      {revision.changedKeys.length > 0 ? revision.changedKeys.join(", ") : "no tracked changes"}
+                      {tx("Changed: {{keys}}", {
+                        keys:
+                          revision.changedKeys.length > 0
+                            ? revision.changedKeys.join(", ")
+                            : tx("no tracked changes"),
+                      })}
                     </p>
                   </div>
                 ))}
@@ -2671,7 +2680,7 @@ export function PromptsTab({
             <div className="grid gap-x-6 gap-y-4 md:grid-cols-(--gtc-18)">
               <label className="space-y-1.5 min-w-0">
                 <span className="text-xs font-medium text-muted-foreground flex items-center gap-1">
-                  Mode
+                  {tx("Mode")}
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <HelpCircle className="h-3 w-3 text-muted-foreground cursor-help" />
@@ -2726,7 +2735,7 @@ export function PromptsTab({
               </label>
               <label className="space-y-1.5 min-w-0">
                 <span className="text-xs font-medium text-muted-foreground flex items-center gap-1">
-                  Root path
+                  {tx("Root path")}
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <HelpCircle className="h-3 w-3 text-muted-foreground cursor-help" />
@@ -2775,7 +2784,7 @@ export function PromptsTab({
               </label>
               <label className="space-y-1.5">
                 <span className="text-xs font-medium text-muted-foreground flex items-center gap-1">
-                  Entry file
+                  {tx("Entry file")}
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <HelpCircle className="h-3 w-3 text-muted-foreground cursor-help" />
@@ -2977,7 +2986,7 @@ export function PromptsTab({
                   {selectedFileExists
                     ? selectedFileSummary?.deprecated
                       ? "Deprecated virtual file"
-                      : `${selectedFileDetail?.language ?? "text"} file`
+                      : tx("{{language}} file", { language: selectedFileDetail?.language ?? "text" })
                     : "New file in this bundle"}
                 </p>
               </div>
@@ -3491,7 +3500,12 @@ function RunDetail({ run: initialRun, agentRouteId, adapterType, adapterConfig }
                 </div>
                 {displayDurationSec !== null && (
                   <div className="text-xs text-muted-foreground">
-                    Duration: {displayDurationSec >= 60 ? `${Math.floor(displayDurationSec / 60)}m ${displayDurationSec % 60}s` : `${displayDurationSec}s`}
+                    {tx("Duration: {{duration}}", {
+                      duration:
+                        displayDurationSec >= 60
+                          ? `${Math.floor(displayDurationSec / 60)}m ${displayDurationSec % 60}s`
+                          : `${displayDurationSec}s`,
+                    })}
                   </div>
                 )}
               </div>
@@ -4284,10 +4298,14 @@ export function LogViewer({ run, adapterType }: { run: HeartbeatRun; adapterType
               {loadingMoreLog ? "Loading..." : "Load more log"}
             </Button>
             <span className="text-xs text-muted-foreground">
-              Showing the first {Math.round(logOffset / 1024).toLocaleString("en-US")} KB
               {typeof run.logBytes === "number" && run.logBytes > 0
-                ? ` of ${Math.round(run.logBytes / 1024).toLocaleString("en-US")} KB`
-                : ""}
+                ? tx("Showing the first {{shown}} KB of {{total}} KB", {
+                    shown: Math.round(logOffset / 1024).toLocaleString("en-US"),
+                    total: Math.round(run.logBytes / 1024).toLocaleString("en-US"),
+                  })
+                : tx("Showing the first {{shown}} KB", {
+                    shown: Math.round(logOffset / 1024).toLocaleString("en-US"),
+                  })}
             </span>
           </div>
         )}

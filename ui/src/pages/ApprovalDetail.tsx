@@ -1,3 +1,4 @@
+import { XoTrans } from "@/xo/XoTrans";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "@/lib/router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -283,7 +284,10 @@ export function ApprovalDetail() {
           )}
           {isBudgetApproval && approval.status === "pending" && (
             <p className="text-sm text-muted-foreground">
-              Resolve this budget stop from the budget controls on <Link to="/costs" className="underline underline-offset-2">/costs</Link>.
+              <XoTrans
+                i18nKey="Resolve this budget stop from the budget controls on <costs>/costs</costs>."
+                components={{ costs: <Link to="/costs" className="underline underline-offset-2" /> }}
+              />
             </p>
           )}
           {approval.status === "pending" && (

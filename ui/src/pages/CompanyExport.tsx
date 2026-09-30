@@ -1,3 +1,4 @@
+import { tx } from "@/i18n/xo";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import type {
@@ -1084,10 +1085,18 @@ export function CompanyExport() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-4 text-sm">
             <span className="font-medium">
-              {selectedCompany?.name ?? "Organization"} export
+              {tx("{{name}} export", { name: selectedCompany?.name ?? tx("Organization") })}
             </span>
             <span className="text-muted-foreground">
-              Exporting {selectedCount.toLocaleString()} of {totalFiles.toLocaleString()} file{totalFiles === 1 ? "" : "s"}
+              {totalFiles === 1
+                ? tx("Exporting {{selected}} of {{total}} file", {
+                    selected: selectedCount.toLocaleString(),
+                    total: totalFiles.toLocaleString(),
+                  })
+                : tx("Exporting {{selected}} of {{total}} files", {
+                    selected: selectedCount.toLocaleString(),
+                    total: totalFiles.toLocaleString(),
+                  })}
               {selectedCount > 0 && ` (~${formatBytes(estimatedZipBytes)})`}
             </span>
             {warnings.length > 0 && (
@@ -1110,7 +1119,9 @@ export function CompanyExport() {
             <Download className="mr-1.5 h-3.5 w-3.5" />
             {downloadMutation.isPending
               ? "Building export..."
-              : `Export ${selectedCount.toLocaleString()} file${selectedCount === 1 ? "" : "s"}`}
+              : selectedCount === 1
+                ? tx("Export {{n}} file", { n: selectedCount.toLocaleString() })
+                : tx("Export {{n}} files", { n: selectedCount.toLocaleString() })}
           </Button>
         </div>
       </div>

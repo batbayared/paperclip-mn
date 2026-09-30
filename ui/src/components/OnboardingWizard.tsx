@@ -1,3 +1,5 @@
+import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
 import { healthApi } from "@/api/health";
 import { LocalProviderLoginInstructions } from "./AdapterLoginChrome";
 import { useLocalAiLogin } from "./ai-connections/useLocalAiLogin";
@@ -2515,7 +2517,11 @@ function OnboardingWizardInner({
                         step === 3 ? undefined : step === 4 ? (
                           <>Paperclip works with your subscription or API keys.</>
                         ) : (
-                          <>{agentName.trim() || "Your first agent"} is ready to work!</>
+                          <>
+                            {tx("{{name}} is ready to work!", {
+                              name: agentName.trim() || tx("Your first agent"),
+                            })}
+                          </>
                         )
                       }
                     />
@@ -2899,10 +2905,10 @@ function OnboardingWizardInner({
                       {shouldSuggestUnsetAnthropicApiKey && (
                         <div className="rounded-md border border-amber-300/60 bg-amber-50/40 px-2.5 py-2 space-y-2">
                           <p className="text-(length:--text-micro) text-amber-900/90 leading-relaxed">
-                            Claude failed while{" "}
-                            <span className="font-mono">ANTHROPIC_API_KEY</span>{" "}
-                            is set. You can clear it in this adapter config
-                            and retry the probe.
+                            <XoTrans
+                              i18nKey="Claude failed while <mono>ANTHROPIC_API_KEY</mono> is set. You can clear it in this adapter config and retry the probe."
+                              components={{ mono: <span className="font-mono" /> }}
+                            />
                           </p>
                           <Button
                             size="sm"
@@ -2937,8 +2943,11 @@ function OnboardingWizardInner({
                               : `${effectiveAdapterCommand} --print - --output-format stream-json --verbose`}
                           </p>
                           <p className="text-muted-foreground">
-                            Prompt:{" "}
-                            <span className="font-mono">Respond with hello.</span>
+                            <XoTrans
+                              i18nKey="Prompt: <mono>{{prompt}}</mono>"
+                              values={{ prompt: "Respond with hello." }}
+                              components={{ mono: <span className="font-mono" /> }}
+                            />
                           </p>
                           {adapterType === "cursor" ||
                           adapterType === "codex_local" ||
@@ -2946,35 +2955,38 @@ function OnboardingWizardInner({
                           adapterType === "kimi_local" ||
                           adapterType === "opencode_local" ? (
                             <p className="text-muted-foreground">
-                              If auth fails, set{" "}
-                              <span className="font-mono">
-                                {adapterType === "cursor"
-                                  ? "CURSOR_API_KEY"
-                                  : adapterType === "gemini_local"
-                                    ? "GEMINI_API_KEY"
-                                    : adapterType === "kimi_local"
-                                      ? "KIMI_MODEL_NAME + KIMI_MODEL_API_KEY"
-                                    : "OPENAI_API_KEY"}
-                              </span>{" "}
-                              in env or run{" "}
-                              <span className="font-mono">
-                                {adapterType === "cursor"
-                                  ? "agent login"
-                                  : adapterType === "codex_local"
-                                    ? "codex login"
-                                    : adapterType === "gemini_local"
-                                      ? "gemini auth"
-                                      : adapterType === "kimi_local"
-                                        ? "kimi login"
-                                      : "opencode auth login"}
-                              </span>
-                              .
+                              <XoTrans
+                                i18nKey="If auth fails, set <mono>{{envVar}}</mono> in env or run <mono>{{command}}</mono>."
+                                values={{
+                                  envVar:
+                                    adapterType === "cursor"
+                                      ? "CURSOR_API_KEY"
+                                      : adapterType === "gemini_local"
+                                        ? "GEMINI_API_KEY"
+                                        : adapterType === "kimi_local"
+                                          ? "KIMI_MODEL_NAME + KIMI_MODEL_API_KEY"
+                                          : "OPENAI_API_KEY",
+                                  command:
+                                    adapterType === "cursor"
+                                      ? "agent login"
+                                      : adapterType === "codex_local"
+                                        ? "codex login"
+                                        : adapterType === "gemini_local"
+                                          ? "gemini auth"
+                                          : adapterType === "kimi_local"
+                                            ? "kimi login"
+                                            : "opencode auth login",
+                                }}
+                                components={{ mono: <span className="font-mono" /> }}
+                              />
                             </p>
                           ) : (
                             <p className="text-muted-foreground">
-                              If login is required, run{" "}
-                              <span className="font-mono">claude login</span>{" "}
-                              and retry.
+                              <XoTrans
+                                i18nKey="If login is required, run <mono>{{command}}</mono> and retry."
+                                values={{ command: "claude login" }}
+                                components={{ mono: <span className="font-mono" /> }}
+                              />
                             </p>
                           )}
                         </div>

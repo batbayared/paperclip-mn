@@ -1,3 +1,4 @@
+import { tx } from "@/i18n/xo";
 import { clearLegacyChatMessageRequests } from "@/lib/chat-message-request";
 import { agentChatDraft } from "@/lib/agent-chat-draft";
 import { Settings as ChatSettings } from "lucide-react";
@@ -2664,16 +2665,30 @@ function IssueDetailActivityTab({
                 ) : null}
                 {issueCostSummary.hasTokens ? (
                   <span>
-                    Tokens {formatTokens(issueCostSummary.totalTokens)}
                     {issueCostSummary.cached > 0
-                      ? ` (in ${formatTokens(issueCostSummary.input)}, out ${formatTokens(issueCostSummary.output)}, cached ${formatTokens(issueCostSummary.cached)})`
-                      : ` (in ${formatTokens(issueCostSummary.input)}, out ${formatTokens(issueCostSummary.output)})`}
+                      ? tx("Tokens {{total}} (in {{input}}, out {{output}}, cached {{cached}})", {
+                          total: formatTokens(issueCostSummary.totalTokens),
+                          input: formatTokens(issueCostSummary.input),
+                          output: formatTokens(issueCostSummary.output),
+                          cached: formatTokens(issueCostSummary.cached),
+                        })
+                      : tx("Tokens {{total}} (in {{input}}, out {{output}})", {
+                          total: formatTokens(issueCostSummary.totalTokens),
+                          input: formatTokens(issueCostSummary.input),
+                          output: formatTokens(issueCostSummary.output),
+                        })}
                   </span>
                 ) : null}
                 {issueCostSummary.hasRuntime ? (
                   <span>
-                    Runtime {formatDurationMs(issueCostSummary.runtimeMs)}
-                    {` (${issueCostSummary.runCount} run${issueCostSummary.runCount === 1 ? "" : "s"})`}
+                    {issueCostSummary.runCount === 1
+                      ? tx("Runtime {{duration}} (1 run)", {
+                          duration: formatDurationMs(issueCostSummary.runtimeMs),
+                        })
+                      : tx("Runtime {{duration}} ({{n}} runs)", {
+                          duration: formatDurationMs(issueCostSummary.runtimeMs),
+                          n: issueCostSummary.runCount,
+                        })}
                   </span>
                 ) : null}
                 {!issueCostSummary.hasCost &&
@@ -2697,15 +2712,29 @@ function IssueDetailActivityTab({
                     )}
                   </span>
                   <span>
-                    Tokens {formatTokens(issueTreeCostTokens)}
                     {issueTreeCostSummary.cachedInputTokens > 0
-                      ? ` (in ${formatTokens(issueTreeCostSummary.inputTokens)}, out ${formatTokens(issueTreeCostSummary.outputTokens)}, cached ${formatTokens(issueTreeCostSummary.cachedInputTokens)})`
-                      : ` (in ${formatTokens(issueTreeCostSummary.inputTokens)}, out ${formatTokens(issueTreeCostSummary.outputTokens)})`}
+                      ? tx("Tokens {{total}} (in {{input}}, out {{output}}, cached {{cached}})", {
+                          total: formatTokens(issueTreeCostTokens),
+                          input: formatTokens(issueTreeCostSummary.inputTokens),
+                          output: formatTokens(issueTreeCostSummary.outputTokens),
+                          cached: formatTokens(issueTreeCostSummary.cachedInputTokens),
+                        })
+                      : tx("Tokens {{total}} (in {{input}}, out {{output}})", {
+                          total: formatTokens(issueTreeCostTokens),
+                          input: formatTokens(issueTreeCostSummary.inputTokens),
+                          output: formatTokens(issueTreeCostSummary.outputTokens),
+                        })}
                   </span>
                   {issueTreeCostSummary.runCount > 0 ? (
                     <span>
-                      Runtime {formatDurationMs(issueTreeCostSummary.runtimeMs)}
-                      {` (${issueTreeCostSummary.runCount} run${issueTreeCostSummary.runCount === 1 ? "" : "s"})`}
+                      {issueTreeCostSummary.runCount === 1
+                        ? tx("Runtime {{duration}} (1 run)", {
+                            duration: formatDurationMs(issueTreeCostSummary.runtimeMs),
+                          })
+                        : tx("Runtime {{duration}} ({{n}} runs)", {
+                            duration: formatDurationMs(issueTreeCostSummary.runtimeMs),
+                            n: issueTreeCostSummary.runCount,
+                          })}
                     </span>
                   ) : null}
                   <span>
@@ -6427,7 +6456,7 @@ export function TaskDetailSurface({ conversation, tasksTab }: { tasksTab?: TaskS
         issue.description ?? "",
       ];
       return issuesApi.create(issue.companyId, {
-        title: `Re-issue (isolated): ${issue.title ?? sourceLabel}`,
+        title: tx("Re-issue (isolated): {{title}}", { title: issue.title ?? sourceLabel }),
         description: descriptionLines.join("\n"),
         priority: issue.priority,
         projectId: issue.projectId ?? null,
@@ -6938,7 +6967,7 @@ export function TaskDetailSurface({ conversation, tasksTab }: { tasksTab?: TaskS
                     "text-(length:--text-nano)",
                     workModeMeta.classes.badge,
                   )}
-                  title={`This task is in ${workModeMeta.label.toLowerCase()}.`}
+                  title={tx("This task is in {{mode}}.", { mode: workModeMeta.label.toLowerCase() })}
                 >
                   <WorkModeIcon className="h-3 w-3" aria-hidden />
                   {workModeMeta.label}

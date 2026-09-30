@@ -1,3 +1,4 @@
+import { tx } from "@/i18n/xo";
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AlertTriangle, FlaskConical, Lock, Play } from "lucide-react";
@@ -590,10 +591,12 @@ export function InstanceExperimentalSettings() {
                   <div className="space-y-0.5">
                     <p className="font-medium text-foreground">Execution is suppressed — effectively off.</p>
                     <p className="text-muted-foreground">
-                      {worktreeRunExecutionState.reason === "instance_mismatch"
-                        ? "This setting was armed in a different instance and copied here, so no tasks run automatically."
-                        : "This setting is missing its activation cutoff, so no tasks run automatically."}{" "}
-                      Toggle it off and back on to arm execution for tasks created here.
+                      {tx("{{reason}} Toggle it off and back on to arm execution for tasks created here.", {
+                        reason:
+                          worktreeRunExecutionState.reason === "instance_mismatch"
+                            ? tx("This setting was armed in a different instance and copied here, so no tasks run automatically.")
+                            : tx("This setting is missing its activation cutoff, so no tasks run automatically."),
+                      })}
                     </p>
                   </div>
                 </div>

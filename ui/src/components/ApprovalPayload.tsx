@@ -1,3 +1,4 @@
+import { tx } from "@/i18n/xo";
 import { UserPlus, Lightbulb, ShieldAlert, ShieldCheck } from "lucide-react";
 import { MarkdownBody } from "./MarkdownBody";
 import { formatCents } from "../lib/utils";
@@ -139,7 +140,10 @@ export function BudgetOverridePayload({ payload }: { payload: Record<string, unk
       <PayloadField label="Metric" value={payload.metric} />
       {(budgetAmount !== null || observedAmount !== null) ? (
         <div className="rounded-md bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
-          Limit {budgetAmount !== null ? formatCents(budgetAmount) : "—"} · Observed {observedAmount !== null ? formatCents(observedAmount) : "—"}
+          {tx("Limit {{limit}} · Observed {{observed}}", {
+            limit: budgetAmount !== null ? formatCents(budgetAmount) : "—",
+            observed: observedAmount !== null ? formatCents(observedAmount) : "—",
+          })}
         </div>
       ) : null}
       {!!payload.guidance && (

@@ -1,3 +1,4 @@
+import { tx } from "@/i18n/xo";
 import { useEffect, useMemo, useRef, useState, type ComponentType } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type {
@@ -699,7 +700,7 @@ export function Costs({
                         </div>
                         <div className="mt-1 text-sm text-muted-foreground">
                           {spendData?.summary.budgetCents && spendData.summary.budgetCents > 0
-                            ? `Budget ${formatCents(spendData.summary.budgetCents)}`
+                            ? tx("Budget {{amount}}", { amount: formatCents(spendData.summary.budgetCents) })
                             : "Unlimited budget"}
                         </div>
                       </div>
@@ -776,7 +777,10 @@ export function Costs({
                               <div className="text-right text-sm tabular-nums">
                                 <div className="font-medium">{formatCents(row.costCents)}</div>
                                 <div className="text-xs text-muted-foreground">
-                                  in {formatTokens(row.inputTokens + row.cachedInputTokens)} · out {formatTokens(row.outputTokens)}
+                                  {tx("in {{input}} · out {{output}}", {
+                                    input: formatTokens(row.inputTokens + row.cachedInputTokens),
+                                    output: formatTokens(row.outputTokens),
+                                  })}
                                 </div>
                                 {(row.apiRunCount > 0 || row.subscriptionRunCount > 0) ? (
                                   <div className="text-xs text-muted-foreground">
@@ -936,7 +940,9 @@ export function Costs({
                   return (
                     <section key={scopeType} className="space-y-3">
                       <div>
-                        <h2 className="text-lg font-semibold capitalize">{scopeType === "company" ? "organization" : scopeType} budgets</h2>
+                        <h2 className="text-lg font-semibold capitalize">
+                          {tx("{{scope}} budgets", { scope: scopeType === "company" ? tx("organization") : scopeType })}
+                        </h2>
                         <p className="text-sm text-muted-foreground">
                           {scopeType === "company"
                             ? "Organization-wide monthly policy."

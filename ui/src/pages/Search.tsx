@@ -1,3 +1,5 @@
+import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Search as SearchIcon, AlertTriangle, FileQuestion, Plus, X } from "lucide-react";
@@ -617,9 +619,15 @@ export function Search() {
             </div>
           ) : (
             <span className="truncate">
-              Try <code className="rounded bg-muted px-1 py-0.5 text-(length:--text-micro)">status:todo</code>,{" "}
-              <code className="rounded bg-muted px-1 py-0.5 text-(length:--text-micro)">assignee:me</code>,{" "}
-              or <code className="rounded bg-muted px-1 py-0.5 text-(length:--text-micro)">updated:&gt;7d</code>.
+              <XoTrans
+                i18nKey="Try <c1>{{q1}}</c1>, <c2>{{q2}}</c2>, or <c3>{{q3}}</c3>."
+                values={{ q1: "status:todo", q2: "assignee:me", q3: "updated:>7d" }}
+                components={{
+                  c1: <code className="rounded bg-muted px-1 py-0.5 text-(length:--text-micro)" />,
+                  c2: <code className="rounded bg-muted px-1 py-0.5 text-(length:--text-micro)" />,
+                  c3: <code className="rounded bg-muted px-1 py-0.5 text-(length:--text-micro)" />,
+                }}
+              />
             </span>
           )}
         </div>
@@ -791,16 +799,23 @@ function SearchTabContent({
         ) : null}
         <ul className="space-y-1 text-xs text-muted-foreground">
           <li>
-            <span className="font-medium text-foreground">Identifier lookup:</span> type{" "}
-            <code className="rounded bg-muted px-1 py-0.5 text-(length:--text-micro)">PAP-123</code> to jump straight to a task.
+            <XoTrans
+              i18nKey="<b>Identifier lookup:</b> type <c>{{id}}</c> to jump straight to a task."
+              values={{ id: "PAP-123" }}
+              components={{ b: <span className="font-medium text-foreground" />, c: <code className="rounded bg-muted px-1 py-0.5 text-(length:--text-micro)" /> }}
+            />
           </li>
           <li>
-            <span className="font-medium text-foreground">Quoted phrases:</span> wrap a phrase in quotes to match the
-            exact sequence.
+            <XoTrans
+              i18nKey="<b>Quoted phrases:</b> wrap a phrase in quotes to match the exact sequence."
+              components={{ b: <span className="font-medium text-foreground" /> }}
+            />
           </li>
           <li>
-            <span className="font-medium text-foreground">⌘K:</span> reopens the command palette pre-seeded with your
-            current query.
+            <XoTrans
+              i18nKey="<b>⌘K:</b> reopens the command palette pre-seeded with your current query."
+              components={{ b: <span className="font-medium text-foreground" /> }}
+            />
           </li>
         </ul>
       </div>
@@ -814,8 +829,9 @@ function SearchTabContent({
         <AlertTriangle className="h-10 w-10 text-destructive" aria-hidden />
         <div className="text-base font-semibold">Couldn’t run that search</div>
         <p className="text-sm text-muted-foreground">
-          {status ? `The server returned ${status}.` : "The request failed."} Your input and filters are still here, so
-          you can retry or fall back to the Tasks filter.
+          {tx("{{reason}} Your input and filters are still here, so you can retry or fall back to the Tasks filter.", {
+            reason: status ? tx("The server returned {{status}}.", { status }) : tx("The request failed."),
+          })}
         </p>
         <div className="flex flex-wrap items-center justify-center gap-2">
           <Button onClick={refetch} variant="default" size="sm">
@@ -862,8 +878,9 @@ function SearchTabContent({
         <FileQuestion className="h-10 w-10 text-muted-foreground" aria-hidden />
         <div className="text-base font-semibold">No results for &ldquo;{trimmedQuery}&rdquo;</div>
         <p className="text-sm text-muted-foreground">
-          We couldn’t find a match in {describeScope(scope).toLowerCase()}. Try widening the scope or rephrasing your
-          query.
+          {tx("We couldn’t find a match in {{scope}}. Try widening the scope or rephrasing your query.", {
+            scope: describeScope(scope).toLowerCase(),
+          })}
         </p>
         <div className="flex flex-wrap items-center justify-center gap-2">
           {scope !== "all" ? (

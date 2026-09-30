@@ -1,3 +1,4 @@
+import { tx } from "@/i18n/xo";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import type { Project } from "@paperclipai/shared";
@@ -223,9 +224,15 @@ export function Projects() {
                           <div className="flex items-center gap-3">
                             <span
                               className="hidden text-xs text-muted-foreground tabular-nums sm:inline"
-                              title={`${formatNumber(project.taskCount ?? 0)} task${(project.taskCount ?? 0) === 1 ? "" : "s"}`}
+                              title={
+                                (project.taskCount ?? 0) === 1
+                                  ? tx("{{n}} task", { n: formatNumber(project.taskCount ?? 0) })
+                                  : tx("{{n}} tasks", { n: formatNumber(project.taskCount ?? 0) })
+                              }
                             >
-                              {formatNumber(project.taskCount ?? 0)} task{(project.taskCount ?? 0) === 1 ? "" : "s"}
+                              {(project.taskCount ?? 0) === 1
+                                ? tx("{{n}} task", { n: formatNumber(project.taskCount ?? 0) })
+                                : tx("{{n}} tasks", { n: formatNumber(project.taskCount ?? 0) })}
                             </span>
                             {project.budget && (
                               <span className="hidden text-xs text-muted-foreground tabular-nums sm:inline">
