@@ -25,3 +25,4 @@ Task 0 (onboarding, heartbeat) ED байлцахаар хойшилсон. Task 
 - Олон тооны хэлбэр (plural) шалгалт: CompanyImport, CompanyExport, IssueDetail, Costs(.production) бүгд transform-оор боловсрогдсон, засвар шаардлагагүй.
 - Build a new organization текст d554c4789-д зөвхөн upstream spec-үүдэд байдаг, ui/src-д байхгүй тул орчуулагдахгүй. Spec-ийг хөндөөгүй.
 - Хүлээгдэж буй (pending ED): 11 дэлгэцийн зургийг ED өөрөө хараад дизайн, Монгол текстийн таслалт, фонтыг батлах. Зам: ~/dev/xo-screenshots/.
+- **Төлөв: нээлттэй.** Хаалт хаагдахын өмнө ED шийдэх зүйл: (1) 11 PNG-ийн зөвшөөрөл; (2) spec §17-ийн pnpm build-ийн оронд cargo-гүй build-ийг хүлээн зөвшөөрөх; (3) 7 улаан e2e-г дээрх тайлбартай хүлээн зөвшөөрөх (recovery x5 upstream baseline-д мөн унадаг; smoke-lab:316 дараалалаас хамаарна, Ү1-д baseline-ийн бүтэн ажиллуулалтад мөн унасан; agent-chat:557 flake).
