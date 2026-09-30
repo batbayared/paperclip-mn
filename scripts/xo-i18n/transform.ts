@@ -19,7 +19,7 @@ export interface ExtractedString {
 export interface ManualCase {
   file: string;
   line: number;
-  reason: "mixed-jsx" | "template-complex";
+  reason: "mixed-jsx" | "template-complex" | "literal-braces";
   snippet: string;
 }
 
@@ -57,6 +57,7 @@ const TX_SOURCE = "@/i18n/xo";
 const TX_IMPORT = `import { tx } from "${TX_SOURCE}";`;
 const LETTER = /\p{L}/u;
 const BRAND_MEMBER = "BRAND.name";
+const BRACES = /\{\{|\}\}/;
 
 export function looksLikeCopy(text: string, { jsxText = false }: { jsxText?: boolean } = {}): boolean {
   const trimmed = text.trim();
@@ -83,7 +84,8 @@ interface Ctx {
 
 type Piece =
   | { kind: "text"; text: string; start: number; end: number; line: number }
-  | { kind: "simple"; node: babelTypes.Expression; src: string; start: number; end: number; line: number };
+  | { kind: "simple"; node: babelTypes.Expression; src: string; start: number; end: number; line: number }
+  | { kind: "plural"; countExpr: string; one: string; other: string; start: number; end: number; line: number };
 
 function parseSource(code: string, filePath: string) {
   const plugins: ParserPlugin[] = filePath.endsWith(".tsx") ? ["typescript", "jsx"] : ["typescript"];
@@ -169,8 +171,24 @@ class Vars {
   }
 }
 
+// JSX текстийн түлхүүр: зөвхөн ASCII зайг нэгтгэж тайрна (NBSP түлхүүр дотор үлдэнэ).
 function toKey(ctx: Ctx, text: string): string {
-  return text.replace(ctx.brandRe, "{{brand}}").replace(/\s+/g, " ").trim();
+  return text.replace(ctx.brandRe, "{{brand}}").replace(/[ \t\r\n]+/g, " ").replace(/^ | $/g, "");
+}
+
+// JSX-ээс гадуурх литерал: захын зайг түлхүүрээс салгаж, дотоод зайг яг хэвээр нь үлдээнэ.
+function splitEdges(ctx: Ctx, text: string): { lead: string; key: string; trail: string } {
+  const lead = /^\s+/.exec(text)?.[0] ?? "";
+  const trail = /\s+$/.exec(text.slice(lead.length))?.[0] ?? "";
+  const key = text.slice(lead.length, text.length - trail.length).replace(ctx.brandRe, "{{brand}}");
+  return { lead, key, trail };
+}
+
+// Салгасан захын зайг tx(...)-ийн гадна эх хэлбэрээр нь буцааж залгана.
+function withEdges(call: string, lead: string, trail: string, paren: boolean): string {
+  if (!lead && !trail) return call;
+  const joined = [lead && JSON.stringify(lead), call, trail && JSON.stringify(trail)].filter(Boolean).join(" + ");
+  return paren ? `(${joined})` : joined;
 }
 
 function record(ctx: Ctx, key: string, line: number, plural?: { one: string; other: string }): void {
@@ -182,13 +200,22 @@ function snippetOf(source: string): string {
   return first.length <= 120 ? first : `${first.slice(0, 117)}...`;
 }
 
+function pushManual(ctx: Ctx, node: babelTypes.Node, reason: ManualCase["reason"]): void {
+  ctx.manual.push({ file: ctx.file, line: lineOf(node), reason, snippet: snippetOf(srcOf(ctx, node)) });
+}
+
 function transformStringLiteral(ctx: Ctx, node: babelTypes.StringLiteral, wrapJsx: boolean): void {
   if (ctx.handled.has(node) || !looksLikeCopy(node.value)) return;
   ctx.handled.add(node);
-  const key = toKey(ctx, node.value);
+  // Жинхэнэ {{ }} нь i18next-ийн interpolation болж хувирна → хөндөхгүй, гараар.
+  if (BRACES.test(node.value)) {
+    pushManual(ctx, node, "literal-braces");
+    return;
+  }
+  const { lead, key, trail } = splitEdges(ctx, node.value);
   const call = `tx(${JSON.stringify(key)})`;
   const { start, end } = span(node);
-  ctx.s.update(start, end, wrapJsx ? `{${call}}` : call);
+  ctx.s.update(start, end, wrapJsx ? `{${withEdges(call, lead, trail, false)}}` : withEdges(call, lead, trail, true));
   ctx.edits++;
   record(ctx, key, lineOf(node));
 }
@@ -247,14 +274,28 @@ function matchPlural(ctx: Ctx, expr: babelTypes.Node): { countExpr: string; one:
 }
 
 function templateComplex(ctx: Ctx, node: babelTypes.TemplateLiteral): void {
-  ctx.manual.push({ file: ctx.file, line: lineOf(node), reason: "template-complex", snippet: snippetOf(srcOf(ctx, node)) });
+  pushManual(ctx, node, "template-complex");
+}
+
+const chunkOf = (q: babelTypes.TemplateElement) => q.value.cooked ?? q.value.raw;
+
+// Үсэгтэй quasi эсвэл үсэгтэй салбартай тооны тернар байвал загвар текст агуулна.
+function templateHasText(ctx: Ctx, node: babelTypes.TemplateLiteral): boolean {
+  if (node.quasis.some((q) => LETTER.test(chunkOf(q)))) return true;
+  return node.expressions.some((expr) => {
+    const plural = matchPlural(ctx, expr);
+    return plural !== null && LETTER.test(plural.one + plural.other);
+  });
 }
 
 function transformTemplate(ctx: Ctx, node: babelTypes.TemplateLiteral): void {
   if (ctx.handled.has(node)) return;
-  const chunkOf = (q: babelTypes.TemplateElement) => q.value.cooked ?? q.value.raw;
-  if (!node.quasis.some((q) => LETTER.test(chunkOf(q)))) return;
+  if (!templateHasText(ctx, node)) return;
   ctx.handled.add(node);
+  if (node.quasis.some((q) => BRACES.test(chunkOf(q)))) {
+    pushManual(ctx, node, "literal-braces");
+    return;
+  }
 
   // 1-р давталт: тоолуурын хувьсагчийг ол (нэгээс олон өөр тоолуур → гараар).
   let countExpr: string | null = null;
@@ -306,10 +347,16 @@ function transformTemplate(ctx: Ctx, node: babelTypes.TemplateLiteral): void {
     return;
   }
 
-  const oneKey = toKey(ctx, one);
-  const otherKey = toKey(ctx, other);
+  const { lead, key: oneKey, trail } = splitEdges(ctx, one);
+  const otherParts = splitEdges(ctx, other);
+  // one/other-ийн захын зай ялгаатай бол нэг tx(...)-ийн гадна гаргах боломжгүй → гараар.
+  if (otherParts.lead !== lead || otherParts.trail !== trail) {
+    templateComplex(ctx, node);
+    return;
+  }
+  const otherKey = otherParts.key;
   const { start, end } = span(node);
-  ctx.s.update(start, end, `tx(${JSON.stringify(oneKey)}${vars.format()})`);
+  ctx.s.update(start, end, withEdges(`tx(${JSON.stringify(oneKey)}${vars.format()})`, lead, trail, true));
   ctx.edits++;
   record(ctx, oneKey, lineOf(node), countExpr !== null ? { one: oneKey, other: otherKey } : undefined);
 }
@@ -345,6 +392,12 @@ function collectRuns(
         run.push({ kind: "text", text, ...span(child), line: lineOf(child) });
         continue;
       }
+      // JSX түвшний тооны тернар нь run-ийг таслахгүй, нэг plural түлхүүрт нийлнэ.
+      const plural = matchPlural(ctx, expr);
+      if (plural) {
+        run.push({ kind: "plural", ...plural, ...span(child), line: lineOf(child) });
+        continue;
+      }
       if (isSimpleExpr(expr)) {
         run.push({ kind: "simple", node: expr, src: srcOf(ctx, expr), ...span(child), line: lineOf(child) });
         continue;
@@ -360,7 +413,28 @@ function collectRuns(
 }
 
 function isCopyRun(run: Piece[]): boolean {
-  return run.some((piece) => piece.kind === "text" && LETTER.test(piece.text));
+  return run.some(
+    (piece) =>
+      (piece.kind === "text" && LETTER.test(piece.text)) ||
+      (piece.kind === "plural" && LETTER.test(piece.one + piece.other)),
+  );
+}
+
+// transformExpression-ий алхдаг байрлалаар үсэгтэй текст байгаа эсэх (tx(...) дуудлага тооцохгүй).
+function carriesText(ctx: Ctx, node: babelTypes.Node): boolean {
+  if (t.isStringLiteral(node)) return LETTER.test(node.value);
+  if (t.isTemplateLiteral(node)) return templateHasText(ctx, node);
+  if (t.isConditionalExpression(node)) return carriesText(ctx, node.consequent) || carriesText(ctx, node.alternate);
+  if (t.isLogicalExpression(node)) return carriesText(ctx, node.right);
+  if (
+    t.isTSAsExpression(node) ||
+    t.isTSSatisfiesExpression(node) ||
+    t.isTSNonNullExpression(node) ||
+    t.isParenthesizedExpression(node)
+  ) {
+    return carriesText(ctx, node.expression);
+  }
+  return false;
 }
 
 function tagNameOf(node: babelTypes.JSXElement): string {
@@ -396,36 +470,56 @@ function elementHasCopy(node: babelTypes.JSXElement | babelTypes.JSXFragment): b
 }
 
 function replaceRun(ctx: Ctx, run: Piece[]): void {
+  const countExpr = run.find((piece) => piece.kind === "plural")?.countExpr ?? null;
   const vars = new Vars();
-  let joined = "";
+  if (countExpr !== null) vars.reserve("count", countExpr);
+  let one = "";
+  let other = "";
   for (const piece of run) {
     if (piece.kind === "text") {
-      joined += piece.text;
-    } else if (piece.src === BRAND_MEMBER) {
-      joined += "{{brand}}";
-    } else {
-      joined += `{{${vars.nameFor(piece.node, piece.src)}}}`;
+      one += piece.text;
+      other += piece.text;
+      continue;
     }
+    if (piece.kind === "plural") {
+      one += piece.one;
+      other += piece.other;
+      continue;
+    }
+    const placeholder =
+      piece.src === BRAND_MEMBER
+        ? "{{brand}}"
+        : piece.src === countExpr
+          ? "{{count}}"
+          : `{{${vars.nameFor(piece.node, piece.src)}}}`;
+    one += placeholder;
+    other += placeholder;
   }
-  const key = toKey(ctx, joined);
-  const leading = /^\s/.test(joined) ? '{" "}' : "";
-  const trailing = /\s$/.test(joined) ? '{" "}' : "";
+  const key = toKey(ctx, one);
+  const leading = /^[ \t\r\n]/.test(one) ? '{" "}' : "";
+  const trailing = /[ \t\r\n]$/.test(one) ? '{" "}' : "";
   const first = run[0];
   const last = run[run.length - 1];
   ctx.s.update(first.start, last.end, `${leading}{tx(${JSON.stringify(key)}${vars.format()})}${trailing}`);
   ctx.edits++;
-  record(ctx, key, first.line);
+  record(ctx, key, first.line, countExpr !== null ? { one: key, other: toKey(ctx, other) } : undefined);
 }
 
 function processChildren(ctx: Ctx, node: babelTypes.JSXElement | babelTypes.JSXFragment, skip: () => void): void {
   const { runs, complex } = collectRuns(ctx, node.children);
   const copyRuns = runs.filter(isCopyRun);
   if (copyRuns.length > 0) {
-    const mixed = node.children.some(
-      (child) => (t.isJSXElement(child) || t.isJSXFragment(child)) && elementHasCopy(child),
-    );
-    if (mixed) {
-      ctx.manual.push({ file: ctx.file, line: lineOf(node), reason: "mixed-jsx", snippet: snippetOf(srcOf(ctx, node)) });
+    // Текст хэсэгчлэгдэх (2+ run, текстэй нарийн илэрхийлэл, текстэй дэд элемент) эсвэл
+    // хоёр өөр тоолуур байвал эцэг элементийг бүхэлд нь гараар засуулна.
+    const counters = new Set(runs.flat().flatMap((piece) => (piece.kind === "plural" ? [piece.countExpr] : [])));
+    const mixed =
+      copyRuns.length > 1 ||
+      counters.size > 1 ||
+      complex.some((container) => carriesText(ctx, container.expression)) ||
+      node.children.some((child) => (t.isJSXElement(child) || t.isJSXFragment(child)) && elementHasCopy(child));
+    const braces = copyRuns.some((run) => run.some((piece) => piece.kind === "text" && BRACES.test(piece.text)));
+    if (mixed || braces) {
+      pushManual(ctx, node, mixed ? "mixed-jsx" : "literal-braces");
       skip();
       return;
     }

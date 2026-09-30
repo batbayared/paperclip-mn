@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { parse } from "@babel/parser";
 
 import { harvestExplicitKeys, looksLikeCopy, transformSource } from "./transform";
 
@@ -124,6 +125,136 @@ describe("transformSource", () => {
   it("leaves identifier-like attribute values alone", () => {
     const result = transformSource(tsx(`<Badge label="primary" />`), FILE);
     expect(result.changed).toBe(false);
+  });
+
+  it("keeps edge whitespace of ternary branches outside the key", () => {
+    const result = transformSource(tsx(`<Button title={ok ? " then come back" : "Retry now "} />`), FILE);
+    expect(result.code).toContain(`title={ok ? (" " + tx("then come back")) : (tx("Retry now") + " ")}`);
+    expect(result.strings.map((s) => s.key)).toEqual(["then come back", "Retry now"]);
+  });
+
+  it("keeps edge whitespace of an attribute string value", () => {
+    const result = transformSource(tsx(`<Button title=" Save changes" />`), FILE);
+    expect(result.code).toContain(`title={" " + tx("Save changes")}`);
+  });
+
+  it("keeps trailing and inner whitespace of object property literals", () => {
+    const input = `pushToast({ title: "Sign in to continue ", body: "First line.\\n  Second line." });\n`;
+    const result = transformSource(input, "ui/src/lib/example.ts");
+    expect(result.code).toContain(`pushToast({ title: (tx("Sign in to continue") + " "), body: tx("First line.\\n  Second line.") });`);
+    expect(result.strings.map((s) => s.key)).toEqual(["Sign in to continue", "First line.\n  Second line."]);
+  });
+
+  it("keeps edge whitespace of a plural template outside the key", () => {
+    const body = "<Badge label={` (${runCount} run${runCount === 1 ? \"\" : \"s\"})`} />";
+    const result = transformSource(tsx(body), FILE);
+    expect(result.code).toContain(`label={(" " + tx("({{count}} run)", { count: runCount }))}`);
+    expect(result.strings[0]).toEqual({
+      key: "({{count}} run)",
+      file: FILE,
+      line: 5,
+      plural: { one: "({{count}} run)", other: "({{count}} runs)" },
+    });
+  });
+
+  it("keeps a non-breaking space inside a JSX text key", () => {
+    const result = transformSource(tsx(`<p>Pay now today</p>`), FILE);
+    expect(result.strings[0].key).toBe("Pay now today");
+  });
+
+  it("leaves literal double braces untouched and records them as manual", () => {
+    const input = tsx("<div><Input placeholder={`Insert {{${field.key}}}`} /><Input placeholder=\"Use {{name}} here\" /></div>");
+    const result = transformSource(input, FILE);
+    expect(result.changed).toBe(false);
+    expect(result.code).toBe(input);
+    expect(result.manual.map((m) => m.reason)).toEqual(["literal-braces", "literal-braces"]);
+  });
+
+  it("records a JSX parent with a literal brace string as manual", () => {
+    const input = tsx(`<p>Type {"{{name}}"} to insert a name</p>`);
+    const result = transformSource(input, FILE);
+    expect(result.changed).toBe(false);
+    expect(result.code).toBe(input);
+    expect(result.manual).toEqual([
+      { file: FILE, line: 5, reason: "literal-braces", snippet: `<p>Type {"{{name}}"} to insert a name</p>` },
+    ]);
+  });
+
+  it("turns a pure plural template into a plural key pair", () => {
+    const body = "<span>{`${count} ${count === 1 ? \"tool\" : \"tools\"}`}</span>";
+    const result = transformSource(tsx(body), FILE);
+    expect(result.code).toContain(`<span>{tx("{{count}} tool", { count })}</span>`);
+    expect(result.strings[0]).toEqual({
+      key: "{{count}} tool",
+      file: FILE,
+      line: 5,
+      plural: { one: "{{count}} tool", other: "{{count}} tools" },
+    });
+  });
+
+  it("merges a JSX-level count ternary into one plural key", () => {
+    const result = transformSource(
+      tsx(`<p>{computedCount} governed tool call{computedCount === 1 ? " was" : "s were"} blocked</p>`),
+      FILE,
+    );
+    expect(result.code).toContain(`<p>{tx("{{count}} governed tool call was blocked", { count: computedCount })}</p>`);
+    expect(result.strings).toEqual([
+      {
+        key: "{{count}} governed tool call was blocked",
+        file: FILE,
+        line: 5,
+        plural: { one: "{{count}} governed tool call was blocked", other: "{{count}} governed tool calls were blocked" },
+      },
+    ]);
+  });
+
+  it("passes the counter to a JSX-level plural key even when the text does not show it", () => {
+    const result = transformSource(tsx(`<span>Reassign {n === 1 ? "agent" : "agents"}</span>`), FILE);
+    expect(result.code).toContain(`<span>{tx("Reassign agent", { count: n })}</span>`);
+    expect(result.strings[0].plural).toEqual({ one: "Reassign agent", other: "Reassign agents" });
+  });
+
+  it("records two different counters in one JSX parent as manual", () => {
+    const input = tsx(`<p>{a} agent{a === 1 ? "" : "s"} and {b} task{b === 1 ? "" : "s"}</p>`);
+    const result = transformSource(input, FILE);
+    expect(result.changed).toBe(false);
+    expect(result.manual.map((m) => m.reason)).toEqual(["mixed-jsx"]);
+  });
+
+  it("records copy split by a copy-free element as manual instead of fragmenting it", () => {
+    const input = tsx(`<p>Restart <code>pnpm dev:once</code> after the work is safe.</p>`);
+    const result = transformSource(input, FILE);
+    expect(result.changed).toBe(false);
+    expect(result.code).toBe(input);
+    expect(result.manual).toEqual([
+      { file: FILE, line: 5, reason: "mixed-jsx", snippet: `<p>Restart <code>pnpm dev:once</code> after the work is safe.</p>` },
+    ]);
+  });
+
+  it("records a copy run next to a text-carrying conditional as manual", () => {
+    const input = tsx(`<p>Reuse this saved {kind === "api" ? "key" : "subscription"}</p>`);
+    const result = transformSource(input, FILE);
+    expect(result.changed).toBe(false);
+    expect(result.manual.map((m) => m.reason)).toEqual(["mixed-jsx"]);
+  });
+
+  it("still transforms a copy run next to a text-free complex container", () => {
+    const result = transformSource(tsx(`<p>Total: {formatCents(total)}</p>`), FILE);
+    expect(result.code).toContain(`<p>{tx("Total:")}{" "}{formatCents(total)}</p>`);
+  });
+
+  it("produces output that parses again", () => {
+    const body = [
+      "<>",
+      "  <Button title={ok ? \" then come back\" : \"Retry now \"} />",
+      "  <Badge label={` (${runCount} run${runCount === 1 ? \"\" : \"s\"})`} />",
+      "  <p>{computedCount} governed tool call{computedCount === 1 ? \" was\" : \"s were\"} blocked</p>",
+      "  <p>Total: {formatCents(total)}</p>",
+      "</>",
+    ].join("\n");
+    const result = transformSource(tsx(body), FILE);
+    expect(result.changed).toBe(true);
+    expect(() => parse(result.code, { sourceType: "module", plugins: ["typescript", "jsx"] })).not.toThrow();
   });
 });
 
