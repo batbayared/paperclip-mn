@@ -11,5 +11,6 @@ export default defineConfig({
   test: {
     environment: "node",
     setupFiles: ["./vitest.setup.ts"],
+    env: { VITE_XO_DEFAULT_LOCALE: "en" },
   },
 });
