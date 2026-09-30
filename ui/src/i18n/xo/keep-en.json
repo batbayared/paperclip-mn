@@ -1,1 +1,10 @@
-[]
+[
+  "Claude Code",
+  "Codex",
+  "{{effectiveAdapterCommand}} --output-format json \"Respond with hello.\"",
+  "{{effectiveAdapterCommand}} --print - --output-format stream-json --verbose",
+  "{{effectiveAdapterCommand}} -p \"Respond with hello.\" --output-format stream-json",
+  "{{effectiveAdapterCommand}} -p --mode ask --output-format json \"Respond with hello.\"",
+  "{{effectiveAdapterCommand}} exec --json -",
+  "{{effectiveAdapterCommand}} run --format json \"Respond with hello.\""
+]
