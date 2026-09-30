@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
+import { BRAND } from "@/xo/brand";
 
 export interface Breadcrumb {
   label: string;
@@ -67,7 +68,7 @@ export function buildDocumentTitle(breadcrumbs: Breadcrumb[], companyName?: stri
     ? []
     : [...breadcrumbs].reverse().map((breadcrumb) => breadcrumb.label);
   const companyPart = companyName?.trim() ? [companyName.trim()] : [];
-  const parts = [...pageParts, ...companyPart, "Paperclip"];
+  const parts = [...pageParts, ...companyPart, BRAND.name];
   return parts.join(" • ");
 }
 
