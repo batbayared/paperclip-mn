@@ -38,6 +38,7 @@ export const XO_TRANSFORM_FILES: readonly string[] = [
   "ui/src/components/ApprovalCard.tsx",
   "ui/src/components/ApprovalPayload.tsx",
   // Эхний тохиргоо (onboarding)
+  "ui/src/App.tsx",
   "ui/src/components/OnboardingChat.tsx",
   "ui/src/components/OnboardingWizard.tsx",
   "ui/src/components/OnboardingWizardVariant.tsx",
