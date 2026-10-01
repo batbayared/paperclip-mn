@@ -67,7 +67,7 @@ Fork-ийн өөрийн хавтас (`ui/src/xo/`, `ui/src/i18n/xo/`, `scripts
 - `ui/src/components/SidebarAccountMenu.tsx`, `ui/src/components/SidebarAccountMenu.production.tsx`
 - `ui/src/components/BreadcrumbBar.tsx`, `ui/src/components/BreadcrumbBar.test.tsx` (Ү2 fix: mobile compact header нь орчуулсан "Tasks" шошгыг мөн таних)
 - `tests/e2e/playwright.config.ts`
-- `tests/e2e/multi-user-authenticated.spec.ts` (S-set-ээс гадуурх онцгой тохиолдол (ED S-set-д нэмэх эсэхээ шийдэх хүртэл энд бүртгэв): default локал mn тул `EN_STORAGE_STATE` + `test.use` нэмж `browser.newContext()`-д дамжуулсан)
+- `tests/e2e/multi-user-authenticated.spec.ts` (ED 2026-10-01-нд S-set-д нэмсэн: default локал mn тул `EN_STORAGE_STATE` + `test.use` нэмж `browser.newContext()`-д дамжуулсан)
 
 Нэмсэн (A), upstream хавтас дотор:
 
