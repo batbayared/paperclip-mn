@@ -2,7 +2,15 @@
 
 ## Ү0 хаалт
 
-Task 0 (onboarding, heartbeat) ED байлцахаар хойшилсон. Task 0 энэ хэсгийг бөглөнө.
+- 2026-10-05 — 10-11, локал instance (pnpm dev:once), компани CMP. ED onboarding, CEO агент («Удирдагч агент», claude_local) үүсгэж, маягтад монголоор хариулсан.
+- claude_local: 2026-10-11 ED CMP-1-д монгол comment бичсэн → run 398d0214 (issue_reopened_via_comment, contextSnapshot.issueId = CMP-1) succeeded, 16 мин, 3.71$ (subscription_included). Агент батлагдсан төлөвлөгөөг хэрэгжүүлж 4 claude_local агент hire хийж, CMP-2…5 task үүсгэсэн. Тэдгээрийн 5 run бүгд succeeded, CMP-1/2/3/5 done, CMP-4 in_review. Агентын 6 comment бүгд монгол. Run log-д cross_issue алдаа 0.
+- codex_local: 2026-10-11 «Codex туршигч» (adapterConfig default) үүсгэж CMP-6 оноов → run f9920dda (issue_assigned) 45 сек-д succeeded, biller chatgpt (subscription_included), монгол comment бичиж CMP-6-г done болгосон. Usage-д model «unknown» гэж бүртгэгдсэн.
+- Ажиглалт (Ү3-д засах нэр дэвшигч):
+  - Agent JWT нууц onboarding-д байхгүй: PAPERCLIP_AGENT_JWT_SECRET ба BETTER_AUTH_SECRET аль аль нь байхгүй бол server зөвхөн WARN хэвлээд агентад PAPERCLIP_API_KEY өгөхгүй, агент API-д 401 авна. ED ~/.paperclip/instances/default/.env-д нууц бичиж шийдсэн.
+  - Issue-гүй run: UI-ийн Run now (on-demand) run-ийн contextSnapshot-д issueId байхгүй. Ийм run-ийн comment/PATCH 403 cross_issue_influence_run_context_required авна. Мөн тийм run-ийн үүсгэсэн батлах картыг хүлээн авахад continuation шалгалт (execution-continuation.ts L120–144) source run-ийг олохгүй тул шинэ run setup_failed continuation_source_context_missing-ээр унаж, issue blocked болно. Тойрох зам: хүний comment blocked issue-г далд дахин нээж агентыг issue-тэй сэрээнэ (issues.ts L2294–2325).
+  - acpx session race: нэг агентын зэрэгцээ хоёр manual run нэг persistent session бичлэг дээр ажиллаж, tmp нэр (pid + Date.now()) давхцаж бичлэг эвдэрсэн; closeBackendSession sessionOptions-гүй spawn хийж «node: not found». Stale бичлэгийг гараар зөөж шийдсэн.
+  - Порт fallback: 3100 завгүй үед server чимээгүйхэн 3101 дээр асдаг («Requested port is busy; using next free port»), хоёр server зэрэг ажиллаж болно.
+- **Төлөв: claude_local ба codex_local хоёул issue-тэй heartbeat-ээр монгол хариу өгсөн. ED-ийн хүлээн зөвшөөрлийг хүлээж байна.**
 
 ## Ү1 хаалт
 
