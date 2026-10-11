@@ -104,7 +104,7 @@ export const telemetryConfigSchema = z.object({
 }).passthrough().prefault({});
 
 export const updatesConfigSchema = z.object({
-  checkEnabled: z.boolean().default(true),
+  checkEnabled: z.boolean().default(false),
 }).passthrough().prefault({});
 
 export const paperclipConfigSchema = z

@@ -6,7 +6,7 @@ JSON on demand and renders it with native components.
 
 ## Operator configuration
 
-- `PAPERCLIP_ANNOUNCEMENTS_ENABLED=false` disables fetching and display.
+- XO: announcements are off by default. `PAPERCLIP_ANNOUNCEMENTS_ENABLED=true` enables fetching and display.
 - `PAPERCLIP_ANNOUNCEMENTS_FEED_URL` overrides the public HTTPS manifest URL.
   Credentials, query strings, private destinations and redirects are rejected.
 

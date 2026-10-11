@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { telemetryConfigSchema } from "../config-schema.js";
+import { telemetryConfigSchema, updatesConfigSchema } from "../config-schema.js";
 import { resolveTelemetryConfig } from "./config.js";
 
 const KILL_SWITCHES = [
@@ -41,5 +41,9 @@ describe("XO telemetry defaults", () => {
 
   it("parses a missing telemetry block as disabled", () => {
     expect(telemetryConfigSchema.parse({}).enabled).toBe(false);
+  });
+
+  it("parses a missing updates block as check disabled", () => {
+    expect(updatesConfigSchema.parse({}).checkEnabled).toBe(false);
   });
 });

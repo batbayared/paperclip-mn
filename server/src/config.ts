@@ -366,7 +366,7 @@ export function loadConfig(): Config {
     heartbeatSchedulerIntervalMs: Math.max(10000, Number(process.env.HEARTBEAT_SCHEDULER_INTERVAL_MS) || 30000),
     companyDeletionEnabled,
     telemetryEnabled: fileConfig?.telemetry?.enabled ?? false,
-    announcementsEnabled: process.env.PAPERCLIP_ANNOUNCEMENTS_ENABLED !== "false",
+    announcementsEnabled: process.env.PAPERCLIP_ANNOUNCEMENTS_ENABLED === "true",
     announcementsFeedUrl: process.env.PAPERCLIP_ANNOUNCEMENTS_FEED_URL?.trim() || "https://pages.paperclip.ing/announcements/v1/current.json",
   };
 }

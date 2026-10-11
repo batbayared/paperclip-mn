@@ -82,4 +82,11 @@ describe("XO server config defaults", () => {
     isolate(writeConfig({ telemetry: { enabled: true } }));
     expect(loadConfig().telemetryEnabled).toBe(true);
   });
+
+  it("disables announcements unless PAPERCLIP_ANNOUNCEMENTS_ENABLED=true", () => {
+    isolate(path.join(root, "missing.json"));
+    expect(loadConfig().announcementsEnabled).toBe(false);
+    vi.stubEnv("PAPERCLIP_ANNOUNCEMENTS_ENABLED", "true");
+    expect(loadConfig().announcementsEnabled).toBe(true);
+  });
 });
