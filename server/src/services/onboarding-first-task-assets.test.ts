@@ -154,8 +154,10 @@ describe("mongolian onboarding variants", () => {
 
   it("uses the mongolian persona and organization fallback", async () => {
     const persona = await renderChiefOfStaffPersona({ agentName: "Бат", organizationName: null, locale: "mn" });
-    expect(persona).toContain("Чи Бат, танай байгууллага-ын штабын дарга");
+    expect(persona).toContain("Чи Бат, танай байгууллагын штабын дарга");
     expect(persona).toContain("paperclip-create-agent");
+    const named = await renderChiefOfStaffPersona({ agentName: "Бат", organizationName: "Тушээ", locale: "mn" });
+    expect(named).toContain("Чи Бат, Тушээ байгууллагын штабын дарга");
   });
 
   it("falls back to the english file when a mongolian variant is missing", async () => {

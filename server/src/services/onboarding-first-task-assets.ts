@@ -107,7 +107,7 @@ export function fillFirstTaskPlaceholders(
       .split("{{agentName}}").join("");
   }
   const org = organizationName?.trim();
-  const orgFallback = locale === "mn" ? "танай байгууллага" : "your organization";
+  const orgFallback = locale === "mn" ? "танай" : "your organization";
   out = out.split("{{organizationName}}").join(org && org.length > 0 ? org : orgFallback);
   return out;
 }
