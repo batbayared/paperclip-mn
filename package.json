@@ -36,6 +36,8 @@
     "xo:i18n:typecheck": "tsc -p scripts/xo-i18n/tsconfig.json",
     "xo:i18n:extract": "node cli/node_modules/tsx/dist/cli.mjs scripts/xo-i18n/cli.ts extract",
     "xo:i18n:check": "node cli/node_modules/tsx/dist/cli.mjs scripts/xo-i18n/cli.ts check",
+    "xo:i18n:extract:server": "node cli/node_modules/tsx/dist/cli.mjs scripts/xo-i18n/cli.ts extract --server",
+    "xo:i18n:check:server": "node cli/node_modules/tsx/dist/cli.mjs scripts/xo-i18n/cli.ts check --server",
     "xo:i18n:emit": "node cli/node_modules/tsx/dist/cli.mjs scripts/xo-i18n/cli.ts emit",
     "xo:i18n:todo": "node cli/node_modules/tsx/dist/cli.mjs scripts/xo-i18n/cli.ts todo",
     "xo:i18n:merge": "node cli/node_modules/tsx/dist/cli.mjs scripts/xo-i18n/cli.ts merge",

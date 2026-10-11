@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSy
 import { dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { extractServerMessages, placeholdersOf, STATIC_SERVER_MESSAGES } from "./extract-server";
 import { XO_TRANSFORM_FILES } from "./tiers";
 import { harvestExplicitKeys, transformSource, type ExtractedString, type ManualCase } from "./transform";
 
@@ -13,6 +14,10 @@ const KEEP_EN_FILE = join(XO_DIR, "keep-en.json");
 const STATUS_FILE = join(REPO_ROOT, "scripts", "xo-i18n", "status.json");
 const EMIT_DIR = join(REPO_ROOT, "scripts", "xo-i18n", ".emit");
 const UI_SRC = join(REPO_ROOT, "ui", "src");
+const SERVER_SRC = join(REPO_ROOT, "server", "src");
+const SERVER_EN_FILE = join(XO_DIR, "server-en.json");
+const SERVER_MN_FILE = join(XO_DIR, "server-mn.json");
+const SERVER_TIER1_FILE = join(XO_DIR, "server-tier1.json");
 
 type Catalog = Record<string, string>;
 
@@ -224,18 +229,77 @@ function runMerge(file: string | undefined): void {
   console.log(`xo:i18n merge: нэгтгэсэн=${merged} алгассан=${skipped}`);
 }
 
+function listServerSources(dir: string): string[] {
+  const files: string[] = [];
+  for (const name of readdirSync(dir)) {
+    const full = join(dir, name);
+    if (statSync(full).isDirectory()) {
+      if (name === "__tests__" || name === "node_modules") continue;
+      files.push(...listServerSources(full));
+    } else if (name.endsWith(".ts") && !name.endsWith(".test.ts") && !name.endsWith(".d.ts")) {
+      files.push(full);
+    }
+  }
+  return files;
+}
+
+function buildServerCatalog(): Catalog {
+  const catalog: Catalog = {};
+  for (const key of STATIC_SERVER_MESSAGES) catalog[key] = key;
+  for (const file of listServerSources(SERVER_SRC)) {
+    const rel = toPosix(relative(REPO_ROOT, file));
+    for (const message of extractServerMessages(readFileSync(file, "utf8"), rel)) {
+      catalog[message.key] = message.key;
+    }
+  }
+  return sortCatalog(catalog);
+}
+
+function runExtractServer(): void {
+  const catalog = buildServerCatalog();
+  writeJson(SERVER_EN_FILE, catalog);
+  console.log(`server-en.json: ${Object.keys(catalog).length} мессеж`);
+}
+
+function runCheckServer(): void {
+  const problems: string[] = [];
+  const fresh = buildServerCatalog();
+  const onDisk = readJson<Catalog>(SERVER_EN_FILE, {});
+  if (JSON.stringify(fresh) !== JSON.stringify(onDisk)) {
+    problems.push("server-en.json хуучирсан: pnpm xo:i18n:extract:server ажиллуул");
+  }
+  const mn = readJson<Catalog>(SERVER_MN_FILE, {});
+  for (const key of readJson<string[]>(SERVER_TIER1_FILE, [])) {
+    if (!(key in fresh)) problems.push(`Tier-1 мессеж серверт алга: ${key}`);
+    if (!mn[key]) problems.push(`Tier-1 орчуулга дутуу: ${key}`);
+  }
+  for (const [key, value] of Object.entries(mn)) {
+    if (!(key in fresh)) problems.push(`server-mn.json-д хуучирсан түлхүүр: ${key}`);
+    if (placeholdersOf(key).join(",") !== placeholdersOf(value).join(",")) {
+      problems.push(`Placeholder таарахгүй: ${key}`);
+    }
+  }
+  if (problems.length > 0) {
+    for (const problem of problems) console.error(`✗ ${problem}`);
+    process.exit(1);
+  }
+  console.log(`server catalog OK: ${Object.keys(fresh).length} мессеж, ${Object.keys(mn).length} орчуулга`);
+}
+
 function usage(): never {
-  console.error("Хэрэглээ: cli.ts extract | check | emit | todo <path-prefix...> | merge <file.json>");
+  console.error("Хэрэглээ: cli.ts extract [--server] | check [--server] | emit | todo <path-prefix...> | merge <file.json>");
   process.exit(2);
 }
 
 const [mode, ...rest] = process.argv.slice(2);
 switch (mode) {
   case "extract":
-    runExtract();
+    if (rest.includes("--server")) runExtractServer();
+    else runExtract();
     break;
   case "check":
-    runCheck();
+    if (rest.includes("--server")) runCheckServer();
+    else runCheck();
     break;
   case "emit":
     runEmit();
