@@ -1,4 +1,5 @@
-import { describe, expect, it } from "vitest";
+import fs from "node:fs/promises";
+import { describe, expect, it, vi } from "vitest";
 import {
   ONBOARDING_FIRST_TASK_OPENING_INTERVIEW_OPTION_ID,
   ONBOARDING_FIRST_TASK_OPENING_QUESTION_ID,
@@ -160,5 +161,24 @@ describe("mongolian onboarding variants", () => {
   it("falls back to the english file when a mongolian variant is missing", async () => {
     // README.md has no .mn variant; english callers keep the english text.
     expect(await renderOnboardingFirstTaskGreeting({ agentName: "Ada" })).toContain("Welcome to Paperclip!");
+  });
+
+  it("falls back to english for locale mn when the .mn file is missing (ENOENT)", async () => {
+    // Every asset the loaders read ships a .mn variant, so simulate a missing
+    // one: reject only the .mn path with ENOENT and let the english read through.
+    const realReadFile = fs.readFile.bind(fs);
+    const spy = vi.spyOn(fs, "readFile").mockImplementation(((file: unknown, ...rest: unknown[]) => {
+      if (String(file).endsWith("greeting.mn.md")) {
+        return Promise.reject(Object.assign(new Error("ENOENT: no such file"), { code: "ENOENT" }));
+      }
+      return (realReadFile as (...a: unknown[]) => Promise<unknown>)(file, ...rest);
+    }) as unknown as typeof fs.readFile);
+    try {
+      const out = await renderOnboardingFirstTaskGreeting({ agentName: "Ada", locale: "mn" });
+      expect(out).toContain("Welcome to Paperclip!");
+      expect(spy.mock.calls.some(([f]) => String(f).endsWith("greeting.mn.md"))).toBe(true);
+    } finally {
+      spy.mockRestore();
+    }
   });
 });
