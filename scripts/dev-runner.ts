@@ -14,6 +14,7 @@ import { applyDevRunnerOptions } from "./dev-runner-options.ts";
 import { collectWatchedSnapshot as collectDevServerWatchedSnapshot, diffSnapshots } from "./dev-runner-snapshot.mjs";
 import { createDevServiceIdentity, repoRoot } from "./dev-service-profile.ts";
 import { bootstrapDevRunnerWorktreeEnv, isWorktreeSeedPending } from "../server/src/dev-runner-worktree.ts";
+import { ensureDevAgentJwtSecret } from "../server/src/dev-agent-jwt-secret.ts";
 import {
   readDevServerRestartRequest,
   removeDevServerRestartRequest,
@@ -54,6 +55,11 @@ if (isWorktreeSeedPending(repoRoot)) {
     "[paperclip] this worktree database is seed-pending. Run `pnpm paperclipai worktree ensure-seeded` before `pnpm dev`.",
   );
   process.exit(1);
+}
+
+const devAgentJwtSecret = ensureDevAgentJwtSecret(process.env);
+if (devAgentJwtSecret.created) {
+  console.log(`[paperclip] created PAPERCLIP_AGENT_JWT_SECRET in ${devAgentJwtSecret.envPath} (dev only)`);
 }
 
 const scanIntervalMs = 1500;
