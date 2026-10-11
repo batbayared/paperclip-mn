@@ -8,16 +8,18 @@
 // {{agentName}} / {{organizationName}} placeholders (see
 // onboarding-first-task-assets.ts).
 
-import { renderOnboardingFirstTaskGreeting } from "./onboarding-first-task-assets.js";
+import { renderOnboardingFirstTaskGreeting, type OnboardingLocale } from "./onboarding-first-task-assets.js";
 
 export const ONBOARDING_GREETING_AUTHORIZATION_REASON = "onboarding first-task greeting";
 
 export async function renderOnboardingGreeting(input: {
   agentName?: string | null;
   organizationName?: string | null;
+  locale?: OnboardingLocale;
 }): Promise<string> {
   return renderOnboardingFirstTaskGreeting({
     agentName: input.agentName,
     organizationName: input.organizationName,
+    locale: input.locale,
   });
 }

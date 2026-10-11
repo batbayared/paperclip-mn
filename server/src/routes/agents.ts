@@ -225,7 +225,7 @@ import {
   loadDefaultAgentInstructionsBundle,
   resolveDefaultAgentInstructionsBundleRole,
 } from "../services/default-agent-instructions.js";
-import { buildOnboardingFirstAgentInstructionsBundle } from "../services/onboarding-first-task-assets.js";
+import { buildOnboardingFirstAgentInstructionsBundle, resolveOnboardingLocale } from "../services/onboarding-first-task-assets.js";
 import { getTelemetryClient } from "../telemetry.js";
 import { assertEnvironmentSelectionForCompany } from "./environment-selection.js";
 import { recoveryService } from "../services/recovery/service.js";
@@ -2726,9 +2726,11 @@ export function agentRoutes(
   }): Promise<{ files: Record<string, string>; entryFile: string } | undefined> {
     if (params.onboardingFirstAgent !== true) return undefined;
     if (params.actorType !== "board") return undefined;
+    const locale = resolveOnboardingLocale(await instanceSettings.getExperimental());
     return buildOnboardingFirstAgentInstructionsBundle({
       agentName: params.agentName,
       organizationName: params.organizationName,
+      locale,
     });
   }
 

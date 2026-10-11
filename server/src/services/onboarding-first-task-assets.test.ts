@@ -9,6 +9,7 @@ import {
   fillFirstTaskPlaceholders,
   renderChiefOfStaffPersona,
   renderOnboardingFirstTaskGreeting,
+  resolveOnboardingLocale,
 } from "./onboarding-first-task-assets.js";
 
 describe("fillFirstTaskPlaceholders", () => {
@@ -109,5 +110,55 @@ describe("chief-of-staff persona", () => {
     });
     expect(bundle.entryFile).toBe("AGENTS.md");
     expect(bundle.files["AGENTS.md"]).toContain("You are Ada, chief of staff for Acme.");
+  });
+});
+
+describe("mongolian onboarding variants", () => {
+  it("resolves the locale only from an explicit mn setting", () => {
+    expect(resolveOnboardingLocale({ interactionLanguage: "mn" })).toBe("mn");
+    expect(resolveOnboardingLocale({ interactionLanguage: "en" })).toBe("en");
+    expect(resolveOnboardingLocale({})).toBe("en");
+    expect(resolveOnboardingLocale(undefined)).toBe("en");
+  });
+
+  it("renders the mongolian greeting with and without a name", async () => {
+    expect(await renderOnboardingFirstTaskGreeting({ agentName: "Бат", locale: "mn" })).toBe(
+      "XO-д тавтай морил! Би Бат, таны анхны агент хамтрагч. Хэрхэн эхлэхээ сонгоорой, үлдсэнийг нь би хариуцъя.",
+    );
+    expect(await renderOnboardingFirstTaskGreeting({ agentName: null, locale: "mn" })).toBe(
+      "XO-д тавтай морил! Би таны анхны агент хамтрагч. Хэрхэн эхлэхээ сонгоорой, үлдсэнийг нь би хариуцъя.",
+    );
+  });
+
+  it("builds the mongolian opening question with the fixed ids", async () => {
+    const payload = await buildOnboardingFirstTaskOpeningQuestion("mn");
+    const question = payload.questions[0];
+    expect(question.id).toBe(ONBOARDING_FIRST_TASK_OPENING_QUESTION_ID);
+    expect(question.prompt).toBe("Юу хийхийг хүсэж байна вэ?");
+    expect(payload.submitLabel).toBe("Үргэлжлүүлэх");
+    expect(question.options.map((o) => o.id)).toEqual([
+      ONBOARDING_FIRST_TASK_OPENING_INTERVIEW_OPTION_ID,
+      ONBOARDING_FIRST_TASK_OPENING_TASK_OPTION_ID,
+    ]);
+  });
+
+  it("builds the mongolian brief with the selected proposal step", async () => {
+    const confirmation = await buildOnboardingFirstTaskBrief({ usePlanProposal: false, locale: "mn" });
+    expect(confirmation).toContain("Энэ бол хэрэглэгчийн XO дахь анхны ажил");
+    expect(confirmation).toContain("request_confirmation");
+    expect(confirmation).not.toContain("{{proposalStep}}");
+    const plan = await buildOnboardingFirstTaskBrief({ usePlanProposal: true, locale: "mn" });
+    expect(plan).toContain("энгийн ажлыг ч төлөвлөгөөний замаар");
+  });
+
+  it("uses the mongolian persona and organization fallback", async () => {
+    const persona = await renderChiefOfStaffPersona({ agentName: "Бат", organizationName: null, locale: "mn" });
+    expect(persona).toContain("Чи Бат, танай байгууллага-ын штабын дарга");
+    expect(persona).toContain("paperclip-create-agent");
+  });
+
+  it("falls back to the english file when a mongolian variant is missing", async () => {
+    // README.md has no .mn variant; english callers keep the english text.
+    expect(await renderOnboardingFirstTaskGreeting({ agentName: "Ada" })).toContain("Welcome to Paperclip!");
   });
 });

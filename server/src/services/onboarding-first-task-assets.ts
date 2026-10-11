@@ -13,9 +13,20 @@ import {
 // copies src/onboarding-assets/. into dist/onboarding-assets/), and fill the
 // {{agentName}} / {{organizationName}} / {{proposalStep}} placeholders.
 
+// XO: Mongolian variants live next to the upstream files as name.mn.ext. The
+// upstream English files stay untouched; a missing variant falls back to them.
+export type OnboardingLocale = "mn" | "en";
+
+export function resolveOnboardingLocale(
+  settings: { interactionLanguage?: unknown } | null | undefined,
+): OnboardingLocale {
+  return settings?.interactionLanguage === "mn" ? "mn" : "en";
+}
+
 export interface OnboardingFirstTaskPlaceholders {
   agentName?: string | null;
   organizationName?: string | null;
+  locale?: OnboardingLocale;
 }
 
 // The opening card seeded on the first task right after the greeting: one
@@ -60,7 +71,20 @@ function resolveFirstTaskAssetUrl(relativePath: string) {
   return new URL(`../onboarding-assets/first-task/${relativePath}`, import.meta.url);
 }
 
-async function loadFirstTaskAsset(relativePath: string): Promise<string> {
+function localizedAssetPath(relativePath: string, locale: OnboardingLocale): string {
+  if (locale !== "mn") return relativePath;
+  const dot = relativePath.lastIndexOf(".");
+  return `${relativePath.slice(0, dot)}.mn${relativePath.slice(dot)}`;
+}
+
+async function loadFirstTaskAsset(relativePath: string, locale: OnboardingLocale = "en"): Promise<string> {
+  if (locale === "mn") {
+    try {
+      return await fs.readFile(resolveFirstTaskAssetUrl(localizedAssetPath(relativePath, locale)), "utf8");
+    } catch (err) {
+      if ((err as NodeJS.ErrnoException).code !== "ENOENT") throw err;
+    }
+  }
   return fs.readFile(resolveFirstTaskAssetUrl(relativePath), "utf8");
 }
 
@@ -70,7 +94,7 @@ async function loadFirstTaskAsset(relativePath: string): Promise<string> {
 // historical buildOnboardingGreeting behaviour.
 export function fillFirstTaskPlaceholders(
   text: string,
-  { agentName, organizationName }: OnboardingFirstTaskPlaceholders,
+  { agentName, organizationName, locale }: OnboardingFirstTaskPlaceholders,
 ): string {
   let out = text;
   const name = agentName?.trim();
@@ -83,7 +107,8 @@ export function fillFirstTaskPlaceholders(
       .split("{{agentName}}").join("");
   }
   const org = organizationName?.trim();
-  out = out.split("{{organizationName}}").join(org && org.length > 0 ? org : "your organization");
+  const orgFallback = locale === "mn" ? "танай байгууллага" : "your organization";
+  out = out.split("{{organizationName}}").join(org && org.length > 0 ? org : orgFallback);
   return out;
 }
 
@@ -91,15 +116,17 @@ export function fillFirstTaskPlaceholders(
 export async function renderOnboardingFirstTaskGreeting(
   placeholders: OnboardingFirstTaskPlaceholders,
 ): Promise<string> {
-  const template = await loadFirstTaskAsset("greeting.md");
+  const template = await loadFirstTaskAsset("greeting.md", placeholders.locale);
   return fillFirstTaskPlaceholders(template, placeholders).trim();
 }
 
 // Layer C — the opening ask_user_questions card seeded as the agent right after
 // the greeting, so the first task is not open-ended: the user either asks to be
 // interviewed or types the task they have in mind. Deterministic, no LLM.
-export async function buildOnboardingFirstTaskOpeningQuestion(): Promise<AskUserQuestionsPayload> {
-  const raw = await loadFirstTaskAsset("opening-question.json");
+export async function buildOnboardingFirstTaskOpeningQuestion(
+  locale: OnboardingLocale = "en",
+): Promise<AskUserQuestionsPayload> {
+  const raw = await loadFirstTaskAsset("opening-question.json", locale);
   const file = openingQuestionFileSchema.parse(JSON.parse(raw));
   return askUserQuestionsPayloadSchema.parse({
     version: 1,
@@ -124,10 +151,11 @@ export async function buildOnboardingFirstTaskOpeningQuestion(): Promise<AskUser
 // which is replaced by the proposal file the toggle selects.
 export async function buildOnboardingFirstTaskBrief(options: {
   usePlanProposal: boolean;
+  locale?: OnboardingLocale;
 }): Promise<string> {
   const [brief, proposal] = await Promise.all([
-    loadFirstTaskAsset("brief.md"),
-    loadFirstTaskAsset(options.usePlanProposal ? "proposal-plan.md" : "proposal-confirmation.md"),
+    loadFirstTaskAsset("brief.md", options.locale),
+    loadFirstTaskAsset(options.usePlanProposal ? "proposal-plan.md" : "proposal-confirmation.md", options.locale),
   ]);
   const proposalStep = proposal.replace(/\s+$/, "");
   // Use a function replacement so `$` sequences in the proposal text are not
@@ -140,7 +168,7 @@ export async function buildOnboardingFirstTaskBrief(options: {
 export async function renderChiefOfStaffPersona(
   placeholders: OnboardingFirstTaskPlaceholders,
 ): Promise<string> {
-  const template = await loadFirstTaskAsset("chief-of-staff/AGENTS.md");
+  const template = await loadFirstTaskAsset("chief-of-staff/AGENTS.md", placeholders.locale);
   return fillFirstTaskPlaceholders(template, placeholders);
 }
 

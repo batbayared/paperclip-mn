@@ -108,6 +108,15 @@ describeEmbeddedPostgres("issue create onboarding first-task routes", () => {
     await tempDb?.cleanup();
   });
 
+  // XO: a fresh instance defaults to interactionLanguage "mn"; the upstream
+  // English expectations below pin "en" explicitly.
+  async function setExperimental(experimental: Record<string, unknown>) {
+    await db
+      .insert(instanceSettings)
+      .values({ singletonKey: "default", general: {}, experimental })
+      .onConflictDoUpdate({ target: [instanceSettings.singletonKey], set: { experimental } });
+  }
+
   function createApp() {
     const app = express();
     app.use(express.json());
@@ -177,6 +186,7 @@ describeEmbeddedPostgres("issue create onboarding first-task routes", () => {
     const companyId = await seedCompany();
     const agentId = await seedAgent(companyId);
     const app = createApp();
+    await setExperimental({ interactionLanguage: "en" });
 
     const created = await request(app)
       .post(`/api/companies/${companyId}/issues`)
@@ -280,6 +290,7 @@ describeEmbeddedPostgres("issue create onboarding first-task routes", () => {
   it("stores the server-assembled brief as the description and ignores the client description", async () => {
     const companyId = await seedCompany();
     const agentId = await seedAgent(companyId);
+    await setExperimental({ interactionLanguage: "en" });
     const app = createApp();
 
     const created = await request(app)
@@ -300,16 +311,30 @@ describeEmbeddedPostgres("issue create onboarding first-task routes", () => {
     expect(created.body.description).not.toContain("client supplied description");
   });
 
+  it("seeds the mongolian brief, greeting and opening card when interactionLanguage is mn", async () => {
+    const companyId = await seedCompany();
+    const agentId = await seedAgent(companyId);
+    const app = createApp();
+    await setExperimental({ interactionLanguage: "mn" });
+
+    const created = await request(app)
+      .post(`/api/companies/${companyId}/issues`)
+      .send({ title: "Get started", onboardingFirstTask: true, assigneeAgentId: agentId })
+      .expect(201);
+
+    expect(created.body.description).toContain("Энэ бол хэрэглэгчийн XO дахь анхны ажил");
+    const comments = await db.select().from(issueComments).where(eq(issueComments.issueId, created.body.id));
+    expect(comments.some((c) => c.body.startsWith("XO-д тавтай морил!"))).toBe(true);
+    const interactions = await db.select().from(issueThreadInteractions);
+    expect(JSON.stringify(interactions.map((i) => i.payload))).toContain("Юу хийхийг хүсэж байна вэ?");
+
+    await db.delete(instanceSettings);
+  });
+
   it("uses the plan proposal brief when enableFirstTaskPlanProposal is on", async () => {
     const companyId = await seedCompany();
     const app = createApp();
-    await db
-      .insert(instanceSettings)
-      .values({ singletonKey: "default", general: {}, experimental: { enableFirstTaskPlanProposal: true } })
-      .onConflictDoUpdate({
-        target: [instanceSettings.singletonKey],
-        set: { experimental: { enableFirstTaskPlanProposal: true } },
-      });
+    await setExperimental({ enableFirstTaskPlanProposal: true, interactionLanguage: "en" });
 
     const created = await request(app)
       .post(`/api/companies/${companyId}/issues`)

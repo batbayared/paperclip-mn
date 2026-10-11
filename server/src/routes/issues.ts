@@ -254,6 +254,7 @@ import {
 import {
   buildOnboardingFirstTaskBrief,
   buildOnboardingFirstTaskOpeningQuestion,
+  resolveOnboardingLocale,
 } from "../services/onboarding-first-task-assets.js";
 import {
   ISSUE_BLOCKERS_RESOLVED_WAKE_REASON,
@@ -11675,6 +11676,7 @@ export function issueRoutes(
           const experimental = await instanceSettings.getExperimental();
           onboardingFirstTaskDescription = await buildOnboardingFirstTaskBrief({
             usePlanProposal: experimental.enableFirstTaskPlanProposal === true,
+            locale: resolveOnboardingLocale(experimental),
           });
         } catch (err) {
           logger.warn(
@@ -11934,6 +11936,7 @@ export function issueRoutes(
       // best-effort: a greeting failure must not fail issue creation.
       if (isOnboardingFirstTask && issue.assigneeAgentId) {
         try {
+          const onboardingLocale = resolveOnboardingLocale(await instanceSettings.getExperimental());
           const [company, assigneeAgent] = await Promise.all([
             companiesSvc.getById(companyId),
             agentsSvc.getById(issue.assigneeAgentId),
@@ -11941,6 +11944,7 @@ export function issueRoutes(
           const greetingBody = await renderOnboardingGreeting({
             agentName: assigneeAgent?.name ?? null,
             organizationName: company?.name ?? null,
+            locale: onboardingLocale,
           });
           await svc.addComment(
             issue.id,
@@ -11971,7 +11975,9 @@ export function issueRoutes(
               kind: "ask_user_questions",
               idempotencyKey: `onboarding-first-task:${issue.id}:opening-question`,
               continuationPolicy: "wake_assignee",
-              payload: await buildOnboardingFirstTaskOpeningQuestion(),
+              payload: await buildOnboardingFirstTaskOpeningQuestion(
+                resolveOnboardingLocale(await instanceSettings.getExperimental()),
+              ),
             },
             { agentId: issue.assigneeAgentId },
           );

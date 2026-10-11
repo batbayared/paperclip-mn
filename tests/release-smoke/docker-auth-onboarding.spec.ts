@@ -250,9 +250,9 @@ test.describe("Docker authenticated onboarding smoke", () => {
     // card are seeded without an LLM, so their absence means the launch
     // half-finished) …
     await expect(
-      page.getByText("Welcome to Paperclip!").first()
+      page.getByText("XO-д тавтай морил!").first()
     ).toBeVisible({ timeout: 20_000 });
-    await expect(page.getByText("What would you like to do?")).toBeVisible();
+    await expect(page.getByText("Юу хийхийг хүсэж байна вэ?")).toBeVisible();
 
     // … and that the no-run contract holds. This spec used to poll for an
     // assignment-triggered heartbeat run here; a run appearing before the
