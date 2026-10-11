@@ -73,6 +73,9 @@ function mapInviteAuthFeedback(
 ): AuthFeedback {
   const code = getAuthErrorCode(error);
   const message = getAuthErrorMessage(error);
+  // Compare against the untranslated server text; `message` may be localized.
+  const rawOriginal = (error as { originalMessage?: unknown } | null)?.originalMessage;
+  const originalMessage = typeof rawOriginal === "string" ? rawOriginal.trim() : message;
   const emailLabel = email.trim().length > 0 ? email.trim() : "that email";
 
   if (code === "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL") {
@@ -90,7 +93,7 @@ function mapInviteAuthFeedback(
     };
   }
 
-  if (authMode === "sign_in" && message === "Request failed: 401") {
+  if (authMode === "sign_in" && originalMessage === "Request failed: 401") {
     return {
       tone: "error",
       message:
@@ -98,7 +101,7 @@ function mapInviteAuthFeedback(
     };
   }
 
-  if (authMode === "sign_up" && message === "Request failed: 422") {
+  if (authMode === "sign_up" && originalMessage === "Request failed: 422") {
     return {
       tone: "info",
       message: `An account may already exist for ${emailLabel}. Try signing in instead.`,

@@ -24,4 +24,9 @@ describe("translateServerMessage", () => {
     localStorage.setItem(XO_LOCALE_STORAGE_KEY, "en");
     expect(translateServerMessage("Issue not found")).toBe("Issue not found");
   });
+
+  it("does not read inherited Object.prototype keys as translations", () => {
+    expect(translateServerMessage("constructor")).toBe("constructor");
+    expect(translateServerMessage("toString")).toBe("toString");
+  });
 });

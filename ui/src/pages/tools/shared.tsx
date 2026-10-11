@@ -172,7 +172,7 @@ export function ErrorState({ error, onRetry }: { error: unknown; onRetry?: () =>
   if (error instanceof ApiError) {
     if (error.status === 403) {
       message = "You do not have permission to view this. Tools & Access requires board/admin access.";
-    } else if (error.status === 404 || /route not found/i.test(error.message)) {
+    } else if (error.status === 404 || /route not found/i.test(error.originalMessage)) {
       // Snapshot-skew window: the route exists in this build but not on the live server snapshot yet.
       message = "Tools & Access isn't available on this server yet — try refreshing after the next deployment.";
     } else {

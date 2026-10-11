@@ -26,10 +26,19 @@ export class AuthApiError extends Error {
   status: number;
   code: string | null;
   body: unknown;
+  /** Untranslated server message; compare against this, never against `message`. */
+  readonly originalMessage: string;
 
-  constructor(message: string, status: number, body: unknown, code: string | null = null) {
+  constructor(
+    message: string,
+    status: number,
+    body: unknown,
+    code: string | null = null,
+    originalMessage: string = message,
+  ) {
     super(message);
     this.name = "AuthApiError";
+    this.originalMessage = originalMessage;
     this.status = status;
     this.code = code;
     this.body = body;
@@ -65,7 +74,7 @@ function extractAuthError(payload: AuthErrorBody, status: number) {
           ? payload.error
           : `Request failed: ${status}`;
 
-  return new AuthApiError(translateServerMessage(message), status, payload, code);
+  return new AuthApiError(translateServerMessage(message), status, payload, code, message);
 }
 
 // Rich diagnostics for auth requests. Network-layer failures (Safari

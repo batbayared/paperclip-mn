@@ -7,10 +7,13 @@ const BASE = "/api";
 export class ApiError extends Error {
   status: number;
   body: unknown;
+  /** Untranslated server message; compare against this, never against `message`. */
+  readonly originalMessage: string;
 
-  constructor(message: string, status: number, body: unknown) {
+  constructor(message: string, status: number, body: unknown, originalMessage: string = message) {
     super(message);
     this.name = "ApiError";
+    this.originalMessage = originalMessage;
     this.status = status;
     this.body = body;
   }
@@ -60,13 +63,9 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     const errorBody = await res.json().catch(() => null);
     const recovery = tenantSessionRecovery.recoverIfNeeded(res.status, errorBody);
     if (recovery) return recovery;
-    throw new ApiError(
-      translateServerMessage(
-        (errorBody as { error?: string } | null)?.error ?? `Request failed: ${res.status}`,
-      ),
-      res.status,
-      errorBody,
-    );
+    const originalMessage =
+      (errorBody as { error?: string } | null)?.error ?? `Request failed: ${res.status}`;
+    throw new ApiError(translateServerMessage(originalMessage), res.status, errorBody, originalMessage);
   }
   if (res.status === 204) return undefined as T;
   return res.json();

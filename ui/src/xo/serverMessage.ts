@@ -33,8 +33,7 @@ const templates: TemplateEntry[] = Object.entries(catalog)
 
 export function translateServerMessage(message: string): string {
   if (resolveLocale() !== "mn") return message;
-  const exact = catalog[message];
-  if (exact) return exact;
+  if (Object.hasOwn(catalog, message)) return catalog[message];
   for (const entry of templates) {
     const match = entry.pattern.exec(message);
     if (!match) continue;

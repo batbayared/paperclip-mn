@@ -131,7 +131,7 @@ function isDocumentConflictError(error: unknown) {
 }
 
 function isLockedDocumentError(error: unknown) {
-  return error instanceof ApiError && error.status === 409 && error.message === "Document is locked";
+  return error instanceof ApiError && error.status === 409 && error.originalMessage === "Document is locked";
 }
 
 function downloadDocumentFile(key: string, body: string) {

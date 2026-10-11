@@ -323,7 +323,7 @@ export function AgentActionButtons({
       try {
         return await agentsApi.create(resolvedCompanyId, payload);
       } catch (error) {
-        if (error instanceof ApiError && error.status === 409 && error.message.includes("requires board approval")) {
+        if (error instanceof ApiError && error.status === 409 && error.originalMessage.includes("requires board approval")) {
           const hire = await agentsApi.hire(resolvedCompanyId, payload);
           return hire.agent;
         }

@@ -3,7 +3,8 @@ import {
   createTenantSessionRecoveryCoordinator,
   tenantSessionRecovery,
 } from "@/lib/tenant-session-recovery";
-import { __inflightGetCount, api, detachInflightGet } from "./client";
+import { XO_LOCALE_STORAGE_KEY } from "@/xo/locale";
+import { __inflightGetCount, api, ApiError, detachInflightGet } from "./client";
 
 interface Deferred<T> {
   promise: Promise<T>;
@@ -197,5 +198,26 @@ describe("per-caller abort semantics", () => {
       name: "AbortError",
     });
     expect(fetchMock).not.toHaveBeenCalled();
+  });
+});
+
+describe("ApiError message translation", () => {
+  afterEach(() => localStorage.removeItem(XO_LOCALE_STORAGE_KEY));
+
+  it("keeps originalMessage English while message is translated under mn", async () => {
+    localStorage.setItem(XO_LOCALE_STORAGE_KEY, "mn");
+    fetchMock.mockResolvedValueOnce(errorResponse({ error: "Document is locked" }, 409));
+    const error = await api.get("/x").catch((e: unknown) => e);
+    expect(error).toBeInstanceOf(ApiError);
+    expect((error as ApiError).message).toBe("Баримт түгжигдсэн байна");
+    expect((error as ApiError).originalMessage).toBe("Document is locked");
+  });
+
+  it("leaves both fields English under en", async () => {
+    localStorage.setItem(XO_LOCALE_STORAGE_KEY, "en");
+    fetchMock.mockResolvedValueOnce(errorResponse({ error: "Document is locked" }, 409));
+    const error = await api.get("/x").catch((e: unknown) => e);
+    expect((error as ApiError).message).toBe("Document is locked");
+    expect((error as ApiError).originalMessage).toBe("Document is locked");
   });
 });
