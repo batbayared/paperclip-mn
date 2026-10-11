@@ -274,7 +274,7 @@ function ModelSourceMark({
 // Exported so tests write/read the exact key the component uses, instead of
 // duplicating the literal and silently drifting from it if it's ever renamed.
 export const ONBOARDING_STORAGE_KEY = "paperclip-onboarding-state";
-const DEFAULT_TASK_TITLE = "Paperclip onboarding";
+const defaultTaskTitle = () => tx("{{brand}} onboarding");
 /**
  * The onboarding draft in `localStorage`, via a browser that is allowed to say
  * no.
@@ -316,8 +316,8 @@ const onboardingDraftStorage = {
   },
 };
 
-const INCOMPLETE_ONBOARDING_STATE_MESSAGE =
-  "Onboarding state is incomplete. Please restart onboarding and try again.";
+const incompleteOnboardingStateMessage = () =>
+  tx("Onboarding state is incomplete. Please restart onboarding and try again.");
 
 /**
  * Thin gate in front of {@link OnboardingWizardInner}. The inner component's
@@ -1201,7 +1201,7 @@ function OnboardingWizardInner({
   */
   const connectCollapsed =
     connectPhase !== "idle" && connectPhase !== "unwindRow" && sourceSelected;
-  const connectProgress = adapterEnvLoading ? "Testing connection…" : loading ? "Connecting…" : null;
+  const connectProgress = adapterEnvLoading ? tx("Testing connection…") : loading ? tx("Connecting…") : null;
   const hasSavedSubscription = Boolean(savedSubscription || savedKeys.storedLogin.data ||
     (credentialMode !== "api" && managedBindingForStep()));
   const connectHasCard = credentialMode === "api" || connectStepNeedsLogin || connectStepHasNoSandbox || Boolean(connectProgress);
@@ -1666,13 +1666,13 @@ function OnboardingWizardInner({
     if (companyIdNow === companyIdAtStart || companyIdNow === returnedCompanyId) {
       return true;
     }
-    setError("Organization created, but onboarding switched to another organization.");
+    setError(tx("Organization created, but onboarding switched to another organization."));
     return false;
   }
 
   async function handleLaunchToDashboard() {
     if (!createdCompanyId || !createdAgentId) {
-      setError(INCOMPLETE_ONBOARDING_STATE_MESSAGE);
+      setError(incompleteOnboardingStateMessage());
       return;
     }
     setLoading(true);
@@ -1709,7 +1709,7 @@ function OnboardingWizardInner({
         const issue = await issuesApi.create(
           createdCompanyId,
           buildOnboardingIssuePayload({
-            title: DEFAULT_TASK_TITLE,
+            title: defaultTaskTitle(),
             assigneeAgentId: createdAgentId,
             projectId,
             goalId
@@ -1742,7 +1742,7 @@ function OnboardingWizardInner({
       // dashboard) so they land on the conversation the agent will start in.
       navigate(prefix ? `/${prefix}/issues/${issueRef}` : `/issues/${issueRef}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to launch first task");
+      setError(err instanceof Error ? err.message : tx("Failed to launch first task"));
     } finally {
       setLoading(false);
     }
@@ -1785,8 +1785,8 @@ function OnboardingWizardInner({
     } catch (err) {
       setError(
         err instanceof Error
-          ? `Could not store the API key: ${err.message}`
-          : "Could not store the API key.",
+          ? tx("Could not store the API key: {{message}}", { message: err.message })
+          : tx("Could not store the API key."),
       );
       return false;
     }
@@ -1865,7 +1865,7 @@ function OnboardingWizardInner({
   ): Promise<AdapterEnvironmentTestResult | null> {
     if (!createdCompanyId) {
       setAdapterEnvError(
-        "Create or select an organization before testing adapter environment."
+        tx("Create or select an organization before testing adapter environment.")
       );
       return null;
     }
@@ -1901,7 +1901,7 @@ function OnboardingWizardInner({
       } catch {
         if (!isCurrent()) return null;
         setAdapterEnvError(
-          "Could not load environment settings to determine which environment to test in. Retry the test.",
+          tx("Could not load environment settings to determine which environment to test in. Retry the test."),
         );
         return null;
       }
@@ -1939,7 +1939,7 @@ function OnboardingWizardInner({
     } catch (err) {
       if (!isCurrent()) return null;
       setAdapterEnvError(
-        err instanceof Error ? err.message : "Adapter environment test failed"
+        err instanceof Error ? err.message : tx("Adapter environment test failed")
       );
       return null;
     } finally {
@@ -1981,7 +1981,7 @@ function OnboardingWizardInner({
       setSelectedCompanyId(company.id);
       setStep(3);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create organization");
+      setError(err instanceof Error ? err.message : tx("Failed to create organization"));
     } finally {
       creatingCompanyRef.current = false;
       setLoading(false);
@@ -2000,7 +2000,7 @@ function OnboardingWizardInner({
     if (adapterType === "paperclip_runner") {
       setAdapterType("claude_local");
       setModel("");
-      setError("Paperclip Runner is not available during onboarding. Choose a legacy adapter.");
+      setError(tx("{{brand}} Runner is not available during onboarding. Choose a legacy adapter."));
       return;
     }
     if (createdAgentId) {
@@ -2019,7 +2019,7 @@ function OnboardingWizardInner({
         const selectedModelId = model.trim();
         if (!isValidOpenCodeModelId(selectedModelId)) {
           setError(
-            "OpenCode requires an explicit model in provider/model format."
+            tx("OpenCode requires an explicit model in provider/model format.")
           );
           return;
         }
@@ -2027,13 +2027,13 @@ function OnboardingWizardInner({
           setError(
             adapterModelsError instanceof Error
               ? adapterModelsError.message
-              : "Failed to load OpenCode models."
+              : tx("Failed to load OpenCode models.")
           );
           return;
         }
         if (adapterModelsLoading || adapterModelsFetching) {
           setError(
-            "OpenCode models are still loading. Please wait and try again."
+            tx("OpenCode models are still loading. Please wait and try again.")
           );
           return;
         }
@@ -2041,8 +2041,8 @@ function OnboardingWizardInner({
         if (!discoveredModels.some((entry) => entry.id === selectedModelId)) {
           setError(
             discoveredModels.length === 0
-              ? "No OpenCode models discovered. Run `opencode models` and authenticate providers."
-              : `Configured OpenCode model is unavailable: ${selectedModelId}`
+              ? tx("No OpenCode models discovered. Run `opencode models` and authenticate providers.")
+              : tx("Configured OpenCode model is unavailable: {{model}}", { model: selectedModelId })
           );
           return;
         }
@@ -2128,8 +2128,8 @@ function OnboardingWizardInner({
         if (blocksAgentCreate(result)) {
           setError(
             result.status === "fail"
-              ? "The environment test failed. Fix the reported checks before you hire this agent."
-              : "No working authentication was found. Fix the reported checks before you hire this agent.",
+              ? tx("The environment test failed. Fix the reported checks before you hire this agent.")
+              : tx("No working authentication was found. Fix the reported checks before you hire this agent."),
           );
           return;
         }
@@ -2208,7 +2208,7 @@ function OnboardingWizardInner({
       setStep(5);
     } catch (err) {
       if (!isCurrent()) return;
-      setError(err instanceof Error ? err.message : "Failed to create agent");
+      setError(err instanceof Error ? err.message : tx("Failed to create agent"));
     } finally {
       if (hiringAgentRef.current === attempt) hiringAgentRef.current = null;
       if (isCurrent()) setLoading(false);
@@ -2257,14 +2257,14 @@ function OnboardingWizardInner({
       const result = await runAdapterEnvironmentTest(configWithUnset);
       if (result?.status === "fail") {
         setError(
-          "Retried with ANTHROPIC_API_KEY unset in adapter config, but the environment test is still failing."
+          tx("Retried with ANTHROPIC_API_KEY unset in adapter config, but the environment test is still failing.")
         );
       }
     } catch (err) {
       setError(
         err instanceof Error
           ? err.message
-          : "Failed to unset ANTHROPIC_API_KEY and retry."
+          : tx("Failed to unset ANTHROPIC_API_KEY and retry.")
       );
     } finally {
       setUnsetAnthropicLoading(false);
@@ -2340,7 +2340,7 @@ function OnboardingWizardInner({
   const showsAgentArcStepper = isAgentArcStep && entryStep >= 3 && !enteredFromCloud;
 
   const launchStateIncomplete = step === 5 && (!createdCompanyId || !createdAgentId);
-  const visibleError = error ?? (launchStateIncomplete ? INCOMPLETE_ONBOARDING_STATE_MESSAGE : null);
+  const visibleError = error ?? (launchStateIncomplete ? incompleteOnboardingStateMessage() : null);
 
   return (
     <Dialog
@@ -2726,9 +2726,7 @@ function OnboardingWizardInner({
                       </p>
                     ) : credentialMode === "api" ? (
                       <OnboardingLoginCard
-                        instruction={savedKeys.options.length ? "Choose a saved API key or enter a new one" : `Provide your ${
-                          CONNECT_SOURCE_NAMES[adapterType] ?? adapterType
-                        } API key to connect`}
+                        instruction={savedKeys.options.length ? tx("Choose a saved API key or enter a new one") : tx("Provide your {{provider}} API key to connect", { provider: CONNECT_SOURCE_NAMES[adapterType] ?? adapterType })}
                       >
                         <SavedProviderKeySelect {...savedKeys} disabled={loading || adapterEnvLoading} value={selectedApiKey?.id ?? ""} onChange={(id) => {
                           setSelectedSavedKey(createdCompanyId ? { companyId: createdCompanyId, envKey: apiKeyEnvKeyFor(adapterType), id } : null);
@@ -3109,10 +3107,10 @@ function AdapterEnvironmentResult({
 }) {
   const statusLabel =
     result.status === "pass"
-      ? "Passed"
+      ? tx("Passed")
       : result.status === "warn"
-      ? "Warnings"
-      : "Failed";
+      ? tx("Warnings")
+      : tx("Failed");
   const statusClass =
     result.status === "pass"
       ? "text-green-700 dark:text-green-300 border-green-300 dark:border-green-500/40 bg-green-50 dark:bg-green-500/10"

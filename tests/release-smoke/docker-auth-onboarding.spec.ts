@@ -39,7 +39,7 @@ const AGENT_NAME = "Release Smoke Lead";
 const AGENT_ROLE = "general";
 // Seeded by the wizard's launch step (DEFAULT_TASK_TITLE in
 // ui/src/components/OnboardingWizard.tsx).
-const FIRST_TASK_TITLE = "Paperclip onboarding";
+const FIRST_TASK_TITLE = "XO-г эхлүүлэх";
 
 async function signIn(page: Page) {
   await page.goto("/");
