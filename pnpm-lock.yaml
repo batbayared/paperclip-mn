@@ -38,9 +38,6 @@ patchedDependencies:
   '@discordjs/ws@1.2.3':
     hash: vbylpnnxt5av2zdnuqmf6hjyjy
     path: patches/@discordjs__ws@1.2.3.patch
-  acpx@0.12.0:
-    hash: kww5qhmpak7g6zankvgzlm4iyu
-    path: patches/acpx@0.12.0.patch
   acpx@0.13.1:
     hash: zmi2maauog4djnfd2acdrgmyhe
     path: patches/acpx@0.13.1.patch
@@ -171,8 +168,8 @@ importers:
         specifier: workspace:*
         version: link:../shared
       acpx:
-        specifier: 0.12.0
-        version: 0.12.0(patch_hash=kww5qhmpak7g6zankvgzlm4iyu)
+        specifier: 0.13.1
+        version: 0.13.1(patch_hash=zmi2maauog4djnfd2acdrgmyhe)
       picocolors:
         specifier: ^1.1.1
         version: 1.1.1
@@ -1282,11 +1279,6 @@ packages:
   '@agentclientprotocol/codex-acp@1.6.2':
     resolution: {integrity: sha512-2eF1mbs1gTqkZJSLYOun/pFDx37sYa7W63HOPezC37b/R8AYms5O1nfQu8lrqFSGDrwDZkASVORymLcqjCNqyA==}
     hasBin: true
-
-  '@agentclientprotocol/sdk@1.2.1':
-    resolution: {integrity: sha512-jwYUdOQR7tc+Zfch53VL4JJyUNK/46q03uUTYb+PjECsmnNl94XFXOfYLJ8RBpMNidXd1rpOAVgb0vqD98xImA==}
-    peerDependencies:
-      zod: ^3.25.0 || ^4.0.0
 
   '@agentclientprotocol/sdk@1.4.0':
     resolution: {integrity: sha512-/eufudw+aFY1LKLolT6yFE6UMmYRl7fMJ/DEONSIyR6wI3slHWITBsANRGqXEY8FRzqUxwh7QEaGiZHcJPVThg==}
@@ -5502,11 +5494,6 @@ packages:
     engines: {node: '>=0.4.0'}
     hasBin: true
 
-  acpx@0.12.0:
-    resolution: {integrity: sha512-APYpN04XFWrCGuSBvM4HTKWWFH8uSIuzc+qI7aCGeVdP9o4euZeBosFEkmNUHvBOop0XBemg6d8RsNvzXN3Mgw==}
-    engines: {node: '>=22.13.0'}
-    hasBin: true
-
   acpx@0.13.1:
     resolution: {integrity: sha512-9zhvUrAR4XxSIgaLCiiWmrwmEWh+m6jxu2KUFC8BMOiK4sFsnrRL7H6VF54ZLTTpt0IHrZQju2V7+8wiMf9DXQ==}
     engines: {node: '>=22.13.0'}
@@ -7643,7 +7630,6 @@ packages:
 
   opencode-ai@1.18.29:
     resolution: {integrity: sha512-syIDVwlrYTgTOXzZe9SkInJWethbq6l3SNC762UeXyO0a9V0wGfd+U4yACvppwNBnhIsl0j2QPYYCyLpNaSomg==}
-    cpu: [arm64, x64]
     os: [darwin, linux, win32]
     hasBin: true
 
@@ -8299,11 +8285,6 @@ packages:
 
   sisteransi@1.0.5:
     resolution: {integrity: sha512-bLGGlR1QxBcynn2d5YmDX4MGjlZvy2MRBDRNHLJ8VI6l6+9FUiyTFNJ0IveOSP0bcXgVDPRcfGqA0pjaqUpfVg==}
-
-  skillflag@0.2.0:
-    resolution: {integrity: sha512-7ZmEpBeEoPLc+hqZ/StAnCO/hulgEPANzPyZgOM/CZ5zc3b0ApSp3URavY5POM/OKyi5d9+UC/Q21OoiYC2kJw==}
-    engines: {node: '>=18'}
-    hasBin: true
 
   skillflag@0.2.1:
     resolution: {integrity: sha512-47lfgUr6xzgljtTD5XfJrS+6muNb9R44OEr+o31Nco2R65W1xOA8Pi6QSbLa90tDYE6TqW5Hrh3N1egserGrhQ==}
@@ -9018,10 +8999,6 @@ snapshots:
       diff: 9.0.0
       open: 11.0.1
       vscode-jsonrpc: 9.0.1
-      zod: 4.4.3
-
-  '@agentclientprotocol/sdk@1.2.1(zod@4.4.3)':
-    dependencies:
       zod: 4.4.3
 
   '@agentclientprotocol/sdk@1.4.0(zod@4.4.3)':
@@ -13305,18 +13282,6 @@ snapshots:
 
   acorn@8.18.0: {}
 
-  acpx@0.12.0(patch_hash=kww5qhmpak7g6zankvgzlm4iyu):
-    dependencies:
-      '@agentclientprotocol/sdk': 1.2.1(zod@4.4.3)
-      commander: 15.0.0
-      skillflag: 0.2.0
-      tsx: 4.23.12
-      zod: 4.4.3
-    transitivePeerDependencies:
-      - bare-abort-controller
-      - bare-buffer
-      - react-native-b4a
-
   acpx@0.13.1(patch_hash=zmi2maauog4djnfd2acdrgmyhe):
     dependencies:
       '@agentclientprotocol/sdk': 1.4.0(zod@4.4.3)
@@ -16546,15 +16511,6 @@ snapshots:
   signal-exit@4.1.0: {}
 
   sisteransi@1.0.5: {}
-
-  skillflag@0.2.0:
-    dependencies:
-      '@clack/prompts': 1.7.0
-      tar-stream: 3.2.0
-    transitivePeerDependencies:
-      - bare-abort-controller
-      - bare-buffer
-      - react-native-b4a
 
   skillflag@0.2.1:
     dependencies:

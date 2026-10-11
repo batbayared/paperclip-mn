@@ -2117,6 +2117,16 @@ describe("shared ACPX engine runtime behavior", () => {
     expect(runtimeOptions[0]!.spawnCwd).toBeUndefined();
   });
 
+  it("hands acpx the sanitized launch environment instead of the ambient process env", async () => {
+    const root = await makeTempRoot();
+    const { runtimeOptions, sessionInputs } = await runExecutor({ agent: "custom", agentCommand: "node ./fake-acp.js", stateDir: path.join(root, "state") });
+    const options = runtimeOptions[0] as Record<string, unknown>;
+    expect(options.inheritProcessEnv).toBeUndefined();
+    expect(options.spawnEnvironment).toBeTypeOf("function");
+    const spawnEnv = (options.spawnEnvironment as () => Record<string, string>)();
+    expect(spawnEnv).toEqual((sessionInputs[0]!.sessionOptions as { env: Record<string, string> }).env);
+  });
+
   it("starts sandbox ACP process sessions in the remote execution cwd", async () => {
     const root = await makeTempRoot();
     const stateDir = path.join(root, "state");

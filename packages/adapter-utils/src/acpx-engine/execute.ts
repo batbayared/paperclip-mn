@@ -4233,7 +4233,7 @@ export function createAcpxEngineExecutor(deps: AcpxEngineExecutorOptions = {}) {
           // The engine passes a complete, sanitized launch environment. ACPX
           // must not merge the Paperclip server's ambient environment back in
           // when it spawns the provider child.
-          inheritProcessEnv: false,
+          spawnEnvironment: () => ({ ...prepared.env }),
           onAgentStderr: prepared.childStderrLogPath
             ? (chunk) => routeChildStderr(childStderrState, chunk)
             : undefined,

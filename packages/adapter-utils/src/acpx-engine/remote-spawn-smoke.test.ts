@@ -67,7 +67,7 @@ async function ensureRealAcpSession(input: {
   const agentCommand = `${JSON.stringify(process.execPath.replaceAll("\\", "/"))} ${JSON.stringify(fixturePath.replaceAll("\\", "/"))}`;
   const runtimeOptions: PatchedAcpRuntimeOptions = {
     cwd: input.cwd,
-    // `spawnCwd` is the host-only knob added by patches/acpx@0.12.0.patch; when
+    // `spawnCwd` is the host-only knob added by patches/acpx@0.13.1.patch; when
     // unset acpx falls back to `cwd`, so every non-proxy lane is byte-identical.
     ...(input.spawnCwd ? { spawnCwd: input.spawnCwd } : {}),
     sessionStore: createRuntimeStore({ stateDir: path.join(stateRoot, "state") }),

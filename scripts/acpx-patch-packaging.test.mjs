@@ -49,7 +49,7 @@ const claudeAcpPatch = await readFile(
   "utf8",
 );
 
-for (const version of ["0.12.0", "0.13.1"]) {
+for (const version of ["0.13.1"]) {
   test(`ACPX ${version} release patch uses portable generated unified hunks`, async () => {
     const patch = await readFile(
       new URL(`../patches/acpx@${version}.patch`, import.meta.url),
@@ -108,15 +108,12 @@ for (const version of ["0.12.0", "0.13.1"]) {
 }
 
 test("published packages preserve the patched ACPX runtime", () => {
-  assert.equal(
-    rootPackage.pnpm.patchedDependencies["acpx@0.12.0"],
-    "patches/acpx@0.12.0.patch",
-  );
+  assert.equal(rootPackage.pnpm.patchedDependencies["acpx@0.12.0"], undefined);
   assert.equal(
     rootPackage.pnpm.patchedDependencies["acpx@0.13.1"],
     "patches/acpx@0.13.1.patch",
   );
-  assert.equal(adapterUtilsPackage.dependencies.acpx, "0.12.0");
+  assert.equal(adapterUtilsPackage.dependencies.acpx, "0.13.1");
   assert.deepEqual(adapterUtilsPackage.bundleDependencies, ["acpx"]);
   assert.equal(serverPackage.dependencies.acpx, "0.13.1");
   assert.ok(serverPackage.bundleDependencies.includes("acpx"));
