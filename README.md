@@ -497,14 +497,14 @@ Paperclip collects anonymous usage telemetry to help us understand how the produ
 Contributors changing emitted telemetry events should follow the [Telemetry Data Contract](packages/shared/src/telemetry/README.md).
 For proposed first-party events that are not in the generated contract yet, follow [Telemetry Workflow](doc/TELEMETRY_WORKFLOW.md).
 
-Telemetry is **enabled by default** and can be disabled with any of the following:
+In XO, telemetry is **disabled by default**. Nothing is sent unless you opt in by setting `telemetry.enabled: true` in your Paperclip config. Even with that setting, any of the following still turns it off:
 
 | Method               | How                                                     |
 | -------------------- | ------------------------------------------------------- |
 | Environment variable | `PAPERCLIP_TELEMETRY_DISABLED=1`                        |
 | Standard convention  | `DO_NOT_TRACK=1`                                        |
 | CI environments      | Automatically disabled when `CI=true`                   |
-| Config file          | Set `telemetry.enabled: false` in your Paperclip config |
+| Config file          | Omit `telemetry.enabled` or set it to `false`           |
 
 ## Contributing
 

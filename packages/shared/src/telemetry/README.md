@@ -1,5 +1,7 @@
 # Telemetry Data Contract
 
+> **XO note:** XO ships telemetry off. `resolveTelemetryConfig()` returns `enabled: true` only when the config file sets `telemetry.enabled: true`, and the env kill-switches (`PAPERCLIP_TELEMETRY_DISABLED=1`, `DO_NOT_TRACK=1`, CI) still override it.
+
 This document explains how contributors should use Paperclip's public telemetry
 contract. It does not duplicate the full list of individual events or
 dimensions. It documents extra semantic and privacy rules where the generated

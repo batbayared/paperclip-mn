@@ -74,6 +74,8 @@ describe("cli telemetry", () => {
     for (const key of CI_ENV_VARS) {
       delete process.env[key];
     }
+    delete process.env.PAPERCLIP_TELEMETRY_DISABLED;
+    delete process.env.DO_NOT_TRACK;
     vi.stubGlobal("fetch", vi.fn(async () => ({ ok: true })));
   });
 
@@ -113,5 +115,17 @@ describe("cli telemetry", () => {
     expect(fs.existsSync(statePath)).toBe(true);
 
     await flushTelemetry();
+  });
+
+  it("is disabled when no config file exists", async () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "paperclip-cli-telemetry-"));
+    process.env.PAPERCLIP_HOME = path.join(root, "home");
+    process.env.PAPERCLIP_INSTANCE_ID = "telemetry-test";
+
+    const { initTelemetryFromConfigFile } = await import("../telemetry.js");
+    const client = initTelemetryFromConfigFile(path.join(root, "missing.json"));
+
+    expect(client).toBeNull();
+    expect(fs.existsSync(path.join(root, "home", "instances", "telemetry-test", "telemetry", "state.json"))).toBe(false);
   });
 });
