@@ -40,6 +40,8 @@ async function flushReact() {
   flushSync(() => {});
 }
 
+const INTERACTION_LANGUAGE_TOGGLE_SELECTOR =
+  'button[aria-label="Toggle Mongolian agent interaction language"]';
 const CONFERENCE_TOGGLE_SELECTOR =
   'button[aria-label="Toggle conference room chat experimental setting"]';
 const STREAMLINED_TOGGLE_SELECTOR =
@@ -95,6 +97,7 @@ function defaultExperimentalSettings(): InstanceExperimentalSettingsPayload {
     enableServerInfoDebugView: false,
     enablePaperclipDeveloperMode: false,
     enableSimplifiedEnglishInteractions: false,
+    interactionLanguage: "mn",
     enableFirstTaskPlanProposal: false,
     enableSmokeLab: false,
     autoRestartDevServerWhenIdle: false,
@@ -383,6 +386,24 @@ describe("InstanceExperimentalSettings — Conference Room Chat card (PAP-11233)
       enableDecisions: true,
     });
     expect(toggle?.getAttribute("aria-checked")).toBe("true");
+  });
+
+  it("renders and patches the agent interaction language toggle", async () => {
+    await renderPage();
+
+    expect(container.textContent).toContain("Agent interaction language");
+
+    const toggle = container.querySelector<HTMLButtonElement>(INTERACTION_LANGUAGE_TOGGLE_SELECTOR);
+    expect(toggle?.getAttribute("aria-checked")).toBe("true");
+
+    await act(async () => {
+      toggle?.click();
+    });
+    await flushReact();
+
+    expect(mockInstanceSettingsApi.updateExperimental).toHaveBeenCalledWith({
+      interactionLanguage: "en",
+    });
   });
 
   it("renders and patches the Goals Sidebar Link experimental toggle", async () => {

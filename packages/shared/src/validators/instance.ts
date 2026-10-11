@@ -70,6 +70,8 @@ export const instanceExperimentalSettingsSchema = z.object({
   enableServerInfoDebugView: z.boolean().default(false),
   enablePaperclipDeveloperMode: z.boolean().default(false),
   enableSimplifiedEnglishInteractions: z.boolean().default(false),
+  // XO: language agents use with the user. "mn" = Mongolian (XO default).
+  interactionLanguage: z.enum(["mn", "en"]).default("mn"),
   enableFirstTaskPlanProposal: z.boolean().default(false),
   autoRestartDevServerWhenIdle: z.boolean().default(false),
   enableWorkspaceBranchReconcileForward: z.boolean().default(true),

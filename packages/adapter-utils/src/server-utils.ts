@@ -812,6 +812,8 @@ type PaperclipWakePayload = {
   // Experimental: write user-interaction content in ASD-STE100 Simplified
   // Technical English with brief decision context.
   simplifiedEnglishInteractions: boolean;
+  // XO: "mn" adds the Mongolian interaction directive; null = upstream behaviour.
+  interactionLanguage: "mn" | "en" | null;
   dependencyBlockedInteraction: boolean;
   treeHoldInteraction: boolean;
   activeTreeHold: PaperclipWakeTreeHoldSummary | null;
@@ -1869,6 +1871,8 @@ export function normalizePaperclipWakePayload(
       payload.simplifiedEnglishInteractions,
       false,
     ),
+    interactionLanguage:
+      payload.interactionLanguage === "mn" ? "mn" : payload.interactionLanguage === "en" ? "en" : null,
     dependencyBlockedInteraction: asBoolean(
       payload.dependencyBlockedInteraction,
       false,
@@ -2553,7 +2557,11 @@ function renderPaperclipWakePromptBody(
       `- execution workspace branch: you are running in an execution workspace on branch ${markdownInlineCode(normalized.executionWorkspace.branchName)}. Do not switch, rename, or re-point this branch; keep all commits on it.`,
     );
   }
-  if (normalized.simplifiedEnglishInteractions) {
+  if (normalized.interactionLanguage === "mn") {
+    lines.push(
+      "- interaction language: write everything the user reads — comments, documents, request_confirmation, ask_user_questions, suggest_tasks, checkbox prompts and options — in Mongolian (Cyrillic script). Keep code, commands, file paths, API field names, tool names and technical identifiers in English.",
+    );
+  } else if (normalized.simplifiedEnglishInteractions) {
     lines.push(
       "- interaction language (experimental): write every user interaction you post (request_confirmation, ask_user_questions, suggest_tasks, checkbox prompts and options, and any other content rendered inside an interaction block) in ASD-STE100 Simplified Technical English. In each interaction, briefly tell the user what information they need to make the decision and what happens for each choice. This applies only to interaction content — write your thinking, comments, documents, and other responses in your usual style.",
     );

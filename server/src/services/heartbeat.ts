@@ -7591,6 +7591,7 @@ export async function buildPaperclipWakePayload(input: {
   // Experimental: agents write user-interaction content in ASD-STE100
   // Simplified Technical English (rendered as a prompt directive downstream).
   simplifiedEnglishInteractions?: boolean;
+  interactionLanguage?: "mn" | "en";
 }) {
   const executionStage = parseObject(input.contextSnapshot.executionStage);
   const commentIds = extractWakeCommentIds(input.contextSnapshot);
@@ -8094,6 +8095,7 @@ export async function buildPaperclipWakePayload(input: {
       input.contextSnapshot[PAPERCLIP_EXTERNAL_CHAT_EXECUTION_BOUND_KEY] ===
       true,
     simplifiedEnglishInteractions: input.simplifiedEnglishInteractions === true,
+    ...(input.interactionLanguage ? { interactionLanguage: input.interactionLanguage } : {}),
     dependencyBlockedInteraction:
       input.contextSnapshot.dependencyBlockedInteraction === true,
     treeHoldInteraction: input.contextSnapshot.treeHoldInteraction === true,
@@ -20389,6 +20391,7 @@ export function heartbeatService(
         simplifiedEnglishInteractions:
           experimentalInstanceSettings.enableSimplifiedEnglishInteractions ===
           true,
+        interactionLanguage: experimentalInstanceSettings.interactionLanguage,
       });
       if (paperclipWakePayload) {
         context[PAPERCLIP_WAKE_PAYLOAD_KEY] = paperclipWakePayload;

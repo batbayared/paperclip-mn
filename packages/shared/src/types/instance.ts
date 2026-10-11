@@ -96,6 +96,8 @@ export interface InstanceExperimentalSettings {
    * behavior change outside interaction wording.
    */
   enableSimplifiedEnglishInteractions: boolean;
+  /** XO: language agents use for user-facing interactions. Default "mn". */
+  interactionLanguage: "mn" | "en";
   /**
    * When the user's first onboarding request is a single task, the chief of
    * staff proposes with a short plan document and a checkbox card instead of a

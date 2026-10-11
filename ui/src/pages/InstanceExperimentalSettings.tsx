@@ -119,6 +119,35 @@ function ExperimentalToggleCard({
   );
 }
 
+function InteractionLanguageCard({
+  checked,
+  onCheckedChange,
+  disabled,
+}: {
+  checked: boolean;
+  onCheckedChange: (checked: boolean) => void;
+  disabled: boolean;
+}) {
+  return (
+    <Card className="block bg-transparent p-5">
+      <div className="flex items-start justify-between gap-4">
+        <div className="space-y-1.5">
+          <h3 className="text-sm font-semibold">{tx("Agent interaction language")}</h3>
+          <p className="max-w-2xl text-sm text-muted-foreground">
+            {tx("When on, agents write comments, questions, confirmations and documents for the user in Mongolian. Code, commands and technical names stay in English. Turn off to use English.")}
+          </p>
+        </div>
+        <ToggleSwitch
+          checked={checked}
+          onCheckedChange={onCheckedChange}
+          disabled={disabled}
+          aria-label="Toggle Mongolian agent interaction language"
+        />
+      </div>
+    </Card>
+  );
+}
+
 export function InstanceExperimentalSettings() {
   const { setBreadcrumbs } = useBreadcrumbs();
   const queryClient = useQueryClient();
@@ -231,6 +260,7 @@ export function InstanceExperimentalSettings() {
   const enableServerInfoDebugView = experimentalQuery.data?.enableServerInfoDebugView === true;
   const enablePaperclipDeveloperMode =
     experimentalQuery.data?.enablePaperclipDeveloperMode === true;
+  const interactionLanguageMongolian = experimentalQuery.data?.interactionLanguage !== "en";
   const enableSimplifiedEnglishInteractions =
     experimentalQuery.data?.enableSimplifiedEnglishInteractions === true;
   const enableFirstTaskPlanProposal =
@@ -432,6 +462,14 @@ export function InstanceExperimentalSettings() {
           settingKey="enableNativeRunner"
           managed={managedKeys.enableNativeRunner}
           ariaLabel="Toggle Paperclip Runner experimental setting"
+        />
+
+        <InteractionLanguageCard
+          checked={interactionLanguageMongolian}
+          onCheckedChange={(checked) =>
+            toggleMutation.mutate({ interactionLanguage: checked ? "mn" : "en" })
+          }
+          disabled={toggleMutation.isPending}
         />
 
         <ExperimentalToggleCard

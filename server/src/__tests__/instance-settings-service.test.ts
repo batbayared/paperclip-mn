@@ -60,6 +60,7 @@ describe("instance settings service", () => {
       enableServerInfoDebugView: true,
       enablePaperclipDeveloperMode: true,
       enableSimplifiedEnglishInteractions: false,
+      interactionLanguage: "mn",
       enableFirstTaskPlanProposal: false,
       autoRestartDevServerWhenIdle: true,
       enableWorkspaceBranchReconcileForward: true,
@@ -130,6 +131,14 @@ describe("instance settings service", () => {
       normalizeExperimentalSettings({ enableSimplifiedEnglishInteractions: true })
         .enableSimplifiedEnglishInteractions,
     ).toBe(true);
+  });
+
+  it("defaults interactionLanguage to mn and keeps an explicit en", () => {
+    expect(normalizeExperimentalSettings(undefined).interactionLanguage).toBe("mn");
+    expect(normalizeExperimentalSettings({}).interactionLanguage).toBe("mn");
+    expect(normalizeExperimentalSettings({ interactionLanguage: "en" }).interactionLanguage).toBe("en");
+    const patched = applyExperimentalSettingsPatch({}, { interactionLanguage: "en" });
+    expect(normalizeExperimentalSettings(JSON.parse(JSON.stringify(patched))).interactionLanguage).toBe("en");
   });
 
   it("defaults enableSmokeLab to false for empty and legacy stored settings", () => {

@@ -1288,6 +1288,34 @@ describe("renderPaperclipWakePrompt", () => {
     });
   });
 
+  it("renders the mongolian interaction directive only when interactionLanguage is mn", () => {
+    const payload = {
+      reason: "issue_commented",
+      issue: {
+        id: "issue-1",
+        identifier: "XO-1",
+        title: "Interaction language",
+        description: null,
+        descriptionTruncated: false,
+        status: "in_progress",
+      },
+      commentWindow: { requestedCount: 0, includedCount: 0, missingCount: 0 },
+      comments: [],
+      fallbackFetchNeeded: false,
+    };
+
+    expect(renderPaperclipWakePrompt(payload)).not.toContain("in Mongolian");
+    expect(renderPaperclipWakePrompt({ ...payload, interactionLanguage: "en" })).not.toContain("in Mongolian");
+
+    const mn = { ...payload, interactionLanguage: "mn", simplifiedEnglishInteractions: true };
+    const fresh = renderPaperclipWakePrompt(mn);
+    expect(fresh).toContain("in Mongolian (Cyrillic script)");
+    // Mongolian wins over the simplified-English experiment.
+    expect(fresh).not.toContain("ASD-STE100");
+    expect(renderPaperclipWakePrompt(mn, { resumedSession: true })).toContain("in Mongolian (Cyrillic script)");
+    expect(JSON.parse(stringifyPaperclipWakePayload(mn) ?? "{}")).toMatchObject({ interactionLanguage: "mn" });
+  });
+
   it("suppresses the issue description when the prompt already carries the task-context markdown", () => {
     const payload = {
       reason: "issue_assigned",
