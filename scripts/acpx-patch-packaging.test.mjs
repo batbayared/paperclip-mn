@@ -37,6 +37,7 @@ const serverPackage = JSON.parse(
 const dbPackage = JSON.parse(
   await readFile(new URL("../packages/db/package.json", import.meta.url), "utf8"),
 );
+const workspaceYaml = await readFile(new URL("../pnpm-workspace.yaml", import.meta.url), "utf8");
 const releaseScript = await readFile(new URL("./release.sh", import.meta.url), "utf8");
 const releaseLib = await readFile(new URL("./release-lib.sh", import.meta.url), "utf8");
 const buildNpmScript = await readFile(new URL("./build-npm.sh", import.meta.url), "utf8");
@@ -119,6 +120,11 @@ test("published packages preserve the patched ACPX runtime", () => {
   assert.ok(serverPackage.bundleDependencies.includes("acpx"));
   assert.equal(bundledCliNpmDependencies.has("acpx"), true);
   assert.equal(cliEsbuildConfig.external.includes("acpx"), false);
+});
+
+test("pnpm-workspace.yaml patchedDependencies no longer references the deleted ACPX 0.12.0 patch", () => {
+  assert.doesNotMatch(workspaceYaml, /acpx@0\.12\.0/);
+  assert.match(workspaceYaml, /acpx@0\.13\.1: patches\/acpx@0\.13\.1\.patch/);
 });
 
 test("Paperclip Runner pins the qualified ACPX host callbacks", () => {
