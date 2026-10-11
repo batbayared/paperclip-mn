@@ -10,7 +10,7 @@
   - Issue-гүй run: UI-ийн Run now (on-demand) run-ийн contextSnapshot-д issueId байхгүй. Ийм run-ийн comment/PATCH 403 cross_issue_influence_run_context_required авна. Мөн тийм run-ийн үүсгэсэн батлах картыг хүлээн авахад continuation шалгалт (execution-continuation.ts L120–144) source run-ийг олохгүй тул шинэ run setup_failed continuation_source_context_missing-ээр унаж, issue blocked болно. Тойрох зам: хүний comment blocked issue-г далд дахин нээж агентыг issue-тэй сэрээнэ (issues.ts L2294–2325).
   - acpx session race: нэг агентын зэрэгцээ хоёр manual run нэг persistent session бичлэг дээр ажиллаж, tmp нэр (pid + Date.now()) давхцаж бичлэг эвдэрсэн; closeBackendSession sessionOptions-гүй spawn хийж «node: not found». Stale бичлэгийг гараар зөөж шийдсэн.
   - Порт fallback: 3100 завгүй үед server чимээгүйхэн 3101 дээр асдаг («Requested port is busy; using next free port»), хоёр server зэрэг ажиллаж болно.
-- **Төлөв: claude_local ба codex_local хоёул issue-тэй heartbeat-ээр монгол хариу өгсөн. ED-ийн хүлээн зөвшөөрлийг хүлээж байна.**
+- **Төлөв: хаагдсан (2026-10-11).** claude_local ба codex_local хоёул issue-тэй heartbeat-ээр монгол хариу өгсөн; ED хүлээн зөвшөөрсөн.
 
 ## Ү1 хаалт
 
