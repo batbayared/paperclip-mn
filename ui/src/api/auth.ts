@@ -7,6 +7,7 @@ import {
 } from "@paperclipai/shared";
 import { redactUrlSecrets } from "@/lib/redact-url-secrets";
 import { tenantSessionRecovery } from "@/lib/tenant-session-recovery";
+import { translateServerMessage } from "@/xo/serverMessage";
 
 type AuthErrorBody =
   | {
@@ -64,7 +65,7 @@ function extractAuthError(payload: AuthErrorBody, status: number) {
           ? payload.error
           : `Request failed: ${status}`;
 
-  return new AuthApiError(message, status, payload, code);
+  return new AuthApiError(translateServerMessage(message), status, payload, code);
 }
 
 // Rich diagnostics for auth requests. Network-layer failures (Safari
