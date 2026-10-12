@@ -146,7 +146,11 @@ export async function buildExecutionContinuation(input: {
               allowIssueLessSource
                 ? or(
                     sql`${heartbeatRuns.contextSnapshot} ->> 'issueId' = ${issueId}`,
-                    sql`(${heartbeatRuns.contextSnapshot} ->> 'issueId') IS NULL`,
+                    // XO (Ү3-В D2): issue-less sources must belong to this agent.
+                    and(
+                      sql`(${heartbeatRuns.contextSnapshot} ->> 'issueId') IS NULL`,
+                      eq(heartbeatRuns.agentId, input.agentId),
+                    ),
                   )
                 : sql`${heartbeatRuns.contextSnapshot} ->> 'issueId' = ${issueId}`,
             ),
@@ -196,12 +200,7 @@ export async function buildExecutionContinuation(input: {
               eq(heartbeatRuns.companyId, companyId),
               eq(heartbeatRuns.agentId, input.agentId),
               eq(heartbeatRuns.id, input.previousContextRunId),
-              allowIssueLessSource
-                ? or(
-                    sql`${heartbeatRuns.contextSnapshot} ->> 'issueId' = ${issueId}`,
-                    sql`(${heartbeatRuns.contextSnapshot} ->> 'issueId') IS NULL`,
-                  )
-                : sql`${heartbeatRuns.contextSnapshot} ->> 'issueId' = ${issueId}`,
+              sql`${heartbeatRuns.contextSnapshot} ->> 'issueId' = ${issueId}`,
             ),
           )
       )[0]

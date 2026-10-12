@@ -210,7 +210,7 @@ describe("cross-issue influence limit rollout", () => {
       now: new Date(CROSS_ISSUE_INFLUENCE_ENFORCE_AT.getTime() - 1),
     })).resolves.toMatchObject({ count: 1, allowed: true });
     expect(fake.inserted).toHaveLength(1);
-    expect((fake.inserted[0]!.details as { sourceIssueId: unknown }).sourceIssueId ?? null).toBeNull();
+    expect((fake.inserted[0]!.details as { sourceIssueId: unknown }).sourceIssueId).toBeNull();
   });
 
   it("XO: rejects an issue-less run once it passes the cap after the flip", async () => {
