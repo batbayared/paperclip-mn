@@ -16,6 +16,8 @@
    Мөн доорх «Upstream хавтас дахь XO файлууд» ба «Lockfile» хэсгийн файлууд.
 6. Толь шинэчлэх: `pnpm xo:i18n:extract && pnpm xo:i18n:check` → шинэ/өөрчлөгдсөн түлхүүрийг `ui/src/i18n/xo/mn.json`-д орчуул, `check` OK болтол.
 6а. Серверийн толь: `pnpm xo:i18n:extract:server && pnpm xo:i18n:check:server` (Tier-1 серверийн мессеж орчуулагдсан эсэх).
+6б. Брэнд скан: `pnpm xo:brand-scan`. Унавал upstream шинэ "Paperclip" мөр оруулсан: хэрэглэгчид харагдах бол XO болго эсвэл каталогоор дамжуул; зөвшөөрөгдөх бол `node scripts/xo-brand/scan.mjs --update`.
+6в. Upstream шинэ `startsWith("PAPERCLIP_")` шүүлтүүр эсвэл `".paperclip"` гэрийн замыг нэмсэн эсэхийг шалга: `git diff <өмнөх-tag>..<шинэ-tag> | grep -n 'startsWith("PAPERCLIP_")\|homedir(), ".paperclip"'`. Олдвол isBrandRuntimeEnvKey / resolveDefaultBrandHomeDir руу шилжүүл.
 7. Шалгалт: `pnpm --filter @paperclipai/ui typecheck && (cd ui && pnpm exec vitest run) && pnpm build && pnpm test:e2e`
 8. Таг: `git tag "xo-$TAG" && git push origin xo-main "xo-$TAG"` (ED зөвшөөрсний дараа).
 9. `docs/xo/SYNC.md`-ийн доорх түүхэнд мөр нэм.
@@ -144,6 +146,30 @@ Upstream тестүүд (`packages/adapter-utils/src/server-utils.test.ts`, `ser
 Upstream sync хийхдээ: upstream telemetry-ийн default-ыг өөрчилсөн эсвэл шинэ гадагш дуудлага (paperclip.ing, paperclip.app, paperclip.dev, AWS ingest) нэмсэн эсэхийг `git diff <old>..upstream/master | grep -n "paperclip.ing\|paperclip.app\|paperclip.dev\|amazonaws"`-аар шалгаж, шинэ дуудлагыг мөн opt-in болго.
 
 `pnpm-lock.yaml` "## Lockfile" хэсгийн дүрмээр зохицуулагдана.
+
+## Ү3-А-д хөндсөн upstream файлууд
+
+Ү3-А (брэндийн нэр: XO_* орчны хувьсагч, ~/.xo гэр, `xo` CLI, onboarding текст) `db96d12e6..HEAD`-д хөндсөн upstream замууд. Sync-д зөрчил гарвал upstream-ийн хувилбарыг аваад XO-ийн мөрүүдийг дахин нэм. XO-ийн шинэ файлууд (`packages/shared/src/xo-brand-env.ts`, `scripts/xo-brand/*`, `ui/src/xo/*`, шинэ `xo-*.test.ts` болон `*.xo-env.test.ts` файлууд) энд ороогүй.
+
+| Файл | Ү3-А | Өөрчлөлт |
+|---|---|---|
+| `packages/shared/src/home-paths.ts` | А | resolveDefaultBrandHomeDir: XO_HOME > PAPERCLIP_HOME > ~/.xo > ~/.paperclip |
+| `packages/adapter-utils/src/server-utils.ts` | А | child env-д PAPERCLIP_X ба XO_X хоёуланг дамжуулна |
+| `packages/adapter-utils/src/acpx-engine/execute.ts` | А | spawn env-д XO_X хуулбар |
+| `server/src/config.ts` | А | XO_* alias унших |
+| `server/src/services/plugin-local-folders.ts` | А | брэнд гэрийн зам |
+| `server/src/services/workspace-runtime.ts` | А | isBrandRuntimeEnvKey шүүлтүүр |
+| `server/src/services/effective-run-config-fingerprints.ts` | А | isBrandRuntimeEnvKey шүүлтүүр |
+| `packages/db/scripts/clean-poisoned-claude-sessions.ts` | А | брэнд гэрийн зам |
+| `cli/src/index.ts` | А | `xo` нэр, XO_ alias эхлүүлэх |
+| `cli/src/config/env.ts` | А | XO_ alias |
+| `cli/src/config/data-dir.ts` | А | `--data-dir` нь XO_* ба PAPERCLIP_* хоёуланг тохируулна |
+| `cli/src/commands/test-drive.ts` | А | брэнд нэр |
+| `cli/package.json` | А | шинэ bin `xo` (`paperclipai` хэвээр) |
+| `package.json` | А | `xo:brand-scan` скрипт |
+| `server/src/onboarding-assets/ceo/AGENTS.md`, `ceo/HEARTBEAT.md`, `default/AGENTS.md`, `first-task/brief.md`, `first-task/greeting.md` | А | XO_ нэр, брэнд текст |
+
+Upstream тестүүд (`cli/src/__tests__/data-dir.test.ts`, `packages/adapter-utils/src/acpx-engine/execute.test.ts`, `packages/shared/src/home-paths.test.ts`, `server/src/services/onboarding-greeting.test.ts`, `server/src/services/onboarding-first-task-assets.test.ts`, `server/src/__tests__/issue-onboarding-first-task-routes.test.ts`) мөн засвартай.
 
 ## Lockfile
 

@@ -39,3 +39,12 @@ User-triggered third-party calls (not Paperclip infra, so not gated):
 D2 caveat: an issue-less continuation source is accepted when an interaction on the issue names it (company, issue, agent and non-explicit-user checks). The interaction status is not checked, and there are no priorRuns receipts for issue-less sources.
 
 `PAPERCLIP_TELEMETRY_DISABLED=1`, `DO_NOT_TRACK=1`, CI variables and `PAPERCLIP_UPDATE_CHECK=0` still win over the config.
+
+## XO env vars and home directory (Ү3-А)
+
+- `XO_*` names are primary, `PAPERCLIP_*` are fallbacks. `XO_X` wins over `PAPERCLIP_X`; a blank or whitespace-only `XO_X` counts as unset. Examples: `XO_HOME`, `XO_INSTANCE_ID`, `XO_PORT`.
+- `XO_I18N_TRANSFORM` and `XO_SCREENSHOTS` are XO-native: no `PAPERCLIP_` pair, not aliased.
+- Home directory resolution: `XO_HOME` > `PAPERCLIP_HOME` > `~/.xo` (if it exists) > `~/.paperclip` (if it exists) > `~/.xo`. No data migration: a machine with an existing `~/.paperclip` keeps using it where it is.
+- Agent child processes receive both `PAPERCLIP_X` and `XO_X` with the same value. New prompts and skills use the `XO_` names.
+- CLI: the new `xo` bin and the old `paperclipai` bin both work. `xo --data-dir` sets both name families.
+- Brand scan: `pnpm xo:brand-scan` fails if the count of user-visible "Paperclip" strings grows above `scripts/xo-brand/baseline.json`. `--update` lowers the baseline after an intentional change; `--list` prints the hits.
