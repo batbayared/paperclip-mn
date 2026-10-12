@@ -2,6 +2,7 @@ import { useRef, type ReactNode } from "react";
 import { AnimatePresence, motion } from "motion/react";
 
 import { cn } from "../../lib/utils";
+import { xoLabel } from "@/xo/labels";
 import {
   SOURCE_EXIT_FADE,
   SOURCE_COLLAPSE_MOVE,
@@ -54,7 +55,7 @@ export function CredentialTag({ mode }: { mode: CredentialMode }) {
           animate={{ opacity: 1, y: 0, transition: TAG_SWAP_ENTER }}
           exit={{ opacity: 0, y: TAG_SWAP_TRAVEL, transition: TAG_SWAP_EXIT }}
         >
-          {CREDENTIAL_TAG_LABEL[mode]}
+          {xoLabel(CREDENTIAL_TAG_LABEL[mode])}
         </motion.span>
       </AnimatePresence>
     </span>

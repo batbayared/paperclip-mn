@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from "motion/react";
 
 import { cn } from "../../lib/utils";
+import { xoLabel } from "@/xo/labels";
 import type { CredentialMode } from "./ModelSourceTiles";
 import { LINK_LABEL_FADE_IN, LINK_LABEL_FADE_OUT } from "./onboarding-motion";
 
@@ -59,7 +60,7 @@ export function CredentialModeLink({
           aria-hidden
           className="invisible col-start-1 row-start-1 whitespace-nowrap"
         >
-          {LINK_LABEL[sizerMode]}
+          {xoLabel(LINK_LABEL[sizerMode])}
         </span>
       ))}
 
@@ -81,7 +82,7 @@ export function CredentialModeLink({
           animate={{ opacity: 1, transition: LINK_LABEL_FADE_IN }}
           exit={{ opacity: 0, transition: LINK_LABEL_FADE_OUT }}
         >
-          {LINK_LABEL[mode]}
+          {xoLabel(LINK_LABEL[mode])}
         </motion.span>
       </AnimatePresence>
     </button>

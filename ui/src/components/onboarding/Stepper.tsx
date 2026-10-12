@@ -1,4 +1,5 @@
 import { cn } from "../../lib/utils";
+import { xoLabel } from "@/xo/labels";
 
 /**
  * The agent arc — create the agent, connect it, review — is the part of the
@@ -115,7 +116,7 @@ export function Stepper({
           <button
             key={segment}
             type="button"
-            aria-label={labels[segment - 1] ?? `Step ${segment}`}
+            aria-label={labels[segment - 1] ? xoLabel(labels[segment - 1]) : `Step ${segment}`}
             aria-current={segment === step ? "step" : undefined}
             disabled={!jumpable}
             onClick={() => jumpable && onJumpToStep?.(segment)}
