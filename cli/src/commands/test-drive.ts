@@ -6,6 +6,7 @@ import * as p from "@clack/prompts";
 import pc from "picocolors";
 import { Option, type Command } from "commander";
 import type { Agent, Company, InstanceExperimentalSettings } from "@paperclipai/shared";
+import { isBrandRuntimeEnvKey } from "@paperclipai/shared/xo-brand-env";
 import { PaperclipApiClient } from "../client/http.js";
 import { openUrl } from "../client/board-auth.js";
 import {
@@ -170,7 +171,7 @@ export async function prepareTestDriveEnvironment(
   const preservedCredential = sourceEnvName ? process.env[sourceEnvName] : undefined;
 
   for (const key of Object.keys(process.env)) {
-    if (key.startsWith("PAPERCLIP_")) {
+    if (isBrandRuntimeEnvKey(key)) {
       delete process.env[key];
     }
   }

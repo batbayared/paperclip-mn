@@ -82,6 +82,7 @@ import {
   type ExposureManagerDeps,
 } from "./runtime-exposure/exposure-manager.js";
 import { diagnoseRuntimeListenerBinds, readListenerBindFacts } from "./runtime-exposure/loopback-listener.js";
+import { isBrandRuntimeEnvKey } from "@paperclipai/shared/xo-brand-env";
 import { allocateExposurePortPair } from "./runtime-exposure/port-pair.js";
 import {
   buildExposureReservationLedger,
@@ -677,7 +678,7 @@ export async function ensureServerWorkspaceLinksCurrent(
 export function sanitizeRuntimeServiceBaseEnv(baseEnv: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
   const env: NodeJS.ProcessEnv = { ...baseEnv };
   for (const key of Object.keys(env)) {
-    if (key.startsWith("PAPERCLIP_")) {
+    if (isBrandRuntimeEnvKey(key)) {
       delete env[key];
     }
   }
