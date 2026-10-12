@@ -28,6 +28,8 @@ import {
 import { ListFilter, Layers, ChevronDown, ChevronRight, User, Settings } from "lucide-react";
 import { AgentIcon } from "./AgentIconPicker";
 import { timeAgo } from "../lib/timeAgo";
+import { xoStatusLabel } from "@/xo/labels";
+import { tx } from "@/i18n/xo";
 
 /* ------------------------------------------------------------------ */
 /*  Event Tier Classification                                          */
@@ -671,7 +673,7 @@ export function ActivityFeed({ className }: ActivityFeedProps) {
               >
                 {FILTER_OPTIONS.map(({ value, label }) => (
                   <DropdownMenuRadioItem key={value} value={value}>
-                    {label}
+                    {label === "All" ? tx("All") : xoStatusLabel(label, label)}
                   </DropdownMenuRadioItem>
                 ))}
               </DropdownMenuRadioGroup>

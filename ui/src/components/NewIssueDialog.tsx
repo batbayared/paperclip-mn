@@ -176,6 +176,7 @@ import {
   ISSUE_OVERRIDE_ADAPTER_TYPES,
   type IssueModelLane,
 } from "../lib/issue-assignee-overrides";
+import { xoStatusLabel } from "@/xo/labels";
 
 const STAGED_FILE_ACCEPT = "image/*,application/pdf,text/plain,text/markdown,application/json,text/csv,text/html,.md,.markdown";
 
@@ -270,7 +271,7 @@ function formatFileSize(file: File) {
 
 function buildStatusOptions(): ReadonlyArray<{ value: string; label: string; color: string; description?: string }> {
   const palette = issueStatusText;
-  return [
+  const options = [
     {
       value: "backlog",
       label: "Backlog",
@@ -287,6 +288,7 @@ function buildStatusOptions(): ReadonlyArray<{ value: string; label: string; col
     { value: "in_review", label: "In Review", color: palette.in_review ?? issueStatusTextDefault },
     { value: "done", label: "Done", color: palette.done ?? issueStatusTextDefault },
   ];
+  return options.map((option) => ({ ...option, label: xoStatusLabel(option.value, option.label) }));
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
