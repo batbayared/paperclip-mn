@@ -109,6 +109,42 @@ Sync бүрд `ThemeToggle`-ийг `ui/src/xo/XoLocaleMenuAction.tsx`-ийн mar
 
 Upstream тестүүд (`packages/adapter-utils/src/server-utils.test.ts`, `server/src/__tests__/instance-settings-service.test.ts`, `server/src/__tests__/issue-onboarding-first-task-routes.test.ts`, `server/src/services/onboarding-first-task-assets.test.ts`, `ui/src/api/client.test.ts`, `ui/src/pages/InstanceExperimentalSettings.test.tsx`) мөн нэмэгдэл/засвартай. Шинээр нэмсэн `server/src/onboarding-assets/first-task/**/*.mn.*` файлууд upstream-д байхгүй тул зөрчилдөхгүй.
 
+## Ү3-В-д хөндсөн upstream файлууд
+
+Ү3-В (гадагш дуудлагагүй default, dev JWT, acpx 0.13.1, issue-гүй run) хөндсөн upstream замууд. Sync-д зөрчил гарвал upstream-ийн хувилбарыг аваад XO-ийн мөрүүдийг дахин нэм. XO-ийн шинэ файлууд (`packages/shared/src/telemetry/config.test.ts`, `server/src/config.telemetry.test.ts`, `server/src/dev-agent-jwt-secret.ts`, `server/src/__tests__/dev-agent-jwt-secret.test.ts`, `docs/xo/ops-notes.md`) энд ороогүй.
+
+| Файл | Ү3-В | Өөрчлөлт |
+|---|---|---|
+| `packages/shared/src/telemetry/config.ts` | A | `enabled !== true` бол унтраах |
+| `packages/shared/src/config-schema.ts` | A | `telemetry.enabled`, `updates.checkEnabled` default `false` |
+| `packages/shared/src/telemetry/README.md` | A | XO тэмдэглэл |
+| `server/src/config.ts` | A | `telemetryEnabled ?? false`, `announcementsEnabled === "true"` |
+| `server/src/services/feedback-share-client.ts` | A | default URL хассан, URL-гүй бол `undefined` |
+| `server/src/__tests__/feedback-share-client.test.ts` | A | default URL тестийг солиод `client!` |
+| `cli/src/update-notice.ts` | A | `checkEnabled === true`, catch нь `false` |
+| `cli/src/__tests__/update-notice.test.ts` | A | config-той throttle тест, config-гүй тест |
+| `cli/src/commands/configure.ts`, `onboard.ts`, `worktree-lib.ts` | A | шинэ config-д `telemetry.enabled: false` |
+| `cli/src/__tests__/telemetry.test.ts` | A | kill-switch env устгах, config-гүй тест |
+| `README.md` | A | Telemetry хэсэг opt-in |
+| `doc/ANNOUNCEMENTS.md` | A | `=true` opt-in |
+| `scripts/dev-runner.ts` | B | `ensureDevAgentJwtSecret(process.env)` |
+| `packages/adapter-utils/package.json` | C | acpx `0.13.1` |
+| `package.json` | C | `acpx@0.12.0` patch хассан |
+| `pnpm-workspace.yaml` | C | `acpx@0.12.0` patch хассан (patchedDependencies) |
+| `patches/acpx@0.12.0.patch` | C | устгасан |
+| `scripts/acpx-patch-packaging.test.mjs` | C | зөвхөн 0.13.1 шалгана |
+| `packages/adapter-utils/src/acpx-engine/execute.ts` | C | `inheritProcessEnv` → `spawnEnvironment` |
+| `packages/adapter-utils/src/acpx-engine/execute.test.ts` | C | spawnEnvironment тест |
+| `packages/adapter-utils/src/acpx-engine/remote-spawn-smoke.test.ts` | C | тайлбар |
+| `server/src/services/cross-issue-influence-limit.ts` | D1 | issue-гүй run-ийг cap-аар тоолно |
+| `server/src/__tests__/cross-issue-influence-limit.test.ts` | D1 | fail-closed тестийг XO тестээр солисон |
+| `server/src/services/execution-continuation.ts` | D2 | interaction нэрлэсэн issue-гүй эх run |
+| `server/src/services/execution-continuation.test.ts` | D2 | хоёр XO тест |
+
+Upstream sync хийхдээ: upstream telemetry-ийн default-ыг өөрчилсөн эсвэл шинэ гадагш дуудлага (paperclip.ing, AWS ingest) нэмсэн эсэхийг `git diff <old>..upstream/master | grep -n "paperclip.ing\|amazonaws"`-аар шалгаж, шинэ дуудлагыг мөн opt-in болго.
+
+`pnpm-lock.yaml` "## Lockfile" хэсгийн дүрмээр зохицуулагдана.
+
 ## Lockfile
 
 `pnpm-lock.yaml` XO-ийн dependency өөрчлөлт (root `package.json`)-өөс болж sync-д ихэвчлэн зөрчилдөнө. Гараар merge хийхгүй:
