@@ -23,7 +23,14 @@
 
 ### 3110 instance ба browser шалгалт
 
-controller шалгана (хүлээгдэж буй). tiers.ts өөрчлөгдсөн тул QuestionForm/PropertiesPanel HMR-ээр орохгүй бол restart-д ED-ийн зөвшөөрөл хэрэгтэй.
+2026-10-12, y3b-test (3110, restart хийгээгүй, Vite HMR):
+
+- /YB/issues: статус «Хийх / Хянагдаж буй / Дууссан», англи статус үлдээгүй.
+- /YB/costs: «company budgets» харагдахгүй.
+- Sidebar aria-label: «Y3B Тест ХХК байгууллага сонгогчийг нээх», «Байгууллага хэсгийг хураах».
+- /YB/issues/YB-999999: API 404 → «Даалгавар олдсонгүй» ~7 сек дараа (retry 3). Browser pane нуугдмал үед React Query retry-г зогсоодог тул мессеж гарахгүй байж болно; энэ нь кодын алдаа биш.
+- en горим (xo.locale=en): «Todo / In Review / Done», «Open … organization switcher».
+- Шалгаагүй: onboarding (шинэ байгууллага үүсгэх шаардлагатай), QuestionForm (асуулттай даалгавар байхгүй). Хоёулаа unit тестээр хамрагдсан.
 
 ### Үлдэгдэл
 
