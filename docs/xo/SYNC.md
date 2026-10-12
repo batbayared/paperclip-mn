@@ -123,7 +123,7 @@ Upstream тестүүд (`packages/adapter-utils/src/server-utils.test.ts`, `ser
 | ui/src/components/SidebarCompanyMenu.tsx | switcherNoun = tx("organization") |
 | ui/src/components/SidebarCompanyMenu.production.tsx | switcherNoun tx() |
 | ui/src/pages/Costs.tsx | scope нэр үгийг tx("organization")/tx("agent")/tx("project") |
-| ui/src/pages/Costs.production.tsx | "{scopeType} budgets" → tx("{{scope}} budgets"); scope нэр үг tx("organization")/tx("agent")/tx("project") |
+| ui/src/pages/Costs.production.tsx | "{scopeType} budgets" → tx("{{scope}} budgets"); scope нэр үг tx("company")/tx("agent")/tx("project") |
 | ui/src/components/StatusIcon.tsx | statusLabel → xoStatusLabel() |
 | ui/src/components/KanbanBoard.tsx | statusLabel → xoStatusLabel() |
 | ui/src/components/StatusBadge.tsx | анхдагч шошго xoStatusLabel() |
@@ -131,8 +131,9 @@ Upstream тестүүд (`packages/adapter-utils/src/server-utils.test.ts`, `ser
 | ui/src/components/ActivityFeed.tsx | шүүлтүүрийн шошго xoStatusLabel(); "All" шүүлтүүрийг tx("All") |
 | ui/src/components/NewIssueDialog.tsx | buildStatusOptions label xoStatusLabel() (description англиар үлдсэн) |
 | ui/src/pages/IssueDetail.tsx | 404 үед "Task not found" |
+| ui/src/pages/IssueDetail.test.tsx | 404 → "Task not found" тест нэмсэн |
 
-XO-ийн өмч (upstream биш): ui/src/xo/labels.ts, scripts/xo-i18n/tiers.ts, ui/src/i18n/xo/*.
+XO-ийн өмч (upstream биш): ui/src/xo/labels.ts, scripts/xo-i18n/tiers.ts, ui/src/i18n/xo/*. Шинэ XO-ийн тестүүд: ui/src/xo/labels.test.ts, ui/src/i18n/xo/suffix.test.ts, ui/src/components/StatusIcon.xo.test.tsx, ui/src/components/onboarding/CredentialTag.xo.test.tsx, ui/src/components/task-chat/QuestionForm.xo.test.ts.
 
 Үлдэгдэл:
 

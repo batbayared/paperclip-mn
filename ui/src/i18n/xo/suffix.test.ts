@@ -8,6 +8,8 @@ const FIXED: Record<string, string> = {
   "New task in {{label}}": "Шинэ даалгавар: {{label}}",
   "{{scope}} budgets": "{{scope}} түвшний төсөв",
   "Resume the agent to generate this {{noun}}.": "Агентыг үргэлжлүүлбэл энэ {{noun}} үүснэ.",
+  "{{page}} of {{total}}": "{{page}} / {{total}}",
+  "Enter a value no greater than {{maximum}}.": "Хамгийн ихдээ {{maximum}} байх утга оруулна уу.",
 };
 
 describe("mn дагавар (Ү3-Б үлдэгдэл)", () => {

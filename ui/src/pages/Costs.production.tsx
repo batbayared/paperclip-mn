@@ -912,7 +912,7 @@ export function Costs() {
                   return (
                     <section key={scopeType} className="space-y-3">
                       <div>
-                        <h2 className="text-lg font-semibold capitalize">{tx("{{scope}} budgets", { scope: scopeType === "company" ? tx("organization") : scopeType === "agent" ? tx("agent") : tx("project") })}</h2>
+                        <h2 className="text-lg font-semibold capitalize">{tx("{{scope}} budgets", { scope: scopeType === "company" ? tx("company") : scopeType === "agent" ? tx("agent") : tx("project") })}</h2>
                         <p className="text-sm text-muted-foreground">
                           {scopeType === "company"
                             ? "Company-wide monthly policy."
