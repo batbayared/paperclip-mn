@@ -126,7 +126,18 @@ Paperclip (MIT, paperclipai/paperclip) нээлттэй эхийн агент у
 
 - ui/src/xo/brand.ts: name "XO", fullName, tagline, siteUrl, supportEmail, лого компонент (SVG-г ED өгнө; түр XO үсэгтэй wordmark).
 - Каталог доторх "Paperclip" → {{brand}}. Гар засвар: index.html title/meta, site.webmanifest, BreadcrumbContext дагавар, PaperclipLockup → XoLockup, Auth.tsx, docs/docs.json. Theme localStorage түлхүүр хэвээр.
-- Хөндөхгүй: @paperclipai/* package нэр, PAPERCLIP_* env, DB нэр, docker volume, CLI bin paperclipai.
+- ~~Хөндөхгүй: @paperclipai/* package нэр, PAPERCLIP_* env, DB нэр, docker volume, CLI bin paperclipai.~~ ED 2026-10-01-нд энэ хязгаарыг цуцалсан (доорх 10.1).
+
+### 10.1 Ү3-А: давхаргат брэнд солилт (ED 2026-10-01, 2026-10-11, 2026-10-12)
+
+- Хэрэглэгчид харагдах бүх зүйл XO: UI, server мессеж (UI дээр), onboarding asset, CLI нэр.
+- Орчны хувьсагч: XO_* үндсэн, PAPERCLIP_* нөөц. Процесс эхлэхэд XO_X байвал PAPERCLIP_X-ийг дарж бичнэ (XO ялна). XO-ийн өөрийн хувьсагч (XO_I18N_TRANSFORM, XO_SCREENSHOTS) alias хийгдэхгүй.
+- Агентын child процесс хоёр нэрээр авна: PAPERCLIP_X бүрд XO_X хуулбар. Одоо байгаа skill, prompt, Rust runner эвдрэхгүй.
+- Гэрийн хавтас: XO_HOME > PAPERCLIP_HOME > ~/.xo (байвал) > ~/.paperclip (байвал) > ~/.xo (шинэ суулгалт). Өгөгдөл зөөхгүй, migrate команд байхгүй. Репо доторх <repo>/.paperclip хавтас хэвээр.
+- CLI: xo bin нэмэгдэнэ, paperclipai bin хэвээр үлдэнэ.
+- Хэвээр үлдэх дотоод нэрс: @paperclipai/* багц, DB нэр/role, хэрэгжсэн migration, cookie угтвар, wire id, MCP tool нэр, skill түлхүүр, localStorage түлхүүр, x-paperclip-* header, adapter-уудын «Paperclip runtime note» prompt.
+- UI доторх хатуу кодлогдсон англи «Paperclip» мөрүүдийг (~163 файл) Ү3-А гараар засахгүй. Брэнд скан (scripts/xo-brand/scan.mjs) тэдгээрийг baseline-аар тоолж, Ү3-Б үлдэгдэл ба T2-ийн оролт болгоно.
+- Хүлээлт: 4–6 ажлын өдөр; сар бүрийн upstream синк 1 өдрөөс бага хэвээр.
 
 ## 11. L2: Server мессеж (Ү3)
 
