@@ -127,8 +127,12 @@ export async function buildExecutionContinuation(input: {
     string(input.context.previousRunId) ??
     string(input.context.interruptedRunId);
   // XO (Ү3-В D2): a "Run now" run carries no issueId. Accept it as the
-  // continuation source only when the resolved interaction on this issue names
-  // it. Explicit user continuations and retry/previous/interrupted ids stay
+  // continuation source only when all of these hold: the interaction belongs
+  // to this company and issue, its sourceRunId equals the chosen source run,
+  // the run's agentId matches (checked below), and the continuation is not an
+  // explicit-user one. The interaction's status is NOT checked, and its
+  // sourceRunId is caller-supplied at creation. Known limitation: no priorRuns
+  // receipts exist for issue-less sources. Retry/previous/interrupted ids stay
   // issue-scoped.
   const allowIssueLessSource =
     !explicitUserSource &&

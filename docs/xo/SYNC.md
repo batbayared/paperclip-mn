@@ -139,9 +139,9 @@ Upstream тестүүд (`packages/adapter-utils/src/server-utils.test.ts`, `ser
 | `server/src/services/cross-issue-influence-limit.ts` | D1 | issue-гүй run-ийг cap-аар тоолно |
 | `server/src/__tests__/cross-issue-influence-limit.test.ts` | D1 | fail-closed тестийг XO тестээр солисон |
 | `server/src/services/execution-continuation.ts` | D2 | interaction нэрлэсэн issue-гүй эх run |
-| `server/src/services/execution-continuation.test.ts` | D2 | хоёр XO тест |
+| `server/src/services/execution-continuation.test.ts` | D2 | таван XO тест |
 
-Upstream sync хийхдээ: upstream telemetry-ийн default-ыг өөрчилсөн эсвэл шинэ гадагш дуудлага (paperclip.ing, AWS ingest) нэмсэн эсэхийг `git diff <old>..upstream/master | grep -n "paperclip.ing\|amazonaws"`-аар шалгаж, шинэ дуудлагыг мөн opt-in болго.
+Upstream sync хийхдээ: upstream telemetry-ийн default-ыг өөрчилсөн эсвэл шинэ гадагш дуудлага (paperclip.ing, paperclip.app, paperclip.dev, AWS ingest) нэмсэн эсэхийг `git diff <old>..upstream/master | grep -n "paperclip.ing\|paperclip.app\|paperclip.dev\|amazonaws"`-аар шалгаж, шинэ дуудлагыг мөн opt-in болго.
 
 `pnpm-lock.yaml` "## Lockfile" хэсгийн дүрмээр зохицуулагдана.
 
