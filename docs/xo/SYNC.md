@@ -111,6 +111,36 @@ Sync бүрд `ThemeToggle`-ийг `ui/src/xo/XoLocaleMenuAction.tsx`-ийн mar
 
 Upstream тестүүд (`packages/adapter-utils/src/server-utils.test.ts`, `server/src/__tests__/instance-settings-service.test.ts`, `server/src/__tests__/issue-onboarding-first-task-routes.test.ts`, `server/src/services/onboarding-first-task-assets.test.ts`, `ui/src/api/client.test.ts`, `ui/src/pages/InstanceExperimentalSettings.test.tsx`) мөн нэмэгдэл/засвартай. Шинээр нэмсэн `server/src/onboarding-assets/first-task/**/*.mn.*` файлууд upstream-д байхгүй тул зөрчилдөхгүй.
 
+## Ү3-Б үлдэгдэлд хөндсөн upstream файлууд
+
+| Файл | Өөрчлөлт |
+|---|---|
+| ui/src/components/onboarding/CredentialModeLink.tsx | LINK_LABEL-г xoLabel()-ээр ороосон, import |
+| ui/src/components/onboarding/ModelSourceTiles.tsx | CREDENTIAL_TAG_LABEL-г xoLabel()-ээр, import |
+| ui/src/components/onboarding/Stepper.tsx | алхмын aria-label xoLabel(), import |
+| ui/src/components/task-chat/QuestionForm.tsx | T1-д нэмсэн; answerError/setError/хуудаслалт/attachAriaLabel tx(); answerError export хийсэн (тестэд) |
+| ui/src/components/PropertiesPanel.tsx | T1-д нэмсэн (кодын өөрчлөлтгүй) |
+| ui/src/components/SidebarCompanyMenu.tsx | switcherNoun = tx("organization") |
+| ui/src/components/SidebarCompanyMenu.production.tsx | switcherNoun tx() |
+| ui/src/pages/Costs.tsx | scope нэр үгийг tx("organization")/tx("agent")/tx("project") |
+| ui/src/pages/Costs.production.tsx | "{scopeType} budgets" → tx("{{scope}} budgets"); scope нэр үг tx("organization")/tx("agent")/tx("project") |
+| ui/src/components/StatusIcon.tsx | statusLabel → xoStatusLabel() |
+| ui/src/components/KanbanBoard.tsx | statusLabel → xoStatusLabel() |
+| ui/src/components/StatusBadge.tsx | анхдагч шошго xoStatusLabel() |
+| ui/src/components/ActivityCharts.tsx | легенд xoStatusLabel() |
+| ui/src/components/ActivityFeed.tsx | шүүлтүүрийн шошго xoStatusLabel(); "All" шүүлтүүрийг tx("All") |
+| ui/src/components/NewIssueDialog.tsx | buildStatusOptions label xoStatusLabel() (description англиар үлдсэн) |
+| ui/src/pages/IssueDetail.tsx | 404 үед "Task not found" |
+
+XO-ийн өмч (upstream биш): ui/src/xo/labels.ts, scripts/xo-i18n/tiers.ts, ui/src/i18n/xo/*.
+
+Үлдэгдэл:
+
+- NewIssueDialog-ийн статусын description англиар үлдсэн.
+- {{var}} дагавартай ~48 бусад mn мөр хойшлогдсон.
+- IssueDetail-ийн 404 бус алдаа дээр түүхий error.message харагдсан хэвээр.
+- 404 мессеж React Query-ийн retry-ийн дараа (~7 сек) гарна.
+
 ## Ү3-В-д хөндсөн upstream файлууд
 
 Ү3-В (гадагш дуудлагагүй default, dev JWT, acpx 0.13.1, issue-гүй run) хөндсөн upstream замууд. Sync-д зөрчил гарвал upstream-ийн хувилбарыг аваад XO-ийн мөрүүдийг дахин нэм. XO-ийн шинэ файлууд (`packages/shared/src/telemetry/config.test.ts`, `server/src/config.telemetry.test.ts`, `server/src/dev-agent-jwt-secret.ts`, `server/src/__tests__/dev-agent-jwt-secret.test.ts`, `docs/xo/ops-notes.md`) энд ороогүй.
