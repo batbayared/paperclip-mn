@@ -6674,7 +6674,12 @@ export function TaskDetailSurface({ conversation, tasksTab }: { tasksTab?: TaskS
 
   if (isLoading)
     return <IssueDetailLoadingState headerSeed={issueHeaderSeed} />;
-  if (error) return <p className="text-sm text-destructive">{error.message}</p>;
+  if (error)
+    return (
+      <p className="text-sm text-destructive">
+        {error instanceof ApiError && error.status === 404 ? "Task not found" : error.message}
+      </p>
+    );
   if (!issue) return null;
   // Do not expose a file chooser on the outgoing UUID/company/interface
   // branch: its input can be detached before the chosen file is returned.

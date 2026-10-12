@@ -1560,6 +1560,22 @@ describe("IssueDetail", () => {
     expect(windowOpen).not.toHaveBeenCalled();
   });
 
+  it("shows a not-found message when the task returns 404", async () => {
+    mockIssuesApi.get.mockRejectedValue(new ApiError("Issue not found", 404, null));
+
+    await act(async () => {
+      root.render(
+        <QueryClientProvider client={queryClient}>
+          <IssueDetail />
+        </QueryClientProvider>,
+      );
+    });
+    await flushReact();
+    await flushReact();
+
+    expect(container.textContent).toContain("Task not found");
+  });
+
   it("loads from the pending state into issue detail without changing hook order", async () => {
     const issueRequest = createDeferred<Issue>();
     mockIssuesApi.get.mockReturnValueOnce(issueRequest.promise);

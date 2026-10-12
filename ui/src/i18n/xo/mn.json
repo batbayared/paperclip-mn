@@ -1406,6 +1406,7 @@
   "Task archive failed": "Даалгаврыг архивлаж чадсангүй",
   "Task archived from inbox": "Даалгаврыг ирсэн хэсгээс архивласан",
   "Task name": "Даалгаврын нэр",
+  "Task not found": "Даалгавар олдсонгүй",
   "Task pause update failed": "Даалгаврын түр зогсолтыг шинэчилж чадсангүй",
   "Task paused": "Даалгавар түр зогссон",
   "Task people": "Даалгаврын хүмүүс",
