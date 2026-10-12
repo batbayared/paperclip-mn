@@ -34,3 +34,18 @@
 - Build a new organization текст d554c4789-д зөвхөн upstream spec-үүдэд байдаг, ui/src-д байхгүй тул орчуулагдахгүй. Spec-ийг хөндөөгүй.
 - 11 дэлгэцийн зургийг (~/dev/xo-screenshots/) ED 2026-10-01-нд батласан. multi-user-authenticated.spec.ts-ийг ED мөн өдөр S-set-д нэмсэн.
 - **Төлөв: хаагдсан (2026-10-01).** ED дараах гурвыг хүлээн зөвшөөрсөн: (1) 11 PNG; (2) spec §17-ийн pnpm build-ийн оронд cargo-гүй build ба server-ийн tsc --noEmit; (3) 7 улаан e2e дээрх тайлбартайгаар (recovery x5 upstream baseline-д мөн унадаг; smoke-lab:316 дараалалаас хамаарна, Ү1-д baseline-ийн бүтэн ажиллуулалтад мөн унасан; agent-chat:557 нь flake гэж нотлогдоогүй, шинэ уналт).
+
+## Ү3 хаалт
+
+- 2026-10-12, HEAD b2bc55f69 (Ү3-А брэнд, Ү3-Б L2/L3 ба үлдэгдэл, Ү3-В hardening).
+- Build хаалга: root pnpm build нь packages/paperclip-runner-ийн cargo шаардаж Ү1, Ү2-ын адил унана. Ү2-д ED зөвшөөрсөн орлуулалт бүгд exit 0: pnpm -r --no-bail --filter '!@paperclipai/paperclip-runner' --filter '!@paperclipai/server' build (42 багц), server-д pnpm exec tsc --noEmit, pnpm --filter @paperclipai/ui build.
+- Ү3-ын unit тест: 2026-10-02-оос хойш өөрчлөгдсөн 38 тест файлаас vitest-д хамаарах 32 файл, 641 тест давсан. xo:i18n:test 54/54; node --test (acpx-patch-packaging, xo-brand/scan) давсан.
+- Шалгалт: xo:i18n:check OK (keys=1640); xo:i18n:check --server «server catalog OK: 2196 мессеж, 29 орчуулга»; xo:brand-scan OK (161 файл, 586 hit, baseline-аас өсөөгүй).
+- Ү3.1 (L2/L3): Ү3-Б Task 6 Step 3-ын 5 browser сценари y3b-test:3110 дээр ec9f9e7-д давсан (wizard mn, эхний даалгаврын мэндчилгээ, API 404 «Ажил олдсонгүй», skill slug давхардлын 409 mn, interactionLanguage солих). Server давхар нэртэй байгууллагыг зөвшөөрдөг тул «давхар нэр» сценариг skill slug-аар сольсон.
+- Ү3.2: ED-ийн «1 агент / 3 даалгавар» тест (Ү3-Б Task 6 Step 4) хийгдээгүй. **Pending ED.**
+- Ү3.3: telemetry анхдагчаар унтраалттай (Ү3-В Task 1), y3v-test:3111 дээр гарах холболтын гар шалгалт давсан (Ү3-В Task 7).
+- E2E (pnpm test:e2e, PAPERCLIP_PLAYWRIGHT_CHANNEL=chrome, порт 3199, 22.4 мин): 135 passed / 79 skipped / 9 failed. Playwright-ийн chromium_headless_shell суугаагүй тул channel хувьсагчгүйгээр 117 тест browser нээж чадалгүй унана.
+- 9 унасан тестийн тайлбар:
+  - recovery.spec.ts:17 x5 ба smoke-lab.shared.ts:316: Ү2-ын baseline-д мөн унадаг, шалтгаан Ү2 хаалтад бичигдсэн. agent-chat.spec.ts:557 энэ удаа давсан.
+  - conference-room-typing-intro.spec.ts:136, :151 ба planning-mode-visual-verification.spec.ts:33 (шинэ): «Connect» товч олдохгүй. Шалтгаан нь орчин. e2e server хостын HOME-ийг өвлөдөг, local_trusted горимд allowHostClaude идэвхтэй. Хост дээр Claude нэвтэрсэн байвал useLocalAiLogin «ready» буцааж, wizard upstream 669bd0e7a (#13499)-ийн auto-connect-оор model сонгомогц шууд Review алхам руу шилждэг. Spec-үүд хостын нэвтрэлтгүй орчныг таамагладаг. HOME-ийг хоосон хавтас болгож дахин ажиллуулахад 3/3 давсан. XO-ийн өөрчлөлттэй холбоогүй, spec-ийг хөндөөгүй.
+- **Төлөв: нээлттэй.** Хаахын тулд ED: (1) Ү3.2-ын 1 агент / 3 даалгаврын тест; (2) дээрх 9 улаан e2e-ийн тайлбарыг хүлээн зөвшөөрөх.
