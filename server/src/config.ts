@@ -24,6 +24,7 @@ import {
   resolveRuntimeBind,
   validateConfiguredBindMode,
 } from "@paperclipai/shared";
+import { applyXoEnvAliases } from "@paperclipai/shared/xo-brand-env";
 import {
   resolveDefaultBackupDir,
   resolveDefaultEmbeddedPostgresDir,
@@ -32,9 +33,11 @@ import {
   resolveHomeAwarePath,
 } from "./home-paths.js";
 
+applyXoEnvAliases();
 const PAPERCLIP_ENV_FILE_PATH = resolvePaperclipEnvPath();
 if (existsSync(PAPERCLIP_ENV_FILE_PATH)) {
   loadDotenv({ path: PAPERCLIP_ENV_FILE_PATH, override: false, quiet: true });
+  applyXoEnvAliases();
 }
 
 const CWD_ENV_PATH = resolve(process.cwd(), ".env");
@@ -47,6 +50,7 @@ if (shouldLoadWorkingDirectoryEnv({
   isPaperclipEnvFile: isSameFile,
 })) {
   loadDotenv({ path: CWD_ENV_PATH, override: false, quiet: true });
+  applyXoEnvAliases();
 }
 
 maybeRepairLegacyWorktreeConfigAndEnvFiles();
