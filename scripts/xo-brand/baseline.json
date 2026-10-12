@@ -1,9 +1,4 @@
 {
-  "server/src/onboarding-assets/ceo/AGENTS.md": 1,
-  "server/src/onboarding-assets/ceo/HEARTBEAT.md": 3,
-  "server/src/onboarding-assets/default/AGENTS.md": 2,
-  "server/src/onboarding-assets/first-task/brief.md": 1,
-  "server/src/onboarding-assets/first-task/greeting.md": 1,
   "ui/src/adapters/adapter-display-registry.ts": 1,
   "ui/src/adapters/claude-local/config-fields.tsx": 1,
   "ui/src/adapters/codex-local/config-fields.tsx": 5,
@@ -163,5 +158,6 @@
   "ui/src/pages/tools/connection-dialogs.tsx": 1,
   "ui/src/pages/tools/PasteConfigTab.tsx": 4,
   "ui/src/plugins/bridge.ts": 1,
-  "ui/src/plugins/slots.tsx": 2
+  "ui/src/plugins/slots.tsx": 2,
+  "ui/src/xo/serverMessage.ts": 2
 }

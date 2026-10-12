@@ -29,4 +29,18 @@ describe("translateServerMessage", () => {
     expect(translateServerMessage("constructor")).toBe("constructor");
     expect(translateServerMessage("toString")).toBe("toString");
   });
+
+  it("shows XO in untranslated messages under the Mongolian locale", () => {
+    expect(translateServerMessage("Paperclip could not reach the agent")).toBe("XO could not reach the agent");
+  });
+
+  it("shows XO instead of Paperclip in English", () => {
+    localStorage.setItem(XO_LOCALE_STORAGE_KEY, "en");
+    expect(translateServerMessage("Paperclip server is unavailable")).toBe("XO server is unavailable");
+  });
+
+  it("leaves header names and package ids alone", () => {
+    expect(translateServerMessage("Missing X-Paperclip-Run-Id header")).toBe("Missing X-Paperclip-Run-Id header");
+    expect(translateServerMessage("Install @paperclipai/shared")).toBe("Install @paperclipai/shared");
+  });
 });
