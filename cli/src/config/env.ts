@@ -3,6 +3,7 @@ import path from "node:path";
 import { randomBytes } from "node:crypto";
 import { config as loadDotenv, parse as parseEnvFileContents } from "dotenv";
 import { updateEnvFileContents, writeEnvFileAtomicallyIfChanged } from "@paperclipai/shared/env-file";
+import { applyXoEnvAliases } from "@paperclipai/shared/xo-brand-env";
 import { resolveConfigPath } from "./store.js";
 
 const JWT_SECRET_ENV_KEY = "PAPERCLIP_AGENT_JWT_SECRET";
@@ -59,6 +60,7 @@ export function loadAgentJwtEnvFile(filePath = resolveEnvFilePath()): void {
   if (!fs.existsSync(filePath)) return;
   loadedEnvFiles.add(filePath);
   loadDotenv({ path: filePath, override: false, quiet: true });
+  applyXoEnvAliases();
 }
 
 export function readAgentJwtSecretFromEnv(configPath?: string): string | null {

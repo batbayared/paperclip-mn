@@ -45,6 +45,7 @@ import { registerAdapterCommands } from "./commands/client/adapter.js";
 import { registerManagedAgentCommands } from "./commands/managed-agent.js";
 import { registerAssetCommands } from "./commands/client/asset.js";
 import { registerSkillCommands } from "./commands/client/skill.js";
+import { applyXoEnvAliases } from "@paperclipai/shared/xo-brand-env";
 import { cliVersion } from "./version.js";
 import { installCommand } from "./commands/install.js";
 import { uninstallCommand } from "./commands/uninstall.js";
@@ -59,15 +60,17 @@ import {
   type TestDriveOptions,
 } from "./commands/test-drive.js";
 
+applyXoEnvAliases();
+
 const program = new Command();
 const DATA_DIR_OPTION_HELP =
-  "Paperclip data directory root (isolates state from ~/.paperclip)";
+  "XO data directory root (isolates state from ~/.xo)";
 
 program.enablePositionalOptions();
 
 program
-  .name("paperclipai")
-  .description("Paperclip CLI — setup, diagnose, and configure your instance")
+  .name("xo")
+  .description("XO CLI — setup, diagnose, and configure your instance")
   .version(cliVersion);
 
 program
