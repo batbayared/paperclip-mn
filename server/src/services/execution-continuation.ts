@@ -126,6 +126,14 @@ export async function buildExecutionContinuation(input: {
     string(input.context.retryOfRunId) ??
     string(input.context.previousRunId) ??
     string(input.context.interruptedRunId);
+  // XO (Ү3-В D2): a "Run now" run carries no issueId. Accept it as the
+  // continuation source only when the resolved interaction on this issue names
+  // it. Explicit user continuations and retry/previous/interrupted ids stay
+  // issue-scoped.
+  const allowIssueLessSource =
+    !explicitUserSource &&
+    !!triggerInteraction?.sourceRunId &&
+    triggerInteraction.sourceRunId === sourceRunId;
   const sourceRun = sourceRunId
     ? (
         await db
@@ -135,7 +143,12 @@ export async function buildExecutionContinuation(input: {
             and(
               eq(heartbeatRuns.companyId, companyId),
               eq(heartbeatRuns.id, sourceRunId),
-              sql`${heartbeatRuns.contextSnapshot} ->> 'issueId' = ${issueId}`,
+              allowIssueLessSource
+                ? or(
+                    sql`${heartbeatRuns.contextSnapshot} ->> 'issueId' = ${issueId}`,
+                    sql`(${heartbeatRuns.contextSnapshot} ->> 'issueId') IS NULL`,
+                  )
+                : sql`${heartbeatRuns.contextSnapshot} ->> 'issueId' = ${issueId}`,
             ),
           )
       )[0]
@@ -183,7 +196,12 @@ export async function buildExecutionContinuation(input: {
               eq(heartbeatRuns.companyId, companyId),
               eq(heartbeatRuns.agentId, input.agentId),
               eq(heartbeatRuns.id, input.previousContextRunId),
-              sql`${heartbeatRuns.contextSnapshot} ->> 'issueId' = ${issueId}`,
+              allowIssueLessSource
+                ? or(
+                    sql`${heartbeatRuns.contextSnapshot} ->> 'issueId' = ${issueId}`,
+                    sql`(${heartbeatRuns.contextSnapshot} ->> 'issueId') IS NULL`,
+                  )
+                : sql`${heartbeatRuns.contextSnapshot} ->> 'issueId' = ${issueId}`,
             ),
           )
       )[0]
