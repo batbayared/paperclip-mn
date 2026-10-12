@@ -55,6 +55,8 @@
     "check:no-git-push": "node scripts/check-no-git-push.mjs",
     "check:module-boundaries": "node scripts/check-module-boundaries.mjs",
     "test:check-no-git-push": "node --test scripts/check-no-git-push.test.mjs",
+    "xo:brand-scan": "node scripts/xo-brand/scan.mjs",
+    "test:xo-brand-scan": "node --test scripts/xo-brand/scan.test.mjs",
     "test:install-sh-docker": "./scripts/test-install-sh-docker.sh",
     "test:hermes-gateway-smoke": "node --test scripts/smoke/hermes-gateway-smoke.test.mjs",
     "docs:dev": "cd docs && npx mintlify dev",
