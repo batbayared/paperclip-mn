@@ -5,6 +5,8 @@ import { constants as fsConstants, promises as fs, type Dirent } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { CONNECTION_INTENT_AGENT_GUIDANCE } from "@paperclipai/shared";
+import { resolveDefaultBrandHomeDir } from "@paperclipai/shared/home-paths";
+import { readBrandEnv } from "@paperclipai/shared/xo-brand-env";
 import { sanitizeRemoteExecutionEnv } from "./remote-execution-env.js";
 import {
   buildLocalProcessSandboxSpawnTarget,
@@ -189,15 +191,15 @@ export function resolvePaperclipInstanceRootForAdapter(
   } = {},
 ): string {
   const env = input.env ?? process.env;
-  const homeRaw = input.homeDir?.trim() || env.PAPERCLIP_HOME?.trim();
+  const homeRaw = input.homeDir?.trim() || readBrandEnv("HOME", env)?.trim();
   const homeDir = path.resolve(
     homeRaw
       ? expandHomePrefix(homeRaw)
-      : path.resolve(os.homedir(), ".paperclip"),
+      : resolveDefaultBrandHomeDir(),
   );
   const instanceId =
     input.instanceId?.trim() ||
-    env.PAPERCLIP_INSTANCE_ID?.trim() ||
+    readBrandEnv("INSTANCE_ID", env)?.trim() ||
     DEFAULT_PAPERCLIP_INSTANCE_ID;
   if (!PATH_SEGMENT_RE.test(instanceId))
     throw new Error(`Invalid PAPERCLIP_INSTANCE_ID '${instanceId}'.`);

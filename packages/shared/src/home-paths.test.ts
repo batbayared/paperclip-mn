@@ -4,11 +4,14 @@ import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import {
   resolveDefaultBackupDir,
+  resolveDefaultBrandHomeDir,
   resolveDefaultEmbeddedPostgresDir,
   resolveDefaultLogsDir,
   resolveDefaultSecretsKeyFilePath,
   resolveDefaultStorageDir,
   resolvePaperclipConfigPathForInstance,
+  resolvePaperclipHomeDir,
+  resolvePaperclipInstanceId,
   resolvePaperclipInstanceRoot,
 } from "./home-paths.js";
 
@@ -32,5 +35,38 @@ describe("home path resolution", () => {
     expect(resolveDefaultLogsDir()).toBe(path.join(instanceRoot, "logs"));
     expect(resolveDefaultStorageDir()).toBe(path.join(instanceRoot, "data", "storage"));
     expect(resolveDefaultSecretsKeyFilePath()).toBe(path.join(instanceRoot, "secrets", "master.key"));
+  });
+});
+
+describe("XO brand home resolution", () => {
+  it("prefers XO_HOME over PAPERCLIP_HOME", () => {
+    const xoHome = fs.mkdtempSync(path.join(os.tmpdir(), "xo-home-"));
+    process.env.XO_HOME = xoHome;
+    process.env.PAPERCLIP_HOME = path.join(os.tmpdir(), "should-not-be-used");
+    expect(resolvePaperclipHomeDir()).toBe(xoHome);
+  });
+
+  it("prefers XO_INSTANCE_ID over PAPERCLIP_INSTANCE_ID", () => {
+    process.env.XO_INSTANCE_ID = "xo-dev";
+    process.env.PAPERCLIP_INSTANCE_ID = "legacy";
+    expect(resolvePaperclipInstanceId()).toBe("xo-dev");
+  });
+
+  it("defaults to ~/.xo on a fresh machine", () => {
+    const userHome = fs.mkdtempSync(path.join(os.tmpdir(), "xo-user-"));
+    expect(resolveDefaultBrandHomeDir(userHome)).toBe(path.join(userHome, ".xo"));
+  });
+
+  it("keeps using an existing ~/.paperclip when ~/.xo is missing", () => {
+    const userHome = fs.mkdtempSync(path.join(os.tmpdir(), "xo-user-"));
+    fs.mkdirSync(path.join(userHome, ".paperclip"));
+    expect(resolveDefaultBrandHomeDir(userHome)).toBe(path.join(userHome, ".paperclip"));
+  });
+
+  it("prefers ~/.xo when both exist", () => {
+    const userHome = fs.mkdtempSync(path.join(os.tmpdir(), "xo-user-"));
+    fs.mkdirSync(path.join(userHome, ".paperclip"));
+    fs.mkdirSync(path.join(userHome, ".xo"));
+    expect(resolveDefaultBrandHomeDir(userHome)).toBe(path.join(userHome, ".xo"));
   });
 });

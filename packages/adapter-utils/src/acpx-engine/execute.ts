@@ -76,6 +76,8 @@ import {
   type PaperclipSkillEntry,
 } from "@paperclipai/adapter-utils/server-utils";
 import { shellQuote } from "@paperclipai/adapter-utils/ssh";
+import { resolveDefaultBrandHomeDir } from "@paperclipai/shared/home-paths";
+import { readBrandEnv } from "@paperclipai/shared/xo-brand-env";
 import {
   createAcpRuntime,
   createAgentRegistry,
@@ -778,8 +780,8 @@ export async function referencedSourceContentSignature(
 }
 
 function defaultPaperclipInstanceDir(): string {
-  const home = process.env.PAPERCLIP_HOME?.trim() || path.join(os.homedir(), ".paperclip");
-  const instanceId = process.env.PAPERCLIP_INSTANCE_ID?.trim() || "default";
+  const home = readBrandEnv("HOME")?.trim() || resolveDefaultBrandHomeDir();
+  const instanceId = readBrandEnv("INSTANCE_ID")?.trim() || "default";
   return resolvePaperclipInstanceRootForAdapter({
     homeDir: home,
     instanceId,

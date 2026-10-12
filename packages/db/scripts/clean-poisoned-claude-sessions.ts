@@ -27,6 +27,8 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { and, eq, isNotNull, sql } from "drizzle-orm";
+import { resolveDefaultBrandHomeDir } from "@paperclipai/shared/home-paths";
+import { readBrandEnv } from "@paperclipai/shared/xo-brand-env";
 import { createDb } from "../src/client.js";
 import { agentTaskSessions } from "../src/schema/index.js";
 
@@ -225,11 +227,11 @@ function readDatabaseUrlFromConfig(configPath: string): string {
 
 function defaultConfigPath(): string | null {
   const candidates: string[] = [];
-  const home = os.homedir();
-  if (process.env.PAPERCLIP_HOME) {
-    candidates.push(path.join(process.env.PAPERCLIP_HOME, "config.json"));
+  const brandHome = readBrandEnv("HOME")?.trim();
+  if (brandHome) {
+    candidates.push(path.join(brandHome, "config.json"));
   }
-  candidates.push(path.join(home, ".paperclip", "instances", "default", "config.json"));
+  candidates.push(path.join(resolveDefaultBrandHomeDir(), "instances", "default", "config.json"));
   for (const candidate of candidates) {
     if (fs.existsSync(candidate)) return candidate;
   }
