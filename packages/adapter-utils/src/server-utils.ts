@@ -4595,10 +4595,12 @@ export async function runChildProcess(
     ((err, id, msg) => console.warn({ err, runId: id }, msg));
   const brandedEnv = mirrorPaperclipEnvToXo(opts.env);
   return new Promise<RunProcessResult>((resolve, reject) => {
-    const rawMerged: NodeJS.ProcessEnv = {
+    // Mirror the merged env so inherited PAPERCLIP_RUNTIME_API_URL /
+    // PAPERCLIP_LISTEN_* (kept by the sanitizer) also get an XO_ copy.
+    const rawMerged: NodeJS.ProcessEnv = mirrorPaperclipEnvToXo({
       ...sanitizeInheritedPaperclipEnv(process.env),
-      ...brandedEnv,
-    };
+      ...opts.env,
+    });
 
     // Strip Claude Code nesting-guard env vars so spawned `claude` processes
     // don't refuse to start with "cannot be launched inside another session".

@@ -1595,6 +1595,32 @@ describe("shared ACPX engine runtime behavior", () => {
     expect(env.PAPERCLIP_CLOUD_PROVIDER_TOKEN).toBe("cloud-token");
   });
 
+  it("mirrors every PAPERCLIP_* launch env key to XO_* with the same value and keeps PAPERCLIP_*", async () => {
+    const root = await makeTempRoot();
+    // Isolate ambient env so only the harness-assigned runtime keys are asserted.
+    for (const key of Object.keys(process.env)) {
+      if (key.startsWith("XO_") || key.startsWith("PAPERCLIP_")) vi.stubEnv(key, undefined as unknown as string);
+    }
+    try {
+      const { sessionInputs, runtimeOptions } = await runExecutor(
+        { agentCommand: "node ./fake-acp.js", stateDir: path.join(root, "state") },
+        { authToken: "runtime-secret-token", context: { taskId: "issue-real", wakeReason: "issue_assigned" } },
+      );
+      const env = (sessionInputs[0]!.sessionOptions as { env: Record<string, string> }).env;
+      expect(env.PAPERCLIP_API_KEY).toBe("runtime-secret-token");
+      expect(env.XO_API_KEY).toBe("runtime-secret-token");
+      expect(env.PAPERCLIP_TASK_ID).toBe("issue-real");
+      expect(env.XO_TASK_ID).toBe("issue-real");
+      for (const key of Object.keys(env).filter((k) => k.startsWith("PAPERCLIP_"))) {
+        expect(env[`XO_${key.slice("PAPERCLIP_".length)}`]).toBe(env[key]);
+      }
+      const spawnEnv = ((runtimeOptions[0] as Record<string, unknown>).spawnEnvironment as () => Record<string, string>)();
+      expect(spawnEnv.XO_API_KEY).toBe("runtime-secret-token");
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
+
   it.each(["OPENAI_API_KEY", "CODEX_API_KEY"] as const)(
     "selects Codex ACP API-key authentication when %s is configured",
     async (apiKeyName) => {

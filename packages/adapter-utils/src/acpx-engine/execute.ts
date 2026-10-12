@@ -7,6 +7,7 @@ import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { createHash, randomUUID } from "node:crypto";
 import { fileURLToPath } from "node:url";
+import { mirrorPaperclipEnvToXo } from "@paperclipai/shared/xo-brand-env";
 import type {
   AdapterBillingType,
   AdapterExecutionContext,
@@ -2645,7 +2646,11 @@ function resolveRuntimeEnv(
   ) {
     finalEnv.DEFAULT_AUTH_REQUEST = JSON.stringify({ methodId: "api-key" });
   }
-  return finalEnv;
+  // XO brand rename: every PAPERCLIP_X runtime key is also exposed as XO_X
+  // (same value). Applied to the final launch env on every launch path, after
+  // all PAPERCLIP_* keys (including PAPERCLIP_API_KEY) are set; the session
+  // fingerprint hashes resolvedAdapterEnv, not this env.
+  return mirrorPaperclipEnvToXo(finalEnv);
 }
 
 function mergeRuntimeEnvironment(

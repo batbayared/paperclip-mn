@@ -72,4 +72,24 @@ describe("runChildProcess XO mirror", () => {
     );
     expect(stdout).toBe("task-1|task-1");
   });
+
+  it("mirrors inherited PAPERCLIP_RUNTIME_API_URL to XO_RUNTIME_API_URL", async () => {
+    process.env.PAPERCLIP_RUNTIME_API_URL = "http://runtime";
+    let stdout = "";
+    await runChildProcess(
+      "xo-mirror-inherited-test",
+      process.execPath,
+      ["-e", "process.stdout.write(`${process.env.PAPERCLIP_RUNTIME_API_URL}|${process.env.XO_RUNTIME_API_URL}`)"],
+      {
+        cwd: process.cwd(),
+        env: {},
+        timeoutSec: 30,
+        graceSec: 5,
+        onLog: async (stream, chunk) => {
+          if (stream === "stdout") stdout += chunk;
+        },
+      },
+    );
+    expect(stdout).toBe("http://runtime|http://runtime");
+  });
 });
