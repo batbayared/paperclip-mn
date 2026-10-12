@@ -48,3 +48,10 @@ D2 caveat: an issue-less continuation source is accepted when an interaction on 
 - Agent child processes receive both `PAPERCLIP_X` and `XO_X` with the same value. New prompts and skills use the `XO_` names.
 - CLI: the new `xo` bin and the old `paperclipai` bin both work. `xo --data-dir` sets both name families.
 - Brand scan: `pnpm xo:brand-scan` fails if the count of user-visible "Paperclip" strings grows above `scripts/xo-brand/baseline.json`. `--update` lowers the baseline after an intentional change; `--list` prints the hits.
+
+## Agent memory isolation (pilot)
+
+- Claude Code loads `<ancestor>/.claude/CLAUDE.md` from every ancestor of the agent's cwd as project memory. The managed AI connection moves `HOME` and `CLAUDE_CONFIG_DIR` to a temp dir, but that does not stop this walk.
+- Default agent workspace: `<XO_HOME>/instances/<id>/workspaces/<agentId>`. With the default `~/.xo` or `~/.paperclip`, the walk reaches the host user's `~/.claude/CLAUDE.md` and the agent follows the operator's personal instructions (seen 2026-10-12 on y3-close, CMP-4).
+- `--setting-sources` in `extraArgs` is rejected with `ai_connection_incompatible` for managed connections, so the fix is placement: set `XO_HOME` to a path outside any user home (e.g. `/Users/Shared/xo`) or run XO as a dedicated OS user. Project workspaces with a custom `cwd` must also sit outside the operator's home.
+- Check: give an agent a task asking whether a user-level CLAUDE.md is loaded; with cwd outside home it reports none (y3-close, CMP-5).
