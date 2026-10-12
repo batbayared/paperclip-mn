@@ -79,6 +79,9 @@ export const XO_TRANSFORM_FILES: readonly string[] = [
   "ui/src/components/ui/textarea.tsx",
   "ui/src/components/ui/toggle-switch.tsx",
   "ui/src/components/ui/tooltip.tsx",
+  // Ү3-Б үлдэгдэл
+  "ui/src/components/task-chat/QuestionForm.tsx",
+  "ui/src/components/PropertiesPanel.tsx",
   // Хуудсууд
   "ui/src/pages/AgentDetail.tsx",
   "ui/src/pages/AgentDetail.production.tsx",

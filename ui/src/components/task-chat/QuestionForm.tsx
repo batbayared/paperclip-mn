@@ -19,6 +19,7 @@ import {
   saveStructuredDraft,
 } from "@/lib/composer-draft";
 import { cn } from "@/lib/utils";
+import { tx } from "@/i18n/xo";
 import {
   TaskChatComposerTakeoverControls,
   useTaskChatComposerTakeoverActions,
@@ -56,32 +57,36 @@ function answerHasValue(answer: Answer | undefined): boolean {
   );
 }
 
-function answerError(
+export function answerError(
   question: Question,
   answer: Answer | undefined,
 ): string | null {
   if (question.required && !answerHasValue(answer))
-    return "This question is required.";
+    return tx("This question is required.");
   if (
     question.answerMode !== "text" &&
     answer?.customText !== undefined &&
     !answer.customText.trim()
   ) {
-    return "Enter a custom answer.";
+    return tx("Enter a custom answer.");
   }
   const value =
     question.answerMode === "text" ? answer?.text : answer?.customText;
   if (value == null || value.length === 0) return null;
   const validation = question.textValidation;
   if (validation?.minLength != null && value.length < validation.minLength)
-    return `Enter at least ${validation.minLength} characters.`;
+    return tx("Enter at least {{minLength}} characters.", {
+      minLength: validation.minLength,
+    });
   if (validation?.maxLength != null && value.length > validation.maxLength)
-    return `Enter no more than ${validation.maxLength} characters.`;
+    return tx("Enter no more than {{maxLength}} characters.", {
+      maxLength: validation.maxLength,
+    });
   if (validation?.pattern) {
     const result = matchSafeQuestionValidationPattern(validation.pattern, value);
     if (result === "unsupported")
-      return "This question has an unsupported validation pattern.";
-    if (result === "no_match") return "Use the requested format.";
+      return tx("This question has an unsupported validation pattern.");
+    if (result === "no_match") return tx("Use the requested format.");
   }
   if (
     validation?.inputType === "number" ||
@@ -92,12 +97,18 @@ function answerError(
       !Number.isFinite(numeric) ||
       (validation.inputType === "integer" && !Number.isInteger(numeric))
     ) {
-      return `Enter a valid ${validation.inputType}.`;
+      return validation.inputType === "integer"
+        ? tx("Enter a valid integer.")
+        : tx("Enter a valid number.");
     }
     if (validation.minimum != null && numeric < validation.minimum)
-      return `Enter a value of at least ${validation.minimum}.`;
+      return tx("Enter a value of at least {{minimum}}.", {
+        minimum: validation.minimum,
+      });
     if (validation.maximum != null && numeric > validation.maximum)
-      return `Enter a value no greater than ${validation.maximum}.`;
+      return tx("Enter a value no greater than {{maximum}}.", {
+        maximum: validation.maximum,
+      });
   }
   return null;
 }
@@ -415,7 +426,9 @@ export function QuestionForm({
       // question and say so rather than dropping the send.
       setPage(invalidIndex);
       setError(
-        `Question ${invalidIndex + 1} needs an answer before you can send.`,
+        tx("Question {{n}} needs an answer before you can send.", {
+          n: invalidIndex + 1,
+        }),
       );
       return;
     }
@@ -431,7 +444,7 @@ export function QuestionForm({
       setError(
         cause instanceof Error
           ? cause.message
-          : "The answers could not be submitted.",
+          : tx("The answers could not be submitted."),
       );
     } finally {
       setWorking(null);
@@ -449,7 +462,7 @@ export function QuestionForm({
       setError(
         cause instanceof Error
           ? cause.message
-          : "The questions could not be cancelled.",
+          : tx("The questions could not be cancelled."),
       );
     } finally {
       setWorking(null);
@@ -491,7 +504,10 @@ export function QuestionForm({
           <ChevronLeft aria-hidden />
         </Button>
         <span className="min-w-10 text-center tabular-nums">
-          {page + 1} of {questionSet.questions.length}
+          {tx("{{page}} of {{total}}", {
+            page: page + 1,
+            total: questionSet.questions.length,
+          })}
         </span>
         <Button
           type="button"
@@ -598,7 +614,9 @@ export function QuestionForm({
             onSubmit={() => {
               if (!inputUploading && currentError == null) progressOrSubmit();
             }}
-            attachAriaLabel={`Attach image to answer for ${question.prompt}`}
+            attachAriaLabel={tx("Attach image to answer for {{prompt}}", {
+              prompt: question.prompt,
+            })}
           />
         </div>
       ) : (
@@ -671,7 +689,9 @@ export function QuestionForm({
                     if (!inputUploading && currentError == null)
                       progressOrSubmit();
                   }}
-                  attachAriaLabel={`Attach image to other answer for ${question.prompt}`}
+                  attachAriaLabel={tx("Attach image to other answer for {{prompt}}", {
+                    prompt: question.prompt,
+                  })}
                 />
               ) : null}
             </div>
