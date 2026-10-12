@@ -23,6 +23,18 @@ export function readBrandEnv(name: string, env: Env = process.env): string | und
   return env[LEGACY_PREFIX + name];
 }
 
+// CLI flag-аас брэнд хувьсагч тавихад хоёр нэрийг хамт тавина: ambient XO_X нь
+// flag-ийг дарж болохгүй.
+export function setBrandEnv(name: string, value: string, env: Env = process.env): void {
+  env[LEGACY_PREFIX + name] = value;
+  env[XO_PREFIX + name] = value;
+}
+
+export function deleteBrandEnv(name: string, env: Env = process.env): void {
+  delete env[LEGACY_PREFIX + name];
+  delete env[XO_PREFIX + name];
+}
+
 // Процесс эхлэхэд: XO_X байвал PAPERCLIP_X-ийг дарж бичнэ, ингэснээр
 // PAPERCLIP_* уншдаг одоогийн код XO утгыг авна.
 export function applyXoEnvAliases(env: Env = process.env): void {

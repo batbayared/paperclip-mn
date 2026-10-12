@@ -58,6 +58,7 @@ import {
   shouldOfferForegroundStart,
 } from "../onboard-service.js";
 import { readInstallManifest, isManagedExecutable } from "../install-store.js";
+import { deleteBrandEnv, setBrandEnv } from "@paperclipai/shared/xo-brand-env";
 
 type SetupMode = "quickstart" | "advanced";
 
@@ -125,9 +126,9 @@ async function runOnboardedForeground(configPath: string): Promise<void> {
   // tab. Explicit configuration wins over the interactive default, while the
   // broad no-browser switch wins over an earlier explicit opt-in.
   if (browserDisabled) {
-    process.env.PAPERCLIP_OPEN_ON_LISTEN = "false";
+    setBrandEnv("OPEN_ON_LISTEN", "false");
   } else if (interactive && previousOpenOnListen === undefined) {
-    process.env.PAPERCLIP_OPEN_ON_LISTEN = "true";
+    setBrandEnv("OPEN_ON_LISTEN", "true");
   }
 
   try {
@@ -135,9 +136,9 @@ async function runOnboardedForeground(configPath: string): Promise<void> {
     await runCommand({ config: configPath, repair: true, yes: true });
   } finally {
     if (previousOpenOnListen === undefined) {
-      delete process.env.PAPERCLIP_OPEN_ON_LISTEN;
+      deleteBrandEnv("OPEN_ON_LISTEN");
     } else {
-      process.env.PAPERCLIP_OPEN_ON_LISTEN = previousOpenOnListen;
+      setBrandEnv("OPEN_ON_LISTEN", previousOpenOnListen);
     }
   }
 }

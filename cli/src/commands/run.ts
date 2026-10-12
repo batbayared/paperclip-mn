@@ -20,6 +20,7 @@ import { assertForegroundRunAllowed } from "../services/service-manager.js";
 import { removeRuntimeInfoForPid, writeRuntimeInfo } from "../runtime-info.js";
 import { printUpdateNotice } from "../update-notice.js";
 import { ensureWorktreeSeeded } from "./worktree.js";
+import { setBrandEnv } from "@paperclipai/shared/xo-brand-env";
 
 export interface RunOptions {
   config?: string;
@@ -48,7 +49,7 @@ export interface StartedServer {
 
 export async function runCommand(opts: RunOptions): Promise<void> {
   const instanceId = resolvePaperclipInstanceId(opts.instance);
-  process.env.PAPERCLIP_INSTANCE_ID = instanceId;
+  setBrandEnv("INSTANCE_ID", instanceId);
   if (!opts.skipServiceManagerCheck) {
     await assertForegroundRunAllowed(instanceId, opts.force);
   }
@@ -60,7 +61,7 @@ export async function runCommand(opts: RunOptions): Promise<void> {
   fs.mkdirSync(paths.instanceRoot, { recursive: true });
 
   const configPath = resolveConfigPath(opts.config);
-  process.env.PAPERCLIP_CONFIG = configPath;
+  setBrandEnv("CONFIG", configPath);
   loadPaperclipEnvFile(configPath);
   await printUpdateNotice(configPath);
 

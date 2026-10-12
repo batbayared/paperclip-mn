@@ -6,6 +6,7 @@ import { readConfig, resolveConfigPath } from "../config/store.js";
 import { resolvePaperclipInstanceId, resolvePaperclipInstanceRoot } from "../config/home.js";
 import { detectServiceManager, type ServiceManager, type ServiceStatus } from "../services/service-manager.js";
 import { buildLocalHealthUrl } from "../utils/health-url.js";
+import { setBrandEnv } from "@paperclipai/shared/xo-brand-env";
 
 type CommonOptions = { instance?: string; json?: boolean };
 type HealthResult = { ok: boolean; serverVersion: string | null; error?: string };
@@ -24,7 +25,7 @@ async function resolveManager(opts: CommonOptions): Promise<ServiceManager | nul
 }
 
 function healthUrl(instanceId: string): string {
-  process.env.PAPERCLIP_INSTANCE_ID = instanceId;
+  setBrandEnv("INSTANCE_ID", instanceId);
   const config = readConfig(resolveConfigPath());
   return buildLocalHealthUrl(config?.server.host, config?.server.port ?? 3100);
 }
