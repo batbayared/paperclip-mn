@@ -2,6 +2,7 @@ import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { applyDataDirOverride } from "../config/data-dir.js";
+import { resolvePaperclipHomeDir } from "../config/home.js";
 
 const ORIGINAL_ENV = { ...process.env };
 
@@ -12,6 +13,7 @@ describe("applyDataDirOverride", () => {
     delete process.env.PAPERCLIP_CONFIG;
     delete process.env.PAPERCLIP_CONTEXT;
     delete process.env.PAPERCLIP_INSTANCE_ID;
+    for (const key of ["XO_HOME", "XO_CONFIG", "XO_CONTEXT", "XO_INSTANCE_ID"]) delete process.env[key];
   });
 
   afterEach(() => {
@@ -75,5 +77,24 @@ describe("applyDataDirOverride", () => {
     expect(process.env.PAPERCLIP_HOME).toBe(path.resolve("/tmp/paperclip-alt"));
     expect(process.env.PAPERCLIP_CONFIG).toBeUndefined();
     expect(process.env.PAPERCLIP_CONTEXT).toBeUndefined();
+  });
+
+  it("--data-dir beats an ambient XO_HOME by also setting XO_*", () => {
+    process.env.XO_HOME = "/a";
+    process.env.XO_CONFIG = "/a/config.json";
+    process.env.XO_CONTEXT = "/a/context.json";
+    process.env.XO_INSTANCE_ID = "ambient";
+
+    applyDataDirOverride(
+      { dataDir: "/b" },
+      { hasConfigOption: true, hasContextOption: true },
+    );
+
+    expect(process.env.XO_HOME).toBe(path.resolve("/b"));
+    expect(process.env.PAPERCLIP_HOME).toBe(path.resolve("/b"));
+    expect(resolvePaperclipHomeDir()).toBe(path.resolve("/b"));
+    expect(process.env.XO_INSTANCE_ID).toBe(process.env.PAPERCLIP_INSTANCE_ID);
+    expect(process.env.XO_CONFIG).toBe(process.env.PAPERCLIP_CONFIG);
+    expect(process.env.XO_CONTEXT).toBe(process.env.PAPERCLIP_CONTEXT);
   });
 });
