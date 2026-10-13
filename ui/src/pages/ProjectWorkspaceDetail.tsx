@@ -84,7 +84,7 @@ const SOURCE_TYPE_OPTIONS: Array<{ value: ProjectWorkspaceSourceType; label: str
 function sourceTypeText(english: string): string {
   switch (english) {
     case "Local git checkout": return tx("Local git checkout");
-    case "A local path Paperclip can use directly.": return tx("A local path {{brand}} can use directly.");
+    case SOURCE_TYPE_OPTIONS[0].description: return tx("A local path {{brand}} can use directly.");
     case "Local non-git path": return tx("Local non-git path");
     case "A local folder without git semantics.": return tx("A local folder without git semantics.");
     case "Remote git repo": return tx("Remote git repo");
