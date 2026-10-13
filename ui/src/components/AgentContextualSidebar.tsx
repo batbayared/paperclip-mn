@@ -87,7 +87,7 @@ export function AgentContextualSidebar({
       >
         {AGENT_DETAIL_NAVIGATION.map((section) => (
           <div
-            key={xoNavLabel(section.label)}
+            key={section.label}
             data-slot="contextual-sidebar-section"
             className={contextualSidebarStyles.section}
           >
@@ -95,7 +95,7 @@ export function AgentContextualSidebar({
               data-slot="contextual-sidebar-section-label"
               className={contextualSidebarStyles.sectionLabel}
             >
-              {section.label}
+              {xoNavLabel(section.label)}
             </p>
             <div data-slot="contextual-sidebar-group" className={contextualSidebarStyles.group}>
               {section.items

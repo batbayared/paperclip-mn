@@ -1,4 +1,4 @@
-import { xoRoleLabel, xoRunSourceLabel } from "@/xo/labels";
+import { xoNavLabel, xoRoleLabel, xoRunSourceLabel } from "@/xo/labels";
 import { xoLocaleTime } from "@/xo/date-format";
 import { tx } from "@/i18n/xo";
 import { XoTrans } from "@/xo/XoTrans";
@@ -284,6 +284,15 @@ function scrollToContainerBottom(container: ScrollContainer, behavior: ScrollBeh
 }
 
 type AgentDetailView = "dashboard" | "instructions" | "configuration" | "secrets" | "skills" | "tools" | "channels" | "runs" | "audit" | "budget";
+
+function agentTabLabel(english: string): string {
+  switch (english) {
+    case "Dashboard": return tx("Dashboard");
+    case "Configuration": return tx("Configuration");
+    case "Budget": return tx("Budget");
+    default: return xoNavLabel(english);
+  }
+}
 
 export const AGENT_DETAIL_TABS: ReadonlyArray<{ value: AgentDetailView; label: string }> = [
   { value: "dashboard", label: "Dashboard" },
@@ -1082,24 +1091,24 @@ export function AgentDetail() {
     } else {
       crumbs.push({ label: agentName, href: `/agents/${canonicalAgentRef}/dashboard` });
       if (urlRunId) {
-        crumbs.push({ label: "Runs", href: `/agents/${canonicalAgentRef}/runs` });
+        crumbs.push({ label: agentTabLabel("Runs"), href: `/agents/${canonicalAgentRef}/runs` });
         crumbs.push({ label: tx("Run {{id}}", { id: urlRunId.slice(0, 8) }) });
       } else if (activeView === "instructions") {
-        crumbs.push({ label: "Instructions" });
+        crumbs.push({ label: agentTabLabel("Instructions") });
       } else if (activeView === "configuration") {
-        crumbs.push({ label: "Configuration" });
+        crumbs.push({ label: agentTabLabel("Configuration") });
       } else if (activeView === "secrets") {
-        crumbs.push({ label: "Secrets" });
+        crumbs.push({ label: agentTabLabel("Secrets") });
       // } else if (activeView === "skills") { // TODO: bring back later
       //   crumbs.push({ label: "Skills" });
       } else if (activeView === "tools") {
-        crumbs.push({ label: "Tools" });
+        crumbs.push({ label: agentTabLabel("Tools") });
       } else if (activeView === "runs") {
-        crumbs.push({ label: "Runs" });
+        crumbs.push({ label: agentTabLabel("Runs") });
       } else if (activeView === "budget") {
-        crumbs.push({ label: "Budget" });
+        crumbs.push({ label: agentTabLabel("Budget") });
       } else {
-        crumbs.push({ label: "Dashboard" });
+        crumbs.push({ label: agentTabLabel("Dashboard") });
       }
     }
     setBreadcrumbs(crumbs);
@@ -1419,7 +1428,7 @@ export function AgentDetail() {
           onValueChange={handleAgentTabChange}
         >
           <PageTabBar
-            items={AGENT_DETAIL_TABS.filter((item) => item.value !== "channels" || chatConnectorsEnabled)}
+            items={AGENT_DETAIL_TABS.filter((item) => item.value !== "channels" || chatConnectorsEnabled).map((t) => ({ ...t, label: agentTabLabel(t.label) }))}
             value={activeView}
             onValueChange={handleAgentTabChange}
           />
