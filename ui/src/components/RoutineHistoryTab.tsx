@@ -36,6 +36,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "./EmptyState";
 import { MarkdownBody } from "./MarkdownBody";
 import { Badge } from "@/components/ui/badge";
+import { tx } from "@/i18n/xo";
+import { xoRoutineDirtyFieldLabel, xoRoutineHistoryFieldLabel } from "@/xo/labels";
 
 type AgentLookup = Map<string, { id: string; name: string }>;
 type ProjectLookup = Map<string, { id: string; name: string }>;
@@ -368,8 +370,8 @@ function ConflictBanner({
   onSave: () => void;
 }) {
   const labels = dirtyFields.length > 0
-    ? dirtyFields.map((field) => field.label)
-    : ["the routine"];
+    ? dirtyFields.map((field) => xoRoutineDirtyFieldLabel(field.label))
+    : [xoRoutineDirtyFieldLabel("the routine")];
   const fieldsText = formatDirtyFieldList(labels);
   return (
     <div className="rounded-md border border-amber-500/30 bg-amber-500/5 px-4 py-3">
@@ -395,7 +397,7 @@ function ConflictBanner({
           {dirtyFields.map((field) => (
             <li key={field.key} className="flex items-center gap-2">
               <span className="h-1 w-1 rounded-full bg-amber-400" />
-              {field.label}
+              {xoRoutineDirtyFieldLabel(field.label)}
             </li>
           ))}
         </ul>
@@ -480,7 +482,7 @@ function RevisionList({
       })}
       {totalRevisions > revisions.length && !showOlder && (
         <Button variant="ghost" size="sm" className="w-full" onClick={onShowOlder}>
-          Show {totalRevisions - revisions.length} older…
+          {tx("Show {{n}} older…", { n: totalRevisions - revisions.length })}
         </Button>
       )}
     </aside>
@@ -511,7 +513,7 @@ function RevisionPreview({
   const snapshot = revision.snapshot.routine;
   const triggers = revision.snapshot.triggers;
   const currentSnapshot = currentRevision?.snapshot.routine ?? null;
-  const restoreLabel = isHistorical ? "Restore this revision" : "Restore this revision";
+  const restoreLabel = isHistorical ? tx("Restore this revision") : tx("Restore this revision");
   const cardWrapper = `rounded-md border transition-colors duration-1000 ${
     highlighted ? "border-emerald-500/40 bg-emerald-500/10" : "border-border"
   }`;
@@ -578,7 +580,7 @@ function RevisionPreview({
           <div className="space-y-1 min-w-0">
             <p className="text-sm font-medium">rev {revision.revisionNumber}</p>
             <p className="text-xs text-muted-foreground truncate">
-              Saved {relativeTime(revision.createdAt)} by {getActorLabel(revision)}
+              {tx("Saved {{time}} by {{actor}}", { time: relativeTime(revision.createdAt), actor: getActorLabel(revision) })}
               {revision.changeSummary ? ` · ${revision.changeSummary}` : ""}
             </p>
           </div>
@@ -655,7 +657,7 @@ function RevisionPreview({
                 <span
                   className={`ml-auto text-xs ${trigger.enabled ? "text-emerald-400" : "text-muted-foreground"}`}
                 >
-                  {trigger.enabled ? "enabled" : "disabled"}
+                  {trigger.enabled ? tx("enabled") : tx("disabled")}
                 </span>
               </li>
             ))}
@@ -982,18 +984,18 @@ function DiffTable({ rows }: { rows: DiffRow[] }) {
 }
 
 function getActorLabel(revision: RoutineRevision): string {
-  if (revision.createdByUserId) return "board";
-  if (revision.createdByAgentId) return "agent";
-  return "system";
+  if (revision.createdByUserId) return tx("board");
+  if (revision.createdByAgentId) return tx("agent");
+  return tx("system");
 }
 
 function resolveAgentName(agentId: string | null, lookup: AgentLookup) {
-  if (!agentId) return "Unassigned";
+  if (!agentId) return tx("Unassigned");
   return lookup.get(agentId)?.name ?? agentId;
 }
 
 function resolveProjectName(projectId: string | null, lookup: ProjectLookup) {
-  if (!projectId) return "No project";
+  if (!projectId) return tx("No project");
   return lookup.get(projectId)?.name ?? projectId;
 }
 
@@ -1014,10 +1016,10 @@ function formatVariableDefault(variable: RoutineVariable): string {
 }
 
 function formatDirtyFieldList(labels: string[]): string {
-  if (labels.length === 0) return "the routine";
+  if (labels.length === 0) return xoRoutineDirtyFieldLabel("the routine");
   if (labels.length === 1) return labels[0];
-  if (labels.length === 2) return `${labels[0]} and ${labels[1]}`;
-  return `${labels.slice(0, -1).join(", ")}, and ${labels[labels.length - 1]}`;
+  if (labels.length === 2) return tx("{{first}} and {{second}}", { first: labels[0], second: labels[1] });
+  return tx("{{items}}, and {{last}}", { items: labels.slice(0, -1).join(", "), last: labels[labels.length - 1] });
 }
 
 function collectWebhookTriggerDifferences(
@@ -1054,7 +1056,7 @@ function computeFieldChanges(
     transform: (value: unknown) => string = describeSnapshotField,
   ) => {
     if (JSON.stringify(oldVal) !== JSON.stringify(newVal)) {
-      changes.push({ field: label, oldValue: transform(oldVal), newValue: transform(newVal) });
+      changes.push({ field: xoRoutineHistoryFieldLabel(label), oldValue: transform(oldVal), newValue: transform(newVal) });
     }
   };
   compareScalar("title", "Title", oldRoutine.title, newRoutine.title);
@@ -1076,7 +1078,7 @@ function computeFieldChanges(
   compareScalar("status", "Status", oldRoutine.status, newRoutine.status);
   if (JSON.stringify(oldRoutine.variables) !== JSON.stringify(newRoutine.variables)) {
     changes.push({
-      field: "Variables",
+      field: xoRoutineHistoryFieldLabel("Variables"),
       oldValue: summarizeVariables(oldRoutine.variables),
       newValue: summarizeVariables(newRoutine.variables),
     });
@@ -1129,9 +1131,14 @@ function summarizeEnv(env: RoutineEnvConfig | null): string {
   const entries = Object.entries(normalizeEnv(env));
   if (entries.length === 0) return "";
   const secretCount = entries.filter(([, binding]) => envBindingKind(binding) === "secret_ref").length;
-  const keyLabel = entries.length === 1 ? "key" : "keys";
-  if (secretCount === 0) return `${entries.length} ${keyLabel}`;
-  return `${entries.length} ${keyLabel} (${secretCount} secret ${secretCount === 1 ? "ref" : "refs"})`;
+  const keyText = entries.length === 1
+    ? tx("{{n}} key", { n: entries.length })
+    : tx("{{n}} keys", { n: entries.length });
+  if (secretCount === 0) return keyText;
+  const refText = secretCount === 1
+    ? tx("{{n}} secret ref", { n: secretCount })
+    : tx("{{n}} secret refs", { n: secretCount });
+  return `${keyText} (${refText})`;
 }
 
 type EnvDiffCounts = {
@@ -1171,9 +1178,21 @@ function summarizeEnvDiffCounts(
 
 function formatEnvDiffCounts(counts: EnvDiffCounts): string {
   const parts: string[] = [];
-  if (counts.added > 0) parts.push(`${counts.added} ${counts.added === 1 ? "key" : "keys"} added`);
-  if (counts.removed > 0) parts.push(`${counts.removed} ${counts.removed === 1 ? "key" : "keys"} removed`);
-  if (counts.changed > 0) parts.push(`${counts.changed} ${counts.changed === 1 ? "key" : "keys"} changed`);
+  if (counts.added > 0) {
+    parts.push(counts.added === 1
+      ? tx("{{n}} key added", { n: counts.added })
+      : tx("{{n}} keys added", { n: counts.added }));
+  }
+  if (counts.removed > 0) {
+    parts.push(counts.removed === 1
+      ? tx("{{n}} key removed", { n: counts.removed })
+      : tx("{{n}} keys removed", { n: counts.removed }));
+  }
+  if (counts.changed > 0) {
+    parts.push(counts.changed === 1
+      ? tx("{{n}} key changed", { n: counts.changed })
+      : tx("{{n}} keys changed", { n: counts.changed }));
+  }
   return parts.join(", ");
 }
 
@@ -1194,7 +1213,7 @@ function compareEnv(
     const inNew = key in newRec;
     if (inNew && !inOld) {
       changes.push({
-        field: `Env added (${key})`,
+        field: tx("Env added ({{key}})", { key }),
         oldValue: "—",
         newValue: describeEnvBinding(newBinding, secrets),
       });
@@ -1202,7 +1221,7 @@ function compareEnv(
     }
     if (!inNew && inOld) {
       changes.push({
-        field: `Env removed (${key})`,
+        field: tx("Env removed ({{key}})", { key }),
         oldValue: describeEnvBinding(oldBinding, secrets),
         newValue: "—",
       });
@@ -1213,7 +1232,7 @@ function compareEnv(
     const newKind = envBindingKind(newBinding);
     if (oldKind !== newKind) {
       changes.push({
-        field: `Env ${key} binding kind`,
+        field: tx("Env {{key}} binding kind", { key }),
         oldValue: describeEnvBinding(oldBinding, secrets),
         newValue: describeEnvBinding(newBinding, secrets),
       });
@@ -1224,21 +1243,21 @@ function compareEnv(
       const newRef = asSecretRef(newBinding)!;
       if (oldRef.secretId !== newRef.secretId) {
         changes.push({
-          field: `Env ${key} secret`,
+          field: tx("Env {{key}} secret", { key }),
           oldValue: describeEnvBinding(oldBinding, secrets),
           newValue: describeEnvBinding(newBinding, secrets),
         });
         continue;
       }
       changes.push({
-        field: `Env ${key} version`,
+        field: tx("Env {{key}} version", { key }),
         oldValue: describeSecretRef(oldRef, secrets),
         newValue: describeSecretRef(newRef, secrets),
       });
       continue;
     }
     changes.push({
-      field: `Env ${key} value`,
+      field: tx("Env {{key}} value", { key }),
       oldValue: "plain (set)",
       newValue: "plain (changed)",
     });
@@ -1246,7 +1265,7 @@ function compareEnv(
 }
 
 function summarizeVariables(variables: RoutineVariable[]): string {
-  if (variables.length === 0) return "(none)";
+  if (variables.length === 0) return tx("(none)");
   return variables
     .map((variable) => `${variable.name}=${formatVariableDefault(variable)}`)
     .join(", ");
@@ -1266,13 +1285,13 @@ function compareTriggers(
   for (const [, pair] of byId) {
     if (pair.old && !pair.next) {
       changes.push({
-        field: `Trigger removed (${pair.old.label ?? pair.old.kind})`,
+        field: tx("Trigger removed ({{name}})", { name: pair.old.label ?? pair.old.kind }),
         oldValue: summarizeTriggerSnapshot(pair.old),
         newValue: null,
       });
     } else if (!pair.old && pair.next) {
       changes.push({
-        field: `Trigger added (${pair.next.label ?? pair.next.kind})`,
+        field: tx("Trigger added ({{name}})", { name: pair.next.label ?? pair.next.kind }),
         oldValue: null,
         newValue: summarizeTriggerSnapshot(pair.next),
       });
@@ -1281,9 +1300,9 @@ function compareTriggers(
       const newSummary = summarizeTriggerSnapshot(pair.next);
       if (oldSummary !== newSummary || pair.old.enabled !== pair.next.enabled) {
         changes.push({
-          field: `Trigger ${pair.next.label ?? pair.next.kind}`,
-          oldValue: `${oldSummary} (${pair.old.enabled ? "enabled" : "disabled"})`,
-          newValue: `${newSummary} (${pair.next.enabled ? "enabled" : "disabled"})`,
+          field: tx("Trigger {{name}}", { name: pair.next.label ?? pair.next.kind }),
+          oldValue: `${oldSummary} (${pair.old.enabled ? tx("enabled") : tx("disabled")})`,
+          newValue: `${newSummary} (${pair.next.enabled ? tx("enabled") : tx("disabled")})`,
         });
       }
     }

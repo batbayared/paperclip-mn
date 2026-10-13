@@ -156,7 +156,7 @@ export function RunsSection() {
             <div className="rounded-lg border border-border">
               {filtered.map((run) => {
                 const label = dedupedTriggerLabel(run.trigger);
-                const title = run.linkedIssue?.title ?? label ?? "Run";
+                const title = run.linkedIssue?.title ?? label ?? tx("Run");
                 return (
                   <EntityRow
                     key={run.id}
