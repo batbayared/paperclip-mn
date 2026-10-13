@@ -81,6 +81,19 @@
 | New Task | Шинэ даалгавар | Sidebar (Task 9) |
 | Let's get started... | За, эхэлцгээе... | OnboardingWizard lede; `{{brand}}` хэвээр |
 
+## Ү6 7.1-д нэмсэн (ED хянах)
+
+| en | mn | Тэмдэглэл |
+|---|---|---|
+| run | ажиллагаа | агентын нэг гүйлт |
+| runner | гүйцэтгэгч | |
+| board | Удирдах зөвлөл | «Interrupted by board» |
+| sub-task | дэд даалгавар | |
+| revision | хувилбар | Plan/Artifact |
+| steering | чиглүүлэлт | |
+| Auto/Plan/Ask mode | Авто/Төлөвлөх/Асуух горим | work mode |
+| provider | үйлчилгээ үзүүлэгч | загварын үйлчилгээ |
+
 ## Sidebar-ын 27 түлхүүр (Task 9-д орчуулсан, өөрчлөхгүй)
 
 Activity → Үйл ажиллагаа; Agents → Агентууд; Artifacts → Артефактууд; Audit → Аудит; Cases → Кейсүүд; Company → Компани; Conference Room → Хурлын өрөө; Connectors → Холбогчид; Costs → Зардал; Dashboard → Хянах самбар; Decisions → Шийдвэрүүд; Goals → Зорилгууд; Inbox → Ирсэн; New Task → Шинэ даалгавар; Org → Байгууллага; Organization → Байгууллага; Pipelines → Пайплайнууд; Projects → Төслүүд; Routines → Тогтмол ажлууд; Search → Хайх; Settings → Тохиргоо; Skills → Чадварууд; Status → Төлөв; Tasks → Даалгаврууд; Timeline → Цагийн хэлхээ; Work → Ажил; Workspaces → Ажлын талбарууд.

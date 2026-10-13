@@ -1,3 +1,4 @@
+import { tx } from "@/i18n/xo";
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -96,8 +97,8 @@ function FilterOptionSearch({
       <Input
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        placeholder={`Search ${label.toLowerCase()}...`}
-        aria-label={`Search ${label.toLowerCase()}`}
+        placeholder={tx("Search {{label}}...", { label: label.toLowerCase() })}
+        aria-label={tx("Search {{label}}", { label: label.toLowerCase() })}
         className="h-8 pl-7 text-xs"
       />
     </div>

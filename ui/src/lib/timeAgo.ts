@@ -1,3 +1,6 @@
+import { localeTag } from "@/xo/locale";
+import { mnTimeAgo } from "@/xo/time-ago";
+
 const MINUTE = 60;
 const HOUR = 60 * MINUTE;
 const DAY = 24 * HOUR;
@@ -8,6 +11,7 @@ export function timeAgo(date: Date | string): string {
   const now = Date.now();
   const then = new Date(date).getTime();
   const seconds = Math.round((now - then) / 1000);
+  if (localeTag() === "mn-MN") return mnTimeAgo(seconds);
 
   if (seconds < MINUTE) return "just now";
   if (seconds < HOUR) {

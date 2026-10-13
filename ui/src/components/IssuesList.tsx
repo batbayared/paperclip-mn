@@ -1,3 +1,4 @@
+import { tx } from "@/i18n/xo";
 import { startTransition, useDeferredValue, useEffect, useMemo, useState, useCallback, useRef } from "react";
 import type { ReactNode } from "react";
 import { useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -613,25 +614,30 @@ function SubIssueProgressSummaryStrip({
         <div className="min-w-0 flex-1 space-y-2">
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
             <span className="font-medium text-foreground">
-              {summary.doneCount}/{summary.totalCount} done
+              {tx("{{done}}/{{total}} done", { done: summary.doneCount, total: summary.totalCount })}
             </span>
             <span className="text-muted-foreground">
-              {summary.inProgressCount} in progress
+              {tx("{{n}} in progress", { n: summary.inProgressCount })}
             </span>
             <span className="text-muted-foreground">
-              {summary.blockedCount} blocked
+              {tx("{{n}} blocked", { n: summary.blockedCount })}
             </span>
             {showCostSummary && (
               <>
                 <span
                   className="text-muted-foreground tabular-nums"
-                  title={`${costSummary.runCount.toLocaleString()} run${
-                    costSummary.runCount === 1 ? "" : "s"
-                  } across ${costSummary.issueCount} sub-task${
-                    costSummary.issueCount === 1 ? "" : "s"
-                  }`}
+                  title={tx("{{runs}} across {{tasks}}", {
+                    runs:
+                      costSummary.runCount === 1
+                        ? tx("{{n}} run", { n: costSummary.runCount.toLocaleString() })
+                        : tx("{{n}} runs", { n: costSummary.runCount.toLocaleString() }),
+                    tasks:
+                      costSummary.issueCount === 1
+                        ? tx("{{n}} sub-task", { n: costSummary.issueCount })
+                        : tx("{{n}} sub-tasks", { n: costSummary.issueCount }),
+                  })}
                 >
-                  {formatTokens(totalTokens)} tokens
+                  {tx("{{n}} tokens", { n: formatTokens(totalTokens) })}
                 </span>
                 <span className="text-muted-foreground tabular-nums">
                   {formatDurationMs(costSummary.runtimeMs)} runtime
@@ -2487,8 +2493,11 @@ function StreamlinedIssuesList({
                 {isLoadingMoreIssues
                   ? "Loading more tasks..."
                   : remainingIssueRowCount > 0
-                    ? `Rendering ${Math.min(renderedIssueRowLimit, filtered.length)} of ${filtered.length} tasks`
-                    : "Scroll to load more tasks"}
+                    ? tx("Rendering {{shown}} of {{total}} tasks", {
+                        shown: Math.min(renderedIssueRowLimit, filtered.length),
+                        total: filtered.length,
+                      })
+                    : tx("Scroll to load more tasks")}
               </p>
             </div>
           )}
