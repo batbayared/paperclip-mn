@@ -250,7 +250,7 @@ export function AgentActionButtons({
       if (onActionError) {
         onActionError(message);
       } else {
-        pushToast({ title: "Action failed", body: message, tone: "error" });
+        pushToast({ title: tx("Action failed"), body: message, tone: "error" });
       }
     },
     [onActionError, pushToast],
@@ -292,7 +292,7 @@ export function AgentActionButtons({
       }
     },
     onError: (err) => {
-      reportError(err instanceof Error ? err.message : "Action failed");
+      reportError(err instanceof Error ? err.message : tx("Action failed"));
     },
   });
 
@@ -310,14 +310,14 @@ export function AgentActionButtons({
       }
     },
     onError: (err) => {
-      reportError(err instanceof Error ? err.message : "Failed to start traced run");
+      reportError(err instanceof Error ? err.message : tx("Failed to start traced run"));
     },
   });
 
   const duplicateAgent = useMutation({
     mutationFn: async () => {
       if (!resolvedCompanyId) {
-        throw new Error("Agent is not ready to duplicate");
+        throw new Error(tx("Agent is not ready to duplicate"));
       }
       const instructionsBundle = await loadDuplicateInstructionsBundle(agent.id, resolvedCompanyId);
       const payload = buildDuplicateAgentPayload(agent, instructionsBundle);
@@ -336,21 +336,21 @@ export function AgentActionButtons({
       if (resolvedCompanyId) {
         await queryClient.invalidateQueries({ queryKey: queryKeys.agents.list(resolvedCompanyId) });
       }
-      pushToast({ title: "Agent duplicated", body: createdAgent.name, tone: "success" });
+      pushToast({ title: tx("Agent duplicated"), body: createdAgent.name, tone: "success" });
       if (!confirmLateNavigationChanges(duplicateStartedDirtyRef)) return;
       navigate(`/agents/${agentRouteRef(createdAgent)}/dashboard`);
     },
     onError: (err) => {
-      const message = err instanceof Error ? err.message : "Failed to duplicate agent";
+      const message = err instanceof Error ? err.message : tx("Failed to duplicate agent");
       onActionError?.(message);
-      pushToast({ title: "Could not duplicate agent", body: message, tone: "error" });
+      pushToast({ title: tx("Could not duplicate agent"), body: message, tone: "error" });
     },
   });
 
   const handleDuplicateAgent = useCallback(() => {
     if (duplicateAgent.isPending) return;
     const nextName = duplicateAgentName(agent.name);
-    const confirmed = window.confirm(`Duplicate ${agent.name} as ${nextName}?`);
+    const confirmed = window.confirm(tx("Duplicate {{name}} as {{nextName}}?", { name: agent.name, nextName }));
     setMoreOpen(false);
     if (!confirmed || !confirmNavigationStart(duplicateStartedDirtyRef)) return;
     duplicateAgent.mutate();
@@ -364,7 +364,7 @@ export function AgentActionButtons({
       queryClient.invalidateQueries({ queryKey: queryKeys.agents.taskSessions(agent.id) });
     },
     onError: (err) => {
-      reportError(err instanceof Error ? err.message : "Failed to reset session");
+      reportError(err instanceof Error ? err.message : tx("Failed to reset session"));
     },
   });
 

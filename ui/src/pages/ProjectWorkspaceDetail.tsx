@@ -81,6 +81,22 @@ const SOURCE_TYPE_OPTIONS: Array<{ value: ProjectWorkspaceSourceType; label: str
   { value: "remote_managed", label: "Remote-managed workspace", description: "A hosted workspace tracked by external reference." },
 ];
 
+function sourceTypeText(english: string): string {
+  switch (english) {
+    case "Local git checkout": return tx("Local git checkout");
+    case "A local path Paperclip can use directly.": return tx("A local path {{brand}} can use directly.");
+    case "Local non-git path": return tx("Local non-git path");
+    case "A local folder without git semantics.": return tx("A local folder without git semantics.");
+    case "Remote git repo": return tx("Remote git repo");
+    case "A repo URL with optional refs and local checkout.": return tx("A repo URL with optional refs and local checkout.");
+    case "Remote-managed workspace": return tx("Remote-managed workspace");
+    case "A hosted workspace tracked by external reference.": return tx("A hosted workspace tracked by external reference.");
+    case "Default": return tx("Default");
+    case "Advanced": return tx("Advanced");
+    default: return english;
+  }
+}
+
 const VISIBILITY_OPTIONS: Array<{ value: ProjectWorkspaceVisibility; label: string }> = [
   { value: "default", label: "Default" },
   { value: "advanced", label: "Advanced" },
@@ -141,14 +157,14 @@ function parseRuntimeConfigJson(value: string) {
     if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
       return {
         ok: false as const,
-        error: "Workspace commands JSON must be a JSON object.",
+        error: tx("Workspace commands JSON must be a JSON object."),
       };
     }
     return { ok: true as const, value: parsed as Record<string, unknown> };
   } catch (error) {
     return {
       ok: false as const,
-      error: error instanceof Error ? error.message : "Invalid JSON.",
+      error: error instanceof Error ? error.message : tx("Invalid JSON."),
     };
   }
 }
@@ -192,21 +208,21 @@ function validateWorkspaceForm(form: WorkspaceFormState) {
 
   if (form.sourceType === "remote_managed") {
     if (!remoteWorkspaceRef && !repoUrl) {
-      return "Remote-managed workspaces require a remote workspace ref or repo URL.";
+      return tx("Remote-managed workspaces require a remote workspace ref or repo URL.");
     }
   } else if (!cwd && !repoUrl) {
-    return "Workspace requires at least one local path or repo URL.";
+    return tx("Workspace requires at least one local path or repo URL.");
   }
 
   if (cwd && (form.sourceType === "local_path" || form.sourceType === "non_git_path") && !isAbsolutePath(cwd)) {
-    return "Local workspace path must be absolute.";
+    return tx("Local workspace path must be absolute.");
   }
 
   if (repoUrl) {
     try {
       new URL(repoUrl);
     } catch {
-      return "Repo URL must be a valid URL.";
+      return tx("Repo URL must be a valid URL.");
     }
   }
 
@@ -356,7 +372,7 @@ export function ProjectWorkspaceDetail() {
       setErrorMessage(null);
     },
     onError: (error) => {
-      setErrorMessage(error instanceof Error ? error.message : "Failed to save workspace.");
+      setErrorMessage(error instanceof Error ? error.message : tx("Failed to save workspace."));
     },
   });
 
@@ -367,7 +383,7 @@ export function ProjectWorkspaceDetail() {
       setErrorMessage(null);
     },
     onError: (error) => {
-      setErrorMessage(error instanceof Error ? error.message : "Failed to update workspace.");
+      setErrorMessage(error instanceof Error ? error.message : tx("Failed to update workspace."));
     },
   });
 
@@ -379,17 +395,17 @@ export function ProjectWorkspaceDetail() {
       setErrorMessage(null);
       setRuntimeActionMessage(
         request.action === "run"
-          ? "Workspace job completed."
+          ? tx("Workspace job completed.")
           : request.action === "stop"
-            ? "Workspace service stopped. Task execution is not paused."
+            ? tx("Workspace service stopped. Task execution is not paused.")
             : request.action === "restart"
-              ? "Workspace service restarted. Task execution is not paused."
-              : "Workspace service started.",
+              ? tx("Workspace service restarted. Task execution is not paused.")
+              : tx("Workspace service started."),
       );
     },
     onError: (error) => {
       setRuntimeActionMessage(null);
-      setErrorMessage(error instanceof Error ? error.message : "Failed to control workspace commands.");
+      setErrorMessage(error instanceof Error ? error.message : tx("Failed to control workspace commands."));
     },
   });
 
@@ -426,7 +442,8 @@ export function ProjectWorkspaceDetail() {
     updateWorkspace.mutate(patch);
   };
 
-  const sourceTypeDescription = SOURCE_TYPE_OPTIONS.find((option) => option.value === form.sourceType)?.description ?? null;
+  const sourceTypeDescriptionEnglish = SOURCE_TYPE_OPTIONS.find((option) => option.value === form.sourceType)?.description ?? null;
+  const sourceTypeDescription = sourceTypeDescriptionEnglish ? sourceTypeText(sourceTypeDescriptionEnglish) : null;
   const handleTabChange = (tab: ProjectWorkspaceTab) => {
     const workspacePath = projectWorkspaceUrl(project, routeWorkspaceId);
     if (isProjectWorkspacePluginTab(tab)) {
@@ -515,7 +532,7 @@ export function ProjectWorkspaceDetail() {
                   }
                 >
                   {VISIBILITY_OPTIONS.map((option) => (
-                    <option key={option.value} value={option.value}>{option.label}</option>
+                    <option key={option.value} value={option.value}>{sourceTypeText(option.label)}</option>
                   ))}
                 </select>
               </Field>
@@ -531,7 +548,7 @@ export function ProjectWorkspaceDetail() {
                   }
                 >
                   {SOURCE_TYPE_OPTIONS.map((option) => (
-                    <option key={option.value} value={option.value}>{option.label}</option>
+                    <option key={option.value} value={option.value}>{sourceTypeText(option.label)}</option>
                   ))}
                 </select>
               </Field>
@@ -616,7 +633,7 @@ export function ProjectWorkspaceDetail() {
               </div>
 
               <div className="grid gap-4 md:grid-cols-2">
-                <Field label="Setup command" hint="Runs when this workspace needs custom bootstrap">
+                <Field label="Setup command" hint={tx("Runs when this workspace needs custom bootstrap")}>
                   <textarea
                     className="min-h-28 w-full rounded-lg border border-border bg-background px-3 py-2 font-mono text-sm outline-none"
                     value={form.setupCommand}
@@ -624,7 +641,7 @@ export function ProjectWorkspaceDetail() {
                     placeholder="pnpm install && pnpm dev"
                   />
                 </Field>
-                <Field label="Cleanup command" hint="Runs before project-level execution workspace teardown">
+                <Field label="Cleanup command" hint={tx("Runs before project-level execution workspace teardown")}>
                   <textarea
                     className="min-h-28 w-full rounded-lg border border-border bg-background px-3 py-2 font-mono text-sm outline-none"
                     value={form.cleanupCommand}
@@ -640,7 +657,7 @@ export function ProjectWorkspaceDetail() {
                   Paperclip derives Services and Jobs from this JSON. Prefer editing named commands first; use raw JSON for advanced lifecycle, port, readiness, or environment settings.
                 </p>
                 <div className="mt-3">
-                  <Field label="Workspace commands JSON" hint="Execution workspaces inherit this config unless they override it. Legacy `services` arrays still work, but `commands` supports both services and jobs.">
+                  <Field label="Workspace commands JSON" hint={tx("Execution workspaces inherit this config unless they override it. Legacy `services` arrays still work, but `commands` supports both services and jobs.")}>
                     <textarea
                       className="min-h-96 w-full rounded-lg border border-border bg-background px-3 py-2 font-mono text-sm outline-none"
                       value={form.runtimeConfig}
@@ -724,11 +741,11 @@ export function ProjectWorkspaceDetail() {
               pendingRequest={pendingRuntimeAction}
               serviceEmptyMessage={
                 workspace.runtimeConfig?.workspaceRuntime
-                  ? "No services have been started for this workspace yet."
-                  : "No workspace command config is defined for this workspace yet."
+                  ? tx("No services have been started for this workspace yet.")
+                  : tx("No workspace command config is defined for this workspace yet.")
               }
-              jobEmptyMessage="No one-shot jobs are configured for this workspace yet."
-              disabledHint="Project workspaces need a working directory before local commands can run, and services also need runtime config."
+              jobEmptyMessage={tx("No one-shot jobs are configured for this workspace yet.")}
+              disabledHint={tx("Project workspaces need a working directory before local commands can run, and services also need runtime config.")}
               onAction={(request) => controlRuntimeServices.mutate(request)}
             />
           </Card>
@@ -756,7 +773,7 @@ export function ProjectWorkspaceDetail() {
         ) : (
           <MissingPluginTabPlaceholder
             defaultTabHref={`${projectWorkspaceUrl(project, routeWorkspaceId)}?tab=configuration`}
-            defaultTabLabel="Back to configuration"
+            defaultTabLabel={tx("Back to configuration")}
           />
         )
       ) : null}
