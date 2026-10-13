@@ -179,6 +179,7 @@ import {
 import { xoNewIssueInlineLabel, xoStatusLabel } from "@/xo/labels";
 import { tx } from "@/i18n/xo";
 import { XoTrans } from "@/xo/XoTrans";
+import { localeTag } from "@/xo/locale";
 
 const STAGED_FILE_ACCEPT = "image/*,application/pdf,text/plain,text/markdown,application/json,text/csv,text/html,.md,.markdown";
 
@@ -1476,7 +1477,7 @@ export function NewIssueDialog() {
           <div className="px-4 pb-2">
             <div className="overflow-x-auto overscroll-x-contain">
               <div className="inline-flex items-center gap-2 text-sm text-muted-foreground flex-wrap sm:flex-nowrap sm:min-w-max">
-              <span className="w-6 shrink-0 text-center">{xoNewIssueInlineLabel("For")}</span>
+              <span className={`${localeTag() === "mn-MN" ? "w-9" : "w-6"} shrink-0 text-center`}>{xoNewIssueInlineLabel("For")}</span>
               <InlineEntitySelector
                 ref={assigneeSelectorRef}
                 value={assigneeValue}

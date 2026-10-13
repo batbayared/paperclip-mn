@@ -304,7 +304,6 @@ XO-ийн өмч (upstream биш): ui/src/xo/labels.ts (xoHumanizeValue, xoTool
 - ui/src/xo/date-format.ts:47 xoLocaleDateTime нь year-гүй богино options (month/day/hour/minute)-ыг mn-д үл хайхарч урт «2026 оны 9-р сарын 7 13:02» хэлбэр өгнө (xoLocaleDate нь mnShortDate руу шилждэг, mnShortDateTime ашиглагдаагүй). Хамаарах газрууд: SystemNotice.tsx:104, IssueRecoveryActionCard.tsx:790 ба 893, Claude/CodexSubscriptionPanel. Мөн weekday, timeZoneName, timeStyle medium/long-ийг mn зам үл хайхарна (operate-sections.tsx:213).
 - Browser шалгалт (7.3 дараах, 7.3-аас өмнөх upstream файл, XO tier-т ороогүй): InteractionGovernancePanel.tsx (компанийн тохиргооны «Interaction governance»), pages/Secrets.tsx-ийн статик шошго («Secrets», «My secrets», «New secret» г.м.), IssueThreadInteractionCard.tsx.
 - Browser шалгалт (T1 файл дахь JSX биш литерал): AgentActionButtons.tsx:55/163 «Run now» ба «Assign Task»/«Pause» prop-ийн анхдагч утга, MembershipAction.tsx:29 «Join»/«Leave», StatusBadge-ийн түүхий төлөв («idle», «succeeded»), AgentDetail.tsx:238 ба .production.tsx:226 run-ийн шалтгаан «Assignment», AgentDetail.tsx:4365 ба .production.tsx:4288 «Waiting for transcript...», ProviderTraceStatusBadge.tsx:52 «Trace off», агентын үүргийн шошго «General».
-- NewIssueDialog.tsx:1479 «Хэнд» шошго w-6 (24px) баганаас халина (scrollWidth 34px, 2026-10-13-нд хэмжив). Нэр томьёо батлагдсан тул баганын өргөнийг (w-8 эсвэл w-auto) өөрчлөх замаар засна.
 
 ## Ү6 7.3-д хөндсөн upstream файлууд
 
@@ -375,6 +374,7 @@ T1 = scripts/xo-i18n/tiers.ts-ийн tier-1 жагсаалтад нэмсэн. "
 | ui/src/pages/secrets/ImportFromVaultDialog.tsx | xoLocaleDate; «Ns/Nm/Nh/Nd ago» гар tx |
 | ui/src/pages/tools/shared.tsx | xoLocaleDateTime |
 | ui/src/components/SwipeToArchive.tsx | swipe арын «Archive» шошго гар tx (browser шалгалтаар илэрсэн) |
+| ui/src/components/NewIssueDialog.tsx | «Хэнд» шошгоны багана mn үед w-9, en үед w-6 хэвээр (localeTag; mn текст 34px, w-6 нь 24px) |
 
 Хазайлт ба тэмдэглэл (хэрэгжүүлэлтийн явцад гарсан):
 - Desk shelf шошгыг attention.ts-д биш render цэг болох WhatNeedsMe.tsx ба DecisionQueuePage.tsx-д орчуулсан (xoLabel); энэ хоёр файл анхны планд байгаагүй.
