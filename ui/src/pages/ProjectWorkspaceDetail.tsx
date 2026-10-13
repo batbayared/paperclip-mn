@@ -682,18 +682,18 @@ export function ProjectWorkspaceDetail() {
               <h2 className="text-lg font-semibold">Current state</h2>
             </div>
             <Separator className="my-4" />
-            <DetailRow label="Project">
+            <DetailRow label={tx("Project")}>
               <Link to={`/projects/${canonicalProjectRef}`} className="hover:underline">{project.name}</Link>
             </DetailRow>
-            <DetailRow label="Workspace ID">
+            <DetailRow label={tx("Workspace ID")}>
               <span className="break-all font-mono text-xs">{workspace.id}</span>
             </DetailRow>
             {hideHostPaths ? null : (
-              <DetailRow label="Local path">
-                <span className="break-all font-mono text-xs">{workspace.cwd ?? "None"}</span>
+              <DetailRow label={tx("Local path")}>
+                <span className="break-all font-mono text-xs">{workspace.cwd ?? tx("None")}</span>
               </DetailRow>
             )}
-            <DetailRow label="Repo">
+            <DetailRow label={tx("Repo")}>
               {workspace.repoUrl && isSafeExternalUrl(workspace.repoUrl) ? (
                 <a href={workspace.repoUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 hover:underline">
                   {workspace.repoUrl}
@@ -701,7 +701,7 @@ export function ProjectWorkspaceDetail() {
                 </a>
               ) : workspace.repoUrl ? (
                 <span className="break-all font-mono text-xs">{workspace.repoUrl}</span>
-              ) : "None"}
+              ) : tx("None")}
             </DetailRow>
             <DetailRow label={tx("Default ref")}>{workspace.defaultRef ?? tx("None")}</DetailRow>
             <DetailRow label={tx("Updated")}>{xoLocaleDateTime(new Date(workspace.updatedAt))}</DetailRow>
