@@ -65,6 +65,7 @@ import {
 } from "./TaskChatComposerTakeoverContext";
 import { TaskChatPlanPreviewCard } from "./TaskChatPlanPreviewCard";
 import { TaskChatRichInput } from "./TaskChatRichInput";
+import { tx } from "@/i18n/xo";
 
 const TAKEOVER_TEXTAREA_CLASS =
   "min-h-16 resize-y border-0 bg-muted/35 text-sm shadow-none focus-visible:ring-0 focus-visible:ring-offset-0";
@@ -413,7 +414,7 @@ function ReceiptDisclosure({
                 </p>
               ) : null}
               <p className="mt-1 text-sm font-medium text-foreground">
-                Answer: {values.length > 0 ? values.join(", ") : "No answer"}
+                {tx("Answer: {{answer}}", { answer: values.length > 0 ? values.join(", ") : tx("No answer") })}
               </p>
             </div>
           );
@@ -430,10 +431,9 @@ function ReceiptDisclosure({
         <p className="text-sm text-foreground">{interaction.payload.prompt}</p>
         {interaction.status === "accepted" ? (
           <p className="mt-1 text-sm font-medium text-foreground">
-            Answer:{" "}
-            {selectedLabels.length > 0
-              ? selectedLabels.join(", ")
-              : "No options selected"}
+            {tx("Answer: {{answer}}", {
+              answer: selectedLabels.length > 0 ? selectedLabels.join(", ") : tx("No options selected"),
+            })}
           </p>
         ) : null}
         {interaction.payload.detailsMarkdown ? (

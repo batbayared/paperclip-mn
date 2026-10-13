@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { i18n } from "@/i18n";
-import { xoLabel, xoStatusLabel } from "./labels";
+import { xoFileKindLabel, xoLabel, xoStatusLabel } from "./labels";
 
 afterEach(async () => {
   await i18n.changeLanguage("en");
@@ -23,6 +23,13 @@ describe("xoLabel", () => {
     expect(xoLabel("Name your organization")).toBe("Байгууллагаа нэрлэх");
     expect(xoLabel("Some unknown label")).toBe("Some unknown label");
   });
+
+  it("mn дээр ажлын горимын тайлбарыг орчуулна", async () => {
+    await i18n.changeLanguage("mn");
+    expect(xoLabel("Make changes and run work")).toBe("Өөрчлөлт хийж, ажил гүйцэтгэх");
+    expect(xoLabel("Draft a plan before acting")).toBe("Ажиллахаас өмнө төлөвлөгөө боловсруулах");
+    expect(xoLabel("Answer questions only, no changes")).toBe("Зөвхөн асуултад хариулна, өөрчлөлт хийхгүй");
+  });
 });
 
 describe("xoStatusLabel", () => {
@@ -42,5 +49,29 @@ describe("xoStatusLabel", () => {
     expect(xoStatusLabel("cancelled", "Cancelled")).toBe("Цуцалсан");
     expect(xoStatusLabel("blocked", "Blocked")).toBe("Саатсан");
     expect(xoStatusLabel("running", "running")).toBe("running");
+  });
+});
+
+describe("xoFileKindLabel", () => {
+  it("en дээр англи шошгыг хэвээр буцаана", () => {
+    expect(xoFileKindLabel("Archive")).toBe("Archive");
+    expect(xoFileKindLabel("Doc")).toBe("Doc");
+    expect(xoFileKindLabel("PDF")).toBe("PDF");
+  });
+
+  it("mn дээр файлын төрлийг орчуулж, товчлолыг хэвээр үлдээнэ", async () => {
+    await i18n.changeLanguage("mn");
+    expect(xoFileKindLabel("Archive")).toBe("Архив");
+    expect(xoFileKindLabel("Audio")).toBe("Аудио");
+    expect(xoFileKindLabel("Code")).toBe("Код");
+    expect(xoFileKindLabel("Doc")).toBe("Баримт");
+    expect(xoFileKindLabel("File")).toBe("Файл");
+    expect(xoFileKindLabel("Log")).toBe("Лог");
+    expect(xoFileKindLabel("Patch")).toBe("Патч");
+    expect(xoFileKindLabel("Sheet")).toBe("Хүснэгт");
+    expect(xoFileKindLabel("Text")).toBe("Текст");
+    expect(xoFileKindLabel("Video")).toBe("Видео");
+    expect(xoFileKindLabel("PDF")).toBe("PDF");
+    expect(xoFileKindLabel("JSON")).toBe("JSON");
   });
 });

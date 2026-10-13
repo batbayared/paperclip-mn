@@ -74,6 +74,8 @@ import type { ActionCommandOption } from "@/context/EditorAutocompleteContext";
 import { TaskChatComposerTakeoverActionsContext } from "./TaskChatComposerTakeoverContext";
 
 import { TaskChatPausedTakeover, type TaskComposerPause } from "./TaskChatPausedTakeover";
+import { tx } from "@/i18n/xo";
+import { xoFileKindLabel, xoLabel } from "@/xo/labels";
 
 /** Structurally identical to IssueChatThread's module-private CommentReassignment. */
 export interface CommentReassignment {
@@ -307,17 +309,17 @@ const MODE_DESCRIPTION: Partial<Record<IssueWorkMode, string>> = {
 /** v7 per-mode placeholder copy; `{agent}` is the pending assignee's name. */
 function modePlaceholder(mode: IssueWorkMode, agentName: string, mobile: boolean): string {
   if (mobile) {
-    if (mode === "planning") return `Plan with ${agentName}…`;
-    if (mode === "ask") return `Ask ${agentName}…`;
-    return `Message ${agentName}…`;
+    if (mode === "planning") return tx("Plan with {{agent}}…", { agent: agentName });
+    if (mode === "ask") return tx("Ask {{agent}}…", { agent: agentName });
+    return tx("Message {{agent}}…", { agent: agentName });
   }
   switch (mode) {
     case "planning":
-      return `Plan with ${agentName} — shapes the plan doc, no code changes…`;
+      return tx("Plan with {{agent}} — shapes the plan doc, no code changes…", { agent: agentName });
     case "ask":
-      return `Ask ${agentName} a question — read-only, nothing runs…`;
+      return tx("Ask {{agent}} a question — read-only, nothing runs…", { agent: agentName });
     default:
-      return `Message ${agentName} — describe what you want done…`;
+      return tx("Message {{agent}} — describe what you want done…", { agent: agentName });
   }
 }
 
@@ -634,11 +636,11 @@ export function TaskChatComposer({
   );
   const assigneeValue = pendingAssignee ?? currentAssigneeValue;
   const assigneeLabel =
-    reassignOptions?.find((o) => o.id === assigneeValue)?.label ?? "Unassigned";
+    reassignOptions?.find((o) => o.id === assigneeValue)?.label ?? tx("Unassigned");
   const assigneeName =
-    assigneeLabel === "Unassigned" ? "the agent" : assigneeLabel;
+    assigneeLabel === "Unassigned" || assigneeLabel === tx("Unassigned") ? tx("the agent") : assigneeLabel;
   const effectivePlaceholder = queuedEdit
-    ? "Edit queued message…"
+    ? tx("Edit queued message…")
     : (placeholder ?? modePlaceholder(pendingMode, assigneeName, mobile));
   const goalUnavailable = runnerGoalCapability?.availability !== "available";
   const goalCommandOption: ActionCommandOption = {
@@ -1383,10 +1385,10 @@ export function TaskChatComposer({
                       </AttachmentTitle>
                       <AttachmentDescription className="max-w-48">
                         {attachment.status === "uploading"
-                          ? "Uploading…"
+                          ? tx("Uploading…")
                           : attachment.status === "error"
-                            ? (attachment.error ?? "Upload failed")
-                            : [kind.label, sizeLabel]
+                            ? (attachment.error ?? tx("Upload failed"))
+                            : [xoFileKindLabel(kind.label), sizeLabel]
                                 .filter(Boolean)
                                 .join(" · ")}
                       </AttachmentDescription>
@@ -1492,7 +1494,7 @@ export function TaskChatComposer({
                         <span className="flex min-w-0 flex-1 flex-col">
                           <span className="font-medium">{m.label}</span>
                           <span className="whitespace-nowrap text-xs text-muted-foreground">
-                            {MODE_DESCRIPTION[m.value] ?? ""}
+                            {xoLabel(MODE_DESCRIPTION[m.value] ?? "")}
                           </span>
                         </span>
                         {selected ? (

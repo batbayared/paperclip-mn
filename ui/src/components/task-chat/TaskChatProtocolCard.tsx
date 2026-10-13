@@ -47,6 +47,7 @@ import type {
 import { QuestionForm, QuestionResponseSummary } from "./QuestionForm";
 import { TaskChatComposerTakeoverHeader } from "./TaskChatComposerTakeoverContext";
 import { RichWorkProductCard } from "./RichWorkProductCard";
+import { tx } from "@/i18n/xo";
 
 export interface TaskChatProtocolCardProps {
   item: TaskChatProtocolItem;
@@ -441,8 +442,8 @@ function WorkspaceChangeCard({ item }: { item: TaskChatWorkspaceChangeItem }) {
               onClick={() => setExpanded((value) => !value)}
             >
               {expanded
-                ? "Show fewer files"
-                : `Show ${item.files.length - 3} more files`}
+                ? tx("Show fewer files")
+                : tx("Show {{n}} more files", { n: item.files.length - 3 })}
             </Button>
           ) : null}
           {item.files.length > 0 ? (

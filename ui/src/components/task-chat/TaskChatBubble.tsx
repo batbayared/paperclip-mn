@@ -32,6 +32,8 @@ import {
 } from "./task-chat-attachments";
 import { TaskChatSystemNotice } from "./TaskChatSystemNotice";
 import type { TaskChatMessageItem } from "./task-chat-model";
+import { tx } from "@/i18n/xo";
+import { xoFileKindLabel } from "@/xo/labels";
 
 interface TaskChatBubbleProps {
   item: TaskChatMessageItem;
@@ -281,7 +283,7 @@ function TaskChatBubbleContent({
                   key={ref.url}
                   type="button"
                   className="group aspect-video min-w-0 overflow-hidden rounded-md bg-muted outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                  aria-label={`Open ${ref.name || `image ${index + 1}`}`}
+                  aria-label={ref.name ? tx("Open {{name}}", { name: ref.name }) : tx("Open image {{n}}", { n: index + 1 })}
                   onClick={() => openImage(ref.url)}
                 >
                   <img
@@ -296,7 +298,7 @@ function TaskChatBubbleContent({
               <button
                 type="button"
                 className="aspect-video min-w-0 rounded-md bg-muted text-sm font-semibold text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                aria-label={`Open ${imageRefs.length - 3} more screenshots`}
+                aria-label={tx("Open {{n}} more screenshots", { n: imageRefs.length - 3 })}
                 onClick={() => openImage(imageRefs[3].url)}
               >
                 +{imageRefs.length - 3}
@@ -328,11 +330,11 @@ function TaskChatBubbleContent({
                       {ref.name}
                     </AttachmentTitle>
                     <AttachmentDescription className="max-w-48">
-                      {size ? `${kind.label} · ${size}` : kind.label}
+                      {size ? `${xoFileKindLabel(kind.label)} · ${size}` : xoFileKindLabel(kind.label)}
                     </AttachmentDescription>
                   </AttachmentContent>
                   <AttachmentTrigger
-                    aria-label={`Open ${ref.name}`}
+                    aria-label={tx("Open {{name}}", { name: ref.name })}
                     render={
                       <a
                         href={ref.openPath ?? ref.url}
