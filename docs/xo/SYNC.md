@@ -291,11 +291,85 @@ XO-ийн өмч (upstream биш): ui/src/xo/labels.ts (xoHumanizeValue, xoTool
 
 Шинэ XO-ийн тестүүд: ui/src/xo/date-format.test.ts, ui/src/i18n/xo/y6-7-2-keys.test.ts, scripts/xo-i18n/tiers-y6-7-2.test.ts, ui/src/components/task-chat/TaskChat.y6-7-2.xo.test.tsx, ui/src/xo/labels.test.ts (нэмэлт).
 
-Үлдэгдэл (Ү6 7.3):
-- Task 4-т ороогүй бусад `toLocale*` дуудлага (~97 газар): Chromium-д mn ICU байхгүй тул англиар харагдана.
-- Ү6/T2 файлууд: TweakPanel, motion-tokens, task-chat-states, task-chat-fixtures, task-chat-attachments, RunTranscriptView, routine-run-display, DesignGuide; LegacyIssuesList.
-- Clipboard-ын "Tool:"/"Result:" угтвар англиар үлдсэн (хуулсан текстийн формат).
-- Clipboard-ын `d.label === "Intent"` харьцуулалт (шошгыг орчуулсан литералтай харьцуулдаг; ийм харьцуулалтыг барих lint guard-тай хамт авч үзнэ).
+Үлдэгдэл (Ү6 7.3): хэрэгжсэн (доорх "Ү6 7.3-д хөндсөн upstream файлууд"). Үлдсэн: clipboard-ын `d.label === "Intent"` харьцуулалт (IssueChatThread.tsx:1637, lib/transcriptPresentation.ts:233 — тэр цэгт шошго англи, render үед xoToolDetailLabel орчуулдаг); dev-only T2 (TweakPanel, motion-tokens, task-chat-states, task-chat-fixtures, DesignGuide, TaskChatLab); LegacyIssuesList; mn-д цагийн бүсийн нэр (Codex/ClaudeSubscriptionPanel) ба UTC огноо (attention.ts:431) харагдахгүй; RunTranscriptView.tsx:881 "Unavailable source"; ProjectWorkspaceDetail.tsx:704 repoUrl-ийн `: "None"` (tx-гүй); Intl.DateTimeFormat timeStyle дуудлагууд (RoutineOverview.tsx:33, SidebarServerInfo.tsx:13, SmokeLabDashboardCard.tsx:29, tools/SmokeLabTab.tsx:46) toLocale* хүрээнээс гадуур тул англиар үлдсэн.
+
+## Ү6 7.3-д хөндсөн upstream файлууд
+
+T1 = scripts/xo-i18n/tiers.ts-ийн tier-1 жагсаалтад нэмсэн. "гар tx" = эх кодод tx()/XoTrans-аар ороосон. "helper" = ui/src/xo/labels.ts эсвэл ui/src/xo/date-format.ts-ийн функцээр render үед орчуулсан. "xoLocale*" = toLocale* дуудлагыг date-format.ts-ийн wrapper-аар сольсон (en дуудлага ижил).
+
+| Файл | Өөрчлөлт |
+|---|---|
+| ui/src/components/AgentBubbleActionRow.tsx | «Helpful»/«Needs work» title ба aria-label гар tx |
+| ui/src/components/AgentConfigForm.tsx | xoLocaleTime (mn үед H:MM:SS, доорх тэмдэглэл) |
+| ui/src/components/AttentionQueueRow.tsx | xoLocaleDateTime; «Reappears», «soon», «in Nm/h/d» гар tx |
+| ui/src/components/ClaudeSubscriptionPanel.tsx | xoLocaleDateTime; «Resets {{date}}» гар tx |
+| ui/src/components/CodexSubscriptionPanel.tsx | xoLocaleDateTime; «Resets {{date}}» гар tx |
+| ui/src/components/DecisionTriageStrip.tsx | xoLocaleDateTime; «Snoozed until» гар tx |
+| ui/src/components/EmailMessageCard.tsx | xoLocaleDateTime |
+| ui/src/components/IssueChatThread.tsx | «Helpful»/«Needs work» гар tx; clipboard-ын «Tool:/Args:/Result:» угтвар гар tx |
+| ui/src/components/IssueRecoveryActionCard.tsx | xoLocaleDateTime; «in Nm»/«Nm ago» гар tx |
+| ui/src/components/IssuesList.tsx | group-by шошго xoLabel |
+| ui/src/components/OnboardingWizard.tsx | xoLocaleTime (mn үед H:MM:SS, доорх тэмдэглэл) |
+| ui/src/components/OutputFeedbackButtons.tsx | «Helpful»/«Needs work» гар tx |
+| ui/src/components/ProviderQuotaCard.tsx | xoLocaleDate; «resets {{date}}» гар tx |
+| ui/src/components/ProviderTraceStatusBadge.tsx | xoLocaleDateTime; frames/bytes/expires ба sensitive capture тайлбар гар tx |
+| ui/src/components/RoutineActivityRow.tsx | xoLocaleTime |
+| ui/src/components/RoutineList.tsx | xoLocaleDateTime |
+| ui/src/components/RoutineOverview.tsx | xoLocaleDateTime |
+| ui/src/components/RoutineTriggerCard.tsx | xoLocaleDateTime; «Next: {{date}}» гар tx |
+| ui/src/components/RunnerInspector.tsx | xoLocaleDateTime; frames/expires мөр гар tx |
+| ui/src/components/ScheduleEditor.tsx | xoLocaleDateTime; «Next: {{dates}}.» гар tx |
+| ui/src/components/SourceResolvedFoldCallout.tsx | xoLocaleDateTime |
+| ui/src/components/SourceTrustBadge.tsx | xoLocaleDateTime; low-trust тайлбар гар tx |
+| ui/src/components/SystemNotice.tsx | xoLocaleDateTime |
+| ui/src/components/TaskChatThread.tsx | interaction.title fallback «Questions» гар tx |
+| ui/src/components/access/InvitesSection.tsx | xoLocaleDateTime |
+| ui/src/components/issue-properties/IssueProperties.tsx | «None» гар tx (2 газар) |
+| ui/src/components/routine-sections/editable-sections.tsx | xoLocaleDateTime |
+| ui/src/components/routine-sections/editable-sections.production.tsx | xoLocaleDateTime (хос файл) |
+| ui/src/components/routine-sections/operate-sections.tsx | xoLocaleDate; «Earlier» гар tx; subtitle xoRunRowSubtitle |
+| ui/src/components/task-chat/TaskChatProtocolCard.tsx | RuntimeQuestionHistory-д export нэмсэн (mn тестэд хэрэгтэй; нэг түлхүүр үг); «Answer details…» ба «pending» гар tx |
+| ui/src/components/task-chat/task-chat-adapter.ts | xoLocaleTime |
+| ui/src/components/task-chat/TaskChat.y6-7-2.xo.test.tsx | mn тест нэмсэн (RuntimeQuestionHistory) |
+| ui/src/components/task-side-panel/TaskDocumentPanel.tsx | xoLocaleDateTime; «Revision {{n}}», «Updated {{date}}» гар tx |
+| ui/src/components/timeline/WorkTimelineChart.tsx | xoLocaleDate, xoLocaleTime (en-US тогтмол locale; mn-д 24 цаг) |
+| ui/src/components/transcript/RunTranscriptView.tsx | T1; төлөвийн шошго («Executing command», «Completed», «Failed with exit code» г.м.) гар tx |
+| ui/src/lib/attention.ts | xoLocaleDate (timeZone: "UTC" mn-д үйлчлэхгүй, доорх «Үлдсэн») |
+| ui/src/lib/issue-change-receipt.ts | xoLocaleDateTime |
+| ui/src/lib/utils.locale.test.ts | xoLocale* ба mnTime-ийн тест тохируулсан |
+| ui/src/pages/AgentDetail.tsx | xoLocaleTime |
+| ui/src/pages/AgentDetail.production.tsx | xoLocaleTime (хос файл) |
+| ui/src/pages/ApprovalDetail.tsx | xoLocaleDateTime |
+| ui/src/pages/CompanyAccess.tsx | xoLocaleDateTime |
+| ui/src/pages/CompanyEnvironments.tsx | xoLocaleDateTime |
+| ui/src/pages/DecisionQueuePage.tsx | desk shelf шошго xoLabel (attention.ts биш; render цэг энд) |
+| ui/src/pages/Inbox.tsx | огнооны хуваагч xoDateGroupLabel |
+| ui/src/pages/InstanceAccess.tsx | xoLocaleDate |
+| ui/src/pages/InstanceExperimentalSettings.tsx | xoLocaleDateTime |
+| ui/src/pages/JoinRequestQueue.tsx | xoLocaleDateTime; «Request details», «Submitted», «Source IP» гар tx |
+| ui/src/pages/PipelineSettings.tsx | xoLocaleDateTime |
+| ui/src/pages/Pipelines.tsx | xoLocaleDate, xoLocaleDateTime |
+| ui/src/pages/PluginSettings.tsx | xoLocaleDateTime, xoLocaleTime; «Last checked» гар tx |
+| ui/src/pages/ProjectWorkspaceDetail.tsx | xoLocaleDateTime; «Default ref», «Updated», «None» гар tx |
+| ui/src/pages/Secrets.tsx | xoLocaleDate, xoLocaleDateTime; «Ns/Nm/Nh/Nd ago» гар tx |
+| ui/src/pages/StatusCards/ArchivedStatusCardRow.tsx | xoLocaleDate |
+| ui/src/pages/Timeline.tsx | xoLocaleDateTime; run/runs олон тоо, «to», «window capped» гар tx |
+| ui/src/pages/WhatNeedsMe.tsx | desk shelf шошго xoLabel (attention.ts биш; render цэг энд) |
+| ui/src/pages/apps/chat/EmailEndpointSetup.tsx | xoLocaleDateTime; «Last mail check», «Not checked yet» гар tx |
+| ui/src/pages/audit/AuditFeed.tsx | xoLocaleDateTime |
+| ui/src/pages/audit/AuditFeed.production.tsx | xoLocaleDateTime (хос файл) |
+| ui/src/pages/secrets/ImportFromVaultDialog.tsx | xoLocaleDate; «Ns/Nm/Nh/Nd ago» гар tx |
+| ui/src/pages/tools/shared.tsx | xoLocaleDateTime |
+
+Хазайлт ба тэмдэглэл (хэрэгжүүлэлтийн явцад гарсан):
+- Desk shelf шошгыг attention.ts-д биш render цэг болох WhatNeedsMe.tsx ба DecisionQueuePage.tsx-д орчуулсан (xoLabel); энэ хоёр файл анхны планд байгаагүй.
+- TaskChatProtocolCard.tsx-д RuntimeQuestionHistory-г export болгосон (upstream файлд нэг түлхүүр үг); mn тест шууд render хийхэд хэрэгтэй.
+- ui/src/i18n/xo/keep-en.json-д "Markdown" нэмсэн (файлын төрлийн шошго mn-д ч Markdown хэвээр).
+- mn xoLocaleTime нь options-д hour/minute/second/timeStyle аль нь ч байхгүй үед секундтэй гаргана (en-ий toLocaleTimeString-тай адил). Үр дүнд OnboardingWizard, AgentConfigForm-ийн холболт шалгасан цаг mn-д H:MM:SS болсон.
+
+XO-ийн өмч (upstream биш): ui/src/xo/date-format.ts (mnTime, xoLocaleDateTime, xoLocaleDate, xoLocaleTime), ui/src/xo/labels.ts (xoRunRowSubtitle, xoLabel нэмэлт, xoFileKindLabel Markdown), scripts/xo-i18n/tiers.ts (RunTranscriptView T1), ui/src/i18n/xo/* (en.json, mn.json, keep-en.json).
+
+Шинэ XO-ийн тестүүд: ui/src/xo/date-format.test.ts (нэмэлт), ui/src/i18n/xo/y6-7-3-keys.test.ts, scripts/xo-i18n/tiers-y6-7-3.test.ts, ui/src/xo/labels.test.ts (нэмэлт).
 
 ## Lockfile
 

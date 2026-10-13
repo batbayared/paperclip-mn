@@ -1,5 +1,43 @@
 # XO ахицын бүртгэл
 
+## Ү6 7.3 — хэрэглэгчид харагдах үлдэгдэл (2026-10-13)
+
+Зорилго: Ү6 7.2-ын дараа mn дээр англиар үлдсэн зүйлийг монгол болгох. toLocale* огнооны дуудлагыг ICU-гүй xoLocale* wrapper руу шилжүүлсэн (49 файл), огнооны хажуугийн шошгыг tx-ээр орчуулсан, browser шалгалтаар илэрсэн 6 зүйл (огнооны хуваагч, desk shelf, group-by, Helpful/Needs work, Questions/None, clipboard угтвар), RunTranscriptView-ийг T1 болгосон, 7.2-ын Minor #6/#7/#8-ийг хаасан.
+
+Төлөвлөгөө: docs/superpowers/plans/2026-10-13-xo-y6-7-3-user-visible-leftovers.md. BASE 53135060b.
+
+| Task | Commit |
+|---|---|
+| 1 toLocale* орлуулагч xoLocaleDateTime/Date/Time ба mnTime | 58edf5030 |
+| 2 components-ийн огноо ба хажуугийн шошго (19 түлхүүр) | d12bdb277 |
+| 3 pages ба lib-ийн огноо, шошго (11 түлхүүр); mn xoLocaleTime секундтэй | c6c3a7f83, 8ba99c495 |
+| 4 Browser шалгалтын 6 зүйл (6 түлхүүр) | 0f355e53c |
+| 5 RunTranscriptView T1, routine run subtitle, Markdown (44 түлхүүр) | daf3f5504 |
+| 6 7.2 Minor #6 pending төлөв, #7 mn.json хоёр утга, #8 relativeTime тест | 4d5624628 |
+| 7 SYNC.md ба бүртгэл | энэ commit |
+
+### Шалгалтын үр дүн (Task 7)
+
+- xo:i18n:check OK, keys=2532 (7.2-ын төгсгөл 2452, 7.3-д +80), «гараар:» мөр байхгүй.
+- xo:i18n:test 4 файл, 57 тест PASS; xo:i18n:typecheck цэвэр.
+- xo:brand-scan 161 файл, 586 hit, baseline-аас дээш байхгүй.
+- ui tsc --noEmit цэвэр (exit 0).
+- vitest run ui/src: 617 файл, 6509 тест PASS (7.3-ын өмнө 614 файл, 6386 тест).
+
+### Browser шалгалт
+
+Browser шалгалт: 3110 dev server-ийн restart-д ED-ийн зөвшөөрөл хүлээгдэж байна (tiers.ts өөрчлөгдсөн).
+
+### Хязгаарлалт
+
+SYNC.md-ийн «Үлдэгдэл (Ү6 7.3)» мөрөнд бүртгэсэн үлдсэн зүйлс:
+
+- d.label === "Intent" харьцуулалт (IssueChatThread.tsx:1637, lib/transcriptPresentation.ts:233).
+- dev-only T2 файлууд (TweakPanel, motion-tokens, task-chat-states, task-chat-fixtures, DesignGuide, TaskChatLab) ба LegacyIssuesList.
+- mn-д цагийн бүсийн нэр (Codex/ClaudeSubscriptionPanel) ба UTC огноо (attention.ts:431) харагдахгүй.
+- RunTranscriptView.tsx:881 «Unavailable source», ProjectWorkspaceDetail.tsx:704 repoUrl-ийн «None» орчуулагдаагүй.
+- Intl.DateTimeFormat timeStyle дуудлагууд (RoutineOverview, SidebarServerInfo, SmokeLabDashboardCard, tools/SmokeLabTab) англиар үлдсэн.
+
 ## Ү6 7.2 орчуулгын үлдэгдэл (xo-main)
 
 Төлөвлөгөө: docs/superpowers/plans/2026-10-13-xo-y6-leftovers-i18n.md. BASE 580087be4.
