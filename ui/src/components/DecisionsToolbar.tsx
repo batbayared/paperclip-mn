@@ -13,6 +13,8 @@ import {
   type AttentionSortOrder,
 } from "../lib/attention";
 import { cn } from "../lib/utils";
+import { tx } from "@/i18n/xo";
+import { xoAttentionSourceLabel, xoDecisionOptionLabel } from "@/xo/labels";
 import { Button } from "./ui/button";
 import { Checkbox } from "./ui/checkbox";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
@@ -57,7 +59,9 @@ export function DecisionsToolbar({
     <div className="flex items-center gap-2">
       {visibleCount > 0 && (
         <span className="text-sm text-muted-foreground">
-          {visibleCount} {visibleCount === 1 ? "decision" : "decisions"}
+          {visibleCount === 1
+            ? tx("{{count}} decision", { count: visibleCount })
+            : tx("{{count}} decisions", { count: visibleCount })}
         </span>
       )}
       {/* Filter */}
@@ -104,7 +108,7 @@ export function DecisionsToolbar({
                 )}
                 onClick={() => onGroupByChange(value)}
               >
-                <span>{label}</span>
+                <span>{xoDecisionOptionLabel(label)}</span>
                 {groupBy === value ? <Check className="h-3.5 w-3.5" /> : null}
               </button>
             ))}
@@ -137,7 +141,7 @@ export function DecisionsToolbar({
                 )}
                 onClick={() => onSortOrderChange(value)}
               >
-                <span>{label}</span>
+                <span>{xoDecisionOptionLabel(label)}</span>
                 {sortOrder === value ? <Check className="h-3.5 w-3.5" /> : null}
               </button>
             ))}
@@ -184,7 +188,7 @@ function FilterMenu({
           {options.sourceKinds.map((kind) => (
             <FilterRow
               key={kind}
-              label={sourceMeta(kind).label}
+              label={xoAttentionSourceLabel(sourceMeta(kind).label)}
               checked={filters.sourceKinds.includes(kind)}
               onToggle={() => toggle("sourceKinds", kind)}
             />
@@ -197,7 +201,7 @@ function FilterMenu({
           {options.severities.map((severity) => (
             <FilterRow
               key={severity}
-              label={SEVERITY_LABELS[severity] ?? severity}
+              label={xoDecisionOptionLabel(SEVERITY_LABELS[severity] ?? severity)}
               checked={filters.severities.includes(severity)}
               onToggle={() => toggle("severities", severity)}
             />

@@ -5,6 +5,7 @@ import {
   type AttentionDateRangeId,
 } from "../lib/attention";
 import { cn } from "../lib/utils";
+import { xoDecisionOptionLabel } from "@/xo/labels";
 import { Button } from "./ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 
@@ -32,7 +33,7 @@ export function DecisionDateChips({ value, custom, onChange }: DecisionDateChips
     <div className="flex flex-wrap items-center gap-1.5" data-decision-date-chips>
       {ATTENTION_DATE_RANGE_OPTIONS.map(([id, label]) => (
         <ChipButton key={id} active={value === id} onClick={() => onChange(id, custom)}>
-          {label}
+          {xoDecisionOptionLabel(label)}
         </ChipButton>
       ))}
       <Popover open={open} onOpenChange={setOpen}>
