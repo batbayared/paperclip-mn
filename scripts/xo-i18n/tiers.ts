@@ -133,6 +133,7 @@ export const XO_TRANSFORM_FILES: readonly string[] = [
   // Ү6 7.2 үлдэгдэл
   "ui/src/components/IssueRow.tsx",
   "ui/src/components/task-side-panel/TaskSidePanel.tsx",
+  "ui/src/components/transcript/RunTranscriptView.tsx",
   // Хуудсууд
   "ui/src/pages/AgentDetail.tsx",
   "ui/src/pages/AgentDetail.production.tsx",

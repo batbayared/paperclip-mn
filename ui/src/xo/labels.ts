@@ -60,10 +60,22 @@ export function xoFileKindLabel(english: string): string {
     case "Doc": return tx("Doc");
     case "File": return tx("File");
     case "Log": return tx("Log");
+    case "Markdown": return tx("Markdown");
     case "Patch": return tx("Patch");
     case "Sheet": return tx("Sheet");
     case "Text": return tx("Text");
     case "Video": return tx("Video");
+    default: return english;
+  }
+}
+
+// routine-run-display.ts-ийн SKIP_REASON_LABELS (Record initializer) ба "Run failed"-ийг render үед орчуулна.
+export function xoRunRowSubtitle(english: string): string {
+  switch (english) {
+    case "Skipped — no activity since last run": return tx("Skipped — no activity since last run");
+    case "Skipped — routine paused": return tx("Skipped — routine paused");
+    case "Skipped — worktree execution cutoff": return tx("Skipped — worktree execution cutoff");
+    case "Run failed": return tx("Run failed");
     default: return english;
   }
 }

@@ -19,6 +19,7 @@ import { RoutineActivityRow } from "../RoutineActivityRow";
 import { useRoutineDetail } from "./context";
 import { xoLocaleDate } from "@/xo/date-format";
 import { tx } from "@/i18n/xo";
+import { xoRunRowSubtitle } from "@/xo/labels";
 
 const DATE_WINDOW_OPTIONS: { value: string; label: string; ms: number | null }[] = [
   { value: "any", label: "Any time", ms: null },
@@ -178,7 +179,7 @@ export function RunsSection() {
                         : undefined
                     }
                     title={title}
-                    subtitle={runRowSubtitle(run, routine.variables)}
+                    subtitle={xoRunRowSubtitle(runRowSubtitle(run, routine.variables))}
                     reserveSubtitleSpace
                     trailing={
                       <span className="text-xs text-muted-foreground">{timeAgo(run.triggeredAt)}</span>

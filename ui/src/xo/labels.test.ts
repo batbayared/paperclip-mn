@@ -14,6 +14,7 @@ import {
   xoNewIssueInlineLabel,
   xoPermissionDecision,
   xoQuickFilterLabel,
+  xoRunRowSubtitle,
   xoSidePanelTabLabel,
   xoStatusLabel,
   xoToolDetailLabel,
@@ -294,5 +295,20 @@ describe("xoNewIssueInlineLabel (M-4)", () => {
     await i18n.changeLanguage("mn");
     expect(xoNewIssueInlineLabel("For")).toBe("Хэнд");
     expect(xoNewIssueInlineLabel("in")).toBe("төсөл");
+  });
+});
+
+describe("xoRunRowSubtitle ба Markdown (Ү6 7.3)", () => {
+  it("mn дээр", async () => {
+    await i18n.changeLanguage("mn");
+    expect(xoRunRowSubtitle("Run failed")).toBe("Ажиллагаа амжилтгүй болсон");
+    expect(xoRunRowSubtitle("Skipped — routine paused")).not.toBe("Skipped — routine paused");
+    expect(xoRunRowSubtitle("custom failure reason")).toBe("custom failure reason");
+    expect(xoFileKindLabel("Markdown")).toBe("Markdown");
+  });
+
+  it("en дээр хэвээр", () => {
+    expect(xoRunRowSubtitle("Run failed")).toBe("Run failed");
+    expect(xoRunRowSubtitle("Skipped — routine paused")).toBe("Skipped — routine paused");
   });
 });
