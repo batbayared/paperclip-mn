@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { tx } from "@/i18n/xo";
 import {
   RoutineListRow,
   type RoutineListAgentSummary,
@@ -152,7 +153,7 @@ export function ManagedRoutinesList({
               >
                 <span>
                   {missingRefs.length
-                    ? `Missing ${missingRefs.map((ref) => `${ref.resourceKind}:${ref.resourceKey}`).join(", ")}`
+                    ? tx("Missing {{refs}}", { refs: missingRefs.map((ref) => `${ref.resourceKind}:${ref.resourceKey}`).join(", ") })
                     : "Routine defaults can be repaired."}
                 </span>
                 <span className="flex items-center gap-2">

@@ -13,6 +13,7 @@ import {
 import { routinesApi } from "@/api/routines";
 import { queryKeys } from "@/lib/queryKeys";
 import { useParams } from "@/lib/router";
+import { tx } from "@/i18n/xo";
 import {
   auditSectionHref,
   routineAuditHref,
@@ -95,7 +96,7 @@ export function RoutineContextualSidebar({
     queryFn: () => routinesApi.get(routineId),
     enabled: Boolean(routineId && !title),
   });
-  const frameTitle = title ?? routine?.title ?? "Routine";
+  const frameTitle = title ?? routine?.title ?? tx("Routine");
 
   return (
     <ContextualSidebarFrame

@@ -52,6 +52,7 @@ import { useStreamlinedUiEnabled } from "../hooks/useStreamlinedUiEnabled";
 import type { RoutineListItem, RoutineVariable } from "@paperclipai/shared";
 import type { FolderListItem } from "@paperclipai/shared";
 import { Tabs } from "@/components/ui/tabs";
+import { tx } from "@/i18n/xo";
 import {
   AllUnfiledBanner,
   BulkBar,
@@ -1388,11 +1389,14 @@ export function Routines() {
                               currentFolderId={routine.folderId ?? null}
                               onMove={(folderId) => {
                                 const previousFolderId = routine.folderId ?? null;
+                                const folderName = routineFolders?.folders.find((folder) => folder.id === folderId)?.name;
                                 moveRoutineToFolder.mutate({ itemId: routine.id, folderId });
                                 pushToast({
                                   title: "Routine moved",
                                   body: folderId
-                                    ? `Moved "${routine.title}" to ${routineFolders?.folders.find((folder) => folder.id === folderId)?.name ?? "folder"}.`
+                                    ? folderName != null
+                                      ? tx("Moved \"{{title}}\" to {{folder}}.", { title: routine.title, folder: folderName })
+                                      : tx("Moved \"{{title}}\" to folder.", { title: routine.title })
                                     : `Moved "${routine.title}" to Unfiled.`,
                                   tone: "success",
                                   action: {
