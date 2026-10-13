@@ -43,6 +43,8 @@ import {
   readRecoveryRetryLineage,
   type RecoveryRetryLineage,
 } from "@/lib/recovery-lineage";
+import { xoLocaleDateTime } from "@/xo/date-format";
+import { tx } from "@/i18n/xo";
 
 export type RecoveryCardCardState = RecoveryDisplayState;
 export const deriveRecoveryCardState = deriveRecoveryDisplayState;
@@ -783,9 +785,9 @@ function formatTimeShort(value: string | Date | null | undefined): string | null
     const diffMs = date.getTime() - now;
     const absMin = Math.round(Math.abs(diffMs) / 60_000);
     if (absMin < 60) {
-      return diffMs >= 0 ? `in ${absMin}m` : `${absMin}m ago`;
+      return diffMs >= 0 ? tx("in {{n}}m", { n: absMin }) : tx("{{n}}m ago", { n: absMin });
     }
-    return date.toLocaleString(undefined, {
+    return xoLocaleDateTime(date, undefined, {
       month: "short",
       day: "numeric",
       hour: "numeric",
@@ -888,7 +890,7 @@ function formatTimeAbsolute(value: string | Date | null | undefined): string | n
   if (!value) return null;
   const date = value instanceof Date ? value : new Date(value);
   if (Number.isNaN(date.getTime())) return null;
-  return date.toLocaleString(undefined, {
+  return xoLocaleDateTime(date, undefined, {
     month: "short",
     day: "numeric",
     hour: "numeric",

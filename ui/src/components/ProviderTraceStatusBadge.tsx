@@ -1,6 +1,8 @@
 import type { ProviderTraceMetadata } from "@paperclipai/shared";
 import { Bug, CircleOff } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { xoLocaleDateTime } from "@/xo/date-format";
+import { tx } from "@/i18n/xo";
 
 export function runRequestedProviderTrace(
   contextSnapshot: Record<string, unknown> | null | undefined,
@@ -70,9 +72,9 @@ export function ProviderTraceStatusBadge({
       )}
       title={
         trace
-          ? `${trace.frameCount} frames · ${trace.byteCount} bytes · expires ${new Date(trace.expiresAt).toLocaleString()}`
+          ? tx("{{frames}} frames · {{bytes}} bytes · expires {{date}}", { frames: trace.frameCount, bytes: trace.byteCount, date: xoLocaleDateTime(new Date(trace.expiresAt)) })
           : requested
-            ? "This run requested sensitive provider-frame capture."
+            ? tx("This run requested sensitive provider-frame capture.")
             : "Raw provider-frame capture was disabled for this run."
       }
     >

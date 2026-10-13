@@ -19,6 +19,7 @@ import {
   routineRunsAuditHref,
 } from "./RoutineContextualSidebar";
 import { useRoutineDetail } from "./routine-sections/context";
+import { xoLocaleDateTime } from "@/xo/date-format";
 
 export type RoutineScheduleSummary = {
   label: string;
@@ -27,7 +28,7 @@ export type RoutineScheduleSummary = {
 };
 
 export function formatRoutineTimestamp(value: Date | string) {
-  return new Date(value).toLocaleString(undefined, {
+  return xoLocaleDateTime(new Date(value), undefined, {
     dateStyle: "medium",
     timeStyle: "short",
   });

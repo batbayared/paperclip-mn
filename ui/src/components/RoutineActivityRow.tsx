@@ -3,12 +3,13 @@ import { ChevronRight } from "lucide-react";
 import type { ActivityEvent } from "@paperclipai/shared";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { xoLocaleTime } from "@/xo/date-format";
 
 export type RoutineActivityEvent = Pick<ActivityEvent, "id" | "action" | "details" | "createdAt">;
 
 function formatTime(value: string | Date): string {
   try {
-    return new Date(value).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    return xoLocaleTime(new Date(value), [], { hour: "2-digit", minute: "2-digit" });
   } catch {
     return String(value);
   }

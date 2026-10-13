@@ -35,6 +35,7 @@ import { RoutineTriggerCard } from "../RoutineTriggerCard";
 import { EnvironmentVariablesEditor } from "../environment-variables-editor";
 import { createDefaultNewTrigger, useRoutineDetail } from "./context";
 import type { EnvBinding, RoutineDetail as RoutineDetailType } from "@paperclipai/shared";
+import { xoLocaleDateTime } from "@/xo/date-format";
 
 const concurrencyPolicyOptions = [
   {
@@ -141,7 +142,7 @@ export function OverviewSection({
       .filter((trigger) => trigger.kind === "schedule" && trigger.nextRunAt)
       .map((trigger) => new Date(trigger.nextRunAt as Date))
       .sort((a, b) => a.getTime() - b.getTime())[0];
-    return upcoming ? upcoming.toLocaleString() : null;
+    return upcoming ? xoLocaleDateTime(upcoming) : null;
   }, [routine.triggers]);
   const lastRun = (routineRuns ?? [])[0] ?? null;
   const recentActivity = (activity ?? []).slice(0, 5);

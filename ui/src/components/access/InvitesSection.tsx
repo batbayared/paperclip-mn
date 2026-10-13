@@ -10,6 +10,7 @@ import { Link } from "@/lib/router";
 import { queryKeys } from "@/lib/queryKeys";
 import { copyTextToClipboard } from "@/lib/clipboard";
 import { Badge } from "@/components/ui/badge";
+import { xoLocaleDateTime } from "@/xo/date-format";
 
 const inviteRoleOptions = [
   {
@@ -323,7 +324,7 @@ export function InvitesSection() {
                         ) : null}
                       </td>
                       <td className="px-5 py-3 align-top text-muted-foreground">
-                        {new Date(invite.createdAt).toLocaleString()}
+                        {xoLocaleDateTime(new Date(invite.createdAt))}
                       </td>
                       <td className="px-5 py-3 align-top">
                         {invite.relatedJoinRequestId ? (

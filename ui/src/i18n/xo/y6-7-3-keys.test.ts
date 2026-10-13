@@ -1,0 +1,57 @@
+import { describe, expect, it } from "vitest";
+import en from "./en.json";
+import mn from "./mn.json";
+
+// Ү6 7.3-т нэмсэн/хэрэглэсэн түлхүүрүүд. Task бүр өөрийн түлхүүрийг доор нэмнэ.
+const Y6_7_3_KEYS: string[] = [
+  // Task 2
+  "Reappears {{date}}",
+  "Reappears {{when}}",
+  "soon",
+  "in {{n}}m",
+  "in {{n}}h",
+  "in {{n}}d",
+  "{{n}}m ago",
+  "Next: {{dates}}.",
+  "Next: {{date}}",
+  "{{frames}} frames · {{bytes}} bytes · expires {{date}}",
+  "This run requested sensitive provider-frame capture.",
+  "{{frames}} frames · {{bytes}} · expires {{date}}",
+  "Resets {{date}}",
+  "resets {{date}}",
+  "Updated {{date}}",
+  "Promoted from low-trust on {{date}}.",
+  "Promoted from low-trust.",
+  "Authored by a low-trust review agent. Raw {{artifact}} is not auto-shared with higher-trust agents.",
+  "Snoozed until {{date}}",
+];
+
+// mn утга нь англитай ижил байж болох түлхүүрүүд (оноосон нэр).
+const SAME_IN_MN = new Set<string>(["Markdown"]);
+
+const PLACEHOLDER = /\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/g;
+function placeholders(s: string): string[] {
+  return [...s.matchAll(PLACEHOLDER)].map((m) => m[1]).sort();
+}
+
+describe("Ү6 7.3 каталогийн түлхүүрүүд", () => {
+  it("en ба mn-д бүгд байна", () => {
+    for (const key of Y6_7_3_KEYS) {
+      expect(en, `en: ${key}`).toHaveProperty([key]);
+      expect(mn, `mn: ${key}`).toHaveProperty([key]);
+    }
+  });
+
+  it("mn утга орчуулагдсан", () => {
+    for (const key of Y6_7_3_KEYS) {
+      if (SAME_IN_MN.has(key)) continue;
+      expect((mn as Record<string, string>)[key], key).not.toBe((en as Record<string, string>)[key]);
+    }
+  });
+
+  it("placeholder en/mn ижил", () => {
+    for (const key of Y6_7_3_KEYS) {
+      expect(placeholders((mn as Record<string, string>)[key] ?? ""), key).toEqual(placeholders(key));
+    }
+  });
+});

@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { nextCronFires, parseCronExpression } from "../lib/cron-fires";
+import { xoLocaleDateTime } from "@/xo/date-format";
+import { tx } from "@/i18n/xo";
 
 export type SchedulePreset = "every_minute" | "every_hour" | "every_day" | "weekdays" | "weekly" | "monthly" | "custom";
 
@@ -290,7 +292,7 @@ export function ScheduleEditor({
           >
             {customValidation.message}
             {customValidation.valid && customValidation.nextFires.length > 0
-              ? ` Next: ${customValidation.nextFires.map((fire) => fire.toLocaleString()).join(", ")}.`
+              ? ` ${tx("Next: {{dates}}.", { dates: customValidation.nextFires.map((fire) => xoLocaleDateTime(fire)).join(", ") })}`
               : null}
           </p>
         </div>

@@ -26,6 +26,8 @@ import {
   type LayoutOptions,
   type PositionedBar,
 } from "@/lib/timeline/layout";
+import { xoLocaleDate } from "@/xo/date-format";
+import { xoLocaleTime } from "@/xo/date-format";
 
 export type ZoomLevel = "hour" | "day" | "week";
 
@@ -120,7 +122,7 @@ interface DragSelectionState {
 function fmtClock(ms: number): string {
   const d = new Date(ms);
   const hasMinutes = d.getMinutes() !== 0;
-  return d.toLocaleTimeString("en-US", {
+  return xoLocaleTime(d, "en-US", {
     hour: "numeric",
     minute: hasMinutes ? "2-digit" : undefined,
     hour12: true,
@@ -129,7 +131,7 @@ function fmtClock(ms: number): string {
 
 function fmtTick(ms: number, stepMs: number): string {
   const d = new Date(ms);
-  const date = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  const date = xoLocaleDate(d, "en-US", { month: "short", day: "numeric" });
   if (stepMs >= 24 * 60 * 60 * 1000) {
     return date;
   }

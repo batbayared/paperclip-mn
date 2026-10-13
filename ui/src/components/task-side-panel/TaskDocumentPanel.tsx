@@ -9,6 +9,8 @@ import { MarkdownBody } from "@/components/MarkdownBody";
 import { queryKeys } from "@/lib/queryKeys";
 import { documentDisplayTitle } from "@/lib/issue-artifacts";
 import { useLocation } from "@/lib/router";
+import { xoLocaleDateTime } from "@/xo/date-format";
+import { tx } from "@/i18n/xo";
 
 export function TaskDocumentPanel({
   issueId,
@@ -69,9 +71,9 @@ export function TaskDocumentPanel({
       <header className="space-y-1">
         <h2 className="text-lg font-semibold">{documentDisplayTitle(document)}</h2>
         <div className="flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
-          <span>{`Revision ${document.latestRevisionNumber ?? 1}`}</span>
+          <span>{tx("Revision {{n}}", { n: document.latestRevisionNumber ?? 1 })}</span>
           <span aria-hidden>·</span>
-          <span>{`Updated ${new Date(document.updatedAt).toLocaleString()}`}</span>
+          <span>{tx("Updated {{date}}", { date: xoLocaleDateTime(new Date(document.updatedAt)) })}</span>
           <DocumentAnnotationsCountChip
             issueId={issueId}
             docKey={document.key}

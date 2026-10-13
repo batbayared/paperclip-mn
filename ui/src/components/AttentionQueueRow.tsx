@@ -51,6 +51,8 @@ import { AttentionInteractionResolver } from "./AttentionInteractionResolver";
 import { DecisionResolver } from "./DecisionResolver";
 import { StalledReviewActions } from "./StalledReviewActions";
 import { readIssueReviewPolicyMetadata } from "../lib/review-policy";
+import { xoLocaleDateTime } from "@/xo/date-format";
+import { tx } from "@/i18n/xo";
 
 const HOUR_MS = 60 * 60 * 1000;
 const DAY_MS = 24 * HOUR_MS;
@@ -293,9 +295,9 @@ export const AttentionQueueRow = memo(function AttentionQueueRow({
           {isHidden && snoozedUntil ? (
             <span
               className="text-(length:--text-nano) text-muted-foreground"
-              title={`Reappears ${new Date(snoozedUntil).toLocaleString()}`}
+              title={tx("Reappears {{date}}", { date: xoLocaleDateTime(new Date(snoozedUntil)) })}
             >
-              Reappears {reappearLabel(snoozedUntil)}
+              {tx("Reappears {{when}}", { when: reappearLabel(snoozedUntil) })}
             </span>
           ) : (
             <span className="text-(length:--text-nano) text-muted-foreground">{relativeTime(item.activityAt)}</span>
@@ -733,13 +735,13 @@ function decideByProvenance(item: AttentionItem): string | null {
 /** Compact "when does this snooze end" label, e.g. `in 2h`, `in 3d`. */
 function reappearLabel(snoozedUntil: string): string {
   const diffMs = new Date(snoozedUntil).getTime() - Date.now();
-  if (!Number.isFinite(diffMs) || diffMs <= 0) return "soon";
+  if (!Number.isFinite(diffMs) || diffMs <= 0) return tx("soon");
   const diffMin = Math.round(diffMs / 60000);
-  if (diffMin < 60) return `in ${diffMin}m`;
+  if (diffMin < 60) return tx("in {{n}}m", { n: diffMin });
   const diffHr = Math.round(diffMin / 60);
-  if (diffHr < 24) return `in ${diffHr}h`;
+  if (diffHr < 24) return tx("in {{n}}h", { n: diffHr });
   const diffDay = Math.round(diffHr / 24);
-  return `in ${diffDay}d`;
+  return tx("in {{n}}d", { n: diffDay });
 }
 
 /**

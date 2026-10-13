@@ -17,6 +17,8 @@ import { LiveRunWidget } from "../LiveRunWidget";
 import { RoutineHistoryTab } from "../RoutineHistoryTab";
 import { RoutineActivityRow } from "../RoutineActivityRow";
 import { useRoutineDetail } from "./context";
+import { xoLocaleDate } from "@/xo/date-format";
+import { tx } from "@/i18n/xo";
 
 const DATE_WINDOW_OPTIONS: { value: string; label: string; ms: number | null }[] = [
   { value: "any", label: "Any time", ms: null },
@@ -205,9 +207,9 @@ export function ActivitySection() {
   const groups = useMemo(() => {
     const byDay = new Map<string, typeof events>();
     for (const event of events) {
-      let label = "Earlier";
+      let label = tx("Earlier");
       try {
-        label = new Date(event.createdAt).toLocaleDateString(undefined, {
+        label = xoLocaleDate(new Date(event.createdAt), undefined, {
           weekday: "short",
           month: "short",
           day: "numeric",

@@ -9,6 +9,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { xoLocaleDateTime } from "@/xo/date-format";
 
 export type SystemNoticeTone = "neutral" | "info" | "success" | "warning" | "danger";
 
@@ -100,7 +101,7 @@ const TONE_TOKENS: Record<SystemNoticeTone, ToneTokens> = {
 
 function formatTimestamp(ts: string) {
   try {
-    return new Date(ts).toLocaleString(undefined, {
+    return xoLocaleDateTime(new Date(ts), undefined, {
       month: "short",
       day: "numeric",
       hour: "numeric",

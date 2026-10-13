@@ -12,6 +12,8 @@ import {
   providerDisplayName,
   quotaSourceDisplayName,
 } from "@/lib/utils";
+import { xoLocaleDate } from "@/xo/date-format";
+import { tx } from "@/i18n/xo";
 
 // ordered display labels for rolling-window rows
 const ROLLING_WINDOWS = ["5h", "24h", "7d"] as const;
@@ -367,7 +369,7 @@ export function ProviderQuotaCard({
                             </p>
                           ) : qw.resetsAt ? (
                             <p className="text-xs text-muted-foreground">
-                              resets {new Date(qw.resetsAt).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+                              {tx("resets {{date}}", { date: xoLocaleDate(new Date(qw.resetsAt), undefined, { month: "short", day: "numeric" }) })}
                             </p>
                           ) : null}
                         </div>

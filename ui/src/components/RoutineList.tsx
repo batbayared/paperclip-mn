@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ToggleSwitch } from "@/components/ui/toggle-switch";
+import { xoLocaleDateTime } from "@/xo/date-format";
 
 export type RoutineListProjectSummary = {
   name: string;
@@ -36,7 +37,7 @@ export type RoutineListRowItem = {
 
 export function formatLastRunTimestamp(value: Date | string | null | undefined) {
   if (!value) return "Never";
-  return new Date(value).toLocaleString();
+  return xoLocaleDateTime(new Date(value));
 }
 
 export function formatRoutineRunStatus(value: string | null | undefined) {

@@ -37,6 +37,7 @@ import {
   SOURCE_COLLAPSE_MS,
   SOURCE_LINK_EXIT,
 } from "./onboarding/onboarding-motion";
+import { xoLocaleTime } from "@/xo/date-format";
 
 /**
  * Where the connect step's sign-in sequence is. Space and visibility land on
@@ -3123,7 +3124,7 @@ function AdapterEnvironmentResult({
       <div className="flex items-center justify-between gap-2">
         <span className="font-medium">{statusLabel}</span>
         <span className="opacity-80">
-          {new Date(result.testedAt).toLocaleTimeString()}
+          {xoLocaleTime(new Date(result.testedAt))}
         </span>
       </div>
       <div className="mt-1.5 space-y-1">
