@@ -1,5 +1,73 @@
 # XO ахицын бүртгэл
 
+## Ү6 7.2 орчуулгын үлдэгдэл (xo-main)
+
+Төлөвлөгөө: docs/superpowers/plans/2026-10-13-xo-y6-leftovers-i18n.md. BASE 580087be4.
+
+| Task | Commit |
+|---|---|
+| 1 Чатын нэрийн fallback, статусын өөрчлөлт, хэрэгслийн дэлгэрэнгүй шошго | b9e7738b0 |
+| 2 Даалгаврын жагсаалтын бүлэг, шүүлтүүр, үүсгэх шошго | 8e2429b5b |
+| 3 IssueRow ба TaskSidePanel (T1), саатлын статусын тайлбар | a813d6ebe |
+| 4 Огноо, цагийг ICU-гүйгээр mn-д форматлах | e9e5a1731 |
+| 5 Task chat-ийн алдаа, дараалал, саатуулагч, протоколын карт | 6a1707b47 |
+| 6 Шинэ даалгаврын цонхны «Хэнд»/«төсөл» шошго, агент хайлт, ажлын талбарын мэдэгдэл | 6ce5804f8 |
+| 7 SYNC.md ба бүртгэл | энэ commit |
+
+### Шалгалтын үр дүн (Task 7)
+
+- xo:i18n:check OK, keys=2452, «гараар:» мөр байхгүй.
+- xo:i18n:test 3 файл, 56 тест; xo:i18n:typecheck цэвэр.
+- vitest (Task 7 Step 3-ын 16 зам): 230 файл, 2841 тест PASS.
+- ui tsc --noEmit цэвэр (exit 0).
+- brand-scan 161 файл, 586 hit (baseline-тэй тэнцүү).
+
+### 3110 instance ба browser шалгалт
+
+2026-10-13-нд шалгав (mn locale, viewport 1280x900). 3110-ийн Vite процесс 12:03:43-д эхэлсэн нь Task 3-ын commit a813d6ebe (14:08:08) -оос 2 цагийн өмнө. tiers.ts-ийг Vite plugin эхлэхдээ уншдаг тул IssueRow ба TaskSidePanel-ийн T1 текст restart хүртэл англи байж болзошгүй. Restart хийгээгүй: ED-ийн зөвшөөрөл хүлээгдэж байна.
+
+- /YB/issues: sr-only «Нээх: YB-3 — …», статусын aria «Төлөв солих (одоогийн: …)», «1 өдрийн өмнө», төлвөөр бүлэглэсэн гарчиг ба «Шинэ даалгавар: Хийх» монгол. Шүүлтүүрийн popover (Түргэн шүүлтүүд, Төлөв, Хариуцагч, Харагдах байдал) бүрэн монгол.
+- /YB/inbox: таб ба шүүлтүүрийн popover монгол. «Бүх ангилал», «Зөвшөөрлийн бүх төлөв» шүүлтүүр энэ UI-д харагдсангүй.
+- YB-3: хажуугийн самбарын tab «Шинж чанарууд», талбарын нэрс монгол, огноо «2026 оны 10-р сарын 12 9:38» (date-format ажиллаж байна).
+- Шинэ даалгаврын цонх: «Хэнд [Хариуцагч] төсөл [Төсөл]» мөр, товчнууд монгол.
+- Issue chat, task chat-ийн хэсгүүд (системийн мөр, статусын өөрчлөлт, «… с бодсон», blocker, steer) seed өгөгдөлд байхгүй тул browser-оор батлаагүй; unit тестээр хамгаалсан.
+- en шалгалт: «New Task», «9m ago», «Oct 12, 2026, 9:38 AM», «For»/«in» өмнөхтэй ижил. Дараа нь mn руу буцаасан.
+
+### Үлдэгдэл
+
+SYNC.md-ийн «Үлдэгдэл (Ү6 7.3)» жагсаалт:
+
+- Task 4-т ороогүй бусад toLocale* дуудлага (~97 газар): Chromium-д mn ICU байхгүй тул англиар харагдана.
+- Ү6/T2 файлууд: TweakPanel, motion-tokens, task-chat-states, task-chat-fixtures, task-chat-attachments, RunTranscriptView, routine-run-display, DesignGuide; LegacyIssuesList.
+- Clipboard-ын «Tool:»/«Result:» угтвар, мөн d.label === "Intent" харьцуулалт.
+
+Browser шалгалтаас гарсан англи үлдэгдэл (7.3):
+
+- Inbox огнооны бүлгийн толгой «YESTERDAY»/«EARLIER» (Inbox.tsx).
+- Жагсаалтын «Бүлэглэх» цэсний утгууд (Status, Responsible, Project, Workspace, Parent Task, None).
+- «Helpful»/«Needs work» title ба aria (OutputFeedbackButtons, AgentBubbleActionRow, IssueChatThread).
+- YB-1 асуултын картын «Questions» толгой.
+- Side panel «Хяналт» → «None», «Үүсгэгч: Board» (restart-ын дараа дахин шалгах).
+
+Task бүрийн Minor (хураангуй):
+
+- Task 1: xoQuickFilterLabel, xoInboxFilterLabel-ийн default нь англи fallback (brief-ийн загвар).
+- Task 3: xoSidePanelTabLabel файл/документ tab-ын нэрэнд ч ажиллана; StatusIcon.xo.test-ийн Blocked салбарын 3 нь тестгүй.
+- Task 4: date-format.ts mn зам хүчингүй огноонд «NaN оны NaN-р сарын NaN» гаргана (en «Invalid Date»); utils.locale.test relativeTime тест Date.now()-оос хамаарна.
+- Task 5: «ирүүлээгүй» (шинэ) ба «илгээгээгүй» (хуучин) зөрүү; ProtocolCard {{status}} салбарт «pending» англиар; «Moved queued message…» mn утга «зөөсөн» гэсэн утгаа алдсан.
+- Task 6: y6-7-2-keys.test-ийн ASSIGNING шалгалт mn түлхүүр байхгүй үед ч давна; «Хэнд» w-6 өргөнд багтаж байгаа эсэх нээлттэй асуулт 8.
+- tool-taxonomy.ts SYNC.md-д бүртгэгдсэн.
+- Өмнөх commit-ийн trailer «Claude Sonnet 5.5» гэж бичигдсэн (M-6): түүхийг дахин бичихгүй, push хийгдээгүй.
+
+ED шийдэх нээлттэй асуулт (төлөвлөгөөний «Хязгаарлалт ба нээлттэй асуулт»):
+
+- 3110 restart (IssueRow, TaskSidePanel-ийн T1 текст харагдахад хэрэгтэй).
+- «Хэнд» w-6 өргөнд таслагдах эсэх, «төсөл» үгийг баталгаажуулах (асуулт 8).
+- Нэр томьёо: шүүлт/шүүлтүүр, самбар, ажлын талбар, саатуулагч, Show less, Depth, Blocked by/Blocking, Subtree/Binding, Runtime/Steer/Interrupt, Hook, Түрээс; сул орчуулга «Файлд хандсан», «Холбогдсон хэрэгсэл ашигласан». docs/xo/glossary.md-д нэг дор шийдэх (асуулт 11, 12).
+- Хувьсагчид дагавар залгасан 47 хуучин түлхүүрийн цэвэрлэгээ (асуулт 13).
+- Thought for / summaryLabel хэл сэлгэхэд хуучин хэлээр үлдэнэ (reload хүртэл), зөвшөөрөх эсэх (асуулт 15).
+- Push хийх эсэх ED-ийн шийдвэр.
+
 ## Ү6 7.1 даалгаврын урсгал (xo-main)
 
 Төлөвлөгөө: docs/superpowers/plans/2026-10-12-xo-y6-task-flow-i18n.md. BASE 1a3365ef4.

@@ -210,7 +210,7 @@ T1 = scripts/xo-i18n/tiers.ts-ийн tier-1 жагсаалтад нэмсэн (V
 |---|---|
 | ui/src/components/IssuesList.tsx | T1; гар tx (бүлгийн гарчиг, хоосон төлөвийн тоо); огнооны хуваагч xoDateGroupLabel |
 | ui/src/components/IssueFiltersPopover.tsx | T1; гар tx (шүүлтүүрийн тоо) |
-| ui/src/components/IssueColumns.tsx | T1; баганын нэр, тайлбар xoColumnLabel/xoColumnDescription |
+| ui/src/components/IssueColumns.tsx | T1; баганын нэр, тайлбар xoColumnLabel/xoColumnDescription; гар tx (Reset defaults мөр) |
 | ui/src/components/MobileBottomNav.tsx | T1 |
 | ui/src/lib/timeAgo.ts | mn үед mnTimeAgo() руу шилжүүлсэн |
 | ui/src/lib/timeAgo.test.ts | шинэ: mn ба en гаралт |
@@ -254,13 +254,48 @@ XO-ийн өмч (upstream биш): ui/src/xo/time-ago.ts, ui/src/xo/run-text.ts
 
 Шинэ XO-ийн тестүүд: ui/src/xo/time-ago.test.ts, ui/src/xo/run-text.test.ts, ui/src/xo/labels.test.ts (нэмэлт).
 
-Үлдэгдэл (Ү6 7.2):
-- Нэрийн fallback ("Agent", "You", "System", "None", "Board", child.status "unknown").
-- Clipboard-ын "Result:\n" угтвар, `d.label === "Intent"` харьцуулалт.
-- Ү6/T2 файлууд: TweakPanel, motion-tokens, task-chat-states, task-chat-fixtures, task-chat-attachments, RunTranscriptView, routine-run-display, DesignGuide.
-- T1 файл дахь JSX биш англи литерал (transform ороодоггүй, эцсийн review I-3): IssueFiltersPopover.tsx:68-81 (INBOX_CATEGORY_OPTIONS, INBOX_APPROVAL_STATUS_OPTIONS); IssuesList.tsx:136-142 (issueStatusLabels); NewIssueDialog.tsx («Search agents...», «No agents found.», «Failed to create task. Try again.»); IssueProperties.tsx:620-646 (workspace toast); TaskChatComposer.tsx:659-918 (/goal алдаанууд); TaskChatQueuedMessages.tsx:109-352; TaskChatBlockerLinks.tsx:196-223; TaskChatProtocolCard.tsx:631-651; transcript-adapter.ts:200-216 («Thought for {secs}s»).
-- Контексттэй түлхүүр (M-4): NewIssueDialog.tsx:1479, 1540 глобал «For»/«in» түлхүүр энэ мөрөнд л тохирно; tx("For (assignee)"), tx("in (project picker)") хэлбэрт шилжүүлэх.
-- Тест (M-5): mn дээр failed run-д «Try again» харагдахыг TaskChatThreadView тестээр хамгаалах.
+Үлдэгдэл: Ү6 7.2-д хэрэгжсэн (доорх "Ү6 7.2-д хөндсөн upstream файлууд" хэсэг); үлдсэн нь "Үлдэгдэл (Ү6 7.3)" жагсаалтад.
+
+## Ү6 7.2-д хөндсөн upstream файлууд
+
+T1 = scripts/xo-i18n/tiers.ts-ийн tier-1 жагсаалтад нэмсэн. "гар tx" = эх кодод tx()/XoTrans-аар ороосон. "helper" = ui/src/xo/labels.ts эсвэл ui/src/xo/date-format.ts-ийн функцээр render үед орчуулсан.
+
+| Файл | Өөрчлөлт |
+|---|---|
+| ui/src/components/IssueChatThread.tsx | нэрийн fallback гар tx; humanizeValue → xoHumanizeValue; хэрэгслийн шошго xoToolDetailLabel; child.status xoStatusLabel |
+| ui/src/components/IssueChatThread.test.tsx | mn тест нэмсэн (resolveIssueChatHumanAuthor) |
+| ui/src/components/CommentThread.tsx | humanizeValue → xoHumanizeValue |
+| ui/src/components/IssuesList.tsx | бүлгийн шошго xoIssueFilterLabel, progress title xoStatusLabel, үүсгэх шошго xoCreateIssueLabels |
+| ui/src/components/IssueFiltersPopover.tsx | xoInboxFilterLabel, xoQuickFilterLabel, xoIssueFilterLabel |
+| ui/src/components/IssueRow.tsx | T1 |
+| ui/src/components/StatusIcon.tsx | саатлын тайлбар ба "Change status" гар tx |
+| ui/src/components/StatusIcon.xo.test.tsx | mn/en тест нэмсэн |
+| ui/src/components/task-side-panel/TaskSidePanel.tsx | T1; tab шошго xoSidePanelTabLabel; Revision ба алдаа гар tx |
+| ui/src/components/task-side-panel/TaskSidePanel.test.tsx | mn тест нэмсэн |
+| ui/src/lib/utils.ts | mn үед ui/src/xo/date-format.ts руу шилжүүлсэн (ICU-гүй) |
+| ui/src/lib/utils.locale.test.ts | цаг/өдөр ба ICU-гүй spy тест нэмсэн |
+| ui/src/components/issue-properties/IssuePropertiesPlansTab.tsx | mn огноо mnShortDateTime |
+| ui/src/components/task-chat/TaskChatComposer.tsx | /goal ба хавсралтын алдаа гар tx |
+| ui/src/components/task-chat/TaskChatQueuedMessages.tsx | steering title, мэдэгдэл, алдаа гар tx |
+| ui/src/components/task-chat/TaskChatBlockerLinks.tsx | const шошго гар tx |
+| ui/src/components/task-chat/TaskChatProtocolCard.tsx | файлын тоо, асуултын төлөв, runtime гарчиг гар tx |
+| ui/src/components/task-chat/transcript-adapter.ts | Unnamed tool, Thought for гар tx |
+| ui/src/components/task-chat/tool-taxonomy.ts | Unnamed tool гар tx |
+| ui/src/components/TaskChatThread.test.tsx | mn retry тест нэмсэн (M-5) |
+| ui/src/components/NewIssueDialog.tsx | For/in xoNewIssueInlineLabel (M-4; каталогийн түлхүүр "For (assignee)"/"in (project picker)", mn утга «Хэнд»/«төсөл»); алдаа ба агент хайлт гар tx |
+| ui/src/components/NewIssueDialog.test.tsx | paused mn тест нэмсэн |
+| ui/src/components/issue-properties/IssueProperties.tsx | ажлын талбарын мэдэгдэл гар tx |
+| ui/src/lib/work-mode-meta.test.ts | ask en тест нэмсэн |
+
+XO-ийн өмч (upstream биш): ui/src/xo/labels.ts (xoHumanizeValue, xoToolDetailLabel, xoIssueFilterLabel, xoQuickFilterLabel, xoInboxFilterLabel, xoCreateIssueLabels, xoSidePanelTabLabel, xoNewIssueInlineLabel), ui/src/xo/date-format.ts, scripts/xo-i18n/tiers.ts, ui/src/i18n/xo/*.
+
+Шинэ XO-ийн тестүүд: ui/src/xo/date-format.test.ts, ui/src/i18n/xo/y6-7-2-keys.test.ts, scripts/xo-i18n/tiers-y6-7-2.test.ts, ui/src/components/task-chat/TaskChat.y6-7-2.xo.test.tsx, ui/src/xo/labels.test.ts (нэмэлт).
+
+Үлдэгдэл (Ү6 7.3):
+- Task 4-т ороогүй бусад `toLocale*` дуудлага (~97 газар): Chromium-д mn ICU байхгүй тул англиар харагдана.
+- Ү6/T2 файлууд: TweakPanel, motion-tokens, task-chat-states, task-chat-fixtures, task-chat-attachments, RunTranscriptView, routine-run-display, DesignGuide; LegacyIssuesList.
+- Clipboard-ын "Tool:"/"Result:" угтвар англиар үлдсэн (хуулсан текстийн формат).
+- Clipboard-ын `d.label === "Intent"` харьцуулалт (шошгыг орчуулсан литералтай харьцуулдаг; ийм харьцуулалтыг барих lint guard-тай хамт авч үзнэ).
 
 ## Lockfile
 
