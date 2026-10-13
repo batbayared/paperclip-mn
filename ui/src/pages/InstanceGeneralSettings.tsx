@@ -17,6 +17,7 @@ import { queryKeys } from "../lib/queryKeys";
 import { ToggleSwitch } from "@/components/ui/toggle-switch";
 import { cn } from "../lib/utils";
 import { useSignOut } from "@/hooks/useSignOut";
+import { tx } from "@/i18n/xo";
 
 const FEEDBACK_TERMS_URL = import.meta.env.VITE_FEEDBACK_TERMS_URL?.trim() || "https://paperclip.ing/tos";
 
@@ -57,7 +58,7 @@ export function InstanceGeneralSettings({ embedded = false }: { embedded?: boole
       await queryClient.invalidateQueries({ queryKey: queryKeys.instance.generalSettings });
     },
     onError: (error) => {
-      setActionError(error instanceof Error ? error.message : "Failed to update general settings.");
+      setActionError(error instanceof Error ? error.message : tx("Failed to update general settings."));
     },
   });
 
@@ -87,18 +88,23 @@ export function InstanceGeneralSettings({ embedded = false }: { embedded?: boole
   const showFeedbackDataSharing = !hiddenSettings.has("instance.general.feedbackDataSharingPreference");
   const showSignOut = !hiddenSettings.has("instance.general.signOut");
   const visibleTopics = [
-    ...(showCensorUsernameInLogs ? ["log display"] : []),
-    ...(showKeyboardShortcuts ? ["keyboard shortcuts"] : []),
-    ...(showBackupRetention ? ["backup retention"] : []),
-    ...(showFeedbackDataSharing ? ["data sharing"] : []),
+    ...(showCensorUsernameInLogs ? [tx("log display")] : []),
+    ...(showKeyboardShortcuts ? [tx("keyboard shortcuts")] : []),
+    ...(showBackupRetention ? [tx("backup retention")] : []),
+    ...(showFeedbackDataSharing ? [tx("data sharing")] : []),
   ];
   const topicSummary = visibleTopics.length > 2
-    ? `${visibleTopics.slice(0, -1).join(", ")}, and ${visibleTopics[visibleTopics.length - 1]}`
-    : visibleTopics.join(" and ");
+    ? tx("{{items}}, and {{last}}", {
+        items: visibleTopics.slice(0, -1).join(", "),
+        last: visibleTopics[visibleTopics.length - 1],
+      })
+    : visibleTopics.length === 2
+      ? tx("{{first}} and {{second}}", { first: visibleTopics[0], second: visibleTopics[1] })
+      : (visibleTopics[0] ?? "");
   const visibleActionError = signOutMutation.error instanceof Error
     ? signOutMutation.error.message
     : signOutMutation.error
-      ? "Failed to sign out."
+      ? tx("Failed to sign out.")
       : actionError;
 
   return (
@@ -142,15 +148,15 @@ export function InstanceGeneralSettings({ embedded = false }: { embedded?: boole
           <div className="grid gap-3 md:grid-cols-3">
             <StatusBox
               label="Auth readiness"
-              value={healthQuery.data?.authReady ? "Ready" : "Not ready"}
+              value={healthQuery.data?.authReady ? tx("Ready") : tx("Not ready")}
             />
             <StatusBox
               label="Bootstrap status"
-              value={healthQuery.data?.bootstrapStatus === "bootstrap_pending" ? "Setup required" : "Ready"}
+              value={healthQuery.data?.bootstrapStatus === "bootstrap_pending" ? tx("Setup required") : tx("Ready")}
             />
             <StatusBox
               label="Bootstrap invite"
-              value={healthQuery.data?.bootstrapInviteActive ? "Active" : "None"}
+              value={healthQuery.data?.bootstrapInviteActive ? tx("Active") : tx("None")}
             />
           </div>
         </div>
@@ -244,7 +250,7 @@ export function InstanceGeneralSettings({ embedded = false }: { embedded?: boole
             <div className="flex flex-wrap gap-2">
               {WEEKLY_RETENTION_PRESETS.map((weeks) => {
                 const active = backupRetention.weeklyWeeks === weeks;
-                const label = weeks === 1 ? "1 week" : `${weeks} weeks`;
+                const label = weeks === 1 ? tx("1 week") : tx("{{weeks}} weeks", { weeks });
                 return (
                   <button
                     key={weeks}
@@ -274,7 +280,7 @@ export function InstanceGeneralSettings({ embedded = false }: { embedded?: boole
             <div className="flex flex-wrap gap-2">
               {MONTHLY_RETENTION_PRESETS.map((months) => {
                 const active = backupRetention.monthlyMonths === months;
-                const label = months === 1 ? "1 month" : `${months} months`;
+                const label = months === 1 ? tx("1 month") : tx("{{months}} months", { months });
                 return (
                   <button
                     key={months}
@@ -308,8 +314,10 @@ export function InstanceGeneralSettings({ embedded = false }: { embedded?: boole
           <div className="space-y-1.5">
             <h2 className="text-sm font-semibold">AI feedback sharing</h2>
             <p className="max-w-2xl text-sm text-muted-foreground">
-              Control whether thumbs up and thumbs down votes can send the voted AI output to
-              Paperclip Labs. Votes are always saved locally.
+              {tx(
+                "Control whether thumbs up and thumbs down votes can send the voted AI output to {{vendor}}. Votes are always saved locally.",
+                { vendor: "Paperclip Labs" },
+              )}
             </p>
             {FEEDBACK_TERMS_URL ? (
               <a
@@ -370,11 +378,11 @@ export function InstanceGeneralSettings({ embedded = false }: { embedded?: boole
             })}
           </div>
           <p className="text-xs text-muted-foreground">
-            To retest the first-use prompt in local dev, remove the{" "}
-            <code>feedbackDataSharingPreference</code> key from the{" "}
-            <code>instance_settings.general</code> JSON row for this instance, or set it back to{" "}
-            <code>"prompt"</code>. Unset and <code>"prompt"</code> both mean no default has been
-            chosen yet.
+            {tx("To retest the first-use prompt in local dev, remove the")}{" "}
+            <code>feedbackDataSharingPreference</code>{" "}{tx("key from the")}{" "}
+            <code>instance_settings.general</code>{" "}{tx("JSON row for this instance, or set it back to")}{" "}
+            <code>"prompt"</code>{tx(". Unset and")}{" "}<code>"prompt"</code>{" "}
+            {tx("both mean no default has been chosen yet.")}
           </p>
         </div>
       </section>
