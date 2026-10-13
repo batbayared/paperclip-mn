@@ -202,6 +202,63 @@ Upstream sync хийхдээ: upstream telemetry-ийн default-ыг өөрчи�
 
 Upstream тестүүд (`cli/src/__tests__/data-dir.test.ts`, `packages/adapter-utils/src/acpx-engine/execute.test.ts`, `packages/shared/src/home-paths.test.ts`, `server/src/services/onboarding-greeting.test.ts`, `server/src/services/onboarding-first-task-assets.test.ts`, `server/src/__tests__/issue-onboarding-first-task-routes.test.ts`) мөн засвартай.
 
+## Ү6 7.1-д хөндсөн upstream файлууд
+
+T1 = scripts/xo-i18n/tiers.ts-ийн tier-1 жагсаалтад нэмсэн (Vite transform JSX текстийг автоматаар tx()-ээр ороодог, эх кодод өөрчлөлтгүй). "гар tx" = template эсвэл холимог JSX-ийг эх кодод tx()/XoTrans-аар ороосон.
+
+| Файл | Өөрчлөлт |
+|---|---|
+| ui/src/components/IssuesList.tsx | T1; гар tx (бүлгийн гарчиг, хоосон төлөвийн тоо) |
+| ui/src/components/IssueFiltersPopover.tsx | T1; гар tx (шүүлтүүрийн тоо) |
+| ui/src/components/IssueColumns.tsx | T1 |
+| ui/src/components/MobileBottomNav.tsx | T1 |
+| ui/src/lib/timeAgo.ts | mn үед mnTimeAgo() руу шилжүүлсэн |
+| ui/src/lib/timeAgo.test.ts | шинэ: mn ба en гаралт |
+| ui/src/components/NewIssueDialog.tsx | T1; гар tx/XoTrans (горимын тайлбар, хавсралтын мөр) |
+| ui/src/components/issue-properties/helpers.ts | T1 |
+| ui/src/lib/work-mode-meta.ts | T1; titleForPendingWorkMode гар tx |
+| ui/src/lib/work-mode-meta.test.ts | mn тест нэмсэн |
+| ui/src/components/issue-properties/IssueProperties.tsx | T1; гар tx |
+| ui/src/components/issue-properties/IssuePropertiesArtifactsTab.tsx | T1; гар tx |
+| ui/src/components/issue-properties/IssuePropertiesPlansTab.tsx | T1; гар tx |
+| ui/src/components/issue-properties/external-object-rows.tsx | T1 |
+| ui/src/components/issue-properties/relation-controls.tsx | T1 |
+| ui/src/components/issue-properties/property-picker.tsx | гар tx (T1-д ороогүй) |
+| ui/src/components/task-chat/TaskChatComposer.tsx | T1; MODE_DESCRIPTION → xoLabel, placeholder ба хавсралтын гар tx |
+| ui/src/components/task-chat/TaskChatCompactInteractionCard.tsx | T1; гар tx |
+| ui/src/components/task-chat/TaskChatBubble.tsx | T1; хавсралтын төрөл xoFileKindLabel, гар tx |
+| ui/src/components/task-chat/TaskChatProtocolCard.tsx | T1; гар tx |
+| ui/src/components/task-chat/TaskChatRichInput.tsx, TaskChatInteractionCard.tsx, TaskChatProtocolActivityRow.tsx, TaskChatQueuedMessages.tsx, TaskChatBlockerLinks.tsx, TaskChatPausedTakeover.tsx | T1 |
+| ui/src/lib/issue-chat-messages.ts | formatDurationWords, runDurationLabel, waitingText, Provider activity гар tx (T1-д ороогүй) |
+| ui/src/components/task-chat/TaskChatLiveRunPill.tsx | T1; run-text helper, гар tx |
+| ui/src/components/task-chat/TaskChatTurn.tsx | T1; run-text helper, гар tx |
+| ui/src/components/task-chat/transcript-adapter.ts | T1; үйлдлийн шошго xoActivityLabel |
+| ui/src/components/task-chat/TaskChatActivityPhase.tsx | T1; гар tx |
+| ui/src/components/task-chat/TaskChatStatusPill.tsx | T1; статусын шошго tx |
+| ui/src/components/task-chat/TaskChatUsageReadout.tsx | T1; гар tx |
+| ui/src/components/task-chat/completed-activity-summary.ts | T1; хураангуй өгүүлбэр гар tx |
+| ui/src/components/task-chat/TaskChatRunnerTurn.tsx, TaskChatRunnerActivityGroup.tsx | T1 |
+| ui/src/components/TaskChatThread.tsx | T1; алдааны шошго ба тоо гар tx |
+| ui/src/components/TaskChatThread.test.tsx | mn тест нэмсэн |
+| ui/src/components/task-chat/TaskChatPlanPreviewCard.tsx | T1; гар tx |
+| ui/src/components/task-chat/TaskChatPlanPreviewCard.test.tsx | mn тест нэмсэн |
+| ui/src/components/task-chat/TaskChatThreadView.tsx | гар tx (T1-д ороогүй) |
+| ui/src/components/task-chat/RichWorkProductCard.tsx, RunnerGoalWidget.tsx, TaskChatBubbleActions.tsx, TaskChatDescriptionBubble.tsx, TaskChatMarker.tsx, TaskChatPlanView.tsx, TaskChatProjectCreatedCard.tsx, TaskChatSystemNotice.tsx, TaskChatToolCard.tsx, TaskChatTurnStatusIsland.tsx, TaskMessageScroller.tsx, task-chat-adapter.ts | T1 |
+| ui/src/components/IssueChatThread.tsx | T1; гар tx, XoTrans |
+| ui/src/components/IssueChatThread.test.tsx | mn тест нэмсэн |
+| ui/src/components/CommentThread.tsx | T1; гар tx |
+| ui/src/lib/issue-chat-messages.test.ts | mn тест нэмсэн |
+| ui/src/pages/IssueDetail.tsx | гар tx (ажиллагааг зогсоох шошго) |
+
+XO-ийн өмч (upstream биш): ui/src/xo/time-ago.ts, ui/src/xo/run-text.ts, ui/src/xo/labels.ts (xoFileKindLabel, xoActivityLabel, MODE_DESCRIPTION), scripts/xo-i18n/tiers.ts, ui/src/i18n/xo/* (en.json, mn.json, keep-en.json), docs/xo/glossary.md.
+
+Шинэ XO-ийн тестүүд: ui/src/xo/time-ago.test.ts, ui/src/xo/run-text.test.ts, ui/src/xo/labels.test.ts (нэмэлт).
+
+Үлдэгдэл (Ү6 7.2):
+- Нэрийн fallback ("Agent", "You", "System", "None", "Board", child.status "unknown").
+- Clipboard-ын "Result:\n" угтвар, `d.label === "Intent"` харьцуулалт.
+- Ү6/T2 файлууд: TweakPanel, motion-tokens, task-chat-states, task-chat-fixtures, task-chat-attachments, RunTranscriptView, routine-run-display, DesignGuide.
+
 ## Lockfile
 
 `pnpm-lock.yaml` XO-ийн dependency өөрчлөлт (root `package.json`)-өөс болж sync-д ихэвчлэн зөрчилдөнө. Гараар merge хийхгүй:
