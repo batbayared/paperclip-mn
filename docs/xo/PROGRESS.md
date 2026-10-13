@@ -1,5 +1,47 @@
 # XO ахицын бүртгэл
 
+## Ү6 7.5 — interaction, Secrets, агентын цэс, Audit (2026-10-13)
+
+Зорилго: 7.4-ийн «Үлдэгдэл»-ийн interaction governance самбар ба card, interaction-audience.ts, Secrets хуудас, агентын зүүн цэс ба гарчиг, Audit хэсгийг монгол болгох. en гаралт db93223a1-тэй байт ижил.
+
+Төлөвлөгөө: docs/superpowers/plans/2026-10-13-xo-y6-7-5-interaction-secrets-audit.md. BASE db93223a1.
+
+| Task | Commit |
+|---|---|
+| 1 labels.ts: xoResolverPolicyLabel/Effect, xoInteractionKindLabel, xoVerdictLabel, xoNavLabel | 1f0c70ced |
+| 5 Агентын зүүн цэс, гарчиг, Audit табууд | 20703bd32, засвар 16adf69cc |
+| 2 interaction-audience.ts, InteractionGovernancePanel, CompanySettings | 0a1789f27 |
+| 6 AgentActionButtons ба ProjectWorkspaceDetail | e5612605c, брэнд literal засвар deaddf6f3 |
+| 4 Secrets.tsx: manual засвар, гар tx, status helper | e1c7c543a |
+| 3 IssueThreadInteractionCard: manual засвар, гар tx, enum helper | 3cd13373e |
+| 7 tiers.ts (8 файл T1), каталог (+621 түлхүүр), y6-7-5-keys тест, labels mn тест | f3dc49d36 |
+| 8 SYNC.md ба бүртгэл | энэ commit |
+
+Түлхүүр: 3237 (7.4-ийн төгсгөл 2616, 7.5-д +621). keep-en.json-д workspace commands JSON жишээ, «MY_SECRET», «PERSONAL_GH_TOKEN», shell командууд, хувилбарын «v{{…}}» хэлбэрүүд нэмэгдсэн.
+
+### Шалгалтын үр дүн
+
+- Gates (2026-10-13): xo:i18n:check keys=3237 (+621), xo:i18n:test 65/65, xo:i18n:typecheck OK, xo:brand-scan 161 файл / 586 (baseline-аас илүүгүй), ui tsc цэвэр, vitest ui/src 619 файл / 6530 тест passed.
+- Эцсийн review (opus): merge-д бэлэн, Critical 0, Important 0, Minor 5 (SYNC.md «Үлдэгдэл (Ү6 7.5)»).
+- Browser (3110 restart хийсний дараа, mn locale):
+  - Агентын дэлгэрэнгүй: зүүн цэс (Агент / Ажиллах орчин / Засаглал / Аудит, доторх бүх холбоос), гарчиг, үйлдлийн цэс (Агентыг хувилах, Агентын ID хуулах, Сессүүдийг шинэчлэх, Ажлаас чөлөөлөх) Монгол.
+  - Аудит → Ажиллагаанууд: таб, шүүлтүүр, ажиллагааны мөр, хөл тайлбар Монгол.
+  - Байгууллагын тохиргоо → Харилцан үйлдлийн удирдлага: тайлбар, хүснэгтийн толгой, 6 төрөл Монгол.
+  - YB-3 thread: харилцан үйлдлийн карт (асуулт, сонголт, Болих/Дараах) Монгол.
+  - Нууц утгууд (/company/settings/secrets): таб, тайлбар, хоосон төлөв Монгол.
+  - Үлдэгдэл: нууц утгын «Folders / Flat» товч Англи хэвээр (components/folders/FolderControls.tsx, 7.6); «<b>Нууц утга</b>-ыг» нөхцөл залгалт буруу (mn.json-д засагдсан). Тохиргооны доод хэсгийн инстанцын ерөнхий тохиргоо (Deployment and auth, Backup retention, AI feedback sharing, Sign out) 7.5-ын хүрээнд ороогүй тул Англи хэвээр.
+  - Шалгаагүй: төслийн ажлын талбарын дэлгэрэнгүй (YB-д төсөл байхгүй), агент хувилах баталгаажуулалт (дарвал агент үүснэ).
+
+### Хязгаарлалт
+
+- 3110 restart: tiers.ts-д 8 файл нэмсэн тул restart шаардлагатай (ED-ийн зөвшөөрөл). 7.4 restart-гүй байсан.
+- Ү6 7.6-д шилжүүлсэн: pages/secrets/* дэд файлууд (≈190 мөр, 8 manual), TaskChatCompactInteractionCard, InteractionAudienceLine, AttentionQueueRow. IssueThreadInteractionCard нь proposal-review.tsx-ийн «Reason given by the agent»-ийг рендерлэдэг тул card дотор тэр хэсэг 7.6 хүртэл англиар үлдэнэ.
+- T1 модулийн түвшний объект импортын үед нэг удаа үнэлэгдэнэ; locale солиход хуудас дахин ачаалагддаг тул асуудалгүй. ProjectWorkspaceDetail-ийн сонголтыг sourceTypeText helper-ээр шийдсэн.
+- mn тест хязгаар: vitest transform ажиллуулдаггүй тул T1 мөрийн mn гаралтыг unit тестээр батлахгүй; tier тест, xo:i18n:check, browser шалгалт хамгаална.
+- Secrets.tsx-ийн XoTrans түлхүүр «Removes <b>{{name}}</b> from Paperclip only.» брэнд literal агуулна; brand-scan baseline-ийг gates шалгана.
+- y6-7-5-keys тест mn утгыг зөвхөн en-ээс ялгаатай эсэхээр шалгана; зарим mn утга товчлол/калька хэвээр («… амжилтгүй», «Нэр дэвшигч 1, эх:»).
+- Үүргийн орчуулгыг (7.4-өөс) ED шалгах хэвээр.
+
 ## Ү6 7.4 — 7.3-ын хүрээнээс гадуурх англи үлдэгдэл (2026-10-13)
 
 Зорилго: 7.3-ын «Үлдэгдэл»-ийн огноо, агент ба ажиллагааны төлөв, үүрэг, T1 файл дахь JSX биш литералыг монгол болгох. mn огноог ICU-гүй гараар формат хийдэг; en гаралт байт хүртэл ижил (цорын ганц үл хамаарах нь xoZonedDateTime доторх Intl("en-US") formatToParts).

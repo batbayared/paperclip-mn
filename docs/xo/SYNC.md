@@ -210,7 +210,7 @@ XO-ийн өмч: ui/src/xo/date-format.ts (mnZoned, богино огнооны
 
 Шинэ XO-ийн тестүүд: ui/src/i18n/xo/y6-7-4-keys.test.ts, ui/src/lib/issue-monitor.test.tsx (mn), ui/src/xo/date-format.test.ts ба ui/src/xo/labels.test.ts (нэмэлт).
 
-Үлдэгдэл (Ү6 7.4):
+Үлдэгдэл (Ү6 7.4): хэрэгжсэн (Ү6 7.5, доорх "Ү6 7.5-д хөндсөн upstream файлууд"). Агентын зүүн навигаци, Audit → Runs, AgentActionButtons-ийн toast ба баталгаажуулах текст, ProjectWorkspaceDetail-ийн Field шошгыг 7.5 хаасан; хаагдаагүй нь "Үлдэгдэл (Ү6 7.5)"-д.
 - Ү6 7.5-д шилжүүлсэн: InteractionGovernancePanel.tsx, interaction-audience.ts, pages/Secrets.tsx-ийн статик шошго, IssueThreadInteractionCard.tsx.
 - mn-д цагийн бүсийн нэр ба гараг харагдахгүй; issue-monitor-ийн mn зам display time zone-ыг үл хайхарна (UB орон нутгийн цагтай ижил тул практикт зөрөхгүй).
 - editable-sections-ийн Intl("en-US") formatToParts нь mn замд тоон хэсэг авах зорилготой; en гаралт өөрчлөгдөөгүй.
@@ -428,6 +428,42 @@ T1 = scripts/xo-i18n/tiers.ts-ийн tier-1 жагсаалтад нэмсэн. "
 XO-ийн өмч (upstream биш): ui/src/xo/date-format.ts (mnTime, xoLocaleDateTime, xoLocaleDate, xoLocaleTime), ui/src/xo/labels.ts (xoRunRowSubtitle, xoLabel нэмэлт, xoFileKindLabel Markdown), scripts/xo-i18n/tiers.ts (RunTranscriptView T1), ui/src/i18n/xo/* (en.json, mn.json, keep-en.json).
 
 Шинэ XO-ийн тестүүд: ui/src/xo/date-format.test.ts (нэмэлт), ui/src/i18n/xo/y6-7-3-keys.test.ts, scripts/xo-i18n/tiers-y6-7-3.test.ts, ui/src/xo/labels.test.ts (нэмэлт).
+
+## Ү6 7.5-д хөндсөн upstream файлууд
+
+7.4-ийн «Үлдэгдэл»-ийн interaction самбар ба card, Secrets хуудас, агентын зүүн цэс, Audit хэсгийг хаасан. tiers.ts-д 8 файл T1 болж нэмэгдсэн. Тэмдэглэгээ 7.3-ын хүснэгттэй ижил; «XoTrans» = текст дундаа `<span>`-тай JSX-ийг XoTrans-аар ороосон.
+
+| Файл | Өөрчлөлт |
+|---|---|
+| ui/src/components/AgentActionButtons.tsx | toast («Action failed», «Agent duplicated», «Could not duplicate agent»), алдааны fallback, duplicate баталгаажуулалт «Duplicate {{name}} as {{nextName}}?» гар tx |
+| ui/src/components/AgentContextualSidebar.tsx | T1; бүлгийн гарчиг ба цэсний зүйл xoNavLabel; «Secrets & variables», «Agent», aria «{{name}} navigation» гар tx |
+| ui/src/components/InteractionGovernancePanel.tsx | T1; policy шошго ба нөлөө xoResolverPolicyLabel/xoResolverPolicyEffect, kind xoInteractionKindLabel; тайлбарын догол XoTrans; aria ба mobile шошго гар tx |
+| ui/src/components/IssueThreadInteractionCard.tsx | T1; manual засвар: олон тооны салаа тусдаа литерал, гар tx (≈78 дуудлага); «Connected/Withdrawn/Resolved by <b>{{who}}</b>» XoTrans; verdict xoVerdictLabel, kind xoInteractionKindLabel, төлөв xoStatusLabel |
+| ui/src/components/PageTabBar.tsx | aria «Page section» гар tx |
+| ui/src/lib/interaction-audience.ts | resolverPolicyLabel/Effect-ийг helper-ээр; audience өгүүлбэр, midSentence «you», «the addressed user/agent» гар tx; template literal → tx interpolation |
+| ui/src/pages/AgentDetail.tsx | agentTabLabel (Dashboard/Configuration/Budget гар tx, бусад xoNavLabel): breadcrumb ба табын шошго; «Action failed» гар tx |
+| ui/src/pages/AgentDetail.production.tsx | breadcrumb, гарчиг (h2) ба production табын шошго xoNavLabel; «Action failed» гар tx (хос файлын засвар өөр: production нь навигацийн бүтэц өөр) |
+| ui/src/pages/CompanySettings.tsx | «Failed to save interaction governance» гар tx |
+| ui/src/pages/ProjectWorkspaceDetail.tsx | T1; sourceTypeText helper (эх төрлийн шошго ба тайлбар; брэндийн тайлбар «{{brand}}» placeholder-тэй, брэнд literal давхардуулахгүй); баталгаажуулалт, toast, hint, хоосон төлөвийн текст гар tx |
+| ui/src/pages/Secrets.tsx | T1; manual засвар, гар tx (≈58 дуудлага); 8 XoTrans (жишээ «Removes <b>{{name}}</b> from Paperclip only.»); статус xoStatusLabel |
+| ui/src/pages/audit/AuditHub.tsx | T1; табын шошго ба breadcrumb xoNavLabel |
+| ui/src/pages/audit/AuditRuns.tsx | T1; үргэлжлэх хугацаа «{{seconds}}s», «{{minutes}}m {{seconds}}s», «Routine run», «{{source}} run» гар tx; эх сурвалж xoRunSourceLabel |
+| ui/src/pages/audit/CompanyActivity.tsx | T1 (эх код өөрчлөгдөөгүй) |
+
+XO-ийн өмч: ui/src/xo/labels.ts (xoResolverPolicyLabel, xoResolverPolicyEffect, xoInteractionKindLabel, xoVerdictLabel, xoNavLabel), scripts/xo-i18n/tiers.ts (8 файл T1), ui/src/i18n/xo/* (keys=3237, +621; keep-en.json-д workspace commands JSON жишээ, «MY_SECRET», «PERSONAL_GH_TOKEN», «API ·», «Env ·», хувилбарын «v{{…}}» хэлбэрүүд, shell командууд).
+
+Шинэ XO-ийн тестүүд: ui/src/i18n/xo/y6-7-5-keys.test.ts, scripts/xo-i18n/tiers-y6-7-5.test.ts, ui/src/xo/labels.test.ts (нэмэлт).
+
+Үлдэгдэл (Ү6 7.5): Ү6 7.6 — pages/secrets/* дэд файлууд (ImportFromVaultDialog, proposal-review, UserSecretDefinitionsTab, SetMyUserSecretDialog, MyUserSecretsTab, ProposalsTab, MissingUserSecretsBanner, secret-path, user-secret-presentation), TaskChatCompactInteractionCard ба InteractionAudienceLine-ийн өөрийн текст, AttentionQueueRow. Хүлээн зөвшөөрсөн (7.4-өөс): «Intent» харьцуулалт; dev-only T2; LegacyIssuesList; mn-д цагийн бүсийн нэр ба гараг; үүргийн орчуулгыг ED шалгана.
+- IssueThreadInteractionCard нь proposal-review.tsx-ийн «Reason given by the agent»-ийг рендерлэдэг тул card дотор тэр хэсэг 7.6 хүртэл англиар үлдэнэ.
+- Secrets.tsx-ийн XoTrans түлхүүр «Removes <b>{{name}}</b> from Paperclip only.» брэнд literal агуулна (en render тест шаарддаг). xo:brand-scan baseline 586/161-ээс өсөхгүй эсэхийг 7.5-ын gates шалгана.
+- Secrets.tsx: parentLabel !== tx("All secrets") харьцуулалт mn-д «Бүх нууц утга» нэртэй хэрэглэгчийн хавтсыг нууна (edge case); «1 candidate from», «1 sampled secret» фрагментийн үгийн дараалал эмзэг.
+- IssueThreadInteractionCard: «on {{date}}» → «огноо: {{date}}» хоёр цэгтэй хэлбэр.
+- interaction-audience.ts: midSentence нь «You» шошгыг англиар харьцуулдаг (одоогоор зөв, шошго өөрчлөгдвөл эмзэг); «удирдах зөвлөл» жижиг/том үсэг T1 ба гар tx-д зөрнө.
+- T1 модулийн түвшний объект (`{ label: "…" }`) импортын үед нэг удаа үнэлэгдэнэ; locale солиход хуудас дахин ачаалагддаг тул практикт зөрөхгүй.
+- Browser (7.5 дараах): нууц утгын хуудсын «Folders» / «Flat» товч components/folders/FolderControls.tsx-оос ирдэг (7.5-ын хүрээнд ороогүй); байгууллагын тохиргооны доод хэсэг (Deployment and auth, Backup retention, AI feedback sharing, Sign out) инстанцын ерөнхий тохиргооны компонентоос ирдэг тул англиар үлдэнэ. Ү6 7.6-д.
+- Эцсийн review (Minor): «interaction governance» нэг газар «засаглалын бодлого», бусад газар «удирдлага» гэж орчуулагдсан; mn утгад «runtime тохиргоо» англи үг үлдсэн. Ү6 7.6-д каталогт нэг мөрөөр засна.
+- y6-7-5-keys тест mn утгыг зөвхөн en-ээс ялгаатай эсэхээр шалгана; зарим mn утга товчлол/калька («… амжилтгүй», «Нэр дэвшигч 1, эх:»).
 
 ## Lockfile
 
