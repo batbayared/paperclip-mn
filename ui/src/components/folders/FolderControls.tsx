@@ -47,6 +47,8 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+import { tx } from "@/i18n/xo";
+import { xoFolderItemLabel } from "@/xo/labels";
 import {
   reservedRootLabel,
   treeFromResult,
@@ -120,7 +122,7 @@ function selectionLabel({
   allLabel: string;
 }) {
   if (selection === "all") return allLabel;
-  if (selection === "unfiled") return "Unfiled";
+  if (selection === "unfiled") return tx("Unfiled");
   return folders.find((folder) => folder.id === selection)?.name ?? allLabel;
 }
 
@@ -222,7 +224,7 @@ export function FolderRail({
   }
 
   return (
-    <nav aria-label={`${itemLabelPlural} folders`} className="hidden w-(--sz-folder-rail) shrink-0 border-r border-border pr-3 md:block">
+    <nav aria-label={tx("{{items}} folders", { items: xoFolderItemLabel(itemLabelPlural) })} className="hidden w-(--sz-folder-rail) shrink-0 border-r border-border pr-3 md:block">
       <div className="mb-2 flex items-center justify-between gap-2">
         <div className="text-(length:--text-micro) font-medium uppercase tracking-wide text-muted-foreground">Folders</div>
         <Button variant="ghost" size="icon-sm" title="New folder" onClick={onCreate}>
@@ -257,7 +259,7 @@ export function FolderRail({
           <div className="px-2 pb-1 pt-3 text-(length:--text-micro) font-medium uppercase tracking-wide text-muted-foreground">
             System
           </div>
-          {renderVirtualRow("unfiled", "Unfiled", result?.unfiledCount ?? 0, <FolderSwatch color={null} className="mt-0.5" />)}
+          {renderVirtualRow("unfiled", tx("Unfiled"), result?.unfiledCount ?? 0, <FolderSwatch color={null} className="mt-0.5" />)}
         </div>
       )}
     </nav>
@@ -389,7 +391,7 @@ export function AllUnfiledBanner({
     <div className="mb-3 flex flex-wrap items-center gap-2 rounded-md border border-border bg-muted/40 px-3 py-2 text-sm">
       <FolderIcon className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
       <span className="min-w-0 flex-1 text-muted-foreground">
-        Group these {itemLabelPlural} into folders to keep things tidy.
+        {tx("Group these {{items}} into folders to keep things tidy.", { items: xoFolderItemLabel(itemLabelPlural) })}
       </span>
       <Button size="sm" variant="outline" onClick={onCreateFolder}>
         Create your first folder
@@ -451,7 +453,7 @@ export function MobileFolderSheet({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="bottom" className="max-h-(--sz-folder-sheet-max) rounded-t-lg pb-4">
         <SheetHeader className="border-b border-border px-4 py-3">
-          <SheetTitle>{itemLabelPlural} folders</SheetTitle>
+          <SheetTitle>{tx("{{items}} folders", { items: xoFolderItemLabel(itemLabelPlural) })}</SheetTitle>
         </SheetHeader>
         <div className="overflow-y-auto px-3">
           <MobileFolderRow
@@ -464,13 +466,13 @@ export function MobileFolderSheet({
           />
           {result?.kind === "skill" ? (
             <>
-              {model.my ? renderBranch(model.my, "My Skills") : null}
+              {model.my ? renderBranch(model.my, tx("My Skills")) : null}
               <div className="px-2 pb-0.5 pt-2 text-(length:--text-micro) font-medium uppercase tracking-wide text-muted-foreground">
                 Organization
               </div>
               {model.company.map((node) => renderBranch(node))}
-              {model.projects ? renderBranch(model.projects, "Projects") : null}
-              {model.bundled ? renderBranch(model.bundled, "Bundled") : null}
+              {model.projects ? renderBranch(model.projects, tx("Projects")) : null}
+              {model.bundled ? renderBranch(model.bundled, tx("Bundled")) : null}
             </>
           ) : (
             model.roots.map((node) => renderBranch(node, reservedRootLabel(node.folder)))
@@ -716,7 +718,10 @@ export function DeleteFolderDialog({
         <AlertDialogHeader>
           <AlertDialogTitle>Delete folder</AlertDialogTitle>
           <AlertDialogDescription>
-            The {folder?.itemCount ?? 0} {itemLabelPlural} in this folder won't be deleted. They'll move to Unfiled.
+            {tx("The {{n}} {{items}} in this folder won't be deleted. They'll move to Unfiled.", {
+              n: folder?.itemCount ?? 0,
+              items: xoFolderItemLabel(itemLabelPlural),
+            })}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
