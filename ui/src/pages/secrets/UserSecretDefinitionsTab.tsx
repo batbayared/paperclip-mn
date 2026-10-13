@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { tx } from "@/i18n/xo";
+import { xoStatusLabel } from "@/xo/labels";
 import { XoTrans } from "@/xo/XoTrans";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { SecretStatus, UserSecretDefinition } from "@paperclipai/shared";
@@ -205,7 +206,7 @@ export function UserSecretDefinitionsTab({ companyId }: { companyId: string }) {
                       variant="outline"
                       className={cn("text-(length:--text-micro)", secretStatusTone(definition.status))}
                     >
-                      {definition.status}
+                      {xoStatusLabel(definition.status, definition.status)}
                     </Badge>
                   </div>
                   {definition.description ? (

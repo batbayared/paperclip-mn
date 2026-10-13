@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { tx } from "@/i18n/xo";
+import { xoStatusLabel } from "@/xo/labels";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { CompanySecret } from "@paperclipai/shared";
 import { AlertCircle, KeyRound, Trash2, UserRound } from "lucide-react";
@@ -146,7 +147,7 @@ function MyUserSecretRow({
           </code>
           {disabledDefinition ? (
             <Badge variant="outline" className="text-(length:--text-nano)">
-              {definition.status}
+              {xoStatusLabel(definition.status, definition.status)}
             </Badge>
           ) : null}
         </div>

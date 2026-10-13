@@ -12,6 +12,7 @@
  * action is permitted, it only explains the answer the server already gave.
  */
 
+import { tx } from "@/i18n/xo";
 import type { InteractionAudienceDescription } from "./interaction-audience";
 
 /**
@@ -130,8 +131,8 @@ export function describeInteractionResolutionFailure(
       message: [
         reason
           ?? (coded
-            ? "You are not in this card's resolver audience."
-            : "You do not have permission to respond to this card."),
+            ? tx("You are not in this card's resolver audience.")
+            : tx("You do not have permission to respond to this card.")),
         responder,
       ]
         .filter(Boolean)
@@ -143,14 +144,14 @@ export function describeInteractionResolutionFailure(
     return {
       kind: "settled",
       code,
-      message: reason ?? "This request is no longer waiting for a decision.",
+      message: reason ?? tx("This request is no longer waiting for a decision."),
     };
   }
 
   return {
     kind: "transient",
     code,
-    message: reason ? `${reason} Try again.` : "Couldn't submit. Try again.",
+    message: reason ? tx("{{reason}} Try again.", { reason }) : tx("Couldn't submit. Try again."),
   };
 }
 
