@@ -75,6 +75,8 @@ import {
 } from "@/components/skill-studio/SkillProvenance";
 import { isProjectScanSkill } from "@/lib/skill-fork";
 import { cn, formatCents, relativeTime } from "@/lib/utils";
+import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
 import { SkillCardIcon, type DiscoveryCard } from "./CompanySkills";
 import {
   ResizableHandle,
@@ -199,7 +201,7 @@ function useMutationErrorToast() {
         return;
       }
       const body =
-        error instanceof Error && error.message ? error.message : "Please try again.";
+        error instanceof Error && error.message ? error.message : tx("Please try again.");
       toast?.pushToast({ tone: "error", title, body });
     },
     [toast],
@@ -403,7 +405,7 @@ function StudioCreateMode({
             skills={skills}
             loading={skillsLoading}
             onSelectSkill={onSelectSkill}
-            emptyLabel="New skill"
+            emptyLabel={tx("New skill")}
           />
         </header>
         <div className="min-h-0 flex-1 overflow-y-auto">
@@ -493,7 +495,7 @@ function StudioNewSkillPanel({
     key: effectiveSlug || draft.name || "new-skill",
     skillId: null,
     catalogRef: null,
-    name: draft.name || "New Skill",
+    name: draft.name || tx("New Skill"),
     slug: effectiveSlug || "skill",
     author: "you",
     version: null,
@@ -724,7 +726,7 @@ function StudioEmptyState({
             skills={skills}
             loading={skillsLoading}
             onSelectSkill={onSelectSkill}
-            emptyLabel="Select skill"
+            emptyLabel={tx("Select skill")}
           />
         </header>
         <div className="flex flex-1 items-center justify-center">
@@ -797,7 +799,7 @@ function StudioLanding({
             skills={skills}
             loading={skillsLoading}
             onSelectSkill={onSelectSkill}
-            emptyLabel="Select skill"
+            emptyLabel={tx("Select skill")}
           />
           <Button variant="ghost" size="sm" className="ml-auto" onClick={onCreateNew}>
             <Plus className="mr-1.5 h-3.5 w-3.5" />
@@ -1197,7 +1199,7 @@ function SkillSwitcher({
   skills,
   loading,
   onSelectSkill,
-  emptyLabel = "Select skill",
+  emptyLabel = tx("Select skill"),
 }: {
   skill: CompanySkillDetail | null;
   skills: CompanySkillListItem[];
@@ -1222,10 +1224,10 @@ function SkillSwitcher({
       value={skill?.id ?? ""}
       groups={groups}
       loading={loading}
-      loadingMessage="Loading skills..."
+      loadingMessage={tx("Loading skills...")}
       placeholder={emptyLabel}
-      searchPlaceholder="Search skills..."
-      emptyMessage="No matching skills."
+      searchPlaceholder={tx("Search skills...")}
+      emptyMessage={tx("No matching skills.")}
       onValueChange={(value) => {
         if (value !== skill?.id) onSelectSkill(value);
       }}
@@ -1323,7 +1325,7 @@ function SkillPane({
     if (
       dirty
       && typeof window !== "undefined"
-      && !window.confirm("Discard unsaved edits and switch files?")
+      && !window.confirm(tx("Discard unsaved edits and switch files?"))
     ) {
       return;
     }
@@ -1344,7 +1346,7 @@ function SkillPane({
         queryKey: queryKeys.companySkills.versions(companyId, skillId),
       });
     },
-    onError: onError("Couldn't save file"),
+    onError: onError(tx("Couldn't save file")),
   });
 
   const createMutation = useMutation({
@@ -1365,7 +1367,7 @@ function SkillPane({
         queryKey: queryKeys.companySkills.versions(companyId, skillId),
       });
     },
-    onError: onError("Couldn't create file"),
+    onError: onError(tx("Couldn't create file")),
   });
 
   const deleteMutation = useMutation({
@@ -1386,7 +1388,7 @@ function SkillPane({
         queryKey: queryKeys.companySkills.versions(companyId, skillId),
       });
     },
-    onError: onError("Couldn't delete file"),
+    onError: onError(tx("Couldn't delete file")),
   });
 
   // Read-only skills (bundled Paperclip, remote GitHub, URL, skills.sh) reject
@@ -1470,7 +1472,7 @@ function SkillPane({
             }
             onSelectFile={selectFile}
             showCheckboxes={false}
-            ariaLabel="Skill files"
+            ariaLabel={tx("Skill files")}
           />
         </div>
         {readOnly && (
@@ -1478,8 +1480,8 @@ function SkillPane({
             <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-500" />
             <div className="min-w-0 flex-1">
               <p>
-                {skill.editableReason ?? "This skill is read-only because it comes from an external source."}
-                {" "}Make an editable copy to change it — the original stays untouched.
+                {skill.editableReason ?? tx("This skill is read-only because it comes from an external source.")}
+                {" "}{tx("Make an editable copy to change it — the original stays untouched.")}
               </p>
               <Button
                 type="button"
@@ -1680,7 +1682,7 @@ function SkillFileActions({
               size="icon-sm"
               disabled={deleteDisabled}
               onClick={() => {
-                if (typeof window === "undefined" || window.confirm(`Delete ${selectedFile}?`)) {
+                if (typeof window === "undefined" || window.confirm(tx("Delete {{path}}?", { path: selectedFile }))) {
                   onDeleteFile();
                 }
               }}
@@ -1734,19 +1736,19 @@ function SkillPathDialog({
     setError(null);
   }, [currentFolder, mode, open]);
 
-  const title = mode === "folder" ? "Add folder" : "Add file";
-  const label = mode === "folder" ? "Folder path" : "File path";
+  const title = mode === "folder" ? tx("Add folder") : tx("Add file");
+  const label = mode === "folder" ? tx("Folder path") : tx("File path");
 
   function submit() {
     if (!mode) return;
     const normalized = normalizeStudioPath(pathValue);
     if (!normalized) {
-      setError(`${label} is required.`);
+      setError(mode === "folder" ? tx("Folder path is required.") : tx("File path is required."));
       return;
     }
     if (mode === "file") {
       if (existingPaths.has(normalized)) {
-        setError("A file already exists at that path.");
+        setError(tx("A file already exists at that path."));
         return;
       }
       onSubmit(normalized, "");
@@ -1755,7 +1757,7 @@ function SkillPathDialog({
 
     const folderPath = normalized.replace(/\/+$/, "");
     if ([...existingPaths].some((path) => path.startsWith(`${folderPath}/`))) {
-      setError("A folder already exists at that path.");
+      setError(tx("A folder already exists at that path."));
       return;
     }
     onSubmit(folderSeedFile(folderPath), folderSeedContent(folderPath));
@@ -1826,16 +1828,16 @@ function DeleteFolderDialog({
   function submit() {
     const normalized = normalizeStudioPath(pathValue).replace(/\/+$/, "");
     if (!normalized) {
-      setError("Folder path is required.");
+      setError(tx("Folder path is required."));
       return;
     }
     const matchingFiles = [...existingPaths].filter((path) => path.startsWith(`${normalized}/`));
     if (matchingFiles.length === 0) {
-      setError("No files exist under that folder.");
+      setError(tx("No files exist under that folder."));
       return;
     }
     if (matchingFiles.includes("SKILL.md")) {
-      setError("SKILL.md cannot be deleted.");
+      setError(tx("SKILL.md cannot be deleted."));
       return;
     }
     onSubmit(normalized);
@@ -1955,7 +1957,7 @@ function InputPane({
     if (!dirty) return true;
     return (
       typeof window === "undefined"
-      || window.confirm("Discard unsaved changes to this input?")
+      || window.confirm(tx("Discard unsaved changes to this input?"))
     );
   }, [dirty]);
 
@@ -1987,7 +1989,7 @@ function InputPane({
         queryKey: queryKeys.companySkills.testInputs(companyId, skillId),
       });
     },
-    onError: onError("Couldn't save input"),
+    onError: onError(tx("Couldn't save input")),
   });
   const deleteMutation = useMutation({
     mutationFn: (inputId: string) => companySkillsApi.deleteTestInput(companyId, skillId, inputId),
@@ -1999,7 +2001,7 @@ function InputPane({
         queryKey: queryKeys.companySkills.testInputs(companyId, skillId),
       });
     },
-    onError: onError("Couldn't delete input"),
+    onError: onError(tx("Couldn't delete input")),
   });
 
   return (
@@ -2113,7 +2115,7 @@ function InputPane({
                         </DropdownMenu>
                       );
                     }}
-                    ariaLabel="Test inputs"
+                    ariaLabel={tx("Test inputs")}
                   />
                 </>
               )}
@@ -2388,9 +2390,9 @@ function RunsPane({
     hasUnsavedSkillEdits: skillDirty,
   });
   const templateGateReason = templatesQuery.isLoading
-    ? "Loading run templates"
+    ? tx("Loading run templates")
     : templatesQuery.isError
-      ? "Run templates couldn't load"
+      ? tx("Run templates couldn't load")
       : null;
 
   const createTemplateMutation = useMutation({
@@ -2408,7 +2410,7 @@ function RunsPane({
         body: `${template.name} is ready for Skills Studio runs.`,
       });
     },
-    onError: onError("Couldn't save template"),
+    onError: onError(tx("Couldn't save template")),
   });
 
   const updateTemplateMutation = useMutation({
@@ -2428,7 +2430,7 @@ function RunsPane({
         body: `${template.name} is ready for Skills Studio runs.`,
       });
     },
-    onError: onError("Couldn't update template"),
+    onError: onError(tx("Couldn't update template")),
   });
 
   const deleteTemplateMutation = useMutation({
@@ -2447,26 +2449,26 @@ function RunsPane({
         body: `${template.name} was removed from Skills Studio runs.`,
       });
     },
-    onError: onError("Couldn't delete template"),
+    onError: onError(tx("Couldn't delete template")),
   });
 
   const selectedTemplate = selectedTemplateId === null
     ? null
     : templates.find((template) => template.id === selectedTemplateId) ?? null;
   const selectedTemplateName = selectedTemplateId === null
-    ? "No template"
-    : selectedTemplate?.name ?? "Default test template";
+    ? tx("No template")
+    : selectedTemplate?.name ?? tx("Default test template");
   const runDisabledReason = gate.reason ?? templateGateReason;
 
   const createRunMutation = useMutation({
     mutationFn: () => {
       if (!templatesQuery.isSuccess) {
-        throw new Error(templateGateReason ?? "Run templates are not ready.");
+        throw new Error(templateGateReason ?? tx("Run templates are not ready."));
       }
       const resolution = resolveRunTemplateSelection(selectedTemplateId, templates);
       if (resolution.recovered) {
         updateTemplateSelection(resolution.selection);
-        throw new Error("Selected run template is no longer available. The selection was reset.");
+        throw new Error(tx("Selected run template is no longer available. The selection was reset."));
       }
       return companySkillsApi.createTestRun(companyId, skillId, buildCreateRunRequest({
         agentId: selectedAgentId!,
@@ -2481,7 +2483,7 @@ function RunsPane({
       });
       onSelectRun(run.id);
     },
-    onError: onError("Couldn't start run"),
+    onError: onError(tx("Couldn't start run")),
   });
 
   if (selectedRunId) {
@@ -2542,7 +2544,7 @@ function RunsPane({
           onDeleteTemplate={(template) => {
             if (
               typeof window !== "undefined"
-              && !window.confirm(`Delete run template "${template.name}"?`)
+              && !window.confirm(tx("Delete run template \"{{name}}\"?", { name: template.name }))
             ) {
               return;
             }
@@ -2705,10 +2707,10 @@ function RunTemplateAdvancedPanel({
                 groups={templateGroups}
                 loading={templatesLoading}
                 disabled={templatesLoading || templatesError}
-                loadingMessage="Loading templates..."
+                loadingMessage={tx("Loading templates...")}
                 placeholder="Select template"
-                searchPlaceholder="Search templates..."
-                emptyMessage="No templates."
+                searchPlaceholder={tx("Search templates...")}
+                emptyMessage={tx("No templates.")}
                 contentClassName="w-(--sz-320px)"
                 onValueChange={(value) => onSelectTemplate(runTemplateSelectionFromOption(value))}
                 renderValue={(option) => option?.label ?? selectedTemplateName}
@@ -2841,13 +2843,13 @@ function RunTemplateDialog({
   }, [source, state]);
 
   const title = state?.mode === "edit"
-    ? "Edit run template"
+    ? tx("Edit run template")
     : source?.builtIn
-      ? "Duplicate built-in template"
-      : "Create run template";
+      ? tx("Duplicate built-in template")
+      : tx("Create run template");
   const descriptionText = state?.mode === "edit"
-    ? "Update the custom run instructions used by Skills Studio."
-    : "Save reusable run instructions for Skills Studio.";
+    ? tx("Update the custom run instructions used by Skills Studio.")
+    : tx("Save reusable run instructions for Skills Studio.");
 
   return (
     <Dialog open={Boolean(state)} onOpenChange={onOpenChange}>
@@ -2884,7 +2886,10 @@ function RunTemplateDialog({
               className="min-h-(--sz-240px) font-mono text-xs leading-5"
             />
             <p className="text-xs text-muted-foreground">
-              Placeholders: {"{{skillName}}"}, {"{{skillKey}}"}, {"{{skillInvocation}}"}, {"{{skillVersion}}"}, {"{{runId}}"}, {"{{issueId}}"}, {"{{outputDocumentKey}}"}.
+              <XoTrans
+                i18nKey="Placeholders: <list/>."
+                components={{ list: <>{"{{skillName}}, {{skillKey}}, {{skillInvocation}}, {{skillVersion}}, {{runId}}, {{issueId}}, {{outputDocumentKey}}"}</> }}
+              />
             </p>
           </div>
         </div>
@@ -2922,7 +2927,7 @@ function RunHistoryRow({
   const agent = agents.find((a) => a.id === run.agentId) ?? null;
   const removed = !agent;
   const snapshotName =
-    (run.agentConfigSnapshot?.name as string | undefined) ?? "Agent";
+    (run.agentConfigSnapshot?.name as string | undefined) ?? tx("Agent");
   const name = agent?.name ?? snapshotName;
   return (
     <EntityRow
@@ -3043,7 +3048,7 @@ function RunDetailView({
       queryClient.invalidateQueries({
         queryKey: queryKeys.companySkills.testRunDetail(companyId, skillId, runId),
       }),
-    onError: onError("Couldn't cancel run"),
+    onError: onError(tx("Couldn't cancel run")),
   });
 
   // Re-run reproduces the VIEWED run's snapshots — pinned skill version, saved
@@ -3053,7 +3058,7 @@ function RunDetailView({
   const reRunMutation = useMutation({
     mutationFn: () => {
       const d = detailQuery.data;
-      if (!d) throw new Error("Run details are still loading.");
+      if (!d) throw new Error(tx("Run details are still loading."));
       return companySkillsApi.createTestRun(companyId, skillId, buildReRunRequest(d));
     },
     onSuccess: (run) => {
@@ -3062,7 +3067,7 @@ function RunDetailView({
       });
       onSelectRun(run.id);
     },
-    onError: onError("Couldn't re-run"),
+    onError: onError(tx("Couldn't re-run")),
   });
 
   const deleteMutation = useMutation({
@@ -3073,7 +3078,7 @@ function RunDetailView({
       });
       onSelectRun(null);
     },
-    onError: onError("Couldn't delete run"),
+    onError: onError(tx("Couldn't delete run")),
   });
 
   const detail = detailQuery.data ?? null;
@@ -3104,7 +3109,7 @@ function RunDetailView({
 
   const agent = agents.find((a) => a.id === detail.agentId) ?? null;
   const agentName =
-    agent?.name ?? (detail.agentConfigSnapshot?.name as string | undefined) ?? "Agent";
+    agent?.name ?? (detail.agentConfigSnapshot?.name as string | undefined) ?? tx("Agent");
   const removed = !agent;
   const outputMode = runOutputMode(detail);
   const nonTerminal = !isTerminalRunStatus(detail.status);
@@ -3127,8 +3132,8 @@ function RunDetailView({
 
         {/* snapshot property block */}
         <div className="rounded-md border border-border text-xs">
-          <PropRow label="Input" value={detail.inputId ? "saved input" : "ad-hoc paste"} />
-          <PropRow label="Template" value={detail.templateName ?? "No template"} />
+          <PropRow label="Input" value={detail.inputId ? tx("saved input") : tx("ad-hoc paste")} />
+          <PropRow label="Template" value={detail.templateName ?? tx("No template")} />
           <PropRow label="Skill version" value={`v${detail.skillVersion.revisionNumber}`} />
           <PropRow label="Created" value={relativeTime(detail.createdAt)} />
         </div>
@@ -3442,9 +3447,9 @@ function VersionHistorySheet({
       for (const file of version.fileInventory) {
         await companySkillsApi.updateFile(companyId, skillId, file.path, file.content);
       }
-      return companySkillsApi.createVersion(companyId, skillId, {
-        label: `Restore of v${version.revisionNumber}`,
-      });
+      // Stored version label: keep English (not a display string).
+      const restoreLabel = `Restore of v${version.revisionNumber}`;
+      return companySkillsApi.createVersion(companyId, skillId, { label: restoreLabel });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.companySkills.versions(companyId, skillId) });
@@ -3498,7 +3503,7 @@ function VersionHistorySheet({
                         restore.mutate(v);
                       }}
                     >
-                      Restore as v{(skill.currentVersion?.revisionNumber ?? v.revisionNumber) + 1}
+                      {tx("Restore as v{{revisionNumber}}", { revisionNumber: (skill.currentVersion?.revisionNumber ?? v.revisionNumber) + 1 })}
                     </Button>
                   }
                 />
