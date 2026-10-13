@@ -31,6 +31,7 @@ import {
   xoSnoozePresetLabel,
   xoFolderItemLabel,
   xoCompactKindLabel,
+  xoDecisionOptionLabel,
 } from "./labels";
 
 afterEach(async () => {
@@ -410,5 +411,19 @@ describe("Ү6 7.6 helper-ууд (mn)", () => {
     expect(xoSnoozePresetLabel("Маргааш өглөө")).toBe("Маргааш өглөө");
     await i18n.changeLanguage("en");
     expect(xoSnoozePresetLabel("Tomorrow morning")).toBe("Tomorrow morning");
+  });
+});
+
+describe("Ү6 7.7 helper-ууд (en)", () => {
+  it("en дээр англи утгаа буцаана, мэдэгдэхгүйг дамжуулна", () => {
+    for (const v of ["Critical", "High", "Medium", "Low", "All", "Today", "Yesterday", "Last 7 days", "This month", "Custom", "This week", "Whenever", "Earlier", "None", "Date", "Type", "Project", "Severity", "Newest first", "Oldest first", "No project", "Something else"]) {
+      expect(xoDecisionOptionLabel(v)).toBe(v);
+    }
+    for (const v of ["Tomorrow", "1 hour", "Next week"]) {
+      expect(xoSnoozePresetLabel(v)).toBe(v);
+    }
+    for (const v of ["disabled", "archived", "deleted"]) {
+      expect(xoStatusLabel(v, v)).toBe(v);
+    }
   });
 });

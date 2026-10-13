@@ -470,6 +470,7 @@ export function xoSnoozePresetLabel(english: string): string {
     case "1 hour": return tx("1 hour");
     case "4 hours": return tx("4 hours");
     case "Tomorrow morning": return tx("Tomorrow morning");
+    case "Tomorrow": return tx("Tomorrow");
     case "Next week": return tx("Next week");
     default: return english;
   }
@@ -499,5 +500,34 @@ export function xoCompactKindLabel(english: string): string {
     case "Review": return tx("Review");
     case "Connection": return tx("Connection");
     default: return xoInteractionKindLabel(english);
+  }
+}
+
+/** Decision queue-ийн severity / date range / group / sort шошго (attention.ts модулийн тогтмолууд). */
+export function xoDecisionOptionLabel(english: string): string {
+  if (!(i18n.resolvedLanguage ?? i18n.language ?? "").startsWith("mn")) return english;
+  switch (english) {
+    case "Critical": return tx("Critical");
+    case "High": return tx("High");
+    case "Medium": return tx("Medium");
+    case "Low": return tx("Low");
+    case "All": return tx("All");
+    case "Today": return tx("Today");
+    case "Yesterday": return tx("Yesterday");
+    case "Last 7 days": return tx("Last 7 days");
+    case "This month": return tx("This month");
+    case "Custom": return tx("Custom");
+    case "This week": return tx("This week");
+    case "Whenever": return tx("Whenever");
+    case "Earlier": return tx("Earlier");
+    case "None": return tx("None");
+    case "Date": return tx("Date");
+    case "Type": return tx("Type");
+    case "Project": return tx("Project");
+    case "Severity": return tx("Severity");
+    case "Newest first": return tx("Newest first");
+    case "Oldest first": return tx("Oldest first");
+    case "No project": return tx("No project");
+    default: return english;
   }
 }
