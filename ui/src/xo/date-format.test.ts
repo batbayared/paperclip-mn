@@ -60,9 +60,12 @@ describe("xoLocale* wrapper (mn)", () => {
     expect(xoLocaleDate(sample)).toBe("2026 оны 9-р сарын 7");
     expect(xoLocaleDate(sample, undefined, { month: "short", day: "numeric" })).toBe("9-р сарын 7");
     expect(xoLocaleDate(sample, "en-US", { year: "numeric", month: "short", day: "numeric" })).toBe("2026 оны 9-р сарын 7");
-    expect(xoLocaleTime(sample)).toBe("13:02");
+    expect(xoLocaleTime(sample)).toBe("13:02:54");
     expect(xoLocaleTime(sample, [], { hour: "2-digit", minute: "2-digit" })).toBe("13:02");
-    expect(xoLocaleTime(sample, "en-US", { hour12: false })).toBe("13:02");
+    expect(xoLocaleTime(sample, undefined, { hour: "2-digit", minute: "2-digit" })).toBe("13:02");
+    expect(xoLocaleTime(sample, "en-US", { hour12: false })).toBe("13:02:54");
+    expect(xoLocaleTime(morning, "en-US", { hour12: false })).toBe("9:05:04");
+    expect(xoLocaleTime(sample, "en-US", { timeStyle: "short" })).toBe("13:02");
     expect(xoLocaleTime(sample, "en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false })).toBe("13:02:54");
     expect(spyString).not.toHaveBeenCalled();
     expect(spyDate).not.toHaveBeenCalled();

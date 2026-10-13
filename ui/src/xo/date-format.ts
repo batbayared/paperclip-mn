@@ -68,12 +68,23 @@ export function xoLocaleDate(
     : d.toLocaleDateString(locales, options);
 }
 
+// en toLocaleTimeString нь hour/minute/second/timeStyle заагаагүй үед секундтэй гаргадаг.
+function timeHasSeconds(options?: Intl.DateTimeFormatOptions): boolean {
+  if (options?.second !== undefined) return true;
+  return (
+    options === undefined ||
+    (options.hour === undefined &&
+      options.minute === undefined &&
+      options.timeStyle === undefined)
+  );
+}
+
 export function xoLocaleTime(
   d: Date,
   locales?: string | string[],
   options?: Intl.DateTimeFormatOptions,
 ): string {
-  if (isMn()) return mnTime(d, options?.second !== undefined);
+  if (isMn()) return mnTime(d, timeHasSeconds(options));
   return locales === undefined && options === undefined
     ? d.toLocaleTimeString()
     : d.toLocaleTimeString(locales, options);
