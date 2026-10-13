@@ -23,6 +23,7 @@ import {
 } from "./ui/dropdown-menu";
 import { xoLocaleDateTime } from "@/xo/date-format";
 import { tx } from "@/i18n/xo";
+import { xoDecisionOptionLabel, xoSnoozePresetLabel } from "@/xo/labels";
 
 const HOUR_MS = 60 * 60 * 1000;
 const DAY_MS = 24 * HOUR_MS;
@@ -54,13 +55,13 @@ function toQueueKey(title: string): string {
 function expiryLabel(expiresAt: string): { text: string; overdue: boolean } {
   const diff = new Date(expiresAt).getTime() - Date.now();
   if (!Number.isFinite(diff)) return { text: "", overdue: false };
-  if (diff <= 0) return { text: "Expired", overdue: true };
+  if (diff <= 0) return { text: tx("Expired"), overdue: true };
   const mins = Math.round(diff / 60000);
-  if (mins < 60) return { text: `Expires in ${mins}m`, overdue: false };
+  if (mins < 60) return { text: tx("Expires in {{mins}}m", { mins }), overdue: false };
   const hrs = Math.round(mins / 60);
-  if (hrs < 24) return { text: `Expires in ${hrs}h`, overdue: false };
+  if (hrs < 24) return { text: tx("Expires in {{hrs}}h", { hrs }), overdue: false };
   const days = Math.round(hrs / 24);
-  return { text: `Expires in ${days}d`, overdue: false };
+  return { text: tx("Expires in {{days}}d", { days }), overdue: false };
 }
 
 interface DecisionTriageStripProps {
@@ -94,10 +95,10 @@ export function DecisionTriageStrip({ item, companyId, agents }: DecisionTriageS
     queryClient.invalidateQueries({ queryKey: queryKeys.decisionQueues.triage(companyId, sourceKind, sourceId) });
   };
 
-  const onError = (verb: string) => (error: unknown) =>
+  const onError = (title: string) => (error: unknown) =>
     pushToast({
-      title: `Could not ${verb}`,
-      body: error instanceof Error ? error.message : "Please try again.",
+      title,
+      body: error instanceof Error ? error.message : tx("Please try again."),
       tone: "error",
     });
 
@@ -105,27 +106,27 @@ export function DecisionTriageStrip({ item, companyId, agents }: DecisionTriageS
     mutationFn: (decideBy: string | null) =>
       decisionQueuesApi.updateTriage(companyId, sourceKind, sourceId, { decideBy }),
     onSuccess: invalidate,
-    onError: onError("set when to decide"),
+    onError: onError(tx("Could not set when to decide")),
   });
   const setSnooze = useMutation({
     mutationFn: (snoozedUntil: string | null) =>
       decisionQueuesApi.updateTriage(companyId, sourceKind, sourceId, { snoozedUntil }),
     onSuccess: invalidate,
-    onError: onError("snooze"),
+    onError: onError(tx("Could not snooze")),
   });
   const addToQueue = useMutation({
     mutationFn: (key: string) => decisionQueuesApi.addItem(companyId, key, sourceKind, sourceId),
     onSuccess: invalidate,
-    onError: onError("add to queue"),
+    onError: onError(tx("Could not add to queue")),
   });
   const removeFromQueue = useMutation({
     mutationFn: (key: string) => decisionQueuesApi.removeItem(companyId, key, sourceKind, sourceId),
     onSuccess: invalidate,
-    onError: onError("remove from queue"),
+    onError: onError(tx("Could not remove from queue")),
   });
   const routeToAgent = useMutation({
     mutationFn: (agent: Agent) => {
-      if (!relatedIssueId) throw new Error("This decision has no linked task to route from.");
+      if (!relatedIssueId) throw new Error(tx("This decision has no linked task to route from."));
       const mention = `[@${agent.name}](${buildAgentMentionHref(agent.id)})`;
       const body =
         `${mention} — could you look at this decision${taskRef ? ` on ${taskRef.identifier}` : ""}, `
@@ -134,9 +135,9 @@ export function DecisionTriageStrip({ item, companyId, agents }: DecisionTriageS
     },
     onSuccess: (_result, agent) => {
       invalidate();
-      pushToast({ title: `Asked ${agent.name} for a recommendation`, tone: "success" });
+      pushToast({ title: tx("Asked {{name}} for a recommendation", { name: agent.name }), tone: "success" });
     },
-    onError: onError("ask that agent for a recommendation"),
+    onError: onError(tx("Could not ask that agent for a recommendation")),
   });
 
   const pending = setDecideBy.isPending || setSnooze.isPending || addToQueue.isPending || removeFromQueue.isPending;
@@ -174,7 +175,7 @@ export function DecisionTriageStrip({ item, companyId, agents }: DecisionTriageS
               disabled={pending}
               onClick={() => setDecideBy.mutate(decideBy === value ? null : value)}
             >
-              {tx(label)}
+              {xoDecisionOptionLabel(label)}
             </SegmentButton>
           ))}
           <Popover>
@@ -213,7 +214,7 @@ export function DecisionTriageStrip({ item, companyId, agents }: DecisionTriageS
             <button
               type="button"
               className="text-muted-foreground hover:text-destructive disabled:opacity-50"
-              aria-label={`Remove from ${queue.title}`}
+              aria-label={tx("Remove from {{title}}", { title: queue.title })}
               disabled={pending}
               onClick={() => removeFromQueue.mutate(queue.key)}
             >
@@ -256,7 +257,7 @@ export function DecisionTriageStrip({ item, companyId, agents }: DecisionTriageS
             <DropdownMenuContent align="start">
               {SNOOZE_PRESETS.map((preset) => (
                 <DropdownMenuItem key={preset.label} onClick={() => setSnooze.mutate(preset.resolve())}>
-                  {preset.label}
+                  {xoSnoozePresetLabel(preset.label)}
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
@@ -266,7 +267,7 @@ export function DecisionTriageStrip({ item, companyId, agents }: DecisionTriageS
         <AskAgentPicker
           agents={agents ?? []}
           disabled={routeToAgent.isPending || !relatedIssueId}
-          disabledReason={!relatedIssueId ? "No linked task to ask about" : undefined}
+          disabledReason={!relatedIssueId ? tx("No linked task to ask about") : undefined}
           onRoute={(agent) => routeToAgent.mutate(agent)}
         />
         {pending && <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />}
@@ -337,8 +338,8 @@ function QueuePicker({
     },
     onError: (error) =>
       pushToast({
-        title: "Could not create queue",
-        body: error instanceof Error ? error.message : "Please try again.",
+        title: tx("Could not create queue"),
+        body: error instanceof Error ? error.message : tx("Please try again."),
         tone: "error",
       }),
   });
