@@ -29,6 +29,8 @@ import type {
 } from "@paperclipai/shared";
 import { normalizeAgentUrlKey } from "@paperclipai/shared";
 import { Link } from "@/lib/router";
+import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
 import { ApiError } from "../../api/client";
 import { companySkillsApi } from "../../api/companySkills";
 import { projectsApi } from "../../api/projects";
@@ -90,13 +92,13 @@ export function scannableWorkspaces(project: Project): ProjectWorkspace[] {
 function workspaceKindLabel(sourceType: ProjectWorkspace["sourceType"]): string {
   switch (sourceType) {
     case "git_repo":
-      return "git";
+      return tx("git");
     case "local_path":
-      return "local";
+      return tx("local");
     case "non_git_path":
-      return "folder";
+      return tx("folder");
     case "remote_managed":
-      return "remote";
+      return tx("remote");
     default:
       return sourceType;
   }
@@ -218,10 +220,10 @@ export function isValidSelectionSlug(selection: SkillSelection): boolean {
 
 function readableErrorMessage(error: unknown): string {
   if (error instanceof ApiError) {
-    return error.message || `Request failed: ${error.status}`;
+    return error.message || tx("Request failed: {{status}}", { status: error.status });
   }
   if (error instanceof Error) return error.message;
-  return "Unexpected error";
+  return tx("Unexpected error");
 }
 
 export function isGrantError(error: unknown): boolean {
@@ -350,7 +352,7 @@ export function ImportSkillsFromProjectDialog({
 
   const importMutation = useMutation({
     mutationFn: () => {
-      if (!selectedProject) throw new Error("No project selected.");
+      if (!selectedProject) throw new Error(tx("No project selected."));
       const selectionInput = Array.from(selection.values());
       return companySkillsApi.scanProjects(companyId, {
         projectIds: [selectedProject.id],
@@ -370,7 +372,15 @@ export function ImportSkillsFromProjectDialog({
         title: importedCount > 0 ? "Skills imported" : "Nothing imported",
         body:
           importedCount > 0
-            ? `${importedCount} skill${importedCount === 1 ? "" : "s"} imported as references from ${selectedProject?.name ?? "the project"}.`
+            ? importedCount === 1
+              ? tx("{{n}} skill imported as references from {{project}}.", {
+                n: importedCount,
+                project: selectedProject?.name ?? tx("the project"),
+              })
+              : tx("{{n}} skills imported as references from {{project}}.", {
+                n: importedCount,
+                project: selectedProject?.name ?? tx("the project"),
+              })
             : "No skills were imported.",
       });
     },
@@ -750,7 +760,9 @@ function ScanningStep({ projectName }: { projectName: string }) {
         <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
       </div>
       <div>
-        <p className="text-sm font-medium">Scanning {projectName || "project"} for skills…</p>
+        <p className="text-sm font-medium">
+          {tx("Scanning {{project}} for skills…", { project: projectName || tx("project") })}
+        </p>
         <p className="mt-1 text-xs text-muted-foreground">
           Looking in well-known skill folders across each workspace.
         </p>
@@ -992,11 +1004,14 @@ function SelectStep({
           </div>
           <p className="text-base font-semibold">No skills found</p>
           <p className="mt-1.5 text-sm text-muted-foreground">
-            None of the well-known skill folders in this project's workspaces contain a{" "}
-            <code className="rounded bg-muted px-1 py-0.5 text-xs">SKILL.md</code>. We searched{" "}
-            {HIGHLIGHTED_SCAN_FOLDERS.join(", ")} and {APPROX_TOTAL_SCAN_FOLDERS -
-              HIGHLIGHTED_SCAN_FOLDERS.length}{" "}
-            other agent-harness folders.
+            <XoTrans
+              i18nKey="None of the well-known skill folders in this project's workspaces contain a <code>SKILL.md</code>. We searched {{folders}} and {{n}} other agent-harness folders."
+              values={{
+                folders: HIGHLIGHTED_SCAN_FOLDERS.join(", "),
+                n: APPROX_TOTAL_SCAN_FOLDERS - HIGHLIGHTED_SCAN_FOLDERS.length,
+              }}
+              components={{ code: <code className="rounded bg-muted px-1 py-0.5 text-xs" /> }}
+            />
           </p>
           <Button
             variant="outline"
@@ -1009,15 +1024,18 @@ function SelectStep({
           </Button>
           {onImportFromPath && (
             <p className="mt-3 text-sm text-muted-foreground">
-              For skills in non-standard folders, use{" "}
-              <button
-                type="button"
-                className="font-medium text-foreground underline underline-offset-2"
-                onClick={onImportFromPath}
-              >
-                Import from path or URL
-              </button>
-              .
+              <XoTrans
+                i18nKey="For skills in non-standard folders, use <button>Import from path or URL</button>."
+                components={{
+                  button: (
+                    <button
+                      type="button"
+                      className="font-medium text-foreground underline underline-offset-2"
+                      onClick={onImportFromPath}
+                    />
+                  ),
+                }}
+              />
             </p>
           )}
         </div>
@@ -1048,7 +1066,7 @@ function SelectStep({
       <div className="min-h-0 flex-1 overflow-y-auto">
         {groups.length === 0 ? (
           <div className="flex h-full items-center justify-center p-6 text-sm text-muted-foreground">
-            No skills match “{filter.trim()}”.
+            {tx("No skills match “{{filter}}”.", { filter: filter.trim() })}
           </div>
         ) : (
           groups.map((group, groupIndex) => (
@@ -1183,9 +1201,10 @@ function ResultStep({ result }: ResultStepProps) {
         <div className="flex items-start gap-3 rounded-md border border-emerald-500/30 bg-emerald-500/5 p-3">
           <Link2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
           <div className="text-xs leading-relaxed text-muted-foreground">
-            <span className="font-medium text-foreground">No files were copied.</span> These skills
-            reference the files in the project workspace — editing them in Skill Studio saves
-            directly back to those files.
+            <XoTrans
+              i18nKey="<b>No files were copied.</b> These skills reference the files in the project workspace — editing them in Skill Studio saves directly back to those files."
+              components={{ b: <span className="font-medium text-foreground" /> }}
+            />
           </div>
         </div>
         <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
