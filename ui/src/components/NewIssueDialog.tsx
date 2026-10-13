@@ -176,7 +176,7 @@ import {
   ISSUE_OVERRIDE_ADAPTER_TYPES,
   type IssueModelLane,
 } from "../lib/issue-assignee-overrides";
-import { xoStatusLabel } from "@/xo/labels";
+import { xoNewIssueInlineLabel, xoStatusLabel } from "@/xo/labels";
 import { tx } from "@/i18n/xo";
 import { XoTrans } from "@/xo/XoTrans";
 
@@ -1250,7 +1250,7 @@ export function NewIssueDialog() {
   const hasSavedDraft = Boolean(savedDraft?.title.trim() || savedDraft?.description.trim());
   const canDiscardDraft = hasDraft || hasSavedDraft;
   const createIssueErrorMessage =
-    createIssue.error instanceof Error ? createIssue.error.message : "Failed to create task. Try again.";
+    createIssue.error instanceof Error ? createIssue.error.message : tx("Failed to create task. Try again.");
   const stagedDocuments = stagedFiles.filter((file) => file.kind === "document");
   const stagedAttachments = stagedFiles.filter((file) => file.kind === "attachment");
 
@@ -1476,7 +1476,7 @@ export function NewIssueDialog() {
           <div className="px-4 pb-2">
             <div className="overflow-x-auto overscroll-x-contain">
               <div className="inline-flex items-center gap-2 text-sm text-muted-foreground flex-wrap sm:flex-nowrap sm:min-w-max">
-              <span className="w-6 shrink-0 text-center">For</span>
+              <span className="w-6 shrink-0 text-center">{xoNewIssueInlineLabel("For")}</span>
               <InlineEntitySelector
                 ref={assigneeSelectorRef}
                 value={assigneeValue}
@@ -1537,7 +1537,7 @@ export function NewIssueDialog() {
                   );
                 }}
               />
-              <span>in</span>
+              <span>{xoNewIssueInlineLabel("in")}</span>
               <InlineEntitySelector
                 ref={projectSelectorRef}
                 value={projectId}
@@ -1770,8 +1770,8 @@ export function NewIssueDialog() {
                         options={watchdogAgentOptions}
                         placeholder="Select agent"
                         noneLabel="No watchdog agent"
-                        searchPlaceholder="Search agents..."
-                        emptyMessage="No agents found."
+                        searchPlaceholder={tx("Search agents...")}
+                        emptyMessage={tx("No agents found.")}
                         onChange={setWatchdogAgentId}
                         renderTriggerValue={(option) =>
                           option ? (

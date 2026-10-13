@@ -617,7 +617,7 @@ export function IssueProperties({
   const controlWorkspaceRuntime = useMutation({
     mutationFn: (request: WorkspaceRuntimeControlRequest) => {
       const workspaceId = issue.currentExecutionWorkspace?.id ?? issue.executionWorkspaceId;
-      if (!workspaceId) throw new Error("This task is not attached to a workspace.");
+      if (!workspaceId) throw new Error(tx("This task is not attached to a workspace."));
       return executionWorkspacesApi.controlRuntimeCommands(workspaceId, request.action, request);
     },
     onSuccess: (result, request) => {
@@ -633,17 +633,17 @@ export function IssueProperties({
       setRuntimeActionErrorMessage(null);
       setRuntimeActionMessage(
         request.action === "run"
-          ? "Workspace job completed."
+          ? tx("Workspace job completed.")
           : request.action === "stop"
-            ? "Workspace service stopped."
+            ? tx("Workspace service stopped.")
             : request.action === "restart"
-              ? "Workspace service restarted."
-              : "Workspace service started.",
+              ? tx("Workspace service restarted.")
+              : tx("Workspace service started."),
       );
     },
     onError: (error) => {
       setRuntimeActionMessage(null);
-      setRuntimeActionErrorMessage(error instanceof Error ? error.message : "Failed to control workspace commands.");
+      setRuntimeActionErrorMessage(error instanceof Error ? error.message : tx("Failed to control workspace commands."));
     },
   });
   const pendingWorkspaceRuntimeAction = controlWorkspaceRuntime.isPending ? controlWorkspaceRuntime.variables ?? null : null;

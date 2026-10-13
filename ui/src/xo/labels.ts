@@ -243,3 +243,10 @@ export function xoSidePanelTabLabel(english: string): string {
     default: return english;
   }
 }
+
+// NewIssueDialog-ийн "For [agent] in [project]" мөр (M-4). Нэг үгт "For"/"in" глобал
+// түлхүүр өөр утгатай тул контексттой түлхүүр хэрэглэж, en дээр guard англиар буцаана.
+export function xoNewIssueInlineLabel(english: "For" | "in"): string {
+  if (!(i18n.resolvedLanguage ?? i18n.language ?? "").startsWith("mn")) return english;
+  return english === "For" ? tx("For (assignee)") : tx("in (project picker)");
+}

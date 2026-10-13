@@ -23,6 +23,9 @@ describe("work mode metadata", () => {
   it("uses graduated tooltip copy", () => {
     expect(titleForPendingWorkMode("standard")).toBe("Auto mode for this submission. Click to change.");
     expect(titleForPendingWorkMode("planning")).toBe("Plan mode is on for this submission. Click to change.");
+    expect(titleForPendingWorkMode("ask")).toBe(
+      "Ask mode for this submission. Click to change. The responsible will answer in this thread; no implementation work.",
+    );
   });
 
   it("translates pending work mode tooltips in mn", async () => {

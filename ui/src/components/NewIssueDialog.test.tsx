@@ -5,6 +5,7 @@ import { flushSync } from "react-dom";
 import { createRoot } from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { i18n } from "@/i18n";
 import { NewIssueDialog } from "./NewIssueDialog";
 
 const dialogState = vi.hoisted(() => ({
@@ -641,6 +642,39 @@ describe("NewIssueDialog", () => {
     expect(container.textContent).toContain("arrived paused from an organization import");
 
     act(() => root.unmount());
+  });
+
+  it("warns about a paused imported assignee in mn", async () => {
+    await i18n.changeLanguage("mn");
+    try {
+      dialogState.newIssueDefaults = {
+        title: "Compare onboarding flows",
+        assigneeAgentId: "agent-1",
+      };
+      mockAgentsApi.list.mockResolvedValue([
+        {
+          id: "agent-1",
+          name: "CEO",
+          status: "paused",
+          pauseReason: "import",
+          adapterType: "claude_local",
+          adapterConfig: {},
+          runtimeConfig: {},
+          permissions: {},
+        },
+      ]);
+
+      const { root } = renderDialog(container);
+      await waitForAssertion(() => {
+        expect(container.querySelector('[data-testid="new-issue-paused-assignee-note"]')).not.toBeNull();
+      });
+      expect(container.textContent).toContain("байгууллагын импортоос түр зогссон төлөвтэй ирсэн");
+      expect(container.textContent).toContain("Хэнд");
+
+      act(() => root.unmount());
+    } finally {
+      await i18n.changeLanguage("en");
+    }
   });
 
   it("restores the planning mode from dialog defaults", async () => {

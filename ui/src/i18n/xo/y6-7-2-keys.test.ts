@@ -54,6 +54,21 @@ const Y6_7_2_KEYS: string[] = [
   "The runtime request could not be resolved.",
   "Unnamed tool",
   "Thought for {{min}}m {{sec}}s",
+  // Task 6
+  "For (assignee)",
+  "in (project picker)",
+  "Failed to create task. Try again.",
+  "Search agents...",
+  "No agents found.",
+  "This task is not attached to a workspace.",
+  "Workspace job completed.",
+  "Workspace service stopped.",
+  "Workspace service restarted.",
+  "Workspace service started.",
+  "Failed to control workspace commands.",
+  // 7.1-ийн Minor: каталогт байгаа түлхүүрүүдийн хамгаалалт
+  "{{items}}, and more",
+  "Reusing {{name}} from {{source}}.",
 ];
 
 const enCatalog = en as Record<string, string>;
@@ -65,4 +80,11 @@ describe("Ү6 7.2 каталог", () => {
     expect(mnCatalog[key]).toBeDefined();
     expect(mnCatalog[key]).not.toBe(key);
   });
+});
+
+const ASSIGNING_KEY = Object.keys(en).find((k) => k.startsWith("Assigning implies executable intent"));
+
+it("7.1 Minor: Assigning түлхүүр каталогт орчуулагдсан", () => {
+  expect(ASSIGNING_KEY).toBeDefined();
+  expect((mn as Record<string, string>)[ASSIGNING_KEY!]).not.toBe(ASSIGNING_KEY);
 });

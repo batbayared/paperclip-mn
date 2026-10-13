@@ -11,6 +11,7 @@ import {
   xoInboxFilterLabel,
   xoIssueFilterLabel,
   xoLabel,
+  xoNewIssueInlineLabel,
   xoPermissionDecision,
   xoQuickFilterLabel,
   xoSidePanelTabLabel,
@@ -271,5 +272,18 @@ describe("xoSidePanelTabLabel", () => {
     expect(xoSidePanelTabLabel("Subtasks")).not.toBe("Subtasks");
     expect(xoSidePanelTabLabel("Artifacts")).not.toBe("Artifacts");
     expect(xoSidePanelTabLabel("My doc")).toBe("My doc");
+  });
+});
+
+describe("xoNewIssueInlineLabel (M-4)", () => {
+  it("en дээр хэвээр", () => {
+    expect(xoNewIssueInlineLabel("For")).toBe("For");
+    expect(xoNewIssueInlineLabel("in")).toBe("in");
+  });
+
+  it("mn дээр шинэ даалгаврын мөрийн шошго", async () => {
+    await i18n.changeLanguage("mn");
+    expect(xoNewIssueInlineLabel("For")).toBe("Хэнд");
+    expect(xoNewIssueInlineLabel("in")).toBe("төсөл");
   });
 });
