@@ -40,6 +40,11 @@ import {
   xoWeekdayName,
   xoRoutineDirtyFieldLabel,
   xoRoutineHistoryFieldLabel,
+  xoSkillSourceFilterLabel,
+  xoSkillDiscoverySortLabel,
+  xoSkillReservedRootLabel,
+  xoSkillPolicyDenialTitle,
+  xoSkillPolicyDenialRemediation,
 } from "./labels";
 
 afterEach(async () => {
@@ -522,5 +527,46 @@ describe("Ү6 7.8 helper-ууд (mn)", () => {
     }
     expect(xoRoutineHistoryFieldLabel("Catch-up")).toBe("Нөхөн ажиллуулалт");
     expect(xoRoutineHistoryFieldLabel("Unknown")).toBe("Unknown");
+  });
+});
+
+describe("Ү6 7.9 helper-ууд (en)", () => {
+  it("en дээр англи утгаа буцаана, мэдэгдэхгүйг дамжуулна", () => {
+    for (const v of ["All", "Organization", "Bundled", "Optional", "External", "Something else"]) {
+      expect(xoSkillSourceFilterLabel(v)).toBe(v);
+    }
+    for (const v of ["Most agents", "Most stars", "Most forks", "Recently updated", "Alphabetical", "Something else"]) {
+      expect(xoSkillDiscoverySortLabel(v)).toBe(v);
+    }
+    for (const v of ["My Skills", "Projects", "Bundled", "Organization", "Custom folder"]) {
+      expect(xoSkillReservedRootLabel(v)).toBe(v);
+    }
+    const titles: Record<string, string> = {
+      skill_authentication_required: "Sign in to manage skills.",
+      skill_company_boundary_denied: "This skill belongs to another organization.",
+      skill_workspace_boundary_denied: "This skill source is outside an allowed workspace.",
+      skill_source_validation_failed: "This skill source failed validation.",
+      skill_unsafe_content_blocked: "This skill contains unsafe content.",
+      skill_secret_handling_blocked: "This skill exposes a secret value.",
+      skill_actor_restricted: "This action isn't available for the current actor.",
+      unknown_code: "Fallback title.",
+    };
+    for (const [code, english] of Object.entries(titles)) {
+      expect(xoSkillPolicyDenialTitle(code, english)).toBe(english);
+    }
+    const remediations: Record<string, string> = {
+      skill_authentication_required: "Sign in and try again.",
+      skill_company_boundary_denied: "Open the skill from the organization that owns it.",
+      skill_workspace_boundary_denied:
+        "Import from a configured Paperclip workspace or the organization managed-skill directory.",
+      skill_source_validation_failed: "Fix the flagged source and retry.",
+      skill_unsafe_content_blocked: "Remove the fetch-and-execute or unsafe pattern before saving.",
+      skill_secret_handling_blocked: "Remove the secret value before saving.",
+      skill_actor_restricted: "Retry from an account with access to this action.",
+      unknown_code: "Fallback remediation.",
+    };
+    for (const [code, english] of Object.entries(remediations)) {
+      expect(xoSkillPolicyDenialRemediation(code, english)).toBe(english);
+    }
   });
 });

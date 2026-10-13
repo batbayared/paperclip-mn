@@ -640,3 +640,71 @@ export function xoRoutineHistoryFieldLabel(english: string): string {
     default: return english;
   }
 }
+
+/** CompanySkills SOURCE_FILTER_LABELS (Ү6 7.9). */
+export function xoSkillSourceFilterLabel(english: string): string {
+  if (!(i18n.resolvedLanguage ?? i18n.language ?? "").startsWith("mn")) return english;
+  switch (english) {
+    case "All": return tx("All");
+    case "Organization": return tx("Organization");
+    case "Bundled": return tx("Bundled");
+    case "Optional": return tx("Optional");
+    case "External": return tx("External");
+    default: return english;
+  }
+}
+
+/** CompanySkills DISCOVERY_SORT_LABELS (Ү6 7.9). */
+export function xoSkillDiscoverySortLabel(english: string): string {
+  if (!(i18n.resolvedLanguage ?? i18n.language ?? "").startsWith("mn")) return english;
+  switch (english) {
+    case "Most agents": return tx("Most agents");
+    case "Most stars": return tx("Most stars");
+    case "Most forks": return tx("Most forks");
+    case "Recently updated": return tx("Recently updated");
+    case "Alphabetical": return tx("Alphabetical");
+    default: return english;
+  }
+}
+
+/** skill-folder-tree reservedRootLabel / «Organization» угтвар — зөвхөн харагдах газарт; key-д англиар. */
+export function xoSkillReservedRootLabel(english: string): string {
+  if (!(i18n.resolvedLanguage ?? i18n.language ?? "").startsWith("mn")) return english;
+  switch (english) {
+    case "My Skills": return tx("My Skills");
+    case "Projects": return tx("Projects");
+    case "Bundled": return tx("Bundled");
+    case "Organization": return tx("Organization");
+    default: return english;
+  }
+}
+
+/** skill-policy-denial PLATFORM_TITLES — кодоор; мэдэгдэхгүй код эсвэл en дээр fallback. */
+export function xoSkillPolicyDenialTitle(code: string, fallback: string): string {
+  if (!(i18n.resolvedLanguage ?? i18n.language ?? "").startsWith("mn")) return fallback;
+  switch (code) {
+    case "skill_authentication_required": return tx("Sign in to manage skills.");
+    case "skill_company_boundary_denied": return tx("This skill belongs to another organization.");
+    case "skill_workspace_boundary_denied": return tx("This skill source is outside an allowed workspace.");
+    case "skill_source_validation_failed": return tx("This skill source failed validation.");
+    case "skill_unsafe_content_blocked": return tx("This skill contains unsafe content.");
+    case "skill_secret_handling_blocked": return tx("This skill exposes a secret value.");
+    case "skill_actor_restricted": return tx("This action isn't available for the current actor.");
+    default: return fallback;
+  }
+}
+
+/** skill-policy-denial PLATFORM_REMEDIATIONS — кодоор; серверийн remediation-д хэрэглэхгүй. */
+export function xoSkillPolicyDenialRemediation(code: string, fallback: string): string {
+  if (!(i18n.resolvedLanguage ?? i18n.language ?? "").startsWith("mn")) return fallback;
+  switch (code) {
+    case "skill_authentication_required": return tx("Sign in and try again.");
+    case "skill_company_boundary_denied": return tx("Open the skill from the organization that owns it.");
+    case "skill_workspace_boundary_denied": return tx("Import from a configured {{brand}} workspace or the organization managed-skill directory.");
+    case "skill_source_validation_failed": return tx("Fix the flagged source and retry.");
+    case "skill_unsafe_content_blocked": return tx("Remove the fetch-and-execute or unsafe pattern before saving.");
+    case "skill_secret_handling_blocked": return tx("Remove the secret value before saving.");
+    case "skill_actor_restricted": return tx("Retry from an account with access to this action.");
+    default: return fallback;
+  }
+}
