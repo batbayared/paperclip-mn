@@ -493,12 +493,43 @@ XO-ийн өмч: ui/src/xo/labels.ts (xoAttentionSourceLabel, xoSnoozePresetLab
 Нэр томьёо (7.6-аас нэгдсэн): proposal = санал, secret = нууц утга, folder = хавтас, unfiled = ангилаагүй, runtime config = ажиллах орчны тохиргоо. 7.5-ын Minor («удирдлага» / «засаглалын бодлого» зөрүү, «runtime тохиргоо») 372a9edb7-д каталогт засагдсан.
 
 Үлдэгдэл (Ү6 7.6):
-- Англиар үлдсэн (хүрээнээс гадуур): SkillFolderTree.tsx ба reservedRootLabel; ModeBadge.tsx («Local trusted» / «Authenticated …»); MyUserSecretsTab ба UserSecretDefinitionsTab дахь {definition.status} enum түүхий утгаараа.
-- Ү6 7.7-д шилжүүлсэн: issue-thread-interactions summary, interaction-resolution-error.
+- Англиар үлдсэн (хүрээнээс гадуур): SkillFolderTree.tsx ба reservedRootLabel (7.9-д); ModeBadge.tsx («Local trusted» / «Authenticated …») — хэрэгжсэн (Ү6 7.7); MyUserSecretsTab ба UserSecretDefinitionsTab дахь {definition.status} enum — хэрэгжсэн (Ү6 7.7, xoStatusLabel).
+- Ү6 7.7-д шилжүүлсэн: issue-thread-interactions summary, interaction-resolution-error — хэрэгжсэн (Ү6 7.7).
 - «by» одоо ерөнхий каталогийн түлхүүр («санал гаргасан:»); өөр газар дахин ашиглавал утга буруу гарна.
 - en түлхүүр «Could not approved / rejected / sent for revision» upstream-ийн дүрмийн алдааг хадгална; en гаралт байт ижил байхын тулд засаагүй.
 - AttentionQueueRow.tsx-ийн SNOOZE_PRESETS (L76-81) модулийн түвшинд tx() дууддаг. i18n синхрон эхэлдэг, locale солиход хуудас дахин ачаалагддаг тул хүлээн зөвшөөрсөн.
-- Browser шалгалт (3110, mn, 2026-10-13): нууц утгын 4 таб (Нууц утгууд / Миний нууц утгууд / Нийлүүлэгчийн сангууд / Саналууд), «Хавтсаар / Жагсаалтаар» товч, хоосон төлөвүүд Монгол. Инстанцын тохиргоо (байгууллагын тохиргоонд embedded) Монгол; «Paperclip Labs» нэр, dev тэмдэглэл, «Local trusted» (ModeBadge) шийдвэрийн дагуу англиар. /decisions дээр AttentionQueueRow-ийн эх сурвалжийн шошго («Шийдвэр хүссэн») ба snooze сонголт (Өнөөдөр / Энэ долоо хоногт / Хэзээ ч болно) Монгол. Хүрээнээс гадуур англиар үлдсэн (7.7-д): WhatNeedsMe шүүлтүүр («N decisions», All/Today/Yesterday…), DecisionTriageStrip («Pick date», «Snooze», «Queue», «Ask agent for recommendation»), lib/attention.ts («N questions — …»), Routines.tsx ба Skills хуудас («New folder» нь Routines.tsx:961-ээс). FolderControls-ын хавтасны rail ба compact interaction card-ыг өгөгдөлгүйгээс browser-т харуулж чадаагүй; unit тестээр баталгаажсан.
+- Browser шалгалт (3110, mn, 2026-10-13): нууц утгын 4 таб (Нууц утгууд / Миний нууц утгууд / Нийлүүлэгчийн сангууд / Саналууд), «Хавтсаар / Жагсаалтаар» товч, хоосон төлөвүүд Монгол. Инстанцын тохиргоо (байгууллагын тохиргоонд embedded) Монгол; «Paperclip Labs» нэр, dev тэмдэглэл, «Local trusted» (ModeBadge) шийдвэрийн дагуу англиар. /decisions дээр AttentionQueueRow-ийн эх сурвалжийн шошго («Шийдвэр хүссэн») ба snooze сонголт (Өнөөдөр / Энэ долоо хоногт / Хэзээ ч болно) Монгол. Хүрээнээс гадуур англиар үлдсэн (7.7-д): WhatNeedsMe шүүлтүүр («N decisions», All/Today/Yesterday…), DecisionTriageStrip («Pick date», «Snooze», «Queue», «Ask agent for recommendation»), lib/attention.ts («N questions — …») — хэрэгжсэн (Ү6 7.7); Routines.tsx ба Skills хуудас («New folder» нь Routines.tsx:961-ээс) — 7.8 / 7.9-д. FolderControls-ын хавтасны rail ба compact interaction card-ыг өгөгдөлгүйгээс browser-т харуулж чадаагүй; unit тестээр баталгаажсан.
+
+## Ү6 7.7-д хөндсөн upstream файлууд
+
+7.6-ын «Үлдэгдэл»-ийн шийдвэрийн хэсэг (/decisions), ModeBadge, нууц утгын status enum, interaction хураангуй ба resolution алдааг хаасан. tiers.ts-д 6 файл T1 болж нэмэгдсэн. Тэмдэглэгээ 7.5-ын хүснэгттэй ижил. BASE 9b7bb9c30. ED шийдвэр: Х1 7.7 = шийдвэрийн хэсэг ба жижиг үлдэгдэл, Routines 7.8-д, Skills 7.9-д; Х2 Routines/Skills-д зөвхөн Streamlined хувилбар; Х3 buildAnsweredQuestionsDeliveryText англиар.
+
+| Файл | Өөрчлөлт |
+|---|---|
+| ui/src/components/DecisionsToolbar.tsx | T1; тоо «{{count}} decision(s)» хоёр литерал tx; SEVERITY_LABELS, огноо/group/sort шошго render үед xoDecisionOptionLabel; эх сурвалж xoAttentionSourceLabel |
+| ui/src/components/DecisionDateChips.tsx | T1; огнооны chip шошго xoDecisionOptionLabel |
+| ui/src/components/DecisionQueueRail.tsx | T1 (эх код өөрчлөгдөөгүй, зөвхөн tiers.ts-д) |
+| ui/src/components/DecisionTriageStrip.tsx | T1; «Expires in {{mins}}m/h/d» гар tx; `Could not ${verb}` → дуудах газар бүрт бүтэн литерал; «Asked {{name}} for a recommendation»; SNOOZE_PRESETS xoSnoozePresetLabel; decide-by шошго xoDecisionOptionLabel; агент руу илгээх comment body англиар |
+| ui/src/pages/DecisionQueuePage.tsx | T1; «Auto-seeding is on / off» тусдаа литерал (manual 0); бусад текст T1-ээр |
+| ui/src/components/DecisionShelf.tsx | T1; curtain шошго `${xoLabel(label)} (${count})` |
+| ui/src/lib/attention.ts | гар tx (T1 биш): тоо (question/option/suggested task/item to verdict) ганц ба олон тооны литерал, «Blocked by …», төсвийн «{{percent}}% of budget used …»; модулийн тогтмолууд хөндөгдөөгүй |
+| ui/src/components/access/ModeBadge.tsx | «Local trusted», «Authenticated private / public» бүтэн литерал, бусад exposure «Authenticated {{exposure}}» |
+| ui/src/pages/secrets/MyUserSecretsTab.tsx | {definition.status} → xoStatusLabel |
+| ui/src/pages/secrets/UserSecretDefinitionsTab.tsx | {definition.status} → xoStatusLabel |
+| ui/src/lib/issue-thread-interactions.ts | interaction хураангуй (decided, verdict, task, confirmation, selection, connect, question) гар tx; buildAnsweredQuestionsDeliveryText хөндөгдөөгүй (Х3) |
+| ui/src/lib/interaction-resolution-error.ts | audience-denial, «no longer waiting», «{{reason}} Try again.» гар tx; серверийн мессеж тааруулах код хөндөгдөөгүй |
+
+XO-ийн өмч: ui/src/xo/labels.ts (xoDecisionOptionLabel шинэ; xoSnoozePresetLabel-д «Tomorrow»), scripts/xo-i18n/tiers.ts (6 файл T1), ui/src/i18n/xo/* (keys=3647, +126).
+
+Шинэ XO-ийн тестүүд: ui/src/i18n/xo/y6-7-7-keys.test.ts, scripts/xo-i18n/tiers-y6-7-7.test.ts, ui/src/xo/labels.test.ts (нэмэлт).
+
+Үлдэгдэл (Ү6 7.7):
+- Routines.tsx (Routines хуудас, «New folder» Routines.tsx:961) → Ү6 7.8.
+- Skills хуудас, SkillFolderTree.tsx, reservedRootLabel → Ү6 7.9.
+- *.production.tsx хувилбарууд англиар үлдэнэ; 7.8/7.9-д зөвхөн Streamlined хувилбарыг орчуулна (ED шийдвэр Х2).
+- buildAnsweredQuestionsDeliveryText англиар үлдэнэ: загварт очих текст (ED шийдвэр Х3).
+- DecisionTriageStrip-ээс агент руу чиглүүлэх comment body англиар үлдэнэ: агентад очих текст.
+- Browser шалгалт: хүлээгдэж байна (3110 restart ED-ийн зөвшөөрлөөр).
 
 ## Lockfile
 

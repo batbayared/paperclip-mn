@@ -1,5 +1,41 @@
 # XO ахицын бүртгэл
 
+## Ү6 7.7 — Шийдвэрийн хэсэг ба жижиг үлдэгдэл (2026-10-13)
+
+Зорилго: 7.6-ын «Үлдэгдэл»-ийн шийдвэрийн хэсэг (/decisions: toolbar, огнооны chip, queue rail, triage strip, queue хуудас, shelf), lib/attention.ts, ModeBadge, нууц утгын status enum, interaction хураангуй ба resolution алдааг монгол болгох. en гаралт 9b7bb9c30-тэй байт ижил.
+
+Төлөвлөгөө: docs/superpowers/plans/2026-10-13-xo-y6-7-7-decisions-small-leftovers.md. BASE 9b7bb9c30.
+
+ED шийдвэр: Х1 7.7 = шийдвэрийн хэсэг ба жижиг үлдэгдэл, Routines 7.8-д, Skills 7.9-д. Х2 Routines/Skills-д зөвхөн Streamlined хувилбар, *.production.tsx үлдэгдэлд. Х3 buildAnsweredQuestionsDeliveryText англиар (загварт очих текст).
+
+| Task | Commit |
+|---|---|
+| 1 labels.ts: xoDecisionOptionLabel, xoSnoozePresetLabel-д «Tomorrow» | ca0ca590c |
+| 3 DecisionTriageStrip.tsx: snooze, queue, toast, expiry | c93e67b1a |
+| 2 DecisionsToolbar.tsx, DecisionDateChips.tsx: тоо, шүүлтүүр, огнооны chip | ed2d35cf9 |
+| 4 DecisionQueuePage.tsx (auto-seeding), DecisionShelf.tsx (curtain шошго) | 9c3084a67 |
+| 5 lib/attention.ts: дэлгэрэнгүй мөрийн тоо, blocked, төсөв | 063c27b22 |
+| 6 ModeBadge.tsx, MyUserSecretsTab/UserSecretDefinitionsTab status, issue-thread-interactions.ts, interaction-resolution-error.ts | cd943ec41 |
+| 7 tiers.ts (6 файл T1), каталог (+126 түлхүүр), y6-7-7-keys тест, tiers-y6-7-7 тест, labels тест | 6ef3278e3 |
+| 8 SYNC.md ба бүртгэл | энэ commit |
+
+Түлхүүр: 3647 (7.6-ын төгсгөл 3521, 7.7-д +126).
+
+Төлөв: commit хийсэн, push хийгээгүй. Browser шалгалт хүлээгдэж байна (3110 restart ED-ийн зөвшөөрлөөр).
+
+### Шалгалтын үр дүн
+
+- Gates (2026-10-13): xo:i18n:check keys=3647 (+126), xo:i18n:test 81, xo:i18n:typecheck OK, xo:brand-scan 161 файл / 586 (baseline-аас илүүгүй), ui tsc цэвэр, vitest (VITE_XO_DEFAULT_LOCALE=en) 621 файл / 6544 тест passed.
+- Browser шалгалт: хүлээгдэж байна.
+
+### Хязгаарлалт
+
+- attention.ts-ийн модулийн тогтмолууд (SEVERITY_LABEL, DECIDE_BY_OPTIONS, ATTENTION_*_OPTIONS, DATE_BUCKET_LABELS, «No project») англиар үлдэж, render хийх газарт xoDecisionOptionLabel / xoLabel / xoAttentionSourceLabel-ээр орчуулагдана; label нь key ба харьцуулалтад ашиглагддаг.
+- DecisionTriageStrip-ээс агент руу чиглүүлэх comment body англиар (агентад очих текст).
+- buildAnsweredQuestionsDeliveryText англиар (Х3).
+- DecisionQueueRail.tsx зөвхөн tiers.ts-ээр T1-д орсон, эх код өөрчлөгдөөгүй.
+- Англиар үлдсэн (хүрээнээс гадуур): Routines (7.8), Skills, SkillFolderTree.tsx, reservedRootLabel (7.9), *.production.tsx хувилбарууд (Х2).
+
 ## Ү6 7.6 — нууц утгын дэд хуудас, хавтас, инстанцын тохиргоо (2026-10-13)
 
 Зорилго: 7.5-ын «Үлдэгдэл»-ийн pages/secrets/* дэд файлууд, хавтасны удирдлага ба Folders/Flat товч, compact interaction card, AttentionQueueRow, инстанцын ерөнхий тохиргоог монгол болгох. en гаралт abbe3f85f-тэй байт ижил.
