@@ -445,3 +445,59 @@ export function xoNavLabel(english: string): string {
     default: return english;
   }
 }
+
+export function xoAttentionSourceLabel(english: string): string {
+  if (!(i18n.resolvedLanguage ?? i18n.language ?? "").startsWith("mn")) return english;
+  switch (english) {
+    case "Approval": return tx("Approval");
+    case "Decision": return tx("Decision");
+    case "Decision requested": return tx("Decision requested");
+    case "Join request": return tx("Join request");
+    case "Recovery": return tx("Recovery");
+    case "Task": return tx("Task");
+    case "Blocked dependency": return tx("Blocked dependency");
+    case "Review": return tx("Review");
+    case "Failed run": return tx("Failed run");
+    case "Budget": return tx("Budget");
+    case "Agent error": return tx("Agent error");
+    default: return english;
+  }
+}
+
+export function xoSnoozePresetLabel(english: string): string {
+  if (!(i18n.resolvedLanguage ?? i18n.language ?? "").startsWith("mn")) return english;
+  switch (english) {
+    case "1 hour": return tx("1 hour");
+    case "4 hours": return tx("4 hours");
+    case "Tomorrow morning": return tx("Tomorrow morning");
+    case "Next week": return tx("Next week");
+    default: return english;
+  }
+}
+
+export function xoFolderItemLabel(english: string): string {
+  if (!(i18n.resolvedLanguage ?? i18n.language ?? "").startsWith("mn")) return english;
+  switch (english) {
+    case "routines": return tx("routines");
+    case "Routines": return tx("Routines");
+    case "skills": return tx("skills");
+    case "Skills": return tx("Skills");
+    default: return english;
+  }
+}
+
+/** TaskChatCompactInteractionCard KIND_COPY; давхардсан утгыг xoInteractionKindLabel руу дамжуулна. */
+export function xoCompactKindLabel(english: string): string {
+  if (!(i18n.resolvedLanguage ?? i18n.language ?? "").startsWith("mn")) return english;
+  switch (english) {
+    case "Questions": return tx("Questions");
+    case "Choose options": return tx("Choose options");
+    case "Review items": return tx("Review items");
+    case "Connect service": return tx("Connect service");
+    case "Tasks": return tx("Tasks");
+    case "Selection": return tx("Selection");
+    case "Review": return tx("Review");
+    case "Connection": return tx("Connection");
+    default: return xoInteractionKindLabel(english);
+  }
+}

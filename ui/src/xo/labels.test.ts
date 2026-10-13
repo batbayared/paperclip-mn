@@ -27,6 +27,10 @@ import {
   xoInteractionKindLabel,
   xoVerdictLabel,
   xoNavLabel,
+  xoAttentionSourceLabel,
+  xoSnoozePresetLabel,
+  xoFolderItemLabel,
+  xoCompactKindLabel,
 } from "./labels";
 
 afterEach(async () => {
@@ -365,5 +369,22 @@ describe("Ү6 7.5 helper-ууд (mn)", () => {
     expect(xoInteractionKindLabel("Suggested tasks")).toBe("Санал болгосон даалгаврууд");
     expect(xoStatusLabel("withdrawn", "Withdrawn")).toBe("Буцаан татсан");
     expect(xoStatusLabel("disabled", "Disabled")).toBe("Идэвхгүй");
+  });
+});
+
+describe("Ү6 7.6 helper-ууд (en)", () => {
+  it("en дээр англи утгаа буцаана, мэдэгдэхгүйг дамжуулна", () => {
+    for (const v of ["Approval", "Decision requested", "Blocked dependency", "Agent error", "some kind"]) {
+      expect(xoAttentionSourceLabel(v)).toBe(v);
+    }
+    for (const v of ["1 hour", "4 hours", "Tomorrow morning", "Next week", "Later"]) {
+      expect(xoSnoozePresetLabel(v)).toBe(v);
+    }
+    for (const v of ["routines", "Routines", "skills", "Skills", "widgets"]) {
+      expect(xoFolderItemLabel(v)).toBe(v);
+    }
+    for (const v of ["Suggested tasks", "Choose options", "Review items", "Connect service", "Selection", "Other"]) {
+      expect(xoCompactKindLabel(v)).toBe(v);
+    }
   });
 });
