@@ -22,6 +22,19 @@ const Y6_7_2_KEYS: string[] = [
   "Needs action",
   "Resolved",
   "Create Sub-task",
+  // Task 3
+  "Blocked · waiting on {{n}} active sub-tasks",
+  "Blocked · {{n}} blocker needs attention; {{covered}} covered by active work",
+  "Change status (current: {{label}})",
+  "Open {{identifier}}: {{title}}",
+  "{{label}} — open the source task to act.",
+  "Could not load all tasks",
+  "{{taskCount}} total",
+  "Task documents",
+  "Recent workspace files",
+  "Open a new tab",
+  "Revision {{n}}",
+  "Recent files are temporarily unavailable.",
 ];
 
 const enCatalog = en as Record<string, string>;

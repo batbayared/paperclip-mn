@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { Issue, IssueDocument } from "@paperclipai/shared";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { i18n } from "@/i18n";
 import {
   taskPanelDocumentTab,
   taskPanelPropertiesTab,
@@ -162,6 +163,16 @@ describe("TaskSidePanel", () => {
     await render(panel());
     expect(container.querySelector('[role="tab"][aria-selected="true"]')?.textContent).toContain("Properties");
     expect(container.textContent).toContain("Properties content");
+  });
+
+  it("mn дээр хадгалсан tab шошгыг орчуулна", async () => {
+    await i18n.changeLanguage("mn");
+    try {
+      await render(panel());
+      expect(container.querySelector('[role="tab"][aria-selected="true"]')?.textContent).toContain("Шинж чанарууд");
+    } finally {
+      await i18n.changeLanguage("en");
+    }
   });
 
   it("opens Artifacts on a new arrival, preserving manual selection until the next arrival", async () => {

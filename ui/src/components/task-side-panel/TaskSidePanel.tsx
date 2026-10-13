@@ -56,6 +56,7 @@ import {
 import { useIssueDocuments } from "@/hooks/useIssueDocuments";
 import type { IssueExternalObjectGroup } from "@/hooks/useIssueExternalObjects";
 import { useIssuePlanDocument } from "@/hooks/useIssuePlanDocument";
+import { tx } from "@/i18n/xo";
 import { documentDisplayTitle } from "@/lib/issue-artifacts";
 import { queryKeys } from "@/lib/queryKeys";
 import { useLocation, useNavigate } from "@/lib/router";
@@ -71,6 +72,7 @@ import {
   type TaskSidePanelTabPayload,
 } from "@/lib/task-side-panel-state";
 import { cn } from "@/lib/utils";
+import { xoSidePanelTabLabel } from "@/xo/labels";
 import { TaskDocumentPanel } from "./TaskDocumentPanel";
 import { TaskWorkspaceFilePanel } from "./TaskWorkspaceFilePanel";
 
@@ -241,7 +243,7 @@ export function TaskSidePanel({
     readTaskSidePanelState(accountScope, issue.companyId, issue.id, fileTabsEnabled),
   );
   const taskCount = tasksTab?.count ?? childIssues.length;
-  const taskLabel = tasksTab ? "Tasks" : "Subtasks";
+  const taskLabel = tasksTab ? tx("Tasks") : tx("Subtasks");
   const initialSubtasksAvailableRef = useRef(showSubtasksTab && (taskCount > 0 || tasksTab?.hasError === true));
   const subtasksDismissedRef = useRef(
     restoredRef.current?.userInteracted === true
@@ -472,8 +474,8 @@ export function TaskSidePanel({
     return {
       id: tab.id,
       type: tab.type,
-      label: tab.payload.kind === "subtasks" && tasksTab ? "Tasks" : document ? documentDisplayTitle(document) : tab.label,
-      ariaLabel: tab.payload.kind === "subtasks" ? taskLabel : tab.ariaLabel,
+      label: tab.payload.kind === "subtasks" && tasksTab ? "Tasks" : document ? documentDisplayTitle(document) : xoSidePanelTabLabel(tab.label),
+      ariaLabel: tab.payload.kind === "subtasks" ? taskLabel : tab.ariaLabel ? xoSidePanelTabLabel(tab.ariaLabel) : tab.ariaLabel,
       closable: true,
       contentMode: tab.contentMode,
       icon: tabIcon(tab),
@@ -493,7 +495,7 @@ export function TaskSidePanel({
       ...(planDocument ? [{
         id: "document:plan",
         label: documentDisplayTitle(planDocument),
-        description: `Revision ${planDocument.latestRevisionNumber ?? 1}`,
+        description: tx("Revision {{n}}", { n: planDocument.latestRevisionNumber ?? 1 }),
         icon: <Lightbulb />,
         alreadyOpen: controller.tabs.some((tab) => tab.id === "document:plan"),
       }] : []),
@@ -503,7 +505,7 @@ export function TaskSidePanel({
         .map((document) => ({
           id: `document:${document.key}`,
           label: documentDisplayTitle(document),
-          description: `Revision ${document.latestRevisionNumber ?? 1}`,
+          description: tx("Revision {{n}}", { n: document.latestRevisionNumber ?? 1 }),
           icon: <FileText />,
           alreadyOpen: controller.tabs.some((tab) => tab.id === `document:${document.key}`),
         })),
@@ -529,7 +531,7 @@ export function TaskSidePanel({
         label: "Recent workspace files",
         items: recentItems,
         loading: recentFilesQuery.isLoading,
-        error: recentFilesQuery.isError ? "Recent files are temporarily unavailable." : null,
+        error: recentFilesQuery.isError ? tx("Recent files are temporarily unavailable.") : null,
       });
     }
     return sections;

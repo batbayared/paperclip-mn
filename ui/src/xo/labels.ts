@@ -231,3 +231,15 @@ export function xoCreateIssueLabels(createIssueLabel?: string): { action: string
   if (createIssueLabel === "Sub-task") return { action: tx("Create Sub-task"), button: tx("New Sub-task") };
   return { action: `Create ${createIssueLabel}`, button: `New ${createIssueLabel}` };
 }
+
+// task-side-panel-state.ts-ийн tab шошго localStorage-д англиар хадгалагддаг тул render үед орчуулна.
+export function xoSidePanelTabLabel(english: string): string {
+  switch (english) {
+    case "Properties": return tx("Properties");
+    case "Subtasks": return tx("Subtasks");
+    case "Tasks": return tx("Tasks");
+    case "Artifacts": return tx("Artifacts");
+    case "Files": return tx("Files");
+    default: return english;
+  }
+}

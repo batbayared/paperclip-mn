@@ -13,6 +13,7 @@ import {
   xoLabel,
   xoPermissionDecision,
   xoQuickFilterLabel,
+  xoSidePanelTabLabel,
   xoStatusLabel,
   xoToolDetailLabel,
   xoWorkProductStatusLabel,
@@ -255,5 +256,20 @@ describe("xoCreateIssueLabels", () => {
       button: "Шинэ дэд даалгавар",
     });
     expect(xoCreateIssueLabels().button).not.toBe("New Task");
+  });
+});
+
+describe("xoSidePanelTabLabel", () => {
+  it("en дээр хэвээр", () => {
+    expect(xoSidePanelTabLabel("Properties")).toBe("Properties");
+    expect(xoSidePanelTabLabel("My doc")).toBe("My doc");
+  });
+
+  it("mn дээр хадгалсан tab шошгыг орчуулна", async () => {
+    await i18n.changeLanguage("mn");
+    expect(xoSidePanelTabLabel("Properties")).toBe("Шинж чанарууд");
+    expect(xoSidePanelTabLabel("Subtasks")).not.toBe("Subtasks");
+    expect(xoSidePanelTabLabel("Artifacts")).not.toBe("Artifacts");
+    expect(xoSidePanelTabLabel("My doc")).toBe("My doc");
   });
 });

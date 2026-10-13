@@ -4,6 +4,7 @@ import { cn } from "../lib/utils";
 import { StatusGlyph, type StatusGlyphSize } from "./StatusGlyph";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
+import { tx } from "@/i18n/xo";
 import { xoStatusLabel } from "@/xo/labels";
 
 const allStatuses = ["backlog", "todo", "in_progress", "in_review", "done", "cancelled", "blocked"];
@@ -23,45 +24,50 @@ interface StatusIconProps {
 }
 
 function blockedAttentionLabel(blockerAttention: IssueBlockerAttention | null | undefined) {
-  if (!blockerAttention || blockerAttention.state === "none") return "Blocked";
+  if (!blockerAttention || blockerAttention.state === "none") return xoStatusLabel("blocked", "Blocked");
 
   if (blockerAttention.reason === "active_child") {
-    const count = blockerAttention.coveredBlockerCount;
-    if (count === 1 && blockerAttention.sampleBlockerIdentifier) {
-      return `Blocked · waiting on active sub-task ${blockerAttention.sampleBlockerIdentifier}`;
+    const n = blockerAttention.coveredBlockerCount;
+    if (n === 1 && blockerAttention.sampleBlockerIdentifier) {
+      return tx("Blocked · waiting on active sub-task {{identifier}}", { identifier: blockerAttention.sampleBlockerIdentifier });
     }
-    if (count === 1) return "Blocked · waiting on 1 active sub-task";
-    return `Blocked · waiting on ${count} active sub-tasks`;
+    return n === 1
+      ? tx("Blocked · waiting on {{n}} active sub-task", { n })
+      : tx("Blocked · waiting on {{n}} active sub-tasks", { n });
   }
 
   if (blockerAttention.reason === "active_dependency") {
-    const count = blockerAttention.coveredBlockerCount;
-    if (count === 1 && blockerAttention.sampleBlockerIdentifier) {
-      return `Blocked · covered by active dependency ${blockerAttention.sampleBlockerIdentifier}`;
+    const n = blockerAttention.coveredBlockerCount;
+    if (n === 1 && blockerAttention.sampleBlockerIdentifier) {
+      return tx("Blocked · covered by active dependency {{identifier}}", { identifier: blockerAttention.sampleBlockerIdentifier });
     }
-    if (count === 1) return "Blocked · covered by 1 active dependency";
-    return `Blocked · covered by ${count} active dependencies`;
+    return n === 1
+      ? tx("Blocked · covered by {{n}} active dependency", { n })
+      : tx("Blocked · covered by {{n}} active dependencies", { n });
   }
 
   if (blockerAttention.reason === "stalled_review") {
-    const count = blockerAttention.stalledBlockerCount;
+    const n = blockerAttention.stalledBlockerCount;
     const leaf = blockerAttention.sampleStalledBlockerIdentifier ?? blockerAttention.sampleBlockerIdentifier;
-    if (count === 1 && leaf) return `Blocked · review stalled on ${leaf}`;
-    if (count === 1) return "Blocked · review stalled with no clear next step";
-    return `Blocked · ${count} reviews stalled with no clear next step`;
+    if (n === 1 && leaf) return tx("Blocked · review stalled on {{identifier}}", { identifier: leaf });
+    if (n === 1) return tx("Blocked · review stalled with no clear next step");
+    return tx("Blocked · {{n}} reviews stalled with no clear next step", { n });
   }
 
   if (blockerAttention.reason === "attention_required") {
-    const count = blockerAttention.attentionBlockerCount || blockerAttention.unresolvedBlockerCount;
-    const attentionCopy = `${count} ${count === 1 ? "blocker needs" : "blockers need"} attention`;
-    const coveredCount = blockerAttention.coveredBlockerCount;
-    if (coveredCount > 0) {
-      return `Blocked · ${attentionCopy}; ${coveredCount} covered by active work`;
+    const n = blockerAttention.attentionBlockerCount || blockerAttention.unresolvedBlockerCount;
+    const covered = blockerAttention.coveredBlockerCount;
+    if (covered > 0) {
+      return n === 1
+        ? tx("Blocked · {{n}} blocker needs attention; {{covered}} covered by active work", { n, covered })
+        : tx("Blocked · {{n}} blockers need attention; {{covered}} covered by active work", { n, covered });
     }
-    return `Blocked · ${attentionCopy}`;
+    return n === 1
+      ? tx("Blocked · {{n}} blocker needs attention", { n })
+      : tx("Blocked · {{n}} blockers need attention", { n });
   }
 
-  return "Blocked";
+  return xoStatusLabel("blocked", "Blocked");
 }
 
 /**
@@ -105,7 +111,7 @@ export function StatusIcon({ status, blockerAttention, onChange, className, show
   const trigger = showLabel ? (
     <button
       type="button"
-      aria-label={`Change status (current: ${ariaLabel})`}
+      aria-label={tx("Change status (current: {{label}})", { label: ariaLabel })}
       className="inline-flex min-h-5 items-center gap-1.5 cursor-pointer hover:bg-accent/50 rounded px-1 -mx-1 py-0.5 transition-colors"
     >
       {glyph}
@@ -115,7 +121,7 @@ export function StatusIcon({ status, blockerAttention, onChange, className, show
     <button
       type="button"
       data-slot="icon-button"
-      aria-label={`Change status (current: ${ariaLabel})`}
+      aria-label={tx("Change status (current: {{label}})", { label: ariaLabel })}
       className="inline-flex cursor-pointer items-center justify-center rounded-sm focus-visible:outline-none focus-visible:ring-(length:--rad-3) focus-visible:ring-ring"
     >
       {glyph}

@@ -130,6 +130,9 @@ export const XO_TRANSFORM_FILES: readonly string[] = [
   "ui/src/components/TaskChatThread.tsx",
   "ui/src/components/CommentThread.tsx",
   "ui/src/components/IssueChatThread.tsx",
+  // Ү6 7.2 үлдэгдэл
+  "ui/src/components/IssueRow.tsx",
+  "ui/src/components/task-side-panel/TaskSidePanel.tsx",
   // Хуудсууд
   "ui/src/pages/AgentDetail.tsx",
   "ui/src/pages/AgentDetail.production.tsx",
