@@ -44,6 +44,9 @@ import { ProposalJustification } from "../pages/secrets/proposal-review";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { AppLogo } from "@/pages/apps/AppLogo";
 import { ConnectionIntentInteractionBody } from "@/features/connections/ConnectionIntentInteractionBody";
+import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
+import { xoInteractionKindLabel, xoStatusLabel, xoVerdictLabel } from "@/xo/labels";
 
 const OTHER_ANSWER_ID = "__paperclip_other__";
 
@@ -139,9 +142,9 @@ function resolveActorLabel(args: {
     return agentMap?.get(agentId)?.name ?? agentId.slice(0, 8);
   }
   if (userId) {
-    return formatAssigneeUserLabel(userId, currentUserId, userLabelMap) ?? "Board";
+    return formatAssigneeUserLabel(userId, currentUserId, userLabelMap) ?? tx("Board");
   }
-  return "Unknown";
+  return tx("Unknown");
 }
 
 /**
@@ -868,8 +871,12 @@ function SuggestTasksCard({
           </div>
           <p className="mt-1 leading-6">
             {skippedCount > 0
-              ? `Created ${createdCount} draft ${createdCount === 1 ? "issue" : "issues"} and skipped ${skippedCount} during review.`
-              : `Created all ${createdCount} draft ${createdCount === 1 ? "issue" : "issues"}.`}
+              ? createdCount === 1
+                ? tx("Created 1 draft issue and skipped {{skippedCount}} during review.", { skippedCount })
+                : tx("Created {{created}} draft issues and skipped {{skippedCount}} during review.", { created: createdCount, skippedCount })
+              : createdCount === 1
+                ? tx("Created all 1 draft issue.")
+                : tx("Created all {{created}} draft issues.", { created: createdCount })}
           </p>
         </div>
       ) : null}
@@ -894,12 +901,16 @@ function SuggestTasksCard({
             <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
               <span>
                 {selectedCount === totalTasks
-                  ? `All ${totalTasks} draft ${totalTasks === 1 ? "issue" : "issues"} selected`
-                  : `${selectedCount} of ${totalTasks} draft ${totalTasks === 1 ? "issue" : "issues"} selected`}
+                  ? totalTasks === 1
+                    ? tx("All 1 draft issue selected")
+                    : tx("All {{total}} draft issues selected", { total: totalTasks })
+                  : totalTasks === 1
+                    ? tx("{{selectedCount}} of 1 draft issue selected", { selectedCount })
+                    : tx("{{selectedCount}} of {{total}} draft issues selected", { selectedCount, total: totalTasks })}
               </span>
               {selectedCount < totalTasks ? (
                 <span>
-                  {totalTasks - selectedCount} will be skipped if you accept this interaction.
+                  {tx("{{skipped}} will be skipped if you accept this interaction.", { skipped: totalTasks - selectedCount })}
                 </span>
               ) : null}
             </div>
@@ -1224,7 +1235,7 @@ function AskUserQuestionsCard({
                 </div>
                 <TaskField
                   label={question.selectionMode === "single" ? "Pick" : "Pick many"}
-                  value={question.required ? "Required" : "Optional"}
+                  value={question.required ? tx("Required") : tx("Optional")}
                   tone="subtle"
                 />
               </div>
@@ -1646,16 +1657,16 @@ function ToolActionResolution({
     try { formattedOutput = JSON.stringify(JSON.parse(output), null, 2); } catch { /* Plain-text results remain readable. */ }
   }
   const labels = {
-    pending: "Waiting for approval",
-    running: "Approved · Running…",
-    executed: "Succeeded",
-    failed: "Execution failed",
-    declined: "Declined",
-    expired: "Expired",
-    cancelled: "Cancelled",
+    pending: tx("Waiting for approval"),
+    running: tx("Approved · Running…"),
+    executed: tx("Succeeded"),
+    failed: tx("Execution failed"),
+    declined: tx("Declined"),
+    expired: tx("Expired"),
+    cancelled: tx("Cancelled"),
   };
   const Icon = state === "running" ? Loader2 : state === "executed" ? CheckCircle2 : state === "failed" ? AlertTriangle : state === "expired" ? Clock : MinusCircle;
-  const detail = state === "failed" ? result?.errorMessage?.trim() || "The action could not complete."
+  const detail = state === "failed" ? result?.errorMessage?.trim() || tx("The action could not complete.")
     : state === "declined" ? interaction.result?.reason?.trim()
     : null;
   const status = <>
@@ -1859,7 +1870,7 @@ function SecretProposalResolution({
   resolvedByLabel: string | null;
 }) {
   const result = interaction.result?.secretProposal ?? null;
-  const who = resolvedByLabel ?? "the board";
+  const who = resolvedByLabel ?? tx("the board");
   const when = interaction.resolvedAt
     ? formatDateTime(interaction.resolvedAt)
     : result?.updatedAt
@@ -2018,13 +2029,13 @@ function RequestSecretProposalCard({
       {isPending ? (
         <ConfirmationActionRow
           resetKey={`${interaction.id}:${interaction.status}`}
-          approveLabel={interaction.payload.acceptLabel ?? "Approve & bind"}
-          reviseLabel="Add reason…"
+          approveLabel={interaction.payload.acceptLabel ?? tx("Approve & bind")}
+          reviseLabel={tx("Add reason…")}
           rejectLabel={interaction.payload.rejectLabel ?? "Reject"}
           approveVariant="cta"
           allowRevise={interaction.payload.allowDeclineReason !== false}
           rejectRequiresReason={interaction.payload.rejectRequiresReason === true}
-          reasonPlaceholder={interaction.payload.declineReasonPlaceholder ?? "Optional: explain why this binding should not be created."}
+          reasonPlaceholder={interaction.payload.declineReasonPlaceholder ?? tx("Optional: explain why this binding should not be created.")}
           working={working}
           actionError={actionError}
           canApprove={Boolean(onAcceptInteraction)}
@@ -2160,7 +2171,7 @@ function ConfirmationActionRow({
               Approving…
             </>
           ) : (
-            approveLabel
+            xoVerdictLabel(approveLabel)
           )}
         </Button>
         {allowRevise ? (
@@ -2174,7 +2185,7 @@ function ConfirmationActionRow({
               setRevising((current) => !current);
             }}
           >
-            {reviseLabel}
+            {xoVerdictLabel(reviseLabel)}
           </Button>
         ) : null}
         {!rejectRequiresReason ? (
@@ -2191,7 +2202,7 @@ function ConfirmationActionRow({
                 Rejecting…
               </>
             ) : (
-              rejectLabel
+              xoVerdictLabel(rejectLabel)
             )}
           </Button>
         ) : null}
@@ -2378,14 +2389,16 @@ function RequestConnectionAuthorizationCard({
   // person. Shown to a teammate it names the wrong account, so a reader who is
   // not the addressee gets the same fact stated about them. Caught by rendering
   // the card, not by reading it.
-  const agentLabel = requestingAgentLabel ?? "An agent";
+  const agentLabel = requestingAgentLabel ?? tx("An agent");
   const lead = isAddressee
     ? interaction.summary?.trim()
-      || `${agentLabel} needs your ${providerName} identity for work running as you.`
-    : `${agentLabel} ${state === "connected" ? "needed" : "needs"} ${addresseeLabel}'s ${providerName} identity for work running as them.`;
+      || tx("{{agent}} needs your {{providerName}} identity for work running as you.", { agent: agentLabel, providerName })
+    : state === "connected"
+      ? tx("{{agent}} needed {{addressee}}'s {{providerName}} identity for work running as them.", { agent: agentLabel, addressee: addresseeLabel, providerName })
+      : tx("{{agent}} needs {{addressee}}'s {{providerName}} identity for work running as them.", { agent: agentLabel, addressee: addresseeLabel, providerName });
   // Only the actionable state needs the consent boundary spelled out; the other
   // states carry it in their own status line.
-  const consentSentence = state === "actionable" ? "No one else can complete this step." : null;
+  const consentSentence = state === "actionable" ? tx("No one else can complete this step.") : null;
 
   return (
     <div className="space-y-4">
@@ -2432,8 +2445,11 @@ function RequestConnectionAuthorizationCard({
             <ConnectionAuthorizationStatusLine
               Icon={TriangleAlert}
               testId="connection-authorization-no-target"
-              headline="This authorization link is unavailable"
-              detail={`Ask ${requestingAgentLabel ?? "the agent"} to send a fresh ${providerName} authorization link.`}
+              headline={tx("This authorization link is unavailable")}
+              detail={tx("Ask {{agent}} to send a fresh {{providerName}} authorization link.", {
+                agent: requestingAgentLabel ?? tx("the agent"),
+                providerName,
+              })}
             />
           )}
           <InteractionActionError message={actionError} />
@@ -2442,7 +2458,7 @@ function RequestConnectionAuthorizationCard({
         <ConnectionAuthorizationStatusLine
           Icon={Clock}
           testId="connection-authorization-waiting"
-          headline={`Waiting for ${addresseeLabel}`}
+          headline={tx("Waiting for {{addresseeLabel}}", { addresseeLabel })}
           detail={`Only ${addresseeLabel} can connect their own ${providerName} account.`}
         />
       ) : state === "connected" ? (
@@ -2452,13 +2468,14 @@ function RequestConnectionAuthorizationCard({
           headline={`${providerName} connected`}
           detail={
             <>
-              Connected by{" "}
-              <span className="font-medium text-foreground">
-                {/* "You" is display-cased for a badge; this is mid-sentence. */}
-                {(resolvedByLabel ?? addresseeLabel) === "You" ? "you" : resolvedByLabel ?? addresseeLabel}
-              </span>
+              {/* "You" is display-cased for a badge; this is mid-sentence. */}
+              <XoTrans
+                i18nKey="Connected by <b>{{who}}</b>"
+                values={{ who: (resolvedByLabel ?? addresseeLabel) === "You" ? tx("you") : resolvedByLabel ?? addresseeLabel }}
+                components={{ b: <span className="font-medium text-foreground" /> }}
+              />
               {resolvedByAgent ? <ResolvedByAgentChip /> : null}
-              {interaction.resolvedAt ? ` on ${formatDateTime(interaction.resolvedAt)}` : ""}
+              {interaction.resolvedAt ? ` ${tx("on {{date}}", { date: formatDateTime(interaction.resolvedAt) })}` : ""}
             </>
           }
         />
@@ -2469,10 +2486,15 @@ function RequestConnectionAuthorizationCard({
         <ConnectionAuthorizationStatusLine
           Icon={state === "declined" ? MinusCircle : CircleDashed}
           testId={state === "declined" ? "connection-authorization-declined" : "connection-authorization-expired"}
-          headline={state === "declined" ? `${providerName} was not connected` : "This authorization request expired"}
+          headline={state === "declined"
+            ? tx("{{providerName}} was not connected", { providerName })
+            : tx("This authorization request expired")}
           detail={
             declineReason
-              ?? `${requestingAgentLabel ?? "The agent"} can ask again with a new ${providerName} authorization link.`
+              ?? tx("{{agent}} can ask again with a new {{providerName}} authorization link.", {
+                agent: requestingAgentLabel ?? tx("The agent"),
+                providerName,
+              })
           }
         />
       )}
@@ -2542,8 +2564,8 @@ function RequestConfirmationCard({
   const reasonPlaceholder =
     interaction.payload.declineReasonPlaceholder
     ?? (interaction.payload.acceptLabel === "Approve plan"
-      ? "Optional: what would you like revised?"
-      : "Optional: tell the agent what you'd change.");
+      ? tx("Optional: what would you like revised?")
+      : tx("Optional: tell the agent what you'd change."));
 
   useEffect(() => {
     setActionError(null);
@@ -2567,7 +2589,7 @@ function RequestConfirmationCard({
       }
       if (uploaded.length > 0) setShots((current) => [...current, ...uploaded]);
     } catch {
-      setUploadError("Couldn't upload that image. Try again.");
+      setUploadError(tx("Couldn't upload that image. Try again."));
     } finally {
       setUploading(false);
     }
@@ -2747,7 +2769,9 @@ function RequestCheckboxConfirmationResolution({
           <span className="font-medium">
             {selectedCount === 0
               ? "Confirmed with no options selected"
-              : `Confirmed ${selectedCount} of ${totalOptions} ${totalOptions === 1 ? "option" : "options"}`}
+              : totalOptions === 1
+                ? tx("Confirmed {{selectedCount}} of 1 option", { selectedCount })
+                : tx("Confirmed {{selectedCount}} of {{total}} options", { selectedCount, total: totalOptions })}
           </span>
           <RequestConfirmationTargetChip interaction={interaction} target={target} />
         </div>
@@ -2890,7 +2914,7 @@ function RequestCheckboxConfirmationCard({
   const rejectRequiresReason = interaction.payload.rejectRequiresReason === true;
   const allowRevise = interaction.payload.allowDeclineReason !== false;
   const reasonPlaceholder =
-    interaction.payload.declineReasonPlaceholder ?? "Optional: tell the agent what you'd change.";
+    interaction.payload.declineReasonPlaceholder ?? tx("Optional: tell the agent what you'd change.");
 
   const selectedCount = selectedOptionIds.size;
   const totalOptions = options.length;
@@ -2901,12 +2925,12 @@ function RequestCheckboxConfirmationCard({
 
   const validationMessage = belowMin
     ? minSelected === 1
-      ? "Select at least 1 option."
-      : `Select at least ${minSelected} options.`
+      ? tx("Select at least 1 option.")
+      : tx("Select at least {{min}} options.", { min: minSelected })
     : aboveMax && maxSelected != null
       ? maxSelected === 1
-        ? "Select at most 1 option."
-        : `Select at most ${maxSelected} options.`
+        ? tx("Select at most 1 option.")
+        : tx("Select at most {{max}} options.", { max: maxSelected })
       : null;
 
   function toggleOption(optionId: string, checked: boolean) {
@@ -2966,12 +2990,16 @@ function RequestCheckboxConfirmationCard({
   }
 
   const selectionSummary = totalOptions > 0 && selectedCount === totalOptions
-    ? `All ${totalOptions} options selected`
-    : `${selectedCount} of ${totalOptions} ${totalOptions === 1 ? "option" : "options"} selected`;
+    ? tx("All {{total}} options selected", { total: totalOptions })
+    : totalOptions === 1
+      ? tx("{{selected}} of 1 option selected", { selected: selectedCount })
+      : tx("{{selected}} of {{total}} options selected", { selected: selectedCount, total: totalOptions });
   const boundsHint = maxSelected != null
-    ? `Pick ${minSelected === maxSelected ? `exactly ${maxSelected}` : `${minSelected}-${maxSelected}`}.`
+    ? minSelected === maxSelected
+      ? tx("Pick exactly {{max}}.", { max: maxSelected })
+      : tx("Pick {{min}}-{{max}}.", { min: minSelected, max: maxSelected })
     : minSelected > 0
-      ? `Pick at least ${minSelected}.`
+      ? tx("Pick at least {{min}}.", { min: minSelected })
       : null;
 
   return (
@@ -3100,7 +3128,7 @@ function VerdictConsequenceChip({ verdict }: { verdict: RequestItemVerdictValue 
       )}
     >
       <Icon className="h-3.5 w-3.5" aria-hidden />
-      {VERDICT_RESOLVED_LABEL[verdict]}
+      {xoVerdictLabel(VERDICT_RESOLVED_LABEL[verdict])}
     </span>
   );
 }
@@ -3166,7 +3194,7 @@ function ItemVerdictSegmentedControl({
             variant={variant}
             disabled={disabled}
             aria-pressed={active}
-            aria-label={`${VERDICT_LABEL[verdict]} this item`}
+            aria-label={tx("{{verdict}} this item", { verdict: xoVerdictLabel(VERDICT_LABEL[verdict]) })}
             className="min-h-11 min-w-24"
             onClick={() => onSelect(verdict)}
             data-verdict={verdict}
@@ -3174,7 +3202,7 @@ function ItemVerdictSegmentedControl({
             data-active={active}
           >
             <Icon className="h-4 w-4" aria-hidden />
-            {VERDICT_LABEL[verdict]}
+            {xoVerdictLabel(VERDICT_LABEL[verdict])}
           </Button>
         );
       })}
@@ -3210,7 +3238,7 @@ function RequestItemVerdictsCard({
     [payload.requireReasonOn],
   );
   const allowBulkApprove = payload.allowBulkApprove !== false && enabledVerdicts.includes("approve");
-  const reasonLabel = payload.reasonLabel ?? "Reason";
+  const reasonLabel = payload.reasonLabel ?? tx("Reason");
 
   const resolvedById = useMemo(
     () => new Map<string, RequestItemVerdictsResultItem>((interaction.result?.items ?? []).map((item) => [item.id, item])),
@@ -3319,8 +3347,10 @@ function RequestItemVerdictsCard({
   }
 
   const applyLabel = draftCount === 0
-    ? "Apply 0 decisions"
-    : `Apply ${draftCount} decision${draftCount === 1 ? "" : "s"}`;
+    ? tx("Apply 0 decisions")
+    : draftCount === 1
+      ? tx("Apply 1 decision")
+      : tx("Apply {{n}} decisions", { n: draftCount });
 
   return (
     <div className="space-y-4">
@@ -3353,8 +3383,9 @@ function RequestItemVerdictsCard({
           </div>
           {progress.decided > 0 ? (
             <p className="mt-1 text-xs leading-5">
-              {progress.decided === 1 ? "1 item was" : `${progress.decided} items were`} already applied and cannot be
-              reverted. Remaining items were cancelled.
+              {progress.decided === 1
+                ? tx("1 item was already applied and cannot be reverted. Remaining items were cancelled.")
+                : tx("{{decided}} items were already applied and cannot be reverted. Remaining items were cancelled.", { decided: progress.decided })}
             </p>
           ) : null}
         </div>
@@ -3444,7 +3475,13 @@ function RequestItemVerdictsCard({
                     )}
                   />
                   {attempted && invalidDraftIds.has(item.id) ? (
-                    <p className="text-xs text-destructive">A reason is required to {VERDICT_LABEL[draft.verdict].toLowerCase()} this item.</p>
+                    <p className="text-xs text-destructive">
+                      {draft.verdict === "approve"
+                        ? tx("A reason is required to approve this item.")
+                        : draft.verdict === "reject"
+                          ? tx("A reason is required to reject this item.")
+                          : tx("A reason is required to defer this item.")}
+                    </p>
                   ) : null}
                 </div>
               ) : null}
@@ -3458,8 +3495,12 @@ function RequestItemVerdictsCard({
         <div className="flex flex-wrap items-center gap-2 rounded-sm border border-emerald-500/50 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-900 dark:text-emerald-100">
           <CheckCircle2 className="h-4 w-4" aria-hidden />
           <span className="font-medium">
-            {progress.decided} decided · {progress.approved} approved · {progress.rejected} rejected
-            {progress.deferred > 0 ? ` · ${progress.deferred} deferred` : ""}
+            {tx("{{decided}} decided · {{approved}} approved · {{rejected}} rejected", {
+              decided: progress.decided,
+              approved: progress.approved,
+              rejected: progress.rejected,
+            })}
+            {progress.deferred > 0 ? ` · ${tx("{{deferred}} deferred", { deferred: progress.deferred })}` : ""}
           </span>
         </div>
       ) : null}
@@ -3469,7 +3510,9 @@ function RequestItemVerdictsCard({
         <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border/60 pt-3">
           <div className="text-xs text-muted-foreground">
             {draftCount > 0
-              ? `${draftCount} draft verdict${draftCount === 1 ? "" : "s"} ready to apply`
+              ? draftCount === 1
+                ? tx("1 draft verdict ready to apply")
+                : tx("{{drafts}} draft verdicts ready to apply", { drafts: draftCount })
               : "Mark verdicts, then apply them in one pass."}
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -3623,7 +3666,7 @@ export function IssueThreadInteractionCard({
   const connectionAuthorizationStyles = connectionAuthorization && connectionAuthorizationState
     ? connectionAuthorizationStatusClasses(connectionAuthorizationState, {
         providerName: connectionAuthorization.providerName,
-        addresseeLabel: addresseeLabel ?? "the addressed person",
+        addresseeLabel: addresseeLabel ?? tx("the addressed person"),
       })
     : null;
   const activeStyles =
@@ -3691,12 +3734,12 @@ export function IssueThreadInteractionCard({
   }
   const statusText =
     adminOutcome === "withdrawn"
-      ? "Withdrawn"
+      ? tx("Withdrawn")
       : adminOutcome === "issue_closed"
-        ? "Expired · issue closed"
+        ? tx("Expired · issue closed")
         : activeStyles
           ? activeStyles.label
-          : statusLabel(interaction.status);
+          : xoStatusLabel(interaction.status, statusLabel(interaction.status));
 
   return (
     // Every nested subcard resolves the same interaction, so they all explain a
@@ -3727,7 +3770,7 @@ export function IssueThreadInteractionCard({
                   <span>{statusText}</span>
                 ) : (
                   <>
-                    {isPlan ? "Plan" : interactionKindLabel(interaction.kind)}
+                    {xoInteractionKindLabel(isPlan ? "Plan" : interactionKindLabel(interaction.kind))}
                     <span className="text-current/60">/</span>
                     {statusText}
                   </>
@@ -3837,7 +3880,7 @@ export function IssueThreadInteractionCard({
               state={connectionAuthorizationState}
               isAddressee={isConnectionAddressee}
               providerName={connectionAuthorization.providerName}
-              addresseeLabel={addresseeLabel ?? "the addressed person"}
+              addresseeLabel={addresseeLabel ?? tx("the addressed person")}
               requestingAgentLabel={connectionAuthorization.requestingAgentName ?? null}
               resolvedByLabel={resolvedByLabel}
               resolvedByAgent={resolvedByAgent}
@@ -3855,7 +3898,7 @@ export function IssueThreadInteractionCard({
             <ConnectionIntentInteractionBody
               interaction={interaction}
               currentUserId={currentUserId}
-              addresseeLabel={addresseeLabel ?? "the addressed person"}
+              addresseeLabel={addresseeLabel ?? tx("the addressed person")}
             />
           ) : interaction.kind === "request_item_verdicts" ? (
             <RequestItemVerdictsCard
@@ -3882,10 +3925,13 @@ export function IssueThreadInteractionCard({
             data-testid="interaction-withdrawn-footer"
           >
             <div>
-              Withdrawn by{" "}
-              <span className="font-medium text-foreground">{resolvedByLabel ?? "an agent"}</span>
+              <XoTrans
+                i18nKey="Withdrawn by <b>{{who}}</b>"
+                values={{ who: resolvedByLabel ?? tx("an agent") }}
+                components={{ b: <span className="font-medium text-foreground" /> }}
+              />
               {resolvedByAgent ? <ResolvedByAgentChip /> : null}
-              {interaction.resolvedAt ? ` on ${formatShortDate(interaction.resolvedAt)}` : ""}
+              {interaction.resolvedAt ? ` ${tx("on {{date}}", { date: formatShortDate(interaction.resolvedAt) })}` : ""}
             </div>
             {adminReason ? (
               <div className="mt-1 italic text-muted-foreground/90">"{adminReason}"</div>
@@ -3908,9 +3954,13 @@ export function IssueThreadInteractionCard({
             className="mt-4 flex flex-wrap items-center gap-x-1 gap-y-0.5 border-t border-border/60 pt-3 text-xs text-muted-foreground"
             data-testid="interaction-resolved-footer"
           >
-            Resolved by <span className="font-medium text-foreground">{resolvedByLabel}</span>
+            <XoTrans
+              i18nKey="Resolved by <b>{{who}}</b>"
+              values={{ who: resolvedByLabel }}
+              components={{ b: <span className="font-medium text-foreground" /> }}
+            />
             {resolvedByAgent ? <ResolvedByAgentChip /> : null}
-            {interaction.resolvedAt ? ` on ${formatShortDate(interaction.resolvedAt)}` : ""}
+            {interaction.resolvedAt ? ` ${tx("on {{date}}", { date: formatShortDate(interaction.resolvedAt) })}` : ""}
           </div>
         ) : null}
       </div>
