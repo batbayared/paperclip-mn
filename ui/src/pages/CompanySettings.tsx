@@ -12,6 +12,7 @@ import { assetsApi } from "../api/assets";
 import { queryKeys } from "../lib/queryKeys";
 import { Button } from "@/components/ui/button";
 import { SlidersHorizontal } from "lucide-react";
+import { tx } from "@/i18n/xo";
 import {
   InteractionGovernancePanel,
   applyGovernanceChange,
@@ -327,7 +328,7 @@ export function CompanySettings() {
           governanceMutation.isError
             ? governanceMutation.error instanceof Error
               ? governanceMutation.error.message
-              : "Failed to save interaction governance"
+              : tx("Failed to save interaction governance")
             : null
         }
       />

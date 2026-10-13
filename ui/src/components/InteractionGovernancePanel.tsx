@@ -15,6 +15,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { resolverPolicyLabel } from "../lib/interaction-audience";
+import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
+import {
+  xoInteractionKindLabel,
+  xoResolverPolicyEffect,
+  xoResolverPolicyLabel,
+} from "@/xo/labels";
 
 const INTERACTION_KIND_LABELS: Record<IssueThreadInteractionKind, string> = {
   suggest_tasks: "Suggested tasks",
@@ -76,11 +83,15 @@ function governanceOptions(field: GovernanceField): {
 }[] {
   const effects = field === "cap" ? CAP_EFFECTS : DEFAULT_POLICY_EFFECTS;
   return [
-    { value: GOVERNANCE_UNSET, label: UNSET_LABELS[field], effect: UNSET_EFFECTS[field] },
+    {
+      value: GOVERNANCE_UNSET,
+      label: xoResolverPolicyLabel(UNSET_LABELS[field]),
+      effect: xoResolverPolicyEffect(UNSET_EFFECTS[field]),
+    },
     ...NARROWING_POLICIES.map((policy) => ({
       value: policy as GovernanceSelectValue,
       label: resolverPolicyLabel(policy),
-      effect: effects[policy],
+      effect: xoResolverPolicyEffect(effects[policy]),
     })),
   ];
 }
@@ -91,7 +102,7 @@ function governanceOptions(field: GovernanceField): {
  * still renders a complete, truthful label instead of falling back to a lie.
  */
 export function governanceValueLabel(field: GovernanceField, value: GovernanceSelectValue): string {
-  return value === GOVERNANCE_UNSET ? UNSET_LABELS[field] : resolverPolicyLabel(value);
+  return value === GOVERNANCE_UNSET ? xoResolverPolicyLabel(UNSET_LABELS[field]) : resolverPolicyLabel(value);
 }
 
 /**
@@ -243,15 +254,10 @@ export function InteractionGovernancePanel({
       </div>
       <div className="space-y-4">
         <p className="text-sm text-muted-foreground">
-          Thread interactions are open by default:{" "}
-          <span className="font-medium text-foreground">Anyone</span> in the organization — the
-          board or any agent, including the one that asked — can respond. Narrow a kind
-          only when you need to.{" "}
-          <span className="font-medium text-foreground">Default policy</span> is the
-          audience new cards get when the requester does not ask for one;{" "}
-          <span className="font-medium text-foreground">Cap</span> narrows every request of
-          that kind and can never widen one. Tool-approval confirmations always stay{" "}
-          <span className="font-medium text-foreground">Human only</span>.
+          <XoTrans
+            i18nKey="Thread interactions are open by default: <b>Anyone</b> in the organization — the board or any agent, including the one that asked — can respond. Narrow a kind only when you need to. <b>Default policy</b> is the audience new cards get when the requester does not ask for one; <b>Cap</b> narrows every request of that kind and can never widen one. Tool-approval confirmations always stay <b>Human only</b>."
+            components={{ b: <span className="font-medium text-foreground" /> }}
+          />
         </p>
         {/*
          * Responsive: below `sm` the row collapses to a single column so the
@@ -272,15 +278,15 @@ export function InteractionGovernancePanel({
           </div>
           {ISSUE_THREAD_INTERACTION_KINDS.map((kind) => {
             const entry = governance[kind] ?? {};
-            const kindLabel = INTERACTION_KIND_LABELS[kind];
+            const kindLabel = xoInteractionKindLabel(INTERACTION_KIND_LABELS[kind]);
             return (
               <Fragment key={kind}>
                 <div className="text-sm font-medium sm:font-normal">{kindLabel}</div>
                 <GovernanceSelect
                   field="defaultPolicy"
                   testId={`governance-${kind}-default`}
-                  ariaLabel={`Default resolver audience for ${kindLabel}`}
-                  mobileLabel="Default policy"
+                  ariaLabel={tx("Default resolver audience for {{kindLabel}}", { kindLabel })}
+                  mobileLabel={tx("Default policy")}
                   value={toGovernanceSelectValue(entry.defaultPolicy)}
                   disabled={isPending}
                   onChange={(v) => onChange(kind, "defaultPolicy", v)}
@@ -288,8 +294,8 @@ export function InteractionGovernancePanel({
                 <GovernanceSelect
                   field="cap"
                   testId={`governance-${kind}-cap`}
-                  ariaLabel={`Resolver cap for ${kindLabel}`}
-                  mobileLabel="Cap"
+                  ariaLabel={tx("Resolver cap for {{kindLabel}}", { kindLabel })}
+                  mobileLabel={tx("Cap")}
                   value={toGovernanceSelectValue(entry.cap)}
                   disabled={isPending}
                   onChange={(v) => onChange(kind, "cap", v)}
