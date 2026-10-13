@@ -1,3 +1,5 @@
+import { localeTag } from "./locale";
+
 // XO: Chromium-д mn ICU өгөгдөл байхгүй тул mn огноог гараар үүсгэнэ.
 // Гаралт Node-ийн mn-MN ICU-тэй ижил: цаг 0-гүй, минут ба секунд 2 оронтой.
 function hm(d: Date, includeSeconds = false): string {
@@ -29,6 +31,52 @@ export function mnDateTime(d: Date, includeSeconds = false): string {
 export function mnShortDateTime(d: Date): string {
   if (invalid(d)) return String(d);
   return `${mnShortDate(d)} ${hm(d)}`;
+}
+
+export function mnTime(d: Date, includeSeconds = false): string {
+  if (invalid(d)) return String(d);
+  return hm(d, includeSeconds);
+}
+
+function isMn(): boolean {
+  return localeTag() === "mn-MN";
+}
+
+// Upstream-ийн d.toLocaleString(locales, options) дуудлагын орлуулагч.
+// mn: ICU-гүй гар формат (Chromium-д mn ICU байхгүй). en: яг хуучин дуудлага.
+export function xoLocaleDateTime(
+  d: Date,
+  locales?: string | string[],
+  options?: Intl.DateTimeFormatOptions,
+): string {
+  if (isMn()) return mnDateTime(d, options?.second !== undefined);
+  return locales === undefined && options === undefined
+    ? d.toLocaleString()
+    : d.toLocaleString(locales, options);
+}
+
+export function xoLocaleDate(
+  d: Date,
+  locales?: string | string[],
+  options?: Intl.DateTimeFormatOptions,
+): string {
+  if (isMn()) {
+    return options?.year === undefined && options?.month !== undefined ? mnShortDate(d) : mnDate(d);
+  }
+  return locales === undefined && options === undefined
+    ? d.toLocaleDateString()
+    : d.toLocaleDateString(locales, options);
+}
+
+export function xoLocaleTime(
+  d: Date,
+  locales?: string | string[],
+  options?: Intl.DateTimeFormatOptions,
+): string {
+  if (isMn()) return mnTime(d, options?.second !== undefined);
+  return locales === undefined && options === undefined
+    ? d.toLocaleTimeString()
+    : d.toLocaleTimeString(locales, options);
 }
 
 export function mnRelative(n: number, unit: "minute" | "hour" | "day"): string {
