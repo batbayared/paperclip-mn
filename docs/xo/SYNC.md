@@ -176,7 +176,50 @@ XO-ийн өмч (upstream биш): ui/src/xo/labels.ts, scripts/xo-i18n/tiers.t
 
 Upstream sync хийхдээ: upstream telemetry-ийн default-ыг өөрчилсөн эсвэл шинэ гадагш дуудлага (paperclip.ing, paperclip.app, paperclip.dev, AWS ingest) нэмсэн эсэхийг `git diff <old>..upstream/master | grep -n "paperclip.ing\|paperclip.app\|paperclip.dev\|amazonaws"`-аар шалгаж, шинэ дуудлагыг мөн opt-in болго.
 
-`pnpm-lock.yaml` "## Lockfile" хэсгийн дүрмээр зохицуулагдана.
+`pnpm-lock.yaml` "## Ү6 7.4-д хөндсөн upstream файлууд
+
+7.3-ын «Үлдэгдэл»-ийн огноо, төлөв, үүрэг, T1 файл дахь JSX биш литералыг хаасан. tiers.ts өөрчлөгдөөгүй. Тэмдэглэгээ 7.3-ын хүснэгттэй ижил.
+
+| Файл | Өөрчлөлт |
+|---|---|
+| ui/src/components/AgentActionButtons.tsx | «Run now», «Assign Task», «Pause» prop-ийн анхдагч утга; цэсний «Clear error», «Reset Sessions», «Terminate», «Duplicate Agent», «Copy Agent ID», provider trace-ийн зүйл гар tx |
+| ui/src/components/AgentProperties.tsx | үүргийн шошго xoRoleLabel |
+| ui/src/components/DecisionTriageStrip.tsx | «When to decide» шошго ба aria-label, DECIDE_BY_OPTIONS-ийн шошго render үед tx |
+| ui/src/components/MembershipAction.tsx | «Join»/«Leave»/«Joining...»/«Leaving...» гар tx; aria «Join {{name}}» (mn «Нэгдэх: {{name}}») |
+| ui/src/components/ProviderTraceStatusBadge.tsx | «Trace off» г.м. xoTraceStatusLabel |
+| ui/src/components/ReportsToPicker.tsx | үүргийн шошго xoRoleLabel |
+| ui/src/components/SidebarServerInfo.tsx | Intl timeStyle → xoLocaleDateTime; «Clean checkout», «Local changes present», staged/unstaged/untracked, «Health unavailable» гар tx |
+| ui/src/components/SmokeLabDashboardCard.tsx | Intl timeStyle → xoLocaleDateTime |
+| ui/src/components/StatusBadge.tsx | агент ба issue-ийн төлөв xoStatusLabel |
+| ui/src/components/SummarySlotCard.tsx | xoLocaleDateTime; «Latest (Rev {{n}})», «Rev {{n}}» гар tx |
+| ui/src/components/routine-sections/editable-sections.tsx | formatFireTime mn замд xoZonedDateTime (Intl("en-US") formatToParts → mnDateTime) |
+| ui/src/components/routine-sections/editable-sections.production.tsx | дээрхтэй ижил (хос файл) |
+| ui/src/components/transcript/RunTranscriptView.tsx | «Unavailable source», «Child agent», «No transcript yet.», «unknown» гар tx |
+| ui/src/lib/attention.ts | decideBy шошго («Not set», «Today», «This week», «Whenever») гар tx; UTC огноо mn-д timeZone дагана (date-format.ts-ийн mnZoned) |
+| ui/src/lib/issue-monitor.ts | mn салаа: «Өнөөдөр, HH:MM», богино ба бүтэн огноо mnDate/mnTime |
+| ui/src/pages/AgentDetail.tsx | «Assign Task», тайлагнах шугамын засварын шалтгаан, «Waiting for transcript...», «No persisted transcript for this run.» гар tx; run source xoRunSourceLabel; үүрэг xoRoleLabel |
+| ui/src/pages/AgentDetail.production.tsx | дээрхтэй ижил (хос файл) |
+| ui/src/pages/Agents.tsx | үүргийн шошго xoRoleLabel |
+| ui/src/pages/Agents.production.tsx | дээрхтэй ижил (хос файл) |
+| ui/src/pages/OrgChart.production.tsx | үүргийн шошго xoRoleLabel |
+| ui/src/pages/Pipelines.tsx | formatShortDate xoLocaleDateTime; formatPipelineActivity-ийн «just now», «{{n}} min ago», «yesterday», «No activity» г.м. гар tx |
+| ui/src/pages/ProjectWorkspaceDetail.tsx | «Workspace ID», «Project», «Local path», «Repo», «None» гар tx |
+| ui/src/pages/tools/SmokeLabTab.tsx | Intl timeStyle → xoLocaleDateTime |
+
+XO-ийн өмч: ui/src/xo/date-format.ts (mnZoned, богино огнооны салаа, xoZonedDateTime), ui/src/xo/labels.ts (xoStatusLabel-д 21 төлөв, xoRoleLabel, xoRunSourceLabel, xoTraceStatusLabel), ui/src/i18n/xo/* (keys=2616; keep-en.json-д "DevOps").
+
+Шинэ XO-ийн тестүүд: ui/src/i18n/xo/y6-7-4-keys.test.ts, ui/src/lib/issue-monitor.test.tsx (mn), ui/src/xo/date-format.test.ts ба ui/src/xo/labels.test.ts (нэмэлт).
+
+Үлдэгдэл (Ү6 7.4):
+- Ү6 7.5-д шилжүүлсэн: InteractionGovernancePanel.tsx, interaction-audience.ts, pages/Secrets.tsx-ийн статик шошго, IssueThreadInteractionCard.tsx.
+- mn-д цагийн бүсийн нэр ба гараг харагдахгүй; issue-monitor-ийн mn зам display time zone-ыг үл хайхарна (UB орон нутгийн цагтай ижил тул практикт зөрөхгүй).
+- editable-sections-ийн Intl("en-US") formatToParts нь mn замд тоон хэсэг авах зорилготой; en гаралт өөрчлөгдөөгүй.
+- AgentActionButtons-ийн toast ба баталгаажуулах текст, ProjectWorkspaceDetail-ийн бусад Field шошго («Workspace facts», «Visibility», «Repo URL» г.м.) англиар үлдсэн.
+- Үүргийн орчуулгыг (CEO, CTO, PM «Бүтээгдэхүүний менежер», QA «Чанарын хяналт» г.м.) ED шалгана.
+- 7.3-ын үлдэгдлээс хэвээр: d.label === "Intent" харьцуулалт, dev-only T2 файлууд ба LegacyIssuesList.
+- Browser шалгалт (7.4 дараах, tier-т ороогүй өмнөх файл): агентын хуудасны зүүн навигаци («Overview», «Instructions», «Runs», «Permissions / Trust» г.м.) ба «Overview» гарчиг; Audit хэсгийн Runs хуудас бүхэлдээ англи.
+
+## Lockfile" хэсгийн дүрмээр зохицуулагдана.
 
 ## Ү3-А-д хөндсөн upstream файлууд
 
@@ -291,7 +334,7 @@ XO-ийн өмч (upstream биш): ui/src/xo/labels.ts (xoHumanizeValue, xoTool
 
 Шинэ XO-ийн тестүүд: ui/src/xo/date-format.test.ts, ui/src/i18n/xo/y6-7-2-keys.test.ts, scripts/xo-i18n/tiers-y6-7-2.test.ts, ui/src/components/task-chat/TaskChat.y6-7-2.xo.test.tsx, ui/src/xo/labels.test.ts (нэмэлт).
 
-Үлдэгдэл (Ү6 7.3): хэрэгжсэн (доорх "Ү6 7.3-д хөндсөн upstream файлууд"). Үлдсэн:
+Үлдэгдэл (Ү6 7.3): хэрэгжсэн (доорх "Ү6 7.3-д хөндсөн upstream файлууд"). Үлдсэн жагсаалтын ихэнхийг Ү6 7.4 хаасан (доорх "Ү6 7.4-д хөндсөн upstream файлууд"); хаагдаагүй нь "Үлдэгдэл (Ү6 7.4)"-д:
 
 - clipboard-ын `d.label === "Intent"` харьцуулалт (IssueChatThread.tsx:1637, lib/transcriptPresentation.ts:233 — тэр цэгт шошго англи, render үед xoToolDetailLabel орчуулдаг).
 - dev-only T2 (TweakPanel, motion-tokens, task-chat-states, task-chat-fixtures, DesignGuide, TaskChatLab); LegacyIssuesList.

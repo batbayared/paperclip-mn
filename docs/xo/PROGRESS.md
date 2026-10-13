@@ -1,5 +1,41 @@
 # XO ахицын бүртгэл
 
+## Ү6 7.4 — 7.3-ын хүрээнээс гадуурх англи үлдэгдэл (2026-10-13)
+
+Зорилго: 7.3-ын «Үлдэгдэл»-ийн огноо, агент ба ажиллагааны төлөв, үүрэг, T1 файл дахь JSX биш литералыг монгол болгох. mn огноог ICU-гүй гараар формат хийдэг; en гаралт байт хүртэл ижил (цорын ганц үл хамаарах нь xoZonedDateTime доторх Intl("en-US") formatToParts).
+
+Төлөвлөгөө: docs/superpowers/plans/2026-10-13-xo-y6-7-4-remaining-leftovers.md. BASE 274832cc0.
+
+| Task | Commit |
+|---|---|
+| 1 Огноо: mnZoned, богино огноо, xoZonedDateTime; Intl timeStyle дуудлагууд (10 файл) | 35c3679b7 |
+| 2 issue-monitor-ийн mn огноо | 62238daa7 |
+| 3 labels.ts: 21 төлөв, xoRoleLabel, xoRunSourceLabel, xoTraceStatusLabel; агентын хуудсууд (11 файл) | 2d2900e6a |
+| 4 AgentActionButtons, MembershipAction, RunTranscriptView, ProjectWorkspaceDetail-ийн литерал | 84b0feb3e |
+| нэмэлт DecisionTriageStrip «When to decide» ба шийдэх хугацааны шошго | ef4854cb3 |
+| 5 Каталог (+80 түлхүүр), y6-7-4-keys тест, labels mn тест | bcc90a171 |
+| 6 SYNC.md ба бүртгэл | энэ commit |
+
+### Шалгалтын үр дүн
+
+- xo:i18n:check OK, keys=2616 (7.3-ын төгсгөл 2536, 7.4-т +80). keep-en.json-д "DevOps" нэмсэн.
+- xo:i18n:test PASS, xo:i18n:typecheck цэвэр, xo:brand-scan 161 файл/586 hit (baseline-аас дээш байхгүй), ui tsc --noEmit цэвэр.
+- vitest run ui/src: 618 файл, 6525 тест. Бүтэн ажиллуулалтад ачааллын timeout-оос болж 1-5 тест унав (хоёр удаа ажиллуулахад тоо өөр). Унасан IssuesList.test.tsx дангаараа 46/46 PASS.
+
+### Browser шалгалт (3110, restart хийгээгүй, tiers.ts өөрчлөгдөөгүй)
+
+- /YB/agents: төлөв «Сул», үүрэг «Ерөнхий».
+- Агентын хуудас: «Даалгавар оноох», «Одоо ажиллуулах» товч, шинж чанарын хүснэгт mn.
+- /YB/issues: огнооны хуваагч mn, регресс байхгүй.
+- Хүрээнээс гадуур илэрсэн: агентын хуудасны зүүн навигаци ба Audit → Runs хуудас англиар. SYNC.md-ийн «Үлдэгдэл (Ү6 7.4)»-д бүртгэсэн.
+
+### Хязгаарлалт
+
+- Ү6 7.5-д шилжүүлсэн: InteractionGovernancePanel, interaction-audience.ts, Secrets.tsx, IssueThreadInteractionCard.
+- mn-д цагийн бүсийн нэр ба гараг алга; issue-monitor-ийн mn зам display time zone-ыг үл хайхарна.
+- AgentActionButtons-ийн toast ба баталгаажуулах текст, ProjectWorkspaceDetail-ийн бусад Field шошго англиар үлдсэн.
+- Үүргийн орчуулгыг ED шалгана (CEO, CTO, PM, QA г.м.).
+
 ## Ү6 7.2 нэр томьёоны шийдвэр (2026-10-13)
 
 ED xo-nertomyo-sanal.md-ийн бүх саналыг батлав. mn.json-д 11 утга солигдсон, «Resume this subtree to send a message.»-ийг «дэд даалгавар» нэр томьёонд нийцүүлсэн. Шийдвэрийн бүрэн хүснэгт glossary.md-ийн «Ү6 7.2-т шийдсэн» хэсэгт.
