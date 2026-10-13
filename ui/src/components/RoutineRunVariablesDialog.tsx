@@ -35,6 +35,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { tx } from "@/i18n/xo";
 
 function buildInitialValues(variables: RoutineVariable[]) {
   return Object.fromEntries(variables.map((variable) => [variable.name, variable.defaultValue ?? ""]));
@@ -362,8 +363,8 @@ export function RoutineRunVariablesDialog({
                 recentOptionIds={recentAssigneeIds}
                 placeholder="Agent"
                 noneLabel="Select an agent"
-                searchPlaceholder="Search agents..."
-                emptyMessage="No agents found."
+                searchPlaceholder={tx("Search agents...")}
+                emptyMessage={tx("No agents found.")}
                 disablePortal
                 openOnFocus={false}
                 onChange={(assigneeAgentId) => {
@@ -404,8 +405,8 @@ export function RoutineRunVariablesDialog({
                 recentOptionIds={recentProjectIds}
                 placeholder="Project"
                 noneLabel="No project"
-                searchPlaceholder="Search projects..."
-                emptyMessage="No projects found."
+                searchPlaceholder={tx("Search projects...")}
+                emptyMessage={tx("No projects found.")}
                 disablePortal
                 openOnFocus={false}
                 onChange={(projectId) => {

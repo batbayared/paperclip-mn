@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { XoTrans } from "@/xo/XoTrans";
 
 const variableTypes: RoutineVariable["type"][] = ["text", "textarea", "number", "boolean", "select", "date"];
 
@@ -85,7 +86,10 @@ export function RoutineVariablesEditor({
         <div>
           <p className="text-sm font-medium">Variables</p>
           <p className="text-xs text-muted-foreground">
-            Detected from `{"{{name}}"}` placeholders in the title and instructions.
+            <XoTrans
+              i18nKey="Detected from `<ph/>` placeholders in the title and instructions."
+              components={{ ph: <>{"{{name}}"}</> }}
+            />
           </p>
         </div>
         {open ? <ChevronDown className="h-4 w-4 text-muted-foreground" /> : <ChevronRight className="h-4 w-4 text-muted-foreground" />}
@@ -275,7 +279,10 @@ export function RoutineVariablesHint() {
     <>
       <div className="flex items-center justify-between gap-2 rounded-lg border border-dashed border-border/70 px-3 py-2 text-xs text-muted-foreground">
         <span>
-          Use `{"{{variable_name}}"}` placeholders in the title or instructions to prompt for inputs when the routine runs.
+          <XoTrans
+            i18nKey="Use `<ph/>` placeholders in the title or instructions to prompt for inputs when the routine runs."
+            components={{ ph: <>{"{{variable_name}}"}</> }}
+          />
         </span>
         <button
           type="button"
@@ -302,13 +309,17 @@ export function RoutineVariablesHint() {
                 Custom variables
               </h3>
               <p className="text-muted-foreground">
-                Type{" "}
-                <code className="rounded bg-muted px-1 py-0.5 font-mono text-xs text-foreground">
-                  {"{{variable_name}}"}
-                </code>{" "}
-                anywhere in the title or instructions. Paperclip detects each placeholder, lists it
-                under <span className="font-medium text-foreground">Variables</span>, and prompts
-                for a value before each run.
+                <XoTrans
+                  i18nKey="Type <code/> anywhere in the title or instructions. {{brand}} detects each placeholder, lists it under <variables>Variables</variables>, and prompts for a value before each run."
+                  components={{
+                    code: (
+                      <code className="rounded bg-muted px-1 py-0.5 font-mono text-xs text-foreground">
+                        {"{{variable_name}}"}
+                      </code>
+                    ),
+                    variables: <span className="font-medium text-foreground" />,
+                  }}
+                />
               </p>
               <ul className="list-disc space-y-1 pl-5 text-muted-foreground">
                 <li>Names must start with a letter and may use letters, numbers, and underscores.</li>
