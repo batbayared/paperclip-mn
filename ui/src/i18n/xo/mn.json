@@ -354,7 +354,7 @@
   "Add reviewer, approver, or watchdog": "Хянагч, зөвшөөрөгч эсвэл харуул нэмэх",
   "Add sub-task": "Дэд даалгавар нэмэх",
   "Add subtask": "Дэд даалгавар нэмэх",
-  "Add the env key the process expects, for example <c>GH_TOKEN</c>, choose <b>Secret</b>, and select the stored secret version.": "Процессын хүлээж буй env түлхүүрийг (жишээ нь <c>GH_TOKEN</c>) нэмж, <b>Нууц утга</b>-ыг сонгоод хадгалсан нууц утгын хувилбарыг сонгоно уу.",
+  "Add the env key the process expects, for example <c>GH_TOKEN</c>, choose <b>Secret</b>, and select the stored secret version.": "Процессын хүлээж буй env түлхүүрийг (жишээ нь <c>GH_TOKEN</c>) нэмж, <b>Нууц утга</b>-г сонгоод хадгалсан нууц утгын хувилбарыг сонгоно уу.",
   "Add vault": "Сан нэмэх",
   "added {{changed}}": "нэмлээ: {{changed}}",
   "added {{changed}} to": "нэмлээ ({{changed}}):",
