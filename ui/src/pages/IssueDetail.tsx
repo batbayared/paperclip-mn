@@ -2436,8 +2436,8 @@ const IssueDetailChatTab = memo(function IssueDetailChatTab({
                 ? (runId) => onPauseWorkRun(runId).catch(() => undefined)
                 : undefined
             }
-            stopRunLabel="Pause work"
-            stoppingRunLabel="Pausing..."
+            stopRunLabel={tx("Pause work")}
+            stoppingRunLabel={tx("Pausing...")}
             stopRunVariant="pause"
             runFinalizationActions={runFinalizationActions}
             onAcceptInteraction={onAcceptInteraction}

@@ -254,6 +254,9 @@ import {
 import { SourceTrustBadge } from "./SourceTrustBadge";
 import { CommentAttributionChip } from "./CommentAttributionChip";
 import { resolveCommentAttribution } from "../lib/comment-attribution";
+import { tx } from "@/i18n/xo";
+import { calledToolsWords, ranCommandsWords } from "@/xo/run-text";
+import { XoTrans } from "@/xo/XoTrans";
 
 interface IssueChatMessageContext {
   feedbackDataSharingPreference: FeedbackDataSharingPreference;
@@ -790,12 +793,12 @@ export function IssueAssigneePausedNotice({
 
   const pauseDetail =
     agent.pauseReason === "budget"
-      ? "It was paused by a budget hard stop."
+      ? tx("It was paused by a budget hard stop.")
       : agent.pauseReason === "import"
-        ? "It arrived paused from an organization import — imported agents stay parked until you resume them."
+        ? tx("It arrived paused from an organization import — imported agents stay parked until you resume them.")
         : agent.pauseReason === "system"
-          ? "It was paused by the system."
-          : "It was paused manually.";
+          ? tx("It was paused by the system.")
+          : tx("It was paused manually.");
   // Budget pauses clear on their own when the budget resets; resuming by hand
   // would fight the hard stop, so the action is only offered for the rest.
   const canResume = Boolean(onResume) && agent.pauseReason !== "budget";
@@ -1183,9 +1186,8 @@ function toolCountSummary(toolParts: ToolCallMessagePart[]): string | null {
     else other++;
   }
   const parts: string[] = [];
-  if (commands > 0)
-    parts.push(`ran ${commands} command${commands === 1 ? "" : "s"}`);
-  if (other > 0) parts.push(`called ${other} tool${other === 1 ? "" : "s"}`);
+  if (commands > 0) parts.push(ranCommandsWords(commands));
+  if (other > 0) parts.push(calledToolsWords(other));
   return parts.join(", ");
 }
 
@@ -1265,15 +1267,15 @@ function IssueChatChainOfThought({
   let headerVerb: string;
   let headerSuffix: string | null = null;
   if (isActive) {
-    headerVerb = "Working";
-    if (liveElapsed) headerSuffix = `for ${liveElapsed}`;
+    headerVerb = tx("Working");
+    if (liveElapsed) headerSuffix = tx("for {{duration}}", { duration: liveElapsed });
   } else if (segmentTiming) {
     const durationMs = segmentTiming.endMs - segmentTiming.startMs;
     const durationText = formatDurationWords(durationMs);
-    headerVerb = "Worked";
-    if (durationText) headerSuffix = `for ${durationText}`;
+    headerVerb = tx("Worked");
+    if (durationText) headerSuffix = tx("for {{duration}}", { duration: durationText });
   } else {
-    headerVerb = "Worked";
+    headerVerb = tx("Worked");
   }
 
   const toolSummary = toolCountSummary(toolParts);
@@ -1745,7 +1747,7 @@ function IssueChatProviderActivity({
       ? (value.payload as Record<string, unknown>)
       : {};
   const title =
-    typeof value.title === "string" ? value.title : "Provider activity";
+    typeof value.title === "string" ? value.title : tx("Provider activity");
   const summary = typeof value.summary === "string" ? value.summary : "";
   const steps = Array.isArray(payload.steps) ? payload.steps.slice(0, 256) : [];
   const children = Array.isArray(payload.children)
@@ -1827,7 +1829,7 @@ function IssueChatProviderActivity({
               return (
                 <div key={String(child.childId ?? index)}>
                   <span className="font-medium">
-                    {String(child.role ?? "Child agent")}
+                    {String(child.role ?? tx("Child agent"))}
                   </span>{" "}
                   · {String(child.status ?? "unknown")}
                   {child.summary ? ` — ${String(child.summary)}` : ""}
@@ -1856,7 +1858,7 @@ function IssueChatProviderActivity({
                       {String(source.title ?? href)}
                     </a>
                   ) : (
-                    <span>{String(source.title ?? "Unavailable source")}</span>
+                    <span>{String(source.title ?? tx("Unavailable source"))}</span>
                   )}{" "}
                   <span className="text-muted-foreground">
                     (provider-reported)
@@ -2026,7 +2028,7 @@ function IssueChatUserMessage({
   const queueReason =
     typeof custom.queueReason === "string" ? custom.queueReason : null;
   const queueBadgeLabel =
-    queueReason === "hold" ? "\u23f8 Deferred wake" : "Queued";
+    queueReason === "hold" ? `\u23f8 ${tx("Deferred wake")}` : tx("Queued");
   const pending = custom.clientStatus === "pending";
   const deleted = Boolean(custom.deletedAt);
   const queueTargetRunId =
@@ -2307,8 +2309,8 @@ function IssueChatAssistantMessage({
     onVote,
     agentMap,
     onStopRun,
-    stopRunLabel = "Stop run",
-    stoppingRunLabel = "Stopping...",
+    stopRunLabel = tx("Stop run"),
+    stoppingRunLabel = tx("Stopping..."),
     stopRunVariant = "stop",
     runFinalizationActions = [],
     userLabelMap,
@@ -2932,11 +2934,10 @@ function IssueChatFeedbackButtons({
           <div className="space-y-3 text-sm text-muted-foreground">
             <p>This vote is always saved locally.</p>
             <p>
-              Choose{" "}
-              <span className="font-medium text-foreground">Always allow</span>{" "}
-              to share this vote and future voted AI outputs. Choose{" "}
-              <span className="font-medium text-foreground">Don't allow</span>{" "}
-              to keep this vote and future votes local.
+              <XoTrans
+                i18nKey="Choose <b>Always allow</b> to share this vote and future voted AI outputs. Choose <b>Don't allow</b> to keep this vote and future votes local."
+                components={{ b: <span className="font-medium text-foreground" /> }}
+              />
             </p>
             <p>You can change this later in Settings &gt; General.</p>
             {termsUrl ? (
@@ -5143,7 +5144,7 @@ const IssueChatComposer = forwardRef<
               ? {
                   ...item,
                   status: "error",
-                  error: "This file type cannot be attached here",
+                  error: tx("This file type cannot be attached here"),
                 }
               : item,
           ),
@@ -5156,7 +5157,7 @@ const IssueChatComposer = forwardRef<
             ? {
                 ...item,
                 status: "error",
-                error: err instanceof Error ? err.message : "Upload failed",
+                error: err instanceof Error ? err.message : tx("Upload failed"),
               }
             : item,
         ),
@@ -5489,12 +5490,12 @@ const IssueChatComposer = forwardRef<
             const sizeLabel = formatAttachmentSize(attachment.size);
             const statusLabel =
               attachment.status === "uploading"
-                ? "Uploading to task"
+                ? tx("Uploading to task")
                 : attachment.status === "error"
-                  ? (attachment.error ?? "Upload failed")
+                  ? (attachment.error ?? tx("Upload failed"))
                   : attachment.inline
-                    ? "Inserted inline"
-                    : "Attached to task";
+                    ? tx("Inserted inline")
+                    : tx("Attached to task");
             return (
               <div
                 key={attachment.id}
@@ -6564,8 +6565,8 @@ export function IssueChatThread({
   const resolvedEmptyMessage =
     emptyMessage ??
     (variant === "embedded"
-      ? "No run output yet."
-      : "This task conversation is empty. Start with a message below.");
+      ? tx("No run output yet.")
+      : tx("This task conversation is empty. Start with a message below."));
   const previousErrorBoundaryMessagesRef = useRef<
     readonly ThreadMessage[] | null
   >(null);

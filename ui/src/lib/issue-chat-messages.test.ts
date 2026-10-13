@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { i18n } from "@/i18n";
 import type { Agent } from "@paperclipai/shared";
 import {
   buildAssistantPartsFromTranscript,
@@ -1528,6 +1529,50 @@ describe("buildIssueChatMessages", () => {
       chainOfThoughtLabel: "Paused by board after 1 minute",
       runStatus: "cancelled",
     });
+  });
+
+  it("mn дээр board-ийн түр зогсоолтын шошгыг орчуулна", async () => {
+    await i18n.changeLanguage("mn");
+    try {
+      const messages = buildIssueChatMessages({
+        comments: [],
+        timelineEvents: [],
+        linkedRuns: [
+          {
+            runId: "run-paused",
+            status: "cancelled",
+            agentId: "agent-1",
+            agentName: "CodexCoder",
+            createdAt: new Date("2026-04-06T12:01:00.000Z"),
+            startedAt: new Date("2026-04-06T12:01:00.000Z"),
+            finishedAt: new Date("2026-04-06T12:02:00.000Z"),
+            resultJson: { stopReason: "paused" },
+          },
+        ],
+        liveRuns: [],
+        transcriptsByRunId: new Map([
+          [
+            "run-paused",
+            [
+              {
+                kind: "assistant",
+                ts: "2026-04-06T12:01:05.000Z",
+                text: "Working on it.",
+              },
+            ],
+          ],
+        ]),
+        hasOutputForRun: (runId) => runId === "run-paused",
+        currentUserId: "user-1",
+      });
+
+      expect(messages[0]?.metadata.custom).toMatchObject({
+        chainOfThoughtLabel: "Удирдах зөвлөл түр зогсоосон (1 минут)",
+        runStatus: "cancelled",
+      });
+    } finally {
+      await i18n.changeLanguage("en");
+    }
   });
 
   it("labels error-code-only operator interruptions as interrupted by board", () => {

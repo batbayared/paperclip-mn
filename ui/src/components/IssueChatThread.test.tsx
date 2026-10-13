@@ -42,6 +42,7 @@ import type {
   IssueChatLinkedRun,
   IssueChatTranscriptEntry,
 } from "../lib/issue-chat-messages";
+import { i18n } from "@/i18n";
 
 function flushAct<T>(callback: () => T): T {
   let result: T | undefined;
@@ -4515,6 +4516,72 @@ describe("IssueChatThread", () => {
     });
   });
 
+  it("mn дээр ажиллаж буй header ба командын тоог орчуулна", async () => {
+    await i18n.changeLanguage("mn");
+    const root = createRoot(container);
+    try {
+      act(() => {
+        root.render(
+          <MemoryRouter>
+            <IssueChatThread
+              comments={[]}
+              linkedRuns={[]}
+              timelineEvents={[]}
+              liveRuns={[
+                {
+                  id: "run-1",
+                  issueId: "issue-1",
+                  status: "running",
+                  invocationSource: "comment",
+                  triggerDetail: null,
+                  startedAt: "2026-04-06T12:00:00.000Z",
+                  finishedAt: null,
+                  createdAt: "2026-04-06T12:00:00.000Z",
+                  agentId: "agent-1",
+                  agentName: "Agent 1",
+                  adapterType: "codex_local",
+                },
+              ]}
+              transcriptsByRunId={
+                new Map([
+                  [
+                    "run-1",
+                    [
+                      {
+                        kind: "tool_call",
+                        ts: "2026-04-06T12:00:10.000Z",
+                        name: "command_execution",
+                        toolUseId: "tool-1",
+                        input: { command: "pnpm test" },
+                      },
+                      {
+                        kind: "tool_result",
+                        ts: "2026-04-06T12:00:20.000Z",
+                        toolUseId: "tool-1",
+                        toolName: "command_execution",
+                        content: "Tests passed",
+                        isError: false,
+                      },
+                    ],
+                  ],
+                ])
+              }
+              onAdd={async () => {}}
+              enableLiveTranscriptPolling={false}
+            />
+          </MemoryRouter>,
+        );
+      });
+
+      expect(container.textContent).toContain("Ажиллаж байна");
+      expect(container.textContent).toContain("1 команд ажиллуулсан");
+      expect(container.textContent).not.toContain("ran 1 command");
+    } finally {
+      act(() => root.unmount());
+      await i18n.changeLanguage("en");
+    }
+  });
+
   it("renders ephemeral active-run status below the working indicator", () => {
     const root = createRoot(container);
 
@@ -4708,6 +4775,30 @@ describe("IssueAssigneePausedNotice", () => {
     ).toBeNull();
 
     act(() => root.unmount());
+  });
+
+  it("mn дээр төсвийн түр зогсоолтын тайлбарыг орчуулна", async () => {
+    await i18n.changeLanguage("mn");
+    const root = createRoot(container);
+    try {
+      act(() => {
+        root.render(
+          <IssueAssigneePausedNotice
+            agent={pausedAgent("budget")}
+            onResume={vi.fn()}
+            resuming={false}
+          />,
+        );
+      });
+
+      expect(container.textContent).toContain(
+        "Төсвийн хатуу хязгаараар түр зогсоосон.",
+      );
+      expect(container.textContent).not.toContain("budget hard stop");
+    } finally {
+      act(() => root.unmount());
+      await i18n.changeLanguage("en");
+    }
   });
 
   it("renders nothing for an active agent", () => {

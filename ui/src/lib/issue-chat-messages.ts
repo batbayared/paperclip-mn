@@ -24,6 +24,7 @@ import {
   summarizeNotice,
 } from "./transcriptPresentation";
 import { hoursWords, minutesWords, secondsWords } from "@/xo/run-text";
+import { tx } from "@/i18n/xo";
 
 type JsonValue = null | string | number | boolean | JsonValue[] | { [key: string]: JsonValue };
 type JsonObject = { [key: string]: JsonValue };
@@ -807,24 +808,28 @@ function runDurationLabel(run: {
   const stopReason = typeof run.resultJson?.stopReason === "string" ? run.resultJson.stopReason : null;
   switch (run.status) {
     case "succeeded":
-      return durationText ? `Worked for ${durationText}` : "Finished work";
+      return durationText ? tx("Worked for {{duration}}", { duration: durationText }) : tx("Finished work");
     case "failed":
     case "error":
-      return durationText ? `Failed after ${durationText}` : "Run failed";
+      return durationText ? tx("Failed after {{duration}}", { duration: durationText }) : tx("Run failed");
     case "timed_out":
-      return durationText ? `Timed out after ${durationText}` : "Run timed out";
+      return durationText ? tx("Timed out after {{duration}}", { duration: durationText }) : tx("Run timed out");
     case "cancelled":
       if (isOperatorInterruptedRun(run.resultJson, run.errorCode)) {
-        return durationText ? `Interrupted by board after ${durationText}` : "Interrupted by board";
+        return durationText
+          ? tx("Interrupted by board after {{duration}}", { duration: durationText })
+          : tx("Interrupted by board");
       }
       if (stopReason === "paused") {
-        return durationText ? `Paused by board after ${durationText}` : "Paused by board";
+        return durationText
+          ? tx("Paused by board after {{duration}}", { duration: durationText })
+          : tx("Paused by board");
       }
-      return durationText ? `Cancelled after ${durationText}` : "Run cancelled";
+      return durationText ? tx("Cancelled after {{duration}}", { duration: durationText }) : tx("Run cancelled");
     case "queued":
-      return "Queued";
+      return tx("Queued");
     case "running":
-      return "Working...";
+      return tx("Working...");
     default:
       return formatStatusLabel(run.status);
   }
@@ -863,7 +868,7 @@ function createHistoricalTranscriptMessage(args: {
   const agentName = run.agentName ?? agentMap?.get(run.agentId)?.name ?? run.agentId.slice(0, 8);
   const compactedTranscript = compactIssueChatTranscript(transcript, issueChatTranscriptMaxVisibleEntries(run.adapterType));
   const { parts, notices, segments } = buildAssistantPartsFromTranscript(compactedTranscript);
-  const waitingText = hasOutput ? "" : "Run finished";
+  const waitingText = hasOutput ? "" : tx("Run finished");
   const content = parts.length > 0
     ? parts
     : waitingText
@@ -936,7 +941,7 @@ export function buildAssistantPartsFromTranscript(entries: readonly IssueChatTra
         family: entry.family ?? "provider_notice",
         eventType: entry.eventType ?? "provider.notice.recorded",
         status: entry.status ?? "informational",
-        title: entry.title ?? "Provider activity",
+        title: entry.title ?? tx("Provider activity"),
         summary: entry.summary ?? "",
         payload: entry.payload ?? {},
       });
@@ -1107,10 +1112,10 @@ function createLiveRunMessage(args: {
   const { parts, notices, segments } = buildAssistantPartsFromTranscript(compactedTranscript);
   const waitingText =
     run.status === "queued"
-      ? "Queued..."
+      ? tx("Queued...")
       : parts.length > 0
         ? ""
-        : "Working...";
+        : tx("Working...");
 
   const content = parts;
 
