@@ -53,6 +53,7 @@ import { StalledReviewActions } from "./StalledReviewActions";
 import { readIssueReviewPolicyMetadata } from "../lib/review-policy";
 import { xoLocaleDateTime } from "@/xo/date-format";
 import { tx } from "@/i18n/xo";
+import { xoAttentionSourceLabel, xoSnoozePresetLabel } from "@/xo/labels";
 
 const HOUR_MS = 60 * 60 * 1000;
 const DAY_MS = 24 * HOUR_MS;
@@ -259,7 +260,7 @@ export const AttentionQueueRow = memo(function AttentionQueueRow({
         <div className="flex min-w-0 flex-wrap items-center gap-1">
           <span className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground">
             <StatusGlyph status={status} size="md" />
-            {meta.label}
+            {xoAttentionSourceLabel(meta.label)}
           </span>
           {taskRef && (
             <>
@@ -279,12 +280,12 @@ export const AttentionQueueRow = memo(function AttentionQueueRow({
               <span
                 className="inline-flex items-center gap-1 text-(length:--text-nano) text-muted-foreground"
                 data-attention-decide-by={item.decideBy}
-                title={decideByProvenance(item) ? `Set by ${decideByProvenance(item)}` : undefined}
+                title={decideByProvenance(item) ? tx("Set by {{who}}", { who: decideByProvenance(item) }) : undefined}
               >
                 <CalendarClock className="h-3 w-3" />
                 {decideByLabel(item.decideBy)}
                 {decideByProvenance(item) && (
-                  <span className="text-muted-foreground/80">· set by {decideByProvenance(item)}</span>
+                  <span className="text-muted-foreground/80">{tx("· set by {{who}}", { who: decideByProvenance(item) })}</span>
                 )}
               </span>
             </>
@@ -353,7 +354,7 @@ export const AttentionQueueRow = memo(function AttentionQueueRow({
           : {})}
       >
         <span className="line-clamp-2 text-sm font-medium text-foreground" title={item.subject.title ?? undefined}>
-          {item.subject.title ?? meta.label}
+          {item.subject.title ?? xoAttentionSourceLabel(meta.label)}
         </span>
         <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{detailLine}</p>
       </div>
@@ -504,11 +505,11 @@ function CompactDecisionActions({
       }
       if (item.sourceKind === "issue_thread_interaction") {
         const issueId = item.subject.metadata?.issueId;
-        if (typeof issueId !== "string") throw new Error("Missing issue reference for this decision.");
+        if (typeof issueId !== "string") throw new Error(tx("Missing issue reference for this decision."));
         if (action === "accept") return issuesApi.acceptInteraction(issueId, item.subject.id);
         return issuesApi.rejectInteraction(issueId, item.subject.id);
       }
-      throw new Error("This decision must be completed from its detail view.");
+      throw new Error(tx("This decision must be completed from its detail view."));
     },
     onSuccess: (_result, action) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.attention(companyId) });
@@ -526,7 +527,7 @@ function CompactDecisionActions({
       // A policy denial is permanent, so it keeps the server's reason and names
       // the real responder instead of asking for a retry that will fail again.
       pushToast({
-        title: `Could not ${decisionLabel(action)}`,
+        title: decisionFailureLabel(action),
         body: interactionResolutionErrorMessage(error, audience),
         tone: "error",
       });
@@ -562,16 +563,23 @@ function CompactDecisionActions({
   );
 }
 
-function decisionLabel(action: CompactDecisionAction): string {
-  if (action === "request_revision") return "sent for revision";
-  if (action === "accept" || action === "approve") return "approved";
-  return "rejected";
+// XO: en гаралт хуучин угсралттай ижил ("Could not approved" гэх мэт); mn-д хослол бүр тусдаа литерал түлхүүр.
+function decisionFailureLabel(action: CompactDecisionAction): string {
+  if (action === "request_revision") return tx("Could not sent for revision");
+  if (action === "accept" || action === "approve") return tx("Could not approved");
+  return tx("Could not rejected");
 }
 
 function compactDecisionSuccessLabel(sourceKind: AttentionItem["sourceKind"], action: CompactDecisionAction): string {
-  if (sourceKind === "approval") return `Approval ${decisionLabel(action)}`;
-  if (sourceKind === "join_request") return `Join request ${decisionLabel(action)}`;
-  return action === "accept" ? "Confirmation accepted" : "Confirmation declined";
+  const revision = action === "request_revision";
+  const approved = action === "accept" || action === "approve";
+  if (sourceKind === "approval") {
+    return revision ? tx("Approval sent for revision") : approved ? tx("Approval approved") : tx("Approval rejected");
+  }
+  if (sourceKind === "join_request") {
+    return revision ? tx("Join request sent for revision") : approved ? tx("Join request approved") : tx("Join request rejected");
+  }
+  return action === "accept" ? tx("Confirmation accepted") : tx("Confirmation declined");
 }
 
 function decisionVerbVariant(verb: AttentionItem["decisionVerbs"][number]): "default" | "outline" | "destructive" {
@@ -691,7 +699,7 @@ function SnoozeSubmenu({ onSnooze }: { onSnooze: (snoozedUntil: string) => void 
       <DropdownMenuSubContent>
         {SNOOZE_PRESETS.map((preset) => (
           <DropdownMenuItem key={preset.label} onClick={() => onSnooze(preset.resolve())}>
-            {preset.label}
+            {xoSnoozePresetLabel(preset.label)}
           </DropdownMenuItem>
         ))}
         <DropdownMenuSeparator />
@@ -728,8 +736,8 @@ function SnoozeSubmenu({ onSnooze }: { onSnooze: (snoozedUntil: string) => void 
 function decideByProvenance(item: AttentionItem): string | null {
   const attribution = item.decideByAttribution;
   if (!attribution) return null;
-  if (attribution.type === "agent") return attribution.agentName ?? "an agent";
-  return "you";
+  if (attribution.type === "agent") return attribution.agentName ?? tx("an agent");
+  return tx("you");
 }
 
 /** Compact "when does this snooze end" label, e.g. `in 2h`, `in 3d`. */

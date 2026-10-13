@@ -66,6 +66,7 @@ import {
 import { TaskChatPlanPreviewCard } from "./TaskChatPlanPreviewCard";
 import { TaskChatRichInput } from "./TaskChatRichInput";
 import { tx } from "@/i18n/xo";
+import { xoCompactKindLabel, xoStatusLabel } from "@/xo/labels";
 import { xoLocaleDateTime } from "@/xo/date-format";
 
 const TAKEOVER_TEXTAREA_CLASS =
@@ -119,7 +120,7 @@ const KIND_COPY = {
 } as const;
 
 function statusLabel(status: IssueThreadInteraction["status"]): string {
-  return status.replaceAll("_", " ");
+  return xoStatusLabel(status, status.replaceAll("_", " "));
 }
 
 function statusTone(status: IssueThreadInteraction["status"]): string {
@@ -169,7 +170,7 @@ function InteractionShell({
     <div className="flex min-w-0 items-center gap-2">
       <Icon aria-hidden className="h-4 w-4 shrink-0 text-muted-foreground" />
       <strong className="min-w-0 truncate text-sm font-medium text-foreground">
-        {interaction.title ?? kind.fallbackTitle}
+        {interaction.title ?? xoCompactKindLabel(kind.fallbackTitle)}
       </strong>
       {interaction.kind === "request_confirmation" &&
       interaction.payload.target?.type === "issue_document" &&
@@ -344,7 +345,13 @@ function PlanReviewPreview({
       }}
       href="#document-plan"
       testId="plan-review-preview"
-      ariaLabel={`Open ${target.label ?? (targetRevision == null ? "plan" : `plan revision ${targetRevision}`)}`}
+      ariaLabel={
+        target.label != null
+          ? tx("Open {{label}}", { label: target.label })
+          : targetRevision == null
+            ? tx("Open plan")
+            : tx("Open plan revision {{revision}}", { revision: targetRevision })
+      }
     />
   );
 }
@@ -599,7 +606,7 @@ function ReceiptDisclosure({
     const summary =
       interaction.kind === "ask_user_questions" &&
       interaction.status === "answered"
-        ? "Questions answered"
+        ? tx("Questions answered")
         : buildIssueThreadInteractionSummary(interaction);
     return (
       <details
@@ -1133,10 +1140,10 @@ function CheckboxConfirmationCard({
 
   const countHint =
     maximum < Number.POSITIVE_INFINITY
-      ? `${selected.size} selected · choose ${minimum}–${maximum}`
+      ? tx("{{selected}} selected · choose {{minimum}}–{{maximum}}", { selected: selected.size, minimum, maximum })
       : minimum > 0
-        ? `${selected.size} selected · at least ${minimum}`
-        : `${selected.size} selected`;
+        ? tx("{{selected}} selected · at least {{minimum}}", { selected: selected.size, minimum })
+        : tx("{{selected}} selected", { selected: selected.size });
 
   return (
     <div>
@@ -1480,7 +1487,7 @@ function SuggestedTasksCard({
       ) : null}
       <InteractionActionError message={actionError} />
       <ActionRow
-        hint={`${selected.size} of ${interaction.payload.tasks.length} selected`}
+        hint={tx("{{selected}} of {{total}} selected", { selected: selected.size, total: interaction.payload.tasks.length })}
       >
         {rejecting ? (
           <>
@@ -1922,7 +1929,11 @@ export function TaskChatCompactInteractionCard({
         <ConnectionIntentInteractionBody
           interaction={interaction}
           currentUserId={currentUserId}
-          addresseeLabel={addresseeLabel ?? "the addressed user"}
+          addresseeLabel={
+            addresseeLabel === "You"
+              ? tx("You")
+              : (addresseeLabel ?? tx("the addressed user"))
+          }
         />
       </InteractionShell>
     );
