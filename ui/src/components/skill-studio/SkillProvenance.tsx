@@ -7,6 +7,8 @@ import { queryKeys } from "@/lib/queryKeys";
 import { skillStudioRoute } from "@/lib/company-skill-routes";
 import { formatLineageLabel } from "@/lib/skill-fork";
 import { Button } from "@/components/ui/button";
+import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
 
 /**
  * Lineage chip for forked skills (PAP-13112, plan §3.1): "Forked from
@@ -31,7 +33,7 @@ export function SkillLineageChip({
   if (!forkedFromSkillId) return null;
 
   const original = originalQuery.data;
-  const label = original ? formatLineageLabel(original) : "the original skill";
+  const label = original ? formatLineageLabel(original) : tx("the original skill");
 
   return (
     <Link
@@ -60,15 +62,18 @@ export function ProjectScanNotice({
   skill: CompanySkillDetail;
   onEditACopy: () => void;
 }) {
-  const location = skill.sourcePath ?? skill.sourceLabel ?? "the project working tree";
+  const location = skill.sourcePath ?? skill.sourceLabel ?? tx("the project working tree");
 
   return (
     <div className="flex flex-wrap items-start gap-2 border-b border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
       <FolderGit2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
       <div className="min-w-0 flex-1">
         <span>
-          This skill lives in <span className="font-mono text-foreground">{location}</span>.
-          Saves write to the project working tree and are not committed.
+          <XoTrans
+            i18nKey="This skill lives in <path>{{location}}</path>. Saves write to the project working tree and are not committed."
+            values={{ location }}
+            components={{ path: <span className="font-mono text-foreground" /> }}
+          />
         </span>{" "}
         <Button
           type="button"

@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/dialog";
 import { ToggleSwitch } from "@/components/ui/toggle-switch";
 import { cn } from "@/lib/utils";
+import { tx } from "@/i18n/xo";
 
 /**
  * "Edit a copy" confirm dialog for read-only external skills (PAP-13112,
@@ -132,8 +133,10 @@ export function ForkSkillDialog({
   const busy = forkMutation.isPending;
   const forkLabel =
     reassign && agentCount > 0
-      ? `Create copy & switch ${agentCount} ${agentCount === 1 ? "agent" : "agents"}`
-      : "Create copy";
+      ? agentCount === 1
+        ? tx("Create copy & switch {{n}} agent", { n: agentCount })
+        : tx("Create copy & switch {{n}} agents", { n: agentCount })
+      : tx("Create copy");
 
   const openExisting = () => {
     if (!reusableFork) return;

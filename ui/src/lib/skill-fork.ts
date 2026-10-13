@@ -4,6 +4,7 @@ import type {
   CompanySkillSourceType,
   CompanySkillUsageAgent,
 } from "@paperclipai/shared";
+import { tx } from "@/i18n/xo";
 
 /**
  * Pure logic for the Skill Studio "Edit a copy" fork flow (PAP-13112). Kept
@@ -31,13 +32,13 @@ function sourceTypeFallbackLabel(sourceType: CompanySkillSourceType): string {
     case "skills_sh":
       return "skills.sh";
     case "url":
-      return "a URL";
+      return tx("a URL");
     case "catalog":
-      return "the catalog";
+      return tx("the catalog");
     case "local_path":
-      return "a local path";
+      return tx("a local path");
     default:
-      return "its source";
+      return tx("its source");
   }
 }
 
@@ -96,8 +97,9 @@ export function pickReusableFork(
 
 /** Unmissable agent-usage sentence for the dialog body (P3 hard requirement). */
 export function agentUsageSentence(count: number): string {
-  if (count <= 0) return "No agents currently use this skill";
-  return `${count} ${count === 1 ? "agent" : "agents"} currently use${count === 1 ? "s" : ""} this skill`;
+  if (count <= 0) return tx("No agents currently use this skill");
+  if (count === 1) return tx("{{n}} agent currently uses this skill", { n: count });
+  return tx("{{n}} agents currently use this skill", { n: count });
 }
 
 /** Agent ids to reassign when the "Switch these agents to the copy" toggle is on. */

@@ -9,6 +9,7 @@ import type {
   CompanySkillVersion,
 } from "@paperclipai/shared";
 import { Link } from "@/lib/router";
+import { tx } from "@/i18n/xo";
 import { agentsApi } from "@/api/agents";
 import { companySkillsApi } from "@/api/companySkills";
 import { queryKeys } from "@/lib/queryKeys";
@@ -56,7 +57,10 @@ export function AgentsUsingSkillBadge({
 }) {
   const [open, setOpen] = useState(false);
   const count = skill.usedByAgents.length;
-  const label = `${count} ${count === 1 ? "agent uses" : "agents use"} this skill`;
+  const label =
+    count === 1
+      ? tx("{{n}} agent uses this skill", { n: count })
+      : tx("{{n}} agents use this skill", { n: count });
 
   return (
     <>
@@ -201,7 +205,7 @@ export function AgentsUsingSkillDialog({
       ]);
     },
     onError: (error) => {
-      const message = error instanceof Error ? error.message : "Failed to update agent skills.";
+      const message = error instanceof Error ? error.message : tx("Failed to update agent skills.");
       toast?.pushToast({
         tone: "error",
         title: "Update failed",
@@ -354,7 +358,9 @@ function AgentRow({
             className="h-8 rounded-md border border-border bg-background px-2 text-xs text-foreground disabled:opacity-60"
           >
             <option value={LATEST_VALUE}>
-              Latest{latestRevision !== null ? ` (v${latestRevision})` : ""}
+              {latestRevision !== null
+                ? tx("Latest (v{{revision}})", { revision: latestRevision })
+                : tx("Latest")}
             </option>
             {versions.map((version) => (
               <option key={version.id} value={version.id}>
@@ -366,8 +372,10 @@ function AgentRow({
         ) : (
           <span className="text-xs text-muted-foreground">
             {agent.versionId
-              ? `v${pinnedRevision ?? "?"}`
-              : `Latest${latestRevision !== null ? ` (v${latestRevision})` : ""}`}
+              ? tx("v{{revision}}", { revision: pinnedRevision ?? "?" })
+              : latestRevision !== null
+                ? tx("Latest (v{{revision}})", { revision: latestRevision })
+                : tx("Latest")}
           </span>
         )}
         {behindLatest > 0 ? (
@@ -439,10 +447,10 @@ function AddAgentPicker({
       value=""
       groups={groups}
       loading={loading}
-      loadingMessage="Loading agents..."
+      loadingMessage={tx("Loading agents...")}
       placeholder="Add agent…"
-      searchPlaceholder="Search agents..."
-      emptyMessage="All eligible agents already have this skill."
+      searchPlaceholder={tx("Search agents...")}
+      emptyMessage={tx("All eligible agents already have this skill.")}
       disabled={disabled}
       onValueChange={(_value, option) => {
         onSelect(option.agent);
