@@ -6,6 +6,7 @@ import { queryKeys } from "@/lib/queryKeys";
 import { useSmokeLabEnabled } from "@/hooks/useSmokeLabEnabled";
 import { advancedTabHref } from "@/pages/tools/tool-tabs";
 import { cn } from "@/lib/utils";
+import { xoLocaleDateTime } from "@/xo/date-format";
 import { failingPaths, runHealth, type SmokeHealth } from "@/pages/tools/smoke-lab-matrix";
 
 const HEALTH_DOT: Record<SmokeHealth, string> = {
@@ -26,7 +27,7 @@ function formatTime(value: string | Date | null | undefined): string {
   if (!value) return "—";
   const date = new Date(value as string | Date);
   if (Number.isNaN(date.getTime())) return "—";
-  return new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(date);
+  return xoLocaleDateTime(date, undefined, { dateStyle: "medium", timeStyle: "short" });
 }
 
 /**

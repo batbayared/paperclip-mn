@@ -32,6 +32,7 @@ import {
   runHealth,
   type CellStatus,
 } from "./smoke-lab-matrix";
+import { xoLocaleDateTime } from "@/xo/date-format";
 
 // Public, non-secret fixture credentials for the fake OAuth provider. Kept in
 // sync with SMOKE_LAB_DEMO_EMAIL / SMOKE_LAB_DEMO_PASSWORD in
@@ -43,7 +44,7 @@ function formatTime(value: string | Date | null | undefined): string {
   if (!value) return "—";
   const date = new Date(value as string | Date);
   if (Number.isNaN(date.getTime())) return "—";
-  return new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(date);
+  return xoLocaleDateTime(date, undefined, { dateStyle: "medium", timeStyle: "short" });
 }
 
 function serviceTone(status: string): "success" | "warn" | "error" | "muted" {

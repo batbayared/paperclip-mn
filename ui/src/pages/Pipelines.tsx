@@ -1,4 +1,5 @@
 import { xoLocaleDate, xoLocaleDateTime } from "@/xo/date-format";
+import { tx } from "@/i18n/xo";
 import { useCallback, useEffect, useMemo, useState, type FormEvent, type ReactNode } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { groupWarningsByStage, LOW_TRUST_REVIEW_PRESET } from "@paperclipai/shared";
@@ -568,20 +569,20 @@ function formatOpenItems(count: number) {
 }
 
 function formatPipelineActivity(value: string | Date | null) {
-  if (!value) return "No activity";
+  if (!value) return tx("No activity");
   const then = new Date(value).getTime();
-  if (!Number.isFinite(then)) return "No activity";
+  if (!Number.isFinite(then)) return tx("No activity");
   const diffSeconds = Math.max(0, Math.round((Date.now() - then) / 1000));
-  if (diffSeconds < 60) return "just now";
+  if (diffSeconds < 60) return tx("just now");
   const diffMinutes = Math.round(diffSeconds / 60);
-  if (diffMinutes < 60) return `${diffMinutes} min ago`;
+  if (diffMinutes < 60) return tx("{{n}} min ago", { n: diffMinutes });
   const diffHours = Math.round(diffMinutes / 60);
-  if (diffHours < 24) return diffHours === 1 ? "1 hr ago" : `${diffHours} hr ago`;
+  if (diffHours < 24) return diffHours === 1 ? tx("1 hr ago") : tx("{{n}} hr ago", { n: diffHours });
   const diffDays = Math.round(diffHours / 24);
-  if (diffDays === 1) return "yesterday";
-  if (diffDays < 7) return `${diffDays} days ago`;
-  if (diffDays < 14) return "last week";
-  if (diffDays < 30) return `${Math.round(diffDays / 7)} weeks ago`;
+  if (diffDays === 1) return tx("yesterday");
+  if (diffDays < 7) return tx("{{n}} days ago", { n: diffDays });
+  if (diffDays < 14) return tx("last week");
+  if (diffDays < 30) return tx("{{n}} weeks ago", { n: Math.round(diffDays / 7) });
   return xoLocaleDate(new Date(value), "en-US", { month: "short", day: "numeric" });
 }
 
@@ -4165,12 +4166,12 @@ function BuiltFromTree({
 }
 
 function formatShortDate(value: Date | string) {
-  return new Intl.DateTimeFormat(undefined, {
+  return xoLocaleDateTime(new Date(value), undefined, {
     month: "short",
     day: "numeric",
     hour: "numeric",
     minute: "2-digit",
-  }).format(new Date(value));
+  });
 }
 
 function PipelineAddItems({ pipelineId }: { pipelineId: string }) {

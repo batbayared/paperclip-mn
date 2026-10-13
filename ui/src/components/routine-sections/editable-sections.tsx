@@ -35,7 +35,7 @@ import { RoutineTriggerCard } from "../RoutineTriggerCard";
 import { EnvironmentVariablesEditor } from "../environment-variables-editor";
 import { createDefaultNewTrigger, useRoutineDetail } from "./context";
 import type { EnvBinding, RoutineDetail as RoutineDetailType } from "@paperclipai/shared";
-import { xoLocaleDateTime } from "@/xo/date-format";
+import { xoLocaleDateTime, xoZonedDateTime } from "@/xo/date-format";
 
 const concurrencyPolicyOptions = [
   {
@@ -833,6 +833,8 @@ function NextFiresPreview({
 
 function formatFireTime(date: Date, timeZone: string): string {
   try {
+    const mn = xoZonedDateTime(date, timeZone);
+    if (mn !== null) return mn;
     return new Intl.DateTimeFormat(undefined, {
       timeZone,
       year: "numeric",

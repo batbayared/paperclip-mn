@@ -24,6 +24,8 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectSeparator, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { queryKeys } from "@/lib/queryKeys";
 import { cn, formatDateTime, relativeTime } from "@/lib/utils";
+import { tx } from "@/i18n/xo";
+import { xoLocaleDateTime } from "@/xo/date-format";
 
 const SUMMARIZER_KEY = "summarizer";
 const TERMINAL_ISSUE_STATUSES = new Set(["done", "cancelled"]);
@@ -45,17 +47,17 @@ function issueLabel(issue: SummarySlotIssueRef) {
 }
 
 function revisionLabel(revision: SummarySlotRevision) {
-  return `Rev ${revision.revisionNumber}`;
+  return tx("Rev {{n}}", { n: revision.revisionNumber });
 }
 
 function formatRevisionTimestamp(date: Date | string) {
-  return new Intl.DateTimeFormat("en-US", {
+  return xoLocaleDateTime(new Date(date), "en-US", {
     month: "short",
     day: "numeric",
     hour: "2-digit",
     minute: "2-digit",
     hourCycle: "h23",
-  }).format(new Date(date)).replace(",", "");
+  }).replace(",", "");
 }
 
 function revisionOptionLabel(revision: SummarySlotRevision) {
@@ -66,7 +68,7 @@ function latestRevisionOptionLabel(
   document: SummarySlotDocument,
   revision: SummarySlotRevision | null,
 ) {
-  return `Latest (Rev ${document.latestRevisionNumber}) - ${
+  return `${tx("Latest (Rev {{n}})", { n: document.latestRevisionNumber })} - ${
     formatRevisionTimestamp(revision?.createdAt ?? document.updatedAt)
   }`;
 }

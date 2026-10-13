@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   mnDate, mnDateTime, mnRelative, mnShortDate, mnShortDateTime,
-  mnTime, xoLocaleDate, xoLocaleDateTime, xoLocaleTime,
+  mnTime, xoLocaleDate, xoLocaleDateTime, xoLocaleTime, xoZonedDateTime,
 } from "./date-format";
 import { XO_LOCALE_STORAGE_KEY } from "./locale";
 
@@ -79,6 +79,34 @@ describe("xoLocale* wrapper (mn)", () => {
     expect(xoLocaleDate(bad)).toBe("Invalid Date");
     expect(xoLocaleTime(bad)).toBe("Invalid Date");
   });
+
+  it("mn: жилгүй, сартай options → богино огноо+цаг", () => {
+    localStorage.setItem(XO_LOCALE_STORAGE_KEY, "mn");
+    expect(
+      xoLocaleDateTime(sample, undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }),
+    ).toBe("9-р сарын 7 13:02");
+    expect(
+      xoLocaleDateTime(sample, undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZoneName: "short" }),
+    ).toBe("9-р сарын 7 13:02");
+  });
+
+  it("mn: dateStyle ба жилтэй options урт хэвээр", () => {
+    localStorage.setItem(XO_LOCALE_STORAGE_KEY, "mn");
+    expect(xoLocaleDateTime(sample, undefined, { dateStyle: "medium", timeStyle: "short" })).toBe("2026 оны 9-р сарын 7 13:02");
+    expect(xoLocaleDateTime(sample, undefined, { year: "numeric", month: "2-digit", day: "2-digit" })).toBe("2026 оны 9-р сарын 7 13:02");
+  });
+
+  it("mn: timeZone UTC → UTC огноо", () => {
+    localStorage.setItem(XO_LOCALE_STORAGE_KEY, "mn");
+    const utcMidnight = new Date("2026-10-13T00:00:00.000Z");
+    expect(xoLocaleDate(utcMidnight, undefined, { month: "short", day: "numeric", timeZone: "UTC" })).toBe("10-р сарын 13");
+    expect(xoLocaleDateTime(utcMidnight, undefined, { timeZone: "UTC" })).toBe("2026 оны 10-р сарын 13 0:00");
+  });
+
+  it("mn: xoZonedDateTime цагийн бүсээр хөрвүүлнэ", () => {
+    localStorage.setItem(XO_LOCALE_STORAGE_KEY, "mn");
+    expect(xoZonedDateTime(new Date("2026-10-13T06:54:00.000Z"), "Asia/Ulaanbaatar")).toBe("2026 оны 10-р сарын 13 14:54");
+  });
 });
 
 describe("xoLocale* wrapper (en)", () => {
@@ -100,5 +128,16 @@ describe("xoLocale* wrapper (en)", () => {
     expect(spyTime).toHaveBeenCalledWith([], { hour: "2-digit" });
     expect(xoLocaleDate(sample, undefined, opts)).toBe("EN-D");
     expect(spyDate).toHaveBeenLastCalledWith(undefined, opts);
+  });
+
+  it("en: богино options-ийн дуудлага хэвээр", () => {
+    const spy = vi.spyOn(Date.prototype, "toLocaleString");
+    const opts = { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" } as const;
+    xoLocaleDateTime(sample, undefined, opts);
+    expect(spy).toHaveBeenCalledWith(undefined, opts);
+  });
+
+  it("en: xoZonedDateTime null буцаана", () => {
+    expect(xoZonedDateTime(new Date(), "UTC")).toBeNull();
   });
 });
