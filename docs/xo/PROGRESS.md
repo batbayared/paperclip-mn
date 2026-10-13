@@ -13,7 +13,9 @@
 | 5 Ажиллагааны явц, хугацаа | 238d8fc31 |
 | 6 Task chat thread ба карт | 20408bd72 |
 | 7 Issue chat thread | e256c5cc5 |
-| 8 SYNC.md ба бүртгэл | энэ commit |
+| 8 SYNC.md ба бүртгэл | 40ecd6fd1 |
+| Эцсийн review 1-ийн засвар (PR «Нээлттэй», en огнооны locale) | 0227002d3 |
+| Эцсийн review 2-ын засвар (runner-ийн алдааны тайлбар, огнооны хуваагч, баганын нэр, зөвшөөрлийн шийдвэр) | энэ commit |
 
 ### Шалгалтын үр дүн (Task 8)
 
@@ -21,6 +23,14 @@
 - xo:i18n:test 2 файл, 54 тест; xo:i18n:typecheck цэвэр.
 - vitest 224 файл, 2684 тест; ui tsc цэвэр.
 - brand-scan 161 файл, 586 hit (baseline-тэй тэнцүү).
+
+### Шалгалтын үр дүн (эцсийн review 2-ын засвар)
+
+- xo:i18n:check OK, keys=2360 (30 шинэ түлхүүр).
+- xo:i18n:test 54 тест; xo:i18n:typecheck цэвэр; ui tsc цэвэр.
+- vitest (ui): 614 файл, 6386 тест PASS. Root-ын бүрэн suite-д ui-гаас гадуурх 3 файлд 48 тест орчны шалтгаанаар унадаг (macOS /var → /private/var symlink: packages/shared worktree-seed-source; adapter-utils dist; server native-codex integration) — энэ өөрчлөлттэй холбоогүй, тэр файлууд HEAD-тэй ижил.
+- brand-scan 161 файл, 586 hit (baseline-тэй тэнцүү).
+- 3110 (mn, /YB/issues): огнооны хуваагч «Өчигдөр»/«Өмнөх», баганын popover «Төлөв, Дугаар, Хариуцагч, Эхлүүлсэн, Төсөл, Эцэг даалгавар, Шошго, Сүүлд шинэчилсэн» тайлбартайгаа монгол.
 
 ### 3110 instance ба browser шалгалт
 
@@ -38,12 +48,12 @@
 7.2-т шилжүүлэх англи үлдэгдэл (JSX текст биш тул энэ төлөвлөгөөний хүрээнээс гадуур):
 
 - IssuesList.tsx-ийн createButtonLabel const «New Task».
-- ui/src/lib/task-date-groups.ts «Yesterday»/«Earlier» бүлгийн шошго.
 - Шүүлтүүрийн түргэн сонголт ба төлвийн сонголтууд (All, Active, Backlog, Done …).
 - Шинж чанарын самбарын «Properties» гарчиг, «Board»/«None» fallback.
 - Огноо, цагийн формат («Oct 12, 2026, 9:38 AM»).
 - sr-only «Open YB-3: …» мөрийн шошго, «Change status (current: …)» aria-label.
-- RichWorkProductCard.tsx PR статус chip «Нээх» → «Нээлттэй» байх ёстой (тусдаа түлхүүр).
+- Эцсийн review 2-ын I-3: T1 файл дахь JSX биш англи литерал (жагсаалт docs/xo/SYNC.md «Үлдэгдэл (Ү6 7.2)»).
+- M-4: NewIssueDialog «For»/«in» глобал түлхүүрийг контексттэй болгох; M-5: mn дээр failed run-ийн «Try again» тест.
 
 ## Ү3-Б үлдэгдэл (xo-main)
 

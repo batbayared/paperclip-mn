@@ -10,6 +10,8 @@ import {
 import { useReducedMotion } from "motion/react";
 import { MarkdownBody } from "@/components/MarkdownBody";
 import { cn } from "@/lib/utils";
+import { tx } from "@/i18n/xo";
+import { xoPermissionDecision } from "@/xo/labels";
 import { useTaskChatExpansion } from "./expansion-state";
 import type { TaskChatActivityPhaseItem } from "./task-chat-model";
 import {
@@ -229,7 +231,7 @@ function ActivityDetails({ item }: { item: Activity }) {
           {item.detail}
         </pre>
       ) : null}
-      {item.decision ? <p>Permission {item.decision}</p> : null}
+      {item.decision ? <p>{tx("Permission {{decision}}", { decision: xoPermissionDecision(item.decision) })}</p> : null}
       {item.diff ? (
         <p className="break-all font-mono">
           {item.diff.path} · +{item.diff.added} −{item.diff.removed}

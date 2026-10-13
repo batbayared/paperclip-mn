@@ -1,4 +1,5 @@
 import { tx } from "@/i18n/xo";
+import { xoColumnDescription, xoColumnLabel } from "@/xo/labels";
 import type { ReactNode } from "react";
 import { deriveOriginatingActor, type Issue } from "@paperclipai/shared";
 import { Columns3 } from "lucide-react";
@@ -140,10 +141,10 @@ export function IssueColumnPicker({
           >
             <span className="flex flex-col gap-0.5">
               <span className="text-sm font-medium text-foreground">
-                {issueColumnLabels[column]}
+                {xoColumnLabel(issueColumnLabels[column])}
               </span>
               <span className="text-xs leading-relaxed text-muted-foreground">
-                {issueColumnDescription(column, rowPresentation)}
+                {xoColumnDescription(issueColumnDescription(column, rowPresentation))}
               </span>
             </span>
           </DropdownMenuCheckboxItem>

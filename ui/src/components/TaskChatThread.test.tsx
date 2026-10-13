@@ -1197,6 +1197,40 @@ describe("TaskChatThread runtime transcript selection", () => {
     }
   });
 
+  it("mn дээр paperclip биш runner-ийн алдааны тайлбарыг орчуулна", async () => {
+    await i18n.changeLanguage("mn");
+    try {
+      render(
+        <TaskChatThread
+          comments={[]}
+          onAdd={async () => {}}
+          issueStatus="blocked"
+          onRetryFailedRun={vi.fn()}
+          linkedRuns={[
+            {
+              runId: "codex-failed",
+              runtimeMode: "legacy",
+              status: "failed",
+              errorCode: "legacy_process_exited",
+              agentId: "agent-1",
+              agentName: "Direct Codex",
+              adapterType: "codex_local",
+              createdAt: "2026-08-25T18:00:00.000Z",
+              startedAt: "2026-08-25T18:00:00.000Z",
+              finishedAt: "2026-08-25T18:00:02.000Z",
+            },
+          ]}
+        />,
+      );
+      expect(container.textContent).toContain("Ажиллагаа амжилтгүй болсон");
+      expect(container.textContent).toContain("Энэ мессежийг одоо дахин илгээж болно.");
+      expect(container.textContent).not.toContain("Run failed");
+      expect(container.textContent).not.toContain("You can retry this message now.");
+    } finally {
+      await i18n.changeLanguage("en");
+    }
+  });
+
   it("explains a legacy run prevented from starting by a reconciliation hold", () => {
     render(<TaskChatThread comments={[]} onAdd={async () => {}} linkedRuns={[{
       runId: "blocked-legacy", runtimeMode: "legacy", status: "cancelled",

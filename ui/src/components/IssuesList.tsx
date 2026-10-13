@@ -1,4 +1,5 @@
 import { tx } from "@/i18n/xo";
+import { xoDateGroupLabel } from "@/xo/labels";
 import { startTransition, useDeferredValue, useEffect, useMemo, useState, useCallback, useRef } from "react";
 import type { ReactNode } from "react";
 import { useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -2452,7 +2453,7 @@ function StreamlinedIssuesList({
                       nodes.push(
                         <IssueDateSeparator
                           key={`date-sep-${issue.id}-${currentDateGroup}`}
-                          label={separatorLabel}
+                          label={xoDateGroupLabel(separatorLabel)}
                         />,
                       );
                     }
@@ -2465,7 +2466,7 @@ function StreamlinedIssuesList({
                       nodes.push(
                         <IssueDateSeparator
                           key={`date-sep-${issue.id}-${crossedBucket}`}
-                          label={issueAgeSeparatorLabel(crossedBucket)}
+                          label={xoDateGroupLabel(issueAgeSeparatorLabel(crossedBucket))}
                         />,
                       );
                     }

@@ -1674,24 +1674,24 @@ export function TaskChatThread(props: TaskChatThreadProps) {
           settledRunIds.add(source.id);
           const code = meta?.errorCode ?? "native_runner_process_exited";
           const retryDetail = meta?.scheduledRetryAt
-            ? "Retry scheduled automatically."
+            ? tx("Retry scheduled automatically.")
             : canRetryFailedRun
-              ? "You can retry this message now."
-              : "Your message is preserved.";
+              ? tx("You can retry this message now.")
+              : tx("Your message is preserved.");
           const aiRequest = interactions?.find((interaction) => interaction.kind === "connection_intent" && interaction.payload.purpose === "ai" && interaction.sourceRunId === source.id);
           const detail = aiRequest
             ? aiRequest.status === "pending"
-              ? "The selected AI account is unavailable. Fix it in the connection card."
-              : "This run stopped because its AI account was unavailable."
+              ? tx("The selected AI account is unavailable. Fix it in the connection card.")
+              : tx("This run stopped because its AI account was unavailable.")
             : source.status === "cancelled"
               ? code === "execution_reconciliation_required"
-                ? "The previous execution must be checked before this task can continue. Your message is preserved. View the stopped run for details."
-                : "Execution was stopped before returning an answer."
+                ? tx("The previous execution must be checked before this task can continue. Your message is preserved. View the stopped run for details.")
+                : tx("Execution was stopped before returning an answer.")
               : code === "provider_frame_too_large"
-              ? `Provider output exceeded the safe limit. ${retryDetail}`
+              ? tx("Provider output exceeded the safe limit. {{retry}}", { retry: retryDetail })
               : code.startsWith("workspace_git_scan_")
-              ? `Workspace setup failed before the agent started. ${retryDetail}`
-              : `The runner stopped before returning an answer (${code}). ${retryDetail}`;
+              ? tx("Workspace setup failed before the agent started. {{retry}}", { retry: retryDetail })
+              : tx("The runner stopped before returning an answer ({{code}}). {{retry}}", { code, retry: retryDetail });
           const id = `${source.id}:failure`;
           entriesWithFailures.push({
             ms: toMs(meta?.finishedAt ?? meta?.startedAt ?? meta?.createdAt),
@@ -1701,7 +1701,7 @@ export function TaskChatThread(props: TaskChatThreadProps) {
               id,
               kind: "marker",
               variant: "interrupted",
-              label: source.status === "cancelled" ? (meta?.startedAt ? "Stopped" : "Couldn't start") : "Run failed",
+              label: source.status === "cancelled" ? (meta?.startedAt ? tx("Stopped") : tx("Couldn't start")) : tx("Run failed"),
               runId: source.status === "cancelled" ? undefined : source.id,
               tone: source.status === "cancelled" ? "neutral" : "error",
               detail,
@@ -1718,7 +1718,7 @@ export function TaskChatThread(props: TaskChatThreadProps) {
               id,
               kind: "marker",
               variant: "turn_boundary",
-              label: source.status === "cancelled" ? "Stopped" : "Run completed",
+              label: source.status === "cancelled" ? tx("Stopped") : tx("Run completed"),
               detail: source.status === "cancelled" ? "This turn was cancelled before it returned a response." : "The runner returned no user-facing response.",
             },
           });

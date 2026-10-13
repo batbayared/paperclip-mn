@@ -208,9 +208,9 @@ T1 = scripts/xo-i18n/tiers.ts-ийн tier-1 жагсаалтад нэмсэн (V
 
 | Файл | Өөрчлөлт |
 |---|---|
-| ui/src/components/IssuesList.tsx | T1; гар tx (бүлгийн гарчиг, хоосон төлөвийн тоо) |
+| ui/src/components/IssuesList.tsx | T1; гар tx (бүлгийн гарчиг, хоосон төлөвийн тоо); огнооны хуваагч xoDateGroupLabel |
 | ui/src/components/IssueFiltersPopover.tsx | T1; гар tx (шүүлтүүрийн тоо) |
-| ui/src/components/IssueColumns.tsx | T1 |
+| ui/src/components/IssueColumns.tsx | T1; баганын нэр, тайлбар xoColumnLabel/xoColumnDescription |
 | ui/src/components/MobileBottomNav.tsx | T1 |
 | ui/src/lib/timeAgo.ts | mn үед mnTimeAgo() руу шилжүүлсэн |
 | ui/src/lib/timeAgo.test.ts | шинэ: mn ба en гаралт |
@@ -237,8 +237,8 @@ T1 = scripts/xo-i18n/tiers.ts-ийн tier-1 жагсаалтад нэмсэн (V
 | ui/src/components/task-chat/TaskChatStatusPill.tsx | T1; статусын шошго tx |
 | ui/src/components/task-chat/TaskChatUsageReadout.tsx | T1; гар tx |
 | ui/src/components/task-chat/completed-activity-summary.ts | T1; хураангуй өгүүлбэр гар tx |
-| ui/src/components/task-chat/TaskChatRunnerTurn.tsx, TaskChatRunnerActivityGroup.tsx | T1 |
-| ui/src/components/TaskChatThread.tsx | T1; алдааны шошго ба тоо гар tx |
+| ui/src/components/task-chat/TaskChatRunnerTurn.tsx, TaskChatRunnerActivityGroup.tsx | T1; зөвшөөрлийн шийдвэр xoPermissionDecision (RunnerActivityGroup) |
+| ui/src/components/TaskChatThread.tsx | T1; алдааны шошго, runner-ийн алдааны тайлбар ба тоо гар tx |
 | ui/src/components/TaskChatThread.test.tsx | mn тест нэмсэн |
 | ui/src/components/task-chat/TaskChatPlanPreviewCard.tsx | T1; гар tx |
 | ui/src/components/task-chat/TaskChatPlanPreviewCard.test.tsx | mn тест нэмсэн |
@@ -250,7 +250,7 @@ T1 = scripts/xo-i18n/tiers.ts-ийн tier-1 жагсаалтад нэмсэн (V
 | ui/src/lib/issue-chat-messages.test.ts | mn тест нэмсэн |
 | ui/src/pages/IssueDetail.tsx | гар tx (ажиллагааг зогсоох шошго) |
 
-XO-ийн өмч (upstream биш): ui/src/xo/time-ago.ts, ui/src/xo/run-text.ts, ui/src/xo/labels.ts (xoFileKindLabel, xoActivityLabel, MODE_DESCRIPTION), scripts/xo-i18n/tiers.ts, ui/src/i18n/xo/* (en.json, mn.json, keep-en.json), docs/xo/glossary.md.
+XO-ийн өмч (upstream биш): ui/src/xo/time-ago.ts, ui/src/xo/run-text.ts, ui/src/xo/labels.ts (xoFileKindLabel, xoActivityLabel, MODE_DESCRIPTION, xoDateGroupLabel, xoColumnLabel, xoColumnDescription, xoPermissionDecision), scripts/xo-i18n/tiers.ts, ui/src/i18n/xo/* (en.json, mn.json, keep-en.json), docs/xo/glossary.md.
 
 Шинэ XO-ийн тестүүд: ui/src/xo/time-ago.test.ts, ui/src/xo/run-text.test.ts, ui/src/xo/labels.test.ts (нэмэлт).
 
@@ -258,6 +258,9 @@ XO-ийн өмч (upstream биш): ui/src/xo/time-ago.ts, ui/src/xo/run-text.ts
 - Нэрийн fallback ("Agent", "You", "System", "None", "Board", child.status "unknown").
 - Clipboard-ын "Result:\n" угтвар, `d.label === "Intent"` харьцуулалт.
 - Ү6/T2 файлууд: TweakPanel, motion-tokens, task-chat-states, task-chat-fixtures, task-chat-attachments, RunTranscriptView, routine-run-display, DesignGuide.
+- T1 файл дахь JSX биш англи литерал (transform ороодоггүй, эцсийн review I-3): IssueFiltersPopover.tsx:68-81 (INBOX_CATEGORY_OPTIONS, INBOX_APPROVAL_STATUS_OPTIONS); IssuesList.tsx:136-142 (issueStatusLabels); NewIssueDialog.tsx («Search agents...», «No agents found.», «Failed to create task. Try again.»); IssueProperties.tsx:620-646 (workspace toast); TaskChatComposer.tsx:659-918 (/goal алдаанууд); TaskChatQueuedMessages.tsx:109-352; TaskChatBlockerLinks.tsx:196-223; TaskChatProtocolCard.tsx:631-651; transcript-adapter.ts:200-216 («Thought for {secs}s»).
+- Контексттэй түлхүүр (M-4): NewIssueDialog.tsx:1479, 1540 глобал «For»/«in» түлхүүр энэ мөрөнд л тохирно; tx("For (assignee)"), tx("in (project picker)") хэлбэрт шилжүүлэх.
+- Тест (M-5): mn дээр failed run-д «Try again» харагдахыг TaskChatThreadView тестээр хамгаалах.
 
 ## Lockfile
 

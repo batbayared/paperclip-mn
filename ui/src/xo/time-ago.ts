@@ -1,5 +1,4 @@
-// XO: timeAgo()-ийн Монгол хувилбар. Гаралт Intl.RelativeTimeFormat("mn-MN")-тэй ижил,
-// браузерын ICU-ээс хамаарахгүйн тулд загварыг шууд бичсэн.
+// XO: timeAgo()-ийн Монгол хувилбар; браузерын ICU-ээс хамаарахгүйн тулд загварыг шууд бичсэн.
 const MINUTE = 60;
 const HOUR = 60 * MINUTE;
 const DAY = 24 * HOUR;

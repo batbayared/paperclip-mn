@@ -1,6 +1,16 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { i18n } from "@/i18n";
-import { xoActivityLabel, xoFileKindLabel, xoLabel, xoStatusLabel, xoWorkProductStatusLabel } from "./labels";
+import {
+  xoActivityLabel,
+  xoColumnDescription,
+  xoColumnLabel,
+  xoDateGroupLabel,
+  xoFileKindLabel,
+  xoLabel,
+  xoPermissionDecision,
+  xoStatusLabel,
+  xoWorkProductStatusLabel,
+} from "./labels";
 
 afterEach(async () => {
   await i18n.changeLanguage("en");
@@ -100,5 +110,50 @@ describe("xoWorkProductStatusLabel", () => {
     await i18n.changeLanguage("mn");
     expect(xoWorkProductStatusLabel("Open")).toBe("Нээлттэй");
     expect(xoWorkProductStatusLabel("Draft")).toBe("Draft");
+  });
+});
+
+describe("xoDateGroupLabel", () => {
+  it("en дээр англи шошгыг хэвээр буцаана", () => {
+    expect(xoDateGroupLabel("Today")).toBe("Today");
+    expect(xoDateGroupLabel("Older than a week")).toBe("Older than a week");
+  });
+
+  it("mn дээр огнооны тусгаарлагчийг орчуулна", async () => {
+    await i18n.changeLanguage("mn");
+    expect(xoDateGroupLabel("Today")).toBe("Өнөөдөр");
+    expect(xoDateGroupLabel("Yesterday")).toBe("Өчигдөр");
+    expect(xoDateGroupLabel("Earlier")).toBe("Өмнөх");
+    expect(xoDateGroupLabel("Older than a day")).toBe("Нэг өдрөөс өмнөх");
+    expect(xoDateGroupLabel("Unknown")).toBe("Unknown");
+  });
+});
+
+describe("xoColumnLabel / xoColumnDescription", () => {
+  it("en дээр англи шошгыг хэвээр буцаана", () => {
+    expect(xoColumnLabel("Kicked off by")).toBe("Kicked off by");
+    expect(xoColumnDescription("Task labels and tags.")).toBe("Task labels and tags.");
+  });
+
+  it("mn дээр баганын нэр ба тайлбарыг орчуулна", async () => {
+    await i18n.changeLanguage("mn");
+    expect(xoColumnLabel("Status")).toBe("Төлөв");
+    expect(xoColumnLabel("Kicked off by")).toBe("Эхлүүлсэн");
+    expect(xoColumnLabel("Last updated")).toBe("Сүүлд шинэчилсэн");
+    expect(xoColumnDescription("Task labels and tags.")).toBe("Даалгаврын шошго.");
+    expect(xoColumnLabel("Unknown")).toBe("Unknown");
+  });
+});
+
+describe("xoPermissionDecision", () => {
+  it("en дээр түүхий утгыг хэвээр буцаана", () => {
+    expect(xoPermissionDecision("allowed")).toBe("allowed");
+  });
+
+  it("mn дээр allowed/rejected-ийг орчуулна", async () => {
+    await i18n.changeLanguage("mn");
+    expect(xoPermissionDecision("allowed")).toBe("Зөвшөөрсөн");
+    expect(xoPermissionDecision("rejected")).toBe("Татгалзсан");
+    expect(xoPermissionDecision("other")).toBe("other");
   });
 });

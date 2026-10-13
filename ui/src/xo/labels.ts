@@ -101,3 +101,60 @@ export function xoActivityLabel(english: string): string {
     default: return english;
   }
 }
+
+// IssuesList-ийн огнооны тусгаарлагч (task-date-groups.ts, issueAgeSeparatorLabel): label
+// хувьсагчаар дамждаг тул transform ороохгүй. Түлхүүр нь англи тексттэй ижил.
+export function xoDateGroupLabel(english: string): string {
+  switch (english) {
+    case "Today": return tx("Today");
+    case "Yesterday": return tx("Yesterday");
+    case "Earlier": return tx("Earlier");
+    case "Older than a day": return tx("Older than a day");
+    case "Older than a week": return tx("Older than a week");
+    default: return english;
+  }
+}
+
+// IssueColumns.tsx-ийн баганын нэр ба тайлбар (Record initializer тул transform барихгүй).
+export function xoColumnLabel(english: string): string {
+  switch (english) {
+    case "Status": return tx("Status");
+    case "ID": return tx("ID");
+    case "Responsible": return tx("Responsible");
+    case "Kicked off by": return tx("Kicked off by");
+    case "Project": return tx("Project");
+    case "Workspace": return tx("Workspace");
+    case "Parent task": return tx("Parent task");
+    case "Tags": return tx("Tags");
+    case "Last updated": return tx("Last updated");
+    default: return english;
+  }
+}
+
+export function xoColumnDescription(english: string): string {
+  switch (english) {
+    case "Task state chip on the left edge.": return tx("Task state chip on the left edge.");
+    case "Task state icon on the leading edge.": return tx("Task state icon on the leading edge.");
+    case "Ticket identifier like PAP-1009.": return tx("Ticket identifier like PAP-1009.");
+    case "Task identifier like PAP-1009 on the trailing edge.": return tx("Task identifier like PAP-1009 on the trailing edge.");
+    case "Responsible agent or board user.": return tx("Responsible agent or board user.");
+    case "Board user or agent who created the task.": return tx("Board user or agent who created the task.");
+    case "Linked project pill with its color.": return tx("Linked project pill with its color.");
+    case "Execution or project workspace used for the task.": return tx("Execution or project workspace used for the task.");
+    case "Parent task identifier and title.": return tx("Parent task identifier and title.");
+    case "Task labels and tags.": return tx("Task labels and tags.");
+    case "Latest visible activity time.": return tx("Latest visible activity time.");
+    default: return english;
+  }
+}
+
+// TaskChatRunnerActivityGroup-ийн зөвшөөрлийн шийдвэр (task-chat-model.ts decision:
+// "allowed" | "rejected"). en дээр guard түүхий утгыг буцаана.
+export function xoPermissionDecision(decision: string): string {
+  if (!(i18n.resolvedLanguage ?? i18n.language ?? "").startsWith("mn")) return decision;
+  switch (decision) {
+    case "allowed": return tx("Allowed");
+    case "rejected": return tx("Rejected");
+    default: return decision;
+  }
+}
