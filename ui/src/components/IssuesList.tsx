@@ -1,5 +1,5 @@
 import { tx } from "@/i18n/xo";
-import { xoDateGroupLabel } from "@/xo/labels";
+import { xoCreateIssueLabels, xoDateGroupLabel, xoIssueFilterLabel, xoStatusLabel } from "@/xo/labels";
 import { startTransition, useDeferredValue, useEffect, useMemo, useState, useCallback, useRef } from "react";
 import type { ReactNode } from "react";
 import { useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -32,7 +32,6 @@ import {
   applyIssueFilters,
   countActiveIssueFilters,
   defaultIssueFilterState,
-  issueFilterLabel,
   issuePriorityOrder,
   normalizeIssueFilterState,
   resolveIssueFilterWorkspaceId,
@@ -659,7 +658,7 @@ function SubIssueProgressSummaryStrip({
                 key={status}
                 className={cn("h-full", progressSegmentClasses[status])}
                 style={{ width: `${(count / summary.totalCount) * 100}%` }}
-                title={`${issueStatusLabels[status]}: ${count}`}
+                title={`${xoStatusLabel(status, issueStatusLabels[status])}: ${count}`}
                 aria-hidden="true"
               />
             ))}
@@ -1278,13 +1277,13 @@ function StreamlinedIssuesList({
       const groups = groupBy(filtered, (i) => i.status);
       return issueStatusOrder
         .filter((s) => groups[s]?.length)
-        .map((s) => ({ key: s, label: issueFilterLabel(s), items: groups[s]! }));
+        .map((s) => ({ key: s, label: xoIssueFilterLabel(s), items: groups[s]! }));
     }
     if (viewState.groupBy === "priority") {
       const groups = groupBy(filtered, (i) => i.priority);
       return issuePriorityOrder
         .filter((p) => groups[p]?.length)
-        .map((p) => ({ key: p, label: issueFilterLabel(p), items: groups[p]! }));
+        .map((p) => ({ key: p, label: xoIssueFilterLabel(p), items: groups[p]! }));
     }
     if (viewState.groupBy === "workspace") {
       const groups = groupBy(
@@ -1679,8 +1678,7 @@ function StreamlinedIssuesList({
     viewState.groupBy,
   ]);
 
-  const createActionLabel = createIssueLabel ? `Create ${createIssueLabel}` : "Create Task";
-  const createButtonLabel = createIssueLabel ? `New ${createIssueLabel}` : "New Task";
+  const { action: createActionLabel, button: createButtonLabel } = xoCreateIssueLabels(createIssueLabel);
   const openCreateIssueDialog = useCallback((group?: { key: string; items: Issue[] }) => {
     openNewIssue(newIssueDefaults(group));
   }, [newIssueDefaults, openNewIssue]);

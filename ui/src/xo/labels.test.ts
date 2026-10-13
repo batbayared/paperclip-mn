@@ -4,11 +4,15 @@ import {
   xoActivityLabel,
   xoColumnDescription,
   xoColumnLabel,
+  xoCreateIssueLabels,
   xoDateGroupLabel,
   xoFileKindLabel,
   xoHumanizeValue,
+  xoInboxFilterLabel,
+  xoIssueFilterLabel,
   xoLabel,
   xoPermissionDecision,
+  xoQuickFilterLabel,
   xoStatusLabel,
   xoToolDetailLabel,
   xoWorkProductStatusLabel,
@@ -193,5 +197,63 @@ describe("xoToolDetailLabel", () => {
     expect(xoToolDetailLabel("Query")).toBe("Асуулга");
     expect(xoToolDetailLabel("Name")).toBe("Нэр");
     expect(xoToolDetailLabel("Unknown")).toBe("Unknown");
+  });
+});
+
+describe("xoIssueFilterLabel", () => {
+  it("en дээр issueFilterLabel-тэй ижил", () => {
+    expect(xoIssueFilterLabel("in_progress")).toBe("In Progress");
+    expect(xoIssueFilterLabel("critical")).toBe("Critical");
+    expect(xoIssueFilterLabel("custom_thing")).toBe("Custom Thing");
+  });
+
+  it("mn дээр статус ба зэрэглэлийг орчуулна", async () => {
+    await i18n.changeLanguage("mn");
+    expect(xoIssueFilterLabel("in_progress")).toBe("Хийгдэж буй");
+    expect(xoIssueFilterLabel("backlog")).toBe("Нөөц");
+    expect(xoIssueFilterLabel("critical")).not.toBe("Critical");
+    expect(xoIssueFilterLabel("low")).not.toBe("Low");
+    expect(xoIssueFilterLabel("custom_thing")).toBe("Custom Thing");
+  });
+});
+
+describe("xoQuickFilterLabel / xoInboxFilterLabel", () => {
+  it("en дээр хэвээр", () => {
+    expect(xoQuickFilterLabel("Active")).toBe("Active");
+    expect(xoInboxFilterLabel("Needs action")).toBe("Needs action");
+  });
+
+  it("mn дээр орчуулна", async () => {
+    await i18n.changeLanguage("mn");
+    expect(xoQuickFilterLabel("All")).toBe("Бүгд");
+    expect(xoQuickFilterLabel("Active")).toBe("Идэвхтэй");
+    expect(xoQuickFilterLabel("Backlog")).toBe("Нөөц");
+    expect(xoQuickFilterLabel("Done")).toBe("Дууссан");
+    expect(xoInboxFilterLabel("All categories")).toBe("Бүх ангилал");
+    expect(xoInboxFilterLabel("My recent tasks")).toBe("Миний сүүлийн даалгаврууд");
+    expect(xoInboxFilterLabel("Join requests")).toBe("Нэгдэх хүсэлт");
+    expect(xoInboxFilterLabel("Approvals")).toBe("Зөвшөөрлүүд");
+    expect(xoInboxFilterLabel("Failed runs")).toBe("Амжилтгүй ажиллагаа");
+    expect(xoInboxFilterLabel("Alerts")).toBe("Сэрэмжлүүлэг");
+    expect(xoInboxFilterLabel("All approval statuses")).toBe("Зөвшөөрлийн бүх төлөв");
+    expect(xoInboxFilterLabel("Needs action")).toBe("Арга хэмжээ шаардлагатай");
+    expect(xoInboxFilterLabel("Resolved")).toBe("Шийдвэрлэсэн");
+  });
+});
+
+describe("xoCreateIssueLabels", () => {
+  it("en дээр upstream template-тэй ижил", () => {
+    expect(xoCreateIssueLabels()).toEqual({ action: "Create Task", button: "New Task" });
+    expect(xoCreateIssueLabels("Sub-task")).toEqual({ action: "Create Sub-task", button: "New Sub-task" });
+    expect(xoCreateIssueLabels("Widget")).toEqual({ action: "Create Widget", button: "New Widget" });
+  });
+
+  it("mn дээр мэдэгдэх шошгыг орчуулна", async () => {
+    await i18n.changeLanguage("mn");
+    expect(xoCreateIssueLabels("Sub-task")).toEqual({
+      action: "Дэд даалгавар үүсгэх",
+      button: "Шинэ дэд даалгавар",
+    });
+    expect(xoCreateIssueLabels().button).not.toBe("New Task");
   });
 });

@@ -1,4 +1,5 @@
 import { tx } from "@/i18n/xo";
+import { xoInboxFilterLabel, xoIssueFilterLabel, xoQuickFilterLabel } from "@/xo/labels";
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -14,7 +15,6 @@ import {
   externalObjectFilterLabel,
   externalObjectFilterOrder,
   issueFilterArraysEqual,
-  issueFilterLabel,
   issuePriorityOrder,
   issueQuickFilterPresets,
   issueStatusOrder,
@@ -254,7 +254,7 @@ export function IssueFiltersPopover({
                           )}
                           onClick={() => inboxScopeFilters.onCategoryChange(value)}
                         >
-                          <span>{label}</span>
+                          <span>{xoInboxFilterLabel(label)}</span>
                           {selected ? <Check className="h-3.5 w-3.5" /> : null}
                         </button>
                       );
@@ -281,7 +281,7 @@ export function IssueFiltersPopover({
                             )}
                             onClick={() => inboxScopeFilters.onApprovalStatusChange(value)}
                           >
-                            <span>{label}</span>
+                            <span>{xoInboxFilterLabel(label)}</span>
                             {selected ? <Check className="h-3.5 w-3.5" /> : null}
                           </button>
                         );
@@ -311,7 +311,7 @@ export function IssueFiltersPopover({
                     }`}
                     onClick={() => onChange({ statuses: isActive ? [] : [...preset.statuses] })}
                   >
-                    {preset.label}
+                    {xoQuickFilterLabel(preset.label)}
                   </button>
                 );
               })}
@@ -332,7 +332,7 @@ export function IssueFiltersPopover({
                         onCheckedChange={() => onChange({ statuses: toggleIssueFilterValue(state.statuses, status) })}
                       />
                       <StatusIcon status={status} />
-                      <span className="text-sm">{issueFilterLabel(status)}</span>
+                      <span className="text-sm">{xoIssueFilterLabel(status)}</span>
                     </label>
                   ))}
                 </div>
@@ -350,7 +350,7 @@ export function IssueFiltersPopover({
                         onCheckedChange={() => onChange({ priorities: toggleIssueFilterValue(state.priorities, priority) })}
                       />
                       <PriorityIcon priority={priority} />
-                      <span className="text-sm">{issueFilterLabel(priority)}</span>
+                      <span className="text-sm">{xoIssueFilterLabel(priority)}</span>
                     </label>
                   ))}
                 </div>

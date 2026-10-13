@@ -2,6 +2,7 @@
 // tx()-ийн аргумент бүр литерал байх ёстой — extract зөвхөн литералыг хураадаг.
 import { i18n } from "@/i18n";
 import { tx } from "@/i18n/xo";
+import { issueFilterLabel } from "@/lib/issue-filters";
 
 export function xoLabel(english: string): string {
   switch (english) {
@@ -183,4 +184,50 @@ export function xoToolDetailLabel(english: string): string {
     case "Paths": return tx("Paths");
     default: return english;
   }
+}
+
+// IssuesList/IssueFiltersPopover-ийн issueFilterLabel(value): статус ба зэрэглэлийн утга.
+export function xoIssueFilterLabel(value: string): string {
+  switch (value) {
+    case "critical": return tx("Critical");
+    case "high": return tx("High");
+    case "medium": return tx("Medium");
+    case "low": return tx("Low");
+    default: return xoStatusLabel(value, issueFilterLabel(value));
+  }
+}
+
+// issue-filters.ts-ийн issueQuickFilterPresets (модулийн түвшний массив).
+export function xoQuickFilterLabel(english: string): string {
+  switch (english) {
+    case "All": return tx("All");
+    case "Active": return tx("Active");
+    case "Backlog": return tx("Backlog");
+    case "Done": return tx("Done");
+    default: return english;
+  }
+}
+
+// IssueFiltersPopover-ийн INBOX_CATEGORY_OPTIONS ба INBOX_APPROVAL_STATUS_OPTIONS.
+export function xoInboxFilterLabel(english: string): string {
+  switch (english) {
+    case "All categories": return tx("All categories");
+    case "My recent tasks": return tx("My recent tasks");
+    case "Join requests": return tx("Join requests");
+    case "Approvals": return tx("Approvals");
+    case "Failed runs": return tx("Failed runs");
+    case "Alerts": return tx("Alerts");
+    case "All approval statuses": return tx("All approval statuses");
+    case "Needs action": return tx("Needs action");
+    case "Resolved": return tx("Resolved");
+    default: return english;
+  }
+}
+
+// IssuesList-ийн createActionLabel/createButtonLabel. createIssueLabel-д одоо зөвхөн
+// "Sub-task" ирдэг (IssueDetail.tsx); бусад утга англи template-ээр үлдэнэ.
+export function xoCreateIssueLabels(createIssueLabel?: string): { action: string; button: string } {
+  if (!createIssueLabel) return { action: tx("Create Task"), button: tx("New Task") };
+  if (createIssueLabel === "Sub-task") return { action: tx("Create Sub-task"), button: tx("New Sub-task") };
+  return { action: `Create ${createIssueLabel}`, button: `New ${createIssueLabel}` };
 }

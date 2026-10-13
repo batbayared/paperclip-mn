@@ -13,6 +13,15 @@ const Y6_7_2_KEYS: string[] = [
   "Paths",
   "Command",
   "Intent",
+  // Task 2
+  "All categories",
+  "My recent tasks",
+  "Join requests",
+  "Failed runs",
+  "All approval statuses",
+  "Needs action",
+  "Resolved",
+  "Create Sub-task",
 ];
 
 const enCatalog = en as Record<string, string>;
