@@ -32,5 +32,14 @@
   "both mean no default has been chosen yet.",
   "API",
   "URL",
-  "high, medium, low"
+  "high, medium, low",
+  "· v{{revisionNumber}}",
+  "git",
+  "GitHub",
+  "SKILL.md",
+  "Slug",
+  "v{{packageVersion}}",
+  "v{{revision}}",
+  "v{{revisionNumber}}",
+  "v{{version}}"
 ]

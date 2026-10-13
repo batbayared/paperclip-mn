@@ -570,3 +570,46 @@ describe("Ү6 7.9 helper-ууд (en)", () => {
     }
   });
 });
+
+describe("Ү6 7.9 helper-ууд (mn)", () => {
+  it("mn дээр эх сурвалжийн шүүлтүүр, эрэмбэ, үндсэн хавтас, бодлогын татгалзлыг орчуулна", async () => {
+    await i18n.changeLanguage("mn");
+    for (const v of ["All", "Organization", "Bundled", "Optional", "External"]) {
+      expect(xoSkillSourceFilterLabel(v), v).not.toBe(v);
+    }
+    expect(xoSkillSourceFilterLabel("Bundled")).toBe("Багцад орсон");
+    expect(xoSkillSourceFilterLabel("Something else")).toBe("Something else");
+    for (const v of ["Most agents", "Most stars", "Most forks", "Recently updated", "Alphabetical"]) {
+      expect(xoSkillDiscoverySortLabel(v), v).not.toBe(v);
+    }
+    expect(xoSkillDiscoverySortLabel("Most stars")).toBe("Хамгийн олон одтой");
+    expect(xoSkillDiscoverySortLabel("Most forks")).toBe("Хамгийн олон салаатай");
+    expect(xoSkillDiscoverySortLabel("Something else")).toBe("Something else");
+    for (const v of ["My Skills", "Projects", "Bundled", "Organization"]) {
+      expect(xoSkillReservedRootLabel(v), v).not.toBe(v);
+    }
+    expect(xoSkillReservedRootLabel("My Skills")).toBe("Миний чадварууд");
+    expect(xoSkillReservedRootLabel("Custom folder")).toBe("Custom folder");
+    const codes = [
+      "skill_authentication_required",
+      "skill_company_boundary_denied",
+      "skill_workspace_boundary_denied",
+      "skill_source_validation_failed",
+      "skill_unsafe_content_blocked",
+      "skill_secret_handling_blocked",
+      "skill_actor_restricted",
+    ];
+    for (const code of codes) {
+      const title = xoSkillPolicyDenialTitle(code, "Fallback title.");
+      expect(title, code).not.toBe("Fallback title.");
+      expect(title, code).not.toMatch(/skill/i);
+      const remediation = xoSkillPolicyDenialRemediation(code, "Fallback remediation.");
+      expect(remediation, code).not.toBe("Fallback remediation.");
+      expect(remediation, code).not.toContain("Paperclip");
+    }
+    expect(xoSkillPolicyDenialTitle("skill_authentication_required", "x")).toBe("Чадваруудыг удирдахын тулд нэвтэрнэ үү.");
+    expect(xoSkillPolicyDenialRemediation("skill_authentication_required", "x")).toBe("Нэвтэрч дахин оролдоно уу.");
+    expect(xoSkillPolicyDenialTitle("unknown_code", "Fallback title.")).toBe("Fallback title.");
+    expect(xoSkillPolicyDenialRemediation("unknown_code", "Fallback remediation.")).toBe("Fallback remediation.");
+  });
+});

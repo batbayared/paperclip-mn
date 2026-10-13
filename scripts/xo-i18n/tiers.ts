@@ -209,4 +209,17 @@ export const XO_TRANSFORM_FILES: readonly string[] = [
   "ui/src/components/routine-sections/operate-sections.tsx",
   "ui/src/components/RoutineVariablesEditor.tsx",
   "ui/src/components/RoutineRunVariablesDialog.tsx",
+  // Ү6 7.9
+  "ui/src/pages/CompanySkills.tsx",
+  "ui/src/pages/SkillStudio.tsx",
+  "ui/src/pages/skills/ImportSkillsFromProjectDialog.tsx",
+  "ui/src/components/folders/SkillFolderTree.tsx",
+  "ui/src/components/SkillsContextualSidebar.tsx",
+  "ui/src/pages/agent-skills/AgentSkillsTab.tsx",
+  "ui/src/pages/agent-skills/AgentSkillRow.tsx",
+  "ui/src/pages/agent-skills/AgentSkillReleasePicker.tsx",
+  "ui/src/components/skill-studio/AgentsUsingSkillDialog.tsx",
+  "ui/src/components/skill-studio/ForkSkillDialog.tsx",
+  "ui/src/components/skill-studio/SkillPolicySurfaces.tsx",
+  "ui/src/components/skill-studio/SkillProvenance.tsx",
 ];
