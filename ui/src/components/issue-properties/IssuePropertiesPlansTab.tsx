@@ -84,7 +84,7 @@ export function IssuePropertiesPlansTab({ issue }: IssuePropertiesPlansTabProps)
           <div className="flex items-center gap-1 text-xs text-muted-foreground">
             {tx("Revision {{n}} · updated {{date}}", {
               n: planDocument.latestRevisionNumber ?? 1,
-              date: new Date(planDocument.updatedAt).toLocaleString(localeTag(), {
+              date: new Date(planDocument.updatedAt).toLocaleString(localeTag() === "mn-MN" ? "mn-MN" : [], {
                 month: "short",
                 day: "numeric",
                 hour: "numeric",

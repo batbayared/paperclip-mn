@@ -3,6 +3,7 @@ import { IssueGalleryContext } from "@/context/IssueGalleryContext";
 import { ImageGalleryModal } from "@/components/ImageGalleryModal";
 import { isImageContentType, isVideoLikeOutput } from "@/lib/issue-output";
 import { attachmentDownloadPath } from "@/lib/issue-attachments";
+import { xoWorkProductStatusLabel } from "@/xo/labels";
 import type { IssueWorkProduct } from "@paperclipai/shared";
 import {
   ExternalLink,
@@ -45,7 +46,7 @@ export function stateChipFor(
     return { label: status === "opening" ? "Opening" : "Pending", tone: "progress", dashed: true };
   }
   if (kind === "pull_request" && (status === "active" || status === "open")) {
-    return { label: "Open", tone: "progress" };
+    return { label: xoWorkProductStatusLabel("Open"), tone: "progress" };
   }
   if (kind === "pull_request" && status === "draft") {
     return { label: "Draft", tone: "review" };

@@ -1306,6 +1306,7 @@
   "On behalf of": "Хэний өмнөөс",
   "Onboarding state is incomplete. Please restart onboarding and try again.": "Эхлүүлэх явцын төлөв дутуу байна. Эхлүүлэх алхмыг дахин эхлүүлээд оролдоно уу.",
   "Open": "Нээх",
+  "Open (PR status)": "Нээлттэй",
   "Open {{brand}} docs in a new tab.": "{{brand}}-ийн баримт бичгийг шинэ табад нээх.",
   "Open {{currentName}} {{switcherNoun}} switcher": "{{currentName}} {{switcherNoun}} сонгогчийг нээх",
   "Open {{issueRef}}": "Нээх: {{issueRef}}",

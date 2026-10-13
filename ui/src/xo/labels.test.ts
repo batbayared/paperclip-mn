@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { i18n } from "@/i18n";
-import { xoActivityLabel, xoFileKindLabel, xoLabel, xoStatusLabel } from "./labels";
+import { xoActivityLabel, xoFileKindLabel, xoLabel, xoStatusLabel, xoWorkProductStatusLabel } from "./labels";
 
 afterEach(async () => {
   await i18n.changeLanguage("en");
@@ -88,5 +88,17 @@ describe("xoActivityLabel", () => {
     expect(xoActivityLabel("Searched the web")).toBe("Вэбээс хайсан");
     expect(xoActivityLabel("Thought through the task")).toBe("Даалгаврыг бодож үзсэн");
     expect(xoActivityLabel("Something new")).toBe("Something new");
+  });
+});
+
+describe("xoWorkProductStatusLabel", () => {
+  it("en дээр англи шошгыг хэвээр буцаана", () => {
+    expect(xoWorkProductStatusLabel("Open")).toBe("Open");
+  });
+
+  it("mn дээр PR статусыг «Нээлттэй» гэж орчуулна", async () => {
+    await i18n.changeLanguage("mn");
+    expect(xoWorkProductStatusLabel("Open")).toBe("Нээлттэй");
+    expect(xoWorkProductStatusLabel("Draft")).toBe("Draft");
   });
 });

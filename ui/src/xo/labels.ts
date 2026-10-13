@@ -57,6 +57,16 @@ export function xoFileKindLabel(english: string): string {
   }
 }
 
+// RichWorkProductCard-ийн PR статусын «Open». "Open" түлхүүр каталогт «Нээх» (товчны
+// үйл үг) тул статусын тэмдэгт тусдаа түлхүүр хэрэглэнэ; en дээр guard англиар буцаана.
+export function xoWorkProductStatusLabel(english: string): string {
+  if (!(i18n.resolvedLanguage ?? i18n.language ?? "").startsWith("mn")) return english;
+  switch (english) {
+    case "Open": return tx("Open (PR status)");
+    default: return english;
+  }
+}
+
 // completed-activity-summary.ts-ийн хураангуй шошго. Түлхүүр нь англи тексттэй ижил
 // тул en дээр tx() түлхүүрээ буцаана, guard хэрэггүй.
 export function xoActivityLabel(english: string): string {
