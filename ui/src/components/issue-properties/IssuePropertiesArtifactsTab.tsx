@@ -38,6 +38,7 @@ import { RichWorkProductCard } from "@/components/task-chat/RichWorkProductCard"
 import { DocumentAnnotationsCountChip, IssueDocumentAnnotations } from "@/components/IssueDocumentAnnotations";
 import { cn, formatDateTime } from "@/lib/utils";
 import { useLocation } from "@/lib/router";
+import { tx } from "@/i18n/xo";
 
 interface IssuePropertiesArtifactsTabProps {
   issue: Issue;
@@ -218,7 +219,7 @@ function MarkdownWorkProductRow({
           ) : null}
           {reviewDoc ? (
             <span className="shrink-0 text-(length:--text-micro) text-muted-foreground">
-              {`Rev ${reviewDoc.latestRevisionNumber ?? 1}`}
+              {tx("Rev {{n}}", { n: reviewDoc.latestRevisionNumber ?? 1 })}
             </span>
           ) : null}
           <Chevron className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
@@ -291,7 +292,7 @@ function DocumentRow({
         <FileText className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
         <span className="min-w-0 flex-1 truncate">{documentDisplayTitle(doc)}</span>
         <span className="shrink-0 text-(length:--text-micro) text-muted-foreground">
-          {`Rev ${doc.latestRevisionNumber ?? 1}`}
+          {tx("Rev {{n}}", { n: doc.latestRevisionNumber ?? 1 })}
         </span>
         <ChevronRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
       </button>
@@ -309,7 +310,7 @@ function DocumentRow({
           <FileText className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
           <span className="min-w-0 flex-1 truncate">{documentDisplayTitle(doc)}</span>
           <span className="shrink-0 text-(length:--text-micro) text-muted-foreground">
-            {`Rev ${doc.latestRevisionNumber ?? 1}`}
+            {tx("Rev {{n}}", { n: doc.latestRevisionNumber ?? 1 })}
           </span>
           <Chevron className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
         </button>
@@ -447,7 +448,7 @@ export function IssuePropertiesArtifactsTab({ issue, documentDeepLink, onOpenDoc
             {group.runId !== "other" ? (
               <header className="flex items-baseline justify-between gap-2 px-1">
                 <h3 className="truncate text-xs font-medium text-foreground">
-                  {agent?.name ?? `Run ${group.runId.slice(0, 8)}`}
+                  {agent?.name ?? tx("Run {{id}}", { id: group.runId.slice(0, 8) })}
                 </h3>
                 <time className="shrink-0 text-(length:--text-micro) text-muted-foreground" dateTime={group.date.toISOString()}>
                   {formatDateTime(group.date)}

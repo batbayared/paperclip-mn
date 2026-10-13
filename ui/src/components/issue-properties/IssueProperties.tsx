@@ -61,6 +61,7 @@ import { IssueReferencePill } from "../IssueReferencePill";
 import { formatDate, formatDateTime, cn, projectUrl } from "../../lib/utils";
 import type { IssueExternalObjectGroup } from "../../hooks/useIssueExternalObjects";
 import { timeAgo } from "../../lib/timeAgo";
+import { tx } from "@/i18n/xo";
 import { invalidateInboxIssueQueries } from "../../lib/inboxArchiveCache";
 import { Button } from "@/components/ui/button";
 import { ToggleSwitch } from "@/components/ui/toggle-switch";
@@ -828,11 +829,11 @@ export function IssueProperties({
         assigneeOverrideThinkingEffort,
         assigneeOverrideChrome ? "Chrome" : "",
       ].filter(Boolean);
-      const summary = details.length > 0 ? `Override · ${details.join(" · ")}` : "Override · adapter options";
+      const summary = details.length > 0 ? tx("Override · {{details}}", { details: details.join(" · ") }) : tx("Override · adapter options");
       return (
         <span
           className="min-w-0 truncate text-sm"
-          title={`Task-level model override — replaces the agent's primary model for this issue.${details.length > 0 ? ` (${details.join(" · ")})` : ""}`}
+          title={tx("Task-level model override — replaces the agent's primary model for this issue.") + (details.length > 0 ? ` (${details.join(" · ")})` : "")}
         >
           {summary}
         </span>
@@ -1203,7 +1204,7 @@ export function IssueProperties({
       </div>
       <div className="space-y-1.5">
         <div className="text-xs font-medium text-foreground">
-          Instructions <span className="font-normal text-muted-foreground">(optional)</span>
+          {tx("Instructions")} <span className="font-normal text-muted-foreground">{tx("(optional)")}</span>
         </div>
         <Textarea
           value={watchdogInstructionsInput}
@@ -1857,7 +1858,7 @@ export function IssueProperties({
     <>
       <input
         className="w-full px-2 py-1.5 text-xs bg-transparent outline-none border-b border-border mb-1 placeholder:text-muted-foreground/50"
-        placeholder={`Search ${stageType === "review" ? "reviewers" : "approvers"}...`}
+        placeholder={stageType === "review" ? tx("Search reviewers...") : tx("Search approvers...")}
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         autoFocus={!inline}
@@ -1870,7 +1871,7 @@ export function IssueProperties({
           )}
           onClick={onClear}
         >
-          No {stageType === "review" ? "reviewers" : "approvers"}
+          {stageType === "review" ? tx("No reviewers") : tx("No approvers")}
         </button>
         {currentUserId && (
           <button
@@ -2942,7 +2943,7 @@ export function IssueProperties({
                       truncation on genuinely long names is recoverable. */}
                   <span
                     className="flex min-w-0 max-w-full items-center gap-1.5 text-sm"
-                    title={`Archived by ${archivedByName} · ${formatDateTime(issue.archivedAt)}`}
+                    title={tx("Archived by {{name}} · {{date}}", { name: archivedByName, date: formatDateTime(issue.archivedAt) })}
                   >
                     {archivedByAgent
                       ? <AgentIcon icon={archivedByAgent.icon} className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />

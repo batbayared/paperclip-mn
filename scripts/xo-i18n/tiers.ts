@@ -90,6 +90,11 @@ export const XO_TRANSFORM_FILES: readonly string[] = [
   "ui/src/components/NewIssueDialog.tsx",
   "ui/src/components/issue-properties/helpers.ts",
   "ui/src/lib/work-mode-meta.ts",
+  "ui/src/components/issue-properties/IssueProperties.tsx",
+  "ui/src/components/issue-properties/IssuePropertiesArtifactsTab.tsx",
+  "ui/src/components/issue-properties/IssuePropertiesPlansTab.tsx",
+  "ui/src/components/issue-properties/external-object-rows.tsx",
+  "ui/src/components/issue-properties/relation-controls.tsx",
   // Хуудсууд
   "ui/src/pages/AgentDetail.tsx",
   "ui/src/pages/AgentDetail.production.tsx",
