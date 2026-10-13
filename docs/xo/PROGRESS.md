@@ -1,5 +1,42 @@
 # XO ахицын бүртгэл
 
+## Ү6 7.6 — нууц утгын дэд хуудас, хавтас, инстанцын тохиргоо (2026-10-13)
+
+Зорилго: 7.5-ын «Үлдэгдэл»-ийн pages/secrets/* дэд файлууд, хавтасны удирдлага ба Folders/Flat товч, compact interaction card, AttentionQueueRow, инстанцын ерөнхий тохиргоог монгол болгох. en гаралт abbe3f85f-тэй байт ижил.
+
+Төлөвлөгөө: docs/superpowers/plans/2026-10-13-xo-y6-7-6-secrets-folders-instance-settings.md. BASE abbe3f85f.
+
+| Task | Commit |
+|---|---|
+| 1 labels.ts: xoAttentionSourceLabel, xoSnoozePresetLabel, xoFolderItemLabel, xoCompactKindLabel | 0e281ae12 |
+| 5 FolderControls.tsx: хавтасны тоо, «Ангилаагүй», устгах dialog | 604b46cc8 |
+| 4 Secrets.tsx (Folders/Flat), SetMyUserSecretDialog, MyUserSecretsTab, MissingUserSecretsBanner, secret-path.ts, user-secret-presentation.tsx | ed0af92aa |
+| 2 ImportFromVaultDialog.tsx | d30d28237 |
+| 7 InstanceGeneralSettings.tsx: «{{vendor}}» хувьсагч, topicSummary, dev тэмдэглэл keep-en | 3772d9f6a |
+| 3 proposal-review.tsx, ProposalsTab.tsx, UserSecretDefinitionsTab.tsx (XoTrans) | b0b869f48 |
+| 6 TaskChatCompactInteractionCard.tsx, AttentionQueueRow.tsx | 664115c21 |
+| 8 tiers.ts (10 файл T1), каталог (+284 түлхүүр), y6-7-6-keys тест, tiers-y6-7-6 тест, labels тест | 372a9edb7 |
+| 9 SYNC.md ба бүртгэл | энэ commit |
+
+Түлхүүр: 3521 (7.5-ын төгсгөл 3237, 7.6-д +284).
+
+Нэр томьёо: proposal = санал, secret = нууц утга, folder = хавтас, unfiled = ангилаагүй, runtime config = ажиллах орчны тохиргоо.
+
+### Шалгалтын үр дүн
+
+- Gates (2026-10-13): xo:i18n:check keys=3521 (+284), xo:i18n:test 75, xo:i18n:typecheck OK, xo:brand-scan 161 файл / 586 (baseline-аас илүүгүй), ui tsc цэвэр, vitest (VITE_XO_DEFAULT_LOCALE=en) 620 файл / 6538 тест passed.
+- Browser шалгалт (3110, mn, 2026-10-13): нууц утгын 4 таб (Нууц утгууд / Миний нууц утгууд / Нийлүүлэгчийн сангууд / Саналууд), «Хавтсаар / Жагсаалтаар» товч, хоосон төлөвүүд Монгол. Инстанцын тохиргоо (байгууллагын тохиргоонд embedded) Монгол; «Paperclip Labs» нэр, dev тэмдэглэл, «Local trusted» (ModeBadge) шийдвэрийн дагуу англиар. /decisions дээр AttentionQueueRow-ийн эх сурвалжийн шошго («Шийдвэр хүссэн») ба snooze сонголт (Өнөөдөр / Энэ долоо хоногт / Хэзээ ч болно) Монгол. Хүрээнээс гадуур англиар үлдсэн (7.7-д): WhatNeedsMe шүүлтүүр («N decisions», All/Today/Yesterday…), DecisionTriageStrip («Pick date», «Snooze», «Queue», «Ask agent for recommendation»), lib/attention.ts («N questions — …»), Routines.tsx ба Skills хуудас («New folder» нь Routines.tsx:961-ээс). FolderControls-ын хавтасны rail ба compact interaction card-ыг өгөгдөлгүйгээс browser-т харуулж чадаагүй; unit тестээр баталгаажсан.
+
+### Хязгаарлалт
+
+- Folders/Flat товч pages/Secrets.tsx-д байдаг (FolderControls.tsx-д биш); 7.5-ын бүртгэл засагдсан. mn: «Хавтсаар / Жагсаалтаар».
+- ImportFromVaultDialog: «A Paperclip secret…»-ийн mn утга «XO системийн…» literal; компонент брэндийн хувьсагч дамжуулдаггүй, «{{brand}}» parity тестийг эвдсэн.
+- AttentionQueueRow.tsx-ийн SNOOZE_PRESETS (L76-81) модулийн түвшинд tx() дууддаг; i18n синхрон эхэлдэг, locale солиход хуудас дахин ачаалагддаг тул хүлээн зөвшөөрсөн.
+- «by» ерөнхий каталогийн түлхүүр болсон («санал гаргасан:»); өөр газар дахин ашиглавал эрсдэлтэй.
+- en «Could not approved / rejected / sent for revision» upstream-ийн дүрмийн алдааг хадгална (en гаралт байт ижил).
+- Англиар үлдсэн (хүрээнээс гадуур): SkillFolderTree.tsx ба reservedRootLabel, ModeBadge.tsx («Local trusted» / «Authenticated …»), MyUserSecretsTab ба UserSecretDefinitionsTab-ийн {definition.status} enum.
+- Ү6 7.7-д шилжүүлсэн: issue-thread-interactions summary, interaction-resolution-error.
+
 ## Ү6 7.5 — interaction, Secrets, агентын цэс, Audit (2026-10-13)
 
 Зорилго: 7.4-ийн «Үлдэгдэл»-ийн interaction governance самбар ба card, interaction-audience.ts, Secrets хуудас, агентын зүүн цэс ба гарчиг, Audit хэсгийг монгол болгох. en гаралт db93223a1-тэй байт ижил.
@@ -29,7 +66,7 @@
   - Байгууллагын тохиргоо → Харилцан үйлдлийн удирдлага: тайлбар, хүснэгтийн толгой, 6 төрөл Монгол.
   - YB-3 thread: харилцан үйлдлийн карт (асуулт, сонголт, Болих/Дараах) Монгол.
   - Нууц утгууд (/company/settings/secrets): таб, тайлбар, хоосон төлөв Монгол.
-  - Үлдэгдэл: нууц утгын «Folders / Flat» товч Англи хэвээр (components/folders/FolderControls.tsx, 7.6); «<b>Нууц утга</b>-ыг» нөхцөл залгалт буруу (mn.json-д засагдсан). Тохиргооны доод хэсгийн инстанцын ерөнхий тохиргоо (Deployment and auth, Backup retention, AI feedback sharing, Sign out) 7.5-ын хүрээнд ороогүй тул Англи хэвээр.
+  - Үлдэгдэл: нууц утгын «Folders / Flat» товч Англи хэвээр (7.6; засвар: товч pages/Secrets.tsx-д байдаг, FolderControls.tsx-д биш); «<b>Нууц утга</b>-ыг» нөхцөл залгалт буруу (mn.json-д засагдсан). Тохиргооны доод хэсгийн инстанцын ерөнхий тохиргоо (Deployment and auth, Backup retention, AI feedback sharing, Sign out) 7.5-ын хүрээнд ороогүй тул Англи хэвээр.
   - Шалгаагүй: төслийн ажлын талбарын дэлгэрэнгүй (YB-д төсөл байхгүй), агент хувилах баталгаажуулалт (дарвал агент үүснэ).
 
 ### Хязгаарлалт

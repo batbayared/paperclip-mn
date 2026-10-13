@@ -461,9 +461,44 @@ XO-ийн өмч: ui/src/xo/labels.ts (xoResolverPolicyLabel, xoResolverPolicyEf
 - IssueThreadInteractionCard: «on {{date}}» → «огноо: {{date}}» хоёр цэгтэй хэлбэр.
 - interaction-audience.ts: midSentence нь «You» шошгыг англиар харьцуулдаг (одоогоор зөв, шошго өөрчлөгдвөл эмзэг); «удирдах зөвлөл» жижиг/том үсэг T1 ба гар tx-д зөрнө.
 - T1 модулийн түвшний объект (`{ label: "…" }`) импортын үед нэг удаа үнэлэгдэнэ; locale солиход хуудас дахин ачаалагддаг тул практикт зөрөхгүй.
-- Browser (7.5 дараах): нууц утгын хуудсын «Folders» / «Flat» товч components/folders/FolderControls.tsx-оос ирдэг (7.5-ын хүрээнд ороогүй); байгууллагын тохиргооны доод хэсэг (Deployment and auth, Backup retention, AI feedback sharing, Sign out) инстанцын ерөнхий тохиргооны компонентоос ирдэг тул англиар үлдэнэ. Ү6 7.6-д.
+- Browser (7.5 дараах): нууц утгын хуудсын «Folders» / «Flat» товч 7.5-ын хүрээнд ороогүй (засвар 7.6: энэ товч pages/Secrets.tsx-д байдаг, FolderControls.tsx-д биш); байгууллагын тохиргооны доод хэсэг (Deployment and auth, Backup retention, AI feedback sharing, Sign out) инстанцын ерөнхий тохиргооны компонентоос ирдэг тул англиар үлдэнэ. Ү6 7.6-д.
 - Эцсийн review (Minor): «interaction governance» нэг газар «засаглалын бодлого», бусад газар «удирдлага» гэж орчуулагдсан; mn утгад «runtime тохиргоо» англи үг үлдсэн. Ү6 7.6-д каталогт нэг мөрөөр засна.
 - y6-7-5-keys тест mn утгыг зөвхөн en-ээс ялгаатай эсэхээр шалгана; зарим mn утга товчлол/калька («… амжилтгүй», «Нэр дэвшигч 1, эх:»).
+
+## Ү6 7.6-д хөндсөн upstream файлууд
+
+7.5-ын «Үлдэгдэл»-ийн pages/secrets/* дэд файлууд, хавтасны удирдлага, compact interaction card, AttentionQueueRow, инстанцын ерөнхий тохиргоог хаасан. tiers.ts-д 10 файл T1 болж нэмэгдсэн. Тэмдэглэгээ 7.5-ын хүснэгттэй ижил. BASE abbe3f85f.
+
+| Файл | Өөрчлөлт |
+|---|---|
+| ui/src/components/folders/FolderControls.tsx | T1; хавтасны тоо xoFolderItemLabel; «Unfiled» → «Ангилаагүй»; хавтас устгах dialog гар tx |
+| ui/src/pages/Secrets.tsx | «Folders» / «Flat» товч гар tx (mn «Хавтсаар / Жагсаалтаар») |
+| ui/src/pages/secrets/SetMyUserSecretDialog.tsx | T1; шошго, баталгаажуулалт, toast гар tx |
+| ui/src/pages/secrets/MyUserSecretsTab.tsx | T1; хүснэгтийн толгой, хоосон төлөв, үйлдлийн текст гар tx |
+| ui/src/pages/secrets/MissingUserSecretsBanner.tsx | T1; анхааруулгын өгүүлбэр гар tx |
+| ui/src/pages/secrets/secret-path.ts | замын шалгалтын алдааны мессеж гар tx |
+| ui/src/pages/secrets/user-secret-presentation.tsx | төлөв ба тайлбарын шошго гар tx |
+| ui/src/pages/secrets/ImportFromVaultDialog.tsx | T1; validation, төлөв, үр дүнгийн текст гар tx; «A Paperclip secret…»-ийн mn утга «XO системийн…» literal (компонент брэндийн хувьсагч дамжуулдаггүй, «{{brand}}» parity тестийг эвдсэн) |
+| ui/src/pages/secrets/proposal-review.tsx | T1; «Reason given by the agent» г.м. шошго гар tx; холимог markup XoTrans; «by» → «санал гаргасан:» |
+| ui/src/pages/secrets/ProposalsTab.tsx | T1; хүснэгт, шүүлтүүр, toast гар tx; XoTrans |
+| ui/src/pages/secrets/UserSecretDefinitionsTab.tsx | T1; гар tx; XoTrans |
+| ui/src/pages/InstanceGeneralSettings.tsx | T1; «Paperclip Labs» «{{vendor}}» хувьсагчаар дамжина; topicSummary холбох үгс орчуулагдсан; dev тэмдэглэл keep-en.json-д |
+| ui/src/components/TaskChatCompactInteractionCard.tsx | kind xoCompactKindLabel; шийдвэрийн шошго гар tx |
+| ui/src/components/AttentionQueueRow.tsx | T1; эх сурвалж xoAttentionSourceLabel; SNOOZE_PRESETS (L76-81) xoSnoozePresetLabel, модулийн түвшний tx() |
+
+XO-ийн өмч: ui/src/xo/labels.ts (xoAttentionSourceLabel, xoSnoozePresetLabel, xoFolderItemLabel, xoCompactKindLabel), scripts/xo-i18n/tiers.ts (10 файл T1), ui/src/i18n/xo/* (keys=3521, +284).
+
+Шинэ XO-ийн тестүүд: ui/src/i18n/xo/y6-7-6-keys.test.ts, scripts/xo-i18n/tiers-y6-7-6.test.ts, ui/src/xo/labels.test.ts (нэмэлт).
+
+Нэр томьёо (7.6-аас нэгдсэн): proposal = санал, secret = нууц утга, folder = хавтас, unfiled = ангилаагүй, runtime config = ажиллах орчны тохиргоо. 7.5-ын Minor («удирдлага» / «засаглалын бодлого» зөрүү, «runtime тохиргоо») 372a9edb7-д каталогт засагдсан.
+
+Үлдэгдэл (Ү6 7.6):
+- Англиар үлдсэн (хүрээнээс гадуур): SkillFolderTree.tsx ба reservedRootLabel; ModeBadge.tsx («Local trusted» / «Authenticated …»); MyUserSecretsTab ба UserSecretDefinitionsTab дахь {definition.status} enum түүхий утгаараа.
+- Ү6 7.7-д шилжүүлсэн: issue-thread-interactions summary, interaction-resolution-error.
+- «by» одоо ерөнхий каталогийн түлхүүр («санал гаргасан:»); өөр газар дахин ашиглавал утга буруу гарна.
+- en түлхүүр «Could not approved / rejected / sent for revision» upstream-ийн дүрмийн алдааг хадгална; en гаралт байт ижил байхын тулд засаагүй.
+- AttentionQueueRow.tsx-ийн SNOOZE_PRESETS (L76-81) модулийн түвшинд tx() дууддаг. i18n синхрон эхэлдэг, locale солиход хуудас дахин ачаалагддаг тул хүлээн зөвшөөрсөн.
+- Browser шалгалт (3110, mn, 2026-10-13): нууц утгын 4 таб (Нууц утгууд / Миний нууц утгууд / Нийлүүлэгчийн сангууд / Саналууд), «Хавтсаар / Жагсаалтаар» товч, хоосон төлөвүүд Монгол. Инстанцын тохиргоо (байгууллагын тохиргоонд embedded) Монгол; «Paperclip Labs» нэр, dev тэмдэглэл, «Local trusted» (ModeBadge) шийдвэрийн дагуу англиар. /decisions дээр AttentionQueueRow-ийн эх сурвалжийн шошго («Шийдвэр хүссэн») ба snooze сонголт (Өнөөдөр / Энэ долоо хоногт / Хэзээ ч болно) Монгол. Хүрээнээс гадуур англиар үлдсэн (7.7-д): WhatNeedsMe шүүлтүүр («N decisions», All/Today/Yesterday…), DecisionTriageStrip («Pick date», «Snooze», «Queue», «Ask agent for recommendation»), lib/attention.ts («N questions — …»), Routines.tsx ба Skills хуудас («New folder» нь Routines.tsx:961-ээс). FolderControls-ын хавтасны rail ба compact interaction card-ыг өгөгдөлгүйгээс browser-т харуулж чадаагүй; unit тестээр баталгаажсан.
 
 ## Lockfile
 
