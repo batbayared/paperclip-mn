@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { mnDate, mnDateTime, mnShortDate, mnTime } from "@/xo/date-format";
+import { localeTag } from "@/xo/locale";
 
 const SECOND_MS = 1_000;
 const MINUTE_MS = 60 * SECOND_MS;
@@ -122,6 +124,17 @@ export function formatMonitorAbsolute(
 ): string {
   const target = new Date(toTimestamp(nextCheckAt));
   const reference = new Date(toTimestamp(now));
+  if (localeTag() === "mn-MN") {
+    // XO: mn нь ICU-гүй гар формат; display time zone-ийг үл тооцож орон нутгийн цагаар.
+    const time = mnTime(target);
+    const sameDay =
+      target.getFullYear() === reference.getFullYear() &&
+      target.getMonth() === reference.getMonth() &&
+      target.getDate() === reference.getDate();
+    if (sameDay) return `Өнөөдөр, ${time}`;
+    const date = target.getFullYear() === reference.getFullYear() ? mnShortDate(target) : mnDate(target);
+    return `${date}, ${time}`;
+  }
   const targetYmd = zonedYmd(target, options.locale, options.timeZone);
   const referenceYmd = zonedYmd(reference, options.locale, options.timeZone);
 
@@ -156,6 +169,7 @@ export function formatMonitorAbsoluteFull(
   options: MonitorDateTimeFormatOptions = {},
 ): string {
   const date = new Date(toTimestamp(nextCheckAt));
+  if (localeTag() === "mn-MN") return mnDateTime(date, true);
   const datePart = new Intl.DateTimeFormat(options.locale, {
     weekday: "long",
     year: "numeric",

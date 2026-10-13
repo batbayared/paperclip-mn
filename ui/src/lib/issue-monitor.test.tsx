@@ -12,6 +12,7 @@ import {
   formatMonitorOffset,
   useMonitorCountdown,
 } from "./issue-monitor";
+import { XO_LOCALE_STORAGE_KEY } from "@/xo/locale";
 
 describe("monitor time formatting", () => {
   const now = new Date("2026-07-17T19:56:00.000Z");
@@ -231,5 +232,30 @@ describe("useMonitorCountdown", () => {
 
     flushSync(() => root.unmount());
     expect(vi.getTimerCount()).toBe(0);
+  });
+});
+
+describe("issue-monitor mn", () => {
+  afterEach(() => localStorage.removeItem(XO_LOCALE_STORAGE_KEY));
+  const now = new Date(2026, 9, 13, 10, 0, 0);
+
+  it("өнөөдөр", () => {
+    localStorage.setItem(XO_LOCALE_STORAGE_KEY, "mn");
+    expect(formatMonitorAbsolute(new Date(2026, 9, 13, 14, 54), {}, now)).toBe("Өнөөдөр, 14:54");
+  });
+  it("өөр өдөр, ижил жил", () => {
+    localStorage.setItem(XO_LOCALE_STORAGE_KEY, "mn");
+    expect(formatMonitorAbsolute(new Date(2026, 9, 20, 9, 5), {}, now)).toBe("10-р сарын 20, 9:05");
+  });
+  it("өөр жил", () => {
+    localStorage.setItem(XO_LOCALE_STORAGE_KEY, "mn");
+    expect(formatMonitorAbsolute(new Date(2027, 0, 3, 9, 5), {}, now)).toBe("2027 оны 1-р сарын 3, 9:05");
+  });
+  it("бүтэн", () => {
+    localStorage.setItem(XO_LOCALE_STORAGE_KEY, "mn");
+    expect(formatMonitorAbsoluteFull(new Date(2026, 9, 13, 14, 54, 7))).toBe("2026 оны 10-р сарын 13 14:54:07");
+  });
+  it("en: хуучин хэлбэр", () => {
+    expect(formatMonitorAbsolute(new Date(2026, 9, 13, 14, 54), { locale: "en-US" }, now)).toMatch(/^Today, /);
   });
 });
