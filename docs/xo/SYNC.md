@@ -524,12 +524,56 @@ XO-ийн өмч: ui/src/xo/labels.ts (xoDecisionOptionLabel шинэ; xoSnoozeP
 Шинэ XO-ийн тестүүд: ui/src/i18n/xo/y6-7-7-keys.test.ts, scripts/xo-i18n/tiers-y6-7-7.test.ts, ui/src/xo/labels.test.ts (нэмэлт).
 
 Үлдэгдэл (Ү6 7.7):
-- Routines.tsx (Routines хуудас, «New folder» Routines.tsx:961) → Ү6 7.8.
+- Routines.tsx (Routines хуудас, «New folder» Routines.tsx:961) — хэрэгжсэн (Ү6 7.8, Streamlined).
 - Skills хуудас, SkillFolderTree.tsx, reservedRootLabel → Ү6 7.9.
 - *.production.tsx хувилбарууд англиар үлдэнэ; 7.8/7.9-д зөвхөн Streamlined хувилбарыг орчуулна (ED шийдвэр Х2).
 - buildAnsweredQuestionsDeliveryText англиар үлдэнэ: загварт очих текст (ED шийдвэр Х3).
 - DecisionTriageStrip-ээс агент руу чиглүүлэх comment body англиар үлдэнэ: агентад очих текст.
 - Browser шалгалт (3110, mn, 2026-10-13, ED-ийн зөвшөөрлөөр restart): /YB/decisions дээр «N шийдвэр», шүүлтүүрийн chip (Бүгд / Өнөөдөр / Өчигдөр / Сүүлийн 7 хоног / Энэ сар / Өөрөө сонгох), shelf (Өмнөх / Шийдвэрлэсэн / Хугацаа дууссан), «Дарааллаас хасах: …» Монгол. Дарааллын хуудас (/decisions/queues/questions): «Автомат нэмэлт асаалттай», тайлбар, «Идэвхгүй болгох», «Хасах» Монгол. ModeBadge «Локал итгэмжлэгдсэн». Нууц утгын хуудас Монгол; seed-д нууц утга байхгүй тул төлвийн шошгыг unit тестээр баталсан. Англиар үлдсэн (UI хүрээнээс гадуур): дарааллын гарчиг, тайлбар, дүрмийн бичвэр («Questions», «Structured questions waiting for a board response.», «Pending ask_user_questions interactions.») серверийн автомат seed өгөгдөл; «Questions need answers» server/src/services/attention.ts:667-оос; Secrets.tsx-ийн гар утасны select-д «proposals» option (PageTabBar JSX шошготой үед value-г харуулдаг, 7.6-аас үлдсэн).
+
+## Ү6 7.8-д хөндсөн upstream файлууд
+
+7.7-ын «Үлдэгдэл»-ийн Routines хэсгийг (Streamlined хувилбар) хаасан: жагсаалт (/YB/routines), дэлгэрэнгүй (overview, triggers, schedule, variables, secrets, delivery, runs, activity, history), хуваарь засварлагч, хувьсагч, хадгалах самбар, хувилбарын түүх, cron тайлбар ба галлагааны урьдчилсан харагдац. tiers.ts-д 16 файл T1 болж нэмэгдсэн. Тэмдэглэгээ 7.5-ын хүснэгттэй ижил. BASE 83326f71b. ED шийдвэр: Х1 зөвхөн Streamlined хувилбар (*.production.tsx үлдэгдэлд); Х2 загвар/агентад очих текст (routine prompt, comment body) англиар; Х3 серверийн мессеж хүрээнээс гадуур. Нэр томьёо: trigger «идэвхжүүлэгч», delivery «хүргэлт», signing mode «гарын үсгийн горим», catch-up «нөхөн ажиллуулалт», concurrency / catch-up policy «зэрэгцээ ажиллагааны / нөхөн ажиллуулах бодлого», activity gate «идэвхжилийн нөхцөл», version history «хувилбарын түүх», cron англиар.
+
+| Файл | Өөрчлөлт |
+|---|---|
+| ui/src/pages/Routines.tsx | T1; хавтас руу зөөх toast «Moved "{{title}}" to {{folder}}.» ба хавтасны нэргүй үеийн тусдаа литерал |
+| ui/src/components/RoutineList.tsx | T1 (эх код өөрчлөгдөөгүй, зөвхөн tiers.ts-д) |
+| ui/src/components/RoutineContextualSidebar.tsx | T1; гарчгийн fallback tx("Routine") |
+| ui/src/components/ManagedRoutinesList.tsx | T1; «Missing {{refs}}» гар tx |
+| ui/src/pages/audit/RoutineAuditActivity.tsx | T1 (эх код өөрчлөгдөөгүй, зөвхөн tiers.ts-д) |
+| ui/src/pages/RoutineDetail.tsx | T1; хэсгийн гарчиг xoRoutineSectionLabel; webhook URL / secret хуулах toast (амжилт, алдаа) бүтэн литерал, бусад label англи template хэвээр |
+| ui/src/components/RoutineSaveBar.tsx | T1; хадгалаагүй талбарын шошго xoRoutineDirtyFieldLabel |
+| ui/src/components/RoutineSubSidebar.tsx | T1 (эх код өөрчлөгдөөгүй; NAV_GROUPS key={group.label} орчуулсан ч давтагдахгүй) |
+| ui/src/components/RoutineOverview.tsx | T1 (эх код өөрчлөгдөөгүй, зөвхөн tiers.ts-д) |
+| ui/src/components/routine-sections/editable-sections.tsx | T1; trigger kind xoTriggerKindLabel, signing mode xoSigningModeLabel, signingModeDescriptions Record → xoSigningModeDescription; галлагааны disposition xoFireDispositionLabel; «{{placeholder(s)}}» литерал хаалт PLACEHOLDER_TOKEN / PlaceholdersCode-оор interpolation-оос гадуур; хувьсагч ба нууц утгын тайлбар XoTrans (PAPERCLIP_* values-аар) |
+| ui/src/components/RoutineTriggerCard.tsx | T1; aria-label «Trigger: {{name}}», trigger kind xoTriggerKindLabel, signing mode xoSigningModeLabel |
+| ui/src/components/ScheduleEditor.tsx | T1; HOURS модулийн шошгыг хассан, render үед xoHourLabel: en 12 цаг (байт ижил), mn 24 цаг «00»–«23» (padStart); locale салаалалт (каталогийн parity тест placeholder зөрүүг хориглодог) |
+| ui/src/components/RoutineHistoryTab.tsx | T1; талбарын шошго xoRoutineDirtyFieldLabel / xoRoutineHistoryFieldLabel; «Show {{n}} older…», «Saved {{time}} by {{actor}}», actor (board/agent/system), «Unassigned», «No project», «(none)», жагсаалтын холбоос «{{first}} and {{second}}» / «{{items}}, and {{last}}»; env diff (key/keys, secret ref/refs, added/removed/changed) ганц ба олон тооны тусдаа литерал; «Env …», «Trigger …» талбар, enabled/disabled гар tx |
+| ui/src/components/routine-sections/operate-sections.tsx | T1; ажиллагааны гарчгийн fallback tx("Run") |
+| ui/src/components/RoutineVariablesEditor.tsx | T1; «{{name}}», «{{variable_name}}» литерал хаалттай өгүүлбэр XoTrans components-оор; тусламжийн цонхонд «Paperclip detects» → «{{brand}} detects» (T1 брэнд дүрэм, en гаралт «XO detects» болсон) |
+| ui/src/components/RoutineRunVariablesDialog.tsx | T1; InlineEntitySelector searchPlaceholder / emptyMessage (агент, төсөл) гар tx |
+| ui/src/lib/cron-readable.ts | гар tx (T1 биш): өгүүлбэр бүр цагтайгаа бүтэн литерал (Every day / weekday / weekend / {{day}} / {{days}} and {{last}} at {{time}}, Every {{n}} minutes, Every {{n}} hours at :{{mm}}, Every hour at :{{mm}}, Day {{n}} of every month at {{time}}); гарагийн нэр xoWeekdayName |
+| ui/src/lib/cron-fires.ts | гар tx (T1 биш): disposition тэмдэглэл «runs immediately», «if the previous run is still active»; throw new Error мессеж ба Intl.DateTimeFormat("en-US") хөндөгдөөгүй |
+
+XO-ийн өмч: ui/src/xo/labels.ts (xoRoutineSectionLabel, xoTriggerKindLabel, xoSigningModeLabel, xoSigningModeDescription, xoFireDispositionLabel, xoWeekdayName, xoRoutineDirtyFieldLabel, xoRoutineHistoryFieldLabel шинэ), scripts/xo-i18n/tiers.ts (16 файл T1), ui/src/i18n/xo/* (keys=4044, +397; keep-en.json-д «API», «URL», «high, medium, low»).
+
+Шинэ XO-ийн тестүүд: ui/src/i18n/xo/y6-7-8-keys.test.ts, scripts/xo-i18n/tiers-y6-7-8.test.ts, ui/src/xo/labels.test.ts (нэмэлт).
+
+Үлдэгдэл (Ү6 7.8):
+- *.production.tsx гурван хувилбар англиар үлдэнэ (ED шийдвэр Х1).
+- ExecutionWorkspaceDetail-ийн routines таб, BuiltInBundlePanel, PipelineSettings хүрээнээс гадуур, англиар.
+- Routine prompt, агентад очих текст англиар үлдэнэ (ED шийдвэр Х2).
+- lib/cron-fires.ts-ийн throw new Error мессеж англиар: catch {}-д залгигдаж UI-д харагддаггүй.
+- Серверээс ирэх мессеж (toast-ийн error.message) англиар үлдэнэ (ED шийдвэр Х3).
+- Skills хуудас, SkillFolderTree.tsx, reservedRootLabel → Ү6 7.9.
+- Routine run.source / run.status badge ба шүүлтүүрийн «any» англиар; xoStatusLabel-д routine-ийн төлөв байхгүй.
+- Routines.tsx-ийн breadcrumb «Recent Runs» (createIssueDetailLocationState-ийн аргумент) англиар.
+- InlineEntitySelector-ийн searchPlaceholder / emptyMessage бусад газарт (CommentThread, IssueProperties, RepositoryEditor, ConnectionSetupFlow) англиар.
+- Техникийн утгууд «plain (set)», «secret_ref → …», «latest», «replay Ns» англиар.
+- relativeTime() mn-д англиар гарвал «Saved … by …» өгүүлбэрт хоёр хэл холилдоно.
+- RoutineVariablesEditor-ийн тусламжийн цонхонд en гаралт «Paperclip detects» → «XO detects» болсон (T1 брэнд дүрэм); en байт ижил байх зарчмаас ухамсартай гажсан.
+- Browser шалгалт (2026-10-14, 3110, restart хийгээгүй, HMR): туршилтын «Туршилт 7.8» routine үүсгэж, хуваарийн идэвхжүүлэгч нэмэв. mn: жагсаалт, үүсгэх цонх («Агент: / төсөл: / хавтас:»), triggers (cron тайлбар «Өдөр бүр 10:00 цагт», цаг 00–23), overview, variables («{{placeholder}}» хаалт зөв), delivery (бодлого, «Дараагийн 5 идэвхжилт», «нэгтгэгдэнэ / дараалалд орно»), history («хув. N», талбарын шошго) Монголоор гарсан. en: triggers (12 цаг AM/PM), delivery англи хэвээр. Англиар үлдсэн (үлдэгдэл): толгойн «Draft» төлөвийн тэмдэг; RoutineOverview L178 «No runs yet» (JSX attribute доторх ternary, T1 барьдаггүй); secrets хэсгийн орчны хувьсагчийн засварлагч («No environment variables», «Add variable»); history-ийн enum утгууд (medium, paused, coalesce if active, skip missed, SCHEDULE); серверийн өгөгдөл: идэвхжүүлэгчийн анхдагч label «schedule», changeSummary, activity event нэрс.
 
 ## Lockfile
 

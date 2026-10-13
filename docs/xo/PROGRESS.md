@@ -1,5 +1,48 @@
 # XO ахицын бүртгэл
 
+## Ү6 7.8 — Routines (2026-10-14)
+
+Зорилго: тогтмол ажлын (routine) Streamlined UI-г монгол болгох: жагсаалт (/YB/routines), дэлгэрэнгүй (/YB/routines/:id: overview, triggers, schedule, variables, secrets, delivery, runs, activity, history), хуваарь засварлагч, хувьсагч, хадгалах самбар, хувилбарын түүх, cron тайлбар (lib/cron-readable.ts), галлагааны урьдчилсан харагдац (lib/cron-fires.ts). en гаралт 83326f71b-тэй байт ижил (нэг үл хамаарах зүйлийг доор бичсэн).
+
+Төлөвлөгөө: docs/superpowers/plans/2026-10-13-xo-y6-7-8-routines.md. BASE 83326f71b.
+
+ED шийдвэр: Х1 зөвхөн Streamlined хувилбар, *.production.tsx үлдэгдэлд. Х2 загвар/агентад очих текст (routine prompt, comment body) англиар. Х3 серверийн мессеж хүрээнээс гадуур.
+
+Батлагдсан нэр томьёо: trigger «идэвхжүүлэгч», delivery «хүргэлт», signing mode «гарын үсгийн горим», catch-up «нөхөн ажиллуулалт», concurrency / catch-up policy «зэрэгцээ ажиллагааны / нөхөн ажиллуулах бодлого», activity gate «идэвхжилийн нөхцөл», version history «хувилбарын түүх», cron англиар.
+
+| Task | Commit |
+|---|---|
+| 1 labels.ts: routine хэсэг, trigger kind, signing mode ба тайлбар, disposition, гараг, талбарын helper-ууд | 3e9bafa1f |
+| 2 RoutineDetail.tsx (хэсгийн гарчиг, хуулах toast), RoutineSaveBar.tsx (талбарын шошго) | 01e1c96ee |
+| 3 Routines.tsx (зөөх toast), ManagedRoutinesList.tsx («Missing …»), RoutineContextualSidebar.tsx (Routine fallback) | 0a81da537 |
+| 4 editable-sections.tsx, RoutineTriggerCard.tsx, ScheduleEditor.tsx (mn 24 цаг), cron-readable.ts, cron-fires.ts | b0d194fc0 |
+| 5 RoutineHistoryTab.tsx (diff шошго, env/trigger талбар, actor), operate-sections.tsx (Run fallback) | a7626461b |
+| 6 RoutineVariablesEditor.tsx (XoTrans, литерал хаалт), RoutineRunVariablesDialog.tsx (selector текст) | f0353445f |
+| 7 tiers.ts (16 файл T1), каталог (+397 түлхүүр), y6-7-8-keys тест, tiers-y6-7-8 тест, labels тест | 62ba43c17 |
+| 8 SYNC.md ба бүртгэл | энэ commit |
+
+Түлхүүр: 4044 (7.7-ын төгсгөл 3647, 7.8-д +397).
+
+Төлөв: Task 1–7 commit хийсэн, push хийгээгүй. Task 8: SYNC.md, PROGRESS.md, browser шалгалт хийгдсэн (3110 restart хийгээгүй, HMR).
+
+### Шалгалтын үр дүн
+
+- Gates (2026-10-14): xo:i18n:check OK keys=4044 (+397), xo:i18n:test 97/97, xo:i18n:typecheck цэвэр, xo:brand-scan 161 файл / 585 (baseline 586/161-ээс доош), ui tsc цэвэр, vitest (VITE_XO_DEFAULT_LOCALE=en) 622 файл / 6552 тест passed.
+- ScheduleEditor: mn-д цагийн сонголт 24 цагийн хэлбэрээр «00»–«23» (padStart), en 12 цагийн хэлбэр (12 AM … 11 PM) хэвээр.
+- Browser шалгалт (2026-10-14, 3110, restart хийгээгүй, HMR): туршилтын «Туршилт 7.8» routine үүсгэж, хуваарийн идэвхжүүлэгч нэмэв. mn: жагсаалт, үүсгэх цонх («Агент: / төсөл: / хавтас:»), triggers (cron тайлбар «Өдөр бүр 10:00 цагт», цаг 00–23), overview, variables («{{placeholder}}» хаалт зөв), delivery (бодлого, «Дараагийн 5 идэвхжилт», «нэгтгэгдэнэ / дараалалд орно»), history («хув. N», талбарын шошго) Монголоор гарсан. en: triggers (12 цаг AM/PM), delivery англи хэвээр. Англиар үлдсэн (үлдэгдэл): толгойн «Draft» төлөвийн тэмдэг; RoutineOverview L178 «No runs yet» (JSX attribute доторх ternary, T1 барьдаггүй); secrets хэсгийн орчны хувьсагчийн засварлагч («No environment variables», «Add variable»); history-ийн enum утгууд (medium, paused, coalesce if active, skip missed, SCHEDULE); серверийн өгөгдөл: идэвхжүүлэгчийн анхдагч label «schedule», changeSummary, activity event нэрс.
+
+### Хязгаарлалт
+
+- *.production.tsx гурван хувилбар англиар (Х1). ExecutionWorkspaceDetail-ийн routines таб, BuiltInBundlePanel, PipelineSettings хүрээнээс гадуур.
+- Routine prompt ба агентад очих текст англиар (Х2); серверийн мессеж англиар (Х3). lib/cron-fires.ts-ийн throw new Error мессеж catch {}-д залгигддаг тул орчуулаагүй.
+- Routine run.source / run.status badge ба шүүлтүүрийн «any» англиар; xoStatusLabel-д routine-ийн төлөв байхгүй.
+- Routines.tsx-ийн breadcrumb «Recent Runs» (createIssueDetailLocationState-ийн аргумент) англиар.
+- InlineEntitySelector-ийн searchPlaceholder / emptyMessage зөвхөн RoutineRunVariablesDialog-д орчуулагдсан; CommentThread, IssueProperties, RepositoryEditor, ConnectionSetupFlow-д англиар.
+- Техникийн утгууд «plain (set)», «secret_ref → …», «latest», «replay Ns» англиар.
+- relativeTime() mn-д англиар гарвал «Saved … by …» өгүүлбэрт хоёр хэл холилдоно.
+- RoutineVariablesEditor-ийн тусламжийн цонхонд en гаралт «Paperclip detects» → «XO detects» болсон (T1 брэнд дүрэм): en байт ижил байх зарчмаас цорын ганц гажилт.
+- Skills хуудас, SkillFolderTree.tsx, reservedRootLabel → Ү6 7.9.
+
 ## Ү6 7.7 — Шийдвэрийн хэсэг ба жижиг үлдэгдэл (2026-10-13)
 
 Зорилго: 7.6-ын «Үлдэгдэл»-ийн шийдвэрийн хэсэг (/decisions: toolbar, огнооны chip, queue rail, triage strip, queue хуудас, shelf), lib/attention.ts, ModeBadge, нууц утгын status enum, interaction хураангуй ба resolution алдааг монгол болгох. en гаралт 9b7bb9c30-тэй байт ижил.
