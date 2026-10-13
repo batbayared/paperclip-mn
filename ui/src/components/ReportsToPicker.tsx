@@ -1,3 +1,4 @@
+import { xoRoleLabel } from "@/xo/labels";
 import { useState } from "react";
 import type { Agent } from "@paperclipai/shared";
 import {
@@ -117,7 +118,7 @@ export function ReportsToPicker({
           >
             <AgentIcon icon={a.icon} className="shrink-0 h-3 w-3 text-muted-foreground" />
             <span className="min-w-0 truncate">{a.name}</span>
-            <span className="text-muted-foreground ml-auto shrink-0">{roleLabels[a.role] ?? a.role}</span>
+            <span className="text-muted-foreground ml-auto shrink-0">{xoRoleLabel(a.role, roleLabels[a.role] ?? a.role)}</span>
           </button>
         ))}
       </PopoverContent>

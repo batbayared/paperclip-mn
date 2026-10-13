@@ -14,10 +14,13 @@ import {
   xoNewIssueInlineLabel,
   xoPermissionDecision,
   xoQuickFilterLabel,
+  xoRoleLabel,
   xoRunRowSubtitle,
+  xoRunSourceLabel,
   xoSidePanelTabLabel,
   xoStatusLabel,
   xoToolDetailLabel,
+  xoTraceStatusLabel,
   xoWorkProductStatusLabel,
 } from "./labels";
 
@@ -76,7 +79,7 @@ describe("xoStatusLabel", () => {
     expect(xoStatusLabel("done", "Done")).toBe("Дууссан");
     expect(xoStatusLabel("cancelled", "Cancelled")).toBe("Цуцалсан");
     expect(xoStatusLabel("blocked", "Blocked")).toBe("Саатсан");
-    expect(xoStatusLabel("running", "running")).toBe("running");
+    expect(xoStatusLabel("some_unknown", "some unknown")).toBe("some unknown");
   });
 });
 
@@ -310,5 +313,15 @@ describe("xoRunRowSubtitle ба Markdown (Ү6 7.3)", () => {
   it("en дээр хэвээр", () => {
     expect(xoRunRowSubtitle("Run failed")).toBe("Run failed");
     expect(xoRunRowSubtitle("Skipped — routine paused")).toBe("Skipped — routine paused");
+  });
+});
+
+describe("xoRoleLabel / xoRunSourceLabel / xoTraceStatusLabel", () => {
+  it("en дээр оролт хэвээр", () => {
+    expect(xoRoleLabel("engineer", "Engineer")).toBe("Engineer");
+    expect(xoRunSourceLabel("assignment", "Assignment")).toBe("Assignment");
+    expect(xoTraceStatusLabel("Trace off")).toBe("Trace off");
+    expect(xoStatusLabel("succeeded", "succeeded")).toBe("succeeded");
+    expect(xoStatusLabel("pending_approval", "pending approval")).toBe("pending approval");
   });
 });

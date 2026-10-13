@@ -3,6 +3,7 @@ import { Bug, CircleOff } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { xoLocaleDateTime } from "@/xo/date-format";
 import { tx } from "@/i18n/xo";
+import { xoTraceStatusLabel } from "@/xo/labels";
 
 export function runRequestedProviderTrace(
   contextSnapshot: Record<string, unknown> | null | undefined,
@@ -79,7 +80,7 @@ export function ProviderTraceStatusBadge({
       }
     >
       <Icon className="h-3 w-3" />
-      {label}
+      {xoTraceStatusLabel(label)}
     </span>
   );
 }

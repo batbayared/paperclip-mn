@@ -1,3 +1,4 @@
+import { xoRoleLabel } from "@/xo/labels";
 import { useState, useEffect, useMemo, lazy, Suspense } from "react";
 import { Link, useNavigate, useLocation } from "@/lib/router";
 import { useQuery } from "@tanstack/react-query";
@@ -392,7 +393,7 @@ export function Agents() {
         titleClassName="flex-1 xl:flex-none xl:w-56"
         titleTextClassName="whitespace-normal break-words xl:truncate xl:whitespace-nowrap"
         subtitleClassName="whitespace-normal break-words xl:truncate xl:whitespace-nowrap"
-        subtitle={`${roleLabels[agent.role] ?? agent.role}${agent.title ? ` - ${agent.title}` : ""}`}
+        subtitle={`${xoRoleLabel(agent.role, roleLabels[agent.role] ?? agent.role)}${agent.title ? ` - ${agent.title}` : ""}`}
         to={agentUrl(agent)}
         className={cn(
           "group",
@@ -664,7 +665,7 @@ function OrgTreeNode({
           <div className="min-w-(--sz-7rem) truncate">
             <span className="text-sm font-medium">{node.name}</span>
             <span className="text-xs text-muted-foreground ml-2">
-              {roleLabels[node.role] ?? node.role}
+              {xoRoleLabel(node.role, roleLabels[node.role] ?? node.role)}
               {agent?.title ? ` - ${agent.title}` : ""}
             </span>
           </div>

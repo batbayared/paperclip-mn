@@ -45,6 +45,27 @@ export function xoStatusLabel(status: string, english: string): string {
     case "done": return tx("Done");
     case "cancelled": return tx("Cancelled");
     case "blocked": return tx("Blocked");
+    case "active": return tx("Active");
+    case "idle": return tx("Idle");
+    case "paused": return tx("Paused");
+    case "running": return tx("Running");
+    case "error": return tx("Error");
+    case "pending_approval": return tx("Pending approval");
+    case "terminated": return tx("Terminated");
+    case "queued": return tx("Queued");
+    case "scheduled_retry": return tx("Scheduled retry");
+    case "succeeded": return tx("Succeeded");
+    case "interrupted": return tx("Interrupted");
+    case "failed": return tx("Failed");
+    case "timed_out": return tx("Timed out");
+    case "revision_requested": return tx("Revision requested");
+    case "approved": return tx("Approved");
+    case "rejected": return tx("Rejected");
+    case "planned": return tx("Planned");
+    case "achieved": return tx("Achieved");
+    case "completed": return tx("Completed");
+    case "pending": return tx("Pending");
+    case "draft": return tx("Draft");
     default: return english;
   }
 }
@@ -271,4 +292,51 @@ export function xoSidePanelTabLabel(english: string): string {
 export function xoNewIssueInlineLabel(english: "For" | "in"): string {
   if (!(i18n.resolvedLanguage ?? i18n.language ?? "").startsWith("mn")) return english;
   return english === "For" ? tx("For (assignee)") : tx("in (project picker)");
+}
+
+// Агентын үүрэг (AGENT_ROLE_LABELS-ийн key). en дээр guard англиар буцаана.
+export function xoRoleLabel(role: string, english: string): string {
+  if (!(i18n.resolvedLanguage ?? i18n.language ?? "").startsWith("mn")) return english;
+  switch (role) {
+    case "ceo": return tx("CEO");
+    case "cto": return tx("CTO");
+    case "cmo": return tx("CMO");
+    case "cfo": return tx("CFO");
+    case "security": return tx("Security");
+    case "engineer": return tx("Engineer");
+    case "designer": return tx("Designer");
+    case "pm": return tx("PM");
+    case "qa": return tx("QA");
+    case "devops": return tx("DevOps");
+    case "researcher": return tx("Researcher");
+    case "general": return tx("General");
+    default: return english;
+  }
+}
+
+// AgentDetail-ийн sourceLabels (run.invocationSource). en дээр guard англиар буцаана.
+export function xoRunSourceLabel(source: string, english: string): string {
+  if (!(i18n.resolvedLanguage ?? i18n.language ?? "").startsWith("mn")) return english;
+  switch (source) {
+    case "timer": return tx("Timer");
+    case "assignment": return tx("Assignment");
+    case "on_demand": return tx("On-demand");
+    case "automation": return tx("Automation");
+    default: return english;
+  }
+}
+
+// ProviderTraceStatusBadge-ийн шошго. Харьцуулалт англиар хэвээр; зөвхөн render үед орчуулна.
+export function xoTraceStatusLabel(english: string): string {
+  switch (english) {
+    case "Trace expired": return tx("Trace expired");
+    case "Raw tracing enabled": return tx("Raw tracing enabled");
+    case "Trace captured": return tx("Trace captured");
+    case "Trace incomplete": return tx("Trace incomplete");
+    case "Trace truncated": return tx("Trace truncated");
+    case "Trace deleted": return tx("Trace deleted");
+    case "Trace requested": return tx("Trace requested");
+    case "Trace off": return tx("Trace off");
+    default: return english;
+  }
 }

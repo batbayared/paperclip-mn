@@ -1,3 +1,4 @@
+import { xoRoleLabel, xoRunSourceLabel } from "@/xo/labels";
 import { xoLocaleTime } from "@/xo/date-format";
 import { tx } from "@/i18n/xo";
 import { XoTrans } from "@/xo/XoTrans";
@@ -1264,7 +1265,7 @@ export function AgentDetail() {
                 ? <img src={`/brands/${agent.adapterType === "claude_local" ? "claude" : "codex"}-color.svg`} className="size-4" alt="" />
                 : null}
               <span>{getAdapterDisplay(agent.adapterType).label}</span><span>·</span>
-              <span>{agent.title || roleLabels[agent.role] || agent.role}</span>
+              <span>{agent.title || xoRoleLabel(agent.role, roleLabels[agent.role] || agent.role)}</span>
             </div>
           </div>
         </div>
@@ -1284,12 +1285,12 @@ export function AgentDetail() {
           <AgentActionButtons
             agent={agent}
             companyId={resolvedCompanyId}
-            assignLabel="Assign Task"
+            assignLabel={tx("Assign Task")}
             showStatus={false}
             canRunWithProviderTrace={canUseProviderTrace}
             actionsDisabled={agentAction.isPending}
             workActionsDisabled={hasInvalidOrgChain}
-            workActionsDisabledReason="Repair this agent's reporting chain before assigning tasks or starting runs"
+            workActionsDisabledReason={tx("Repair this agent's reporting chain before assigning tasks or starting runs")}
             hasPendingNavigationChanges={configDirty}
             onBeforeNavigate={prepareAgentNavigation}
             onActionError={setActionError}
@@ -1688,7 +1689,7 @@ function LatestRunCard({
                   : run.invocationSource === "on_demand" ? "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/50 dark:text-cyan-300"
                   : "bg-muted text-muted-foreground"
               )}>
-                {sourceLabels[run.invocationSource] ?? run.invocationSource}
+                {xoRunSourceLabel(run.invocationSource, sourceLabels[run.invocationSource] ?? run.invocationSource)}
               </Badge>
             </>
           )}
@@ -1748,7 +1749,7 @@ export function AgentOverview({
             <StatusBadge status={agent.status} />
           </div>
           <div className="space-y-3">
-            <SummaryRow label="Role"><span className="text-sm">{roleLabels[agent.role] ?? agent.role}</span></SummaryRow>
+            <SummaryRow label="Role"><span className="text-sm">{xoRoleLabel(agent.role, roleLabels[agent.role] ?? agent.role)}</span></SummaryRow>
             <SummaryRow label="Title"><span className="text-sm">{agent.title ?? "Not set"}</span></SummaryRow>
             <SummaryRow label="Reports to">
               {reportsToAgent ? (
@@ -3098,7 +3099,7 @@ function RunListItem({ run, isSelected, agentId }: { run: HeartbeatRun; isSelect
             : run.invocationSource === "on_demand" ? "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/50 dark:text-cyan-300"
             : "bg-muted text-muted-foreground"
         )}>
-          {sourceLabels[run.invocationSource] ?? run.invocationSource}
+          {xoRunSourceLabel(run.invocationSource, sourceLabels[run.invocationSource] ?? run.invocationSource)}
         </Badge>
         {sourceResolvedFold ? <SourceResolvedFoldBadge showIcon={false} className="shrink-0 text-(length:--text-nano) py-0" /> : null}
         <span className="ml-auto text-(length:--text-micro) text-muted-foreground shrink-0">
@@ -4362,7 +4363,7 @@ export function LogViewer({ run, adapterType }: { run: HeartbeatRun; adapterType
           mode={transcriptMode}
           streaming={isLive}
           limit={isLive ? LIVE_TRANSCRIPT_RENDER_LIMIT : undefined}
-          emptyMessage={run.logRef ? "Waiting for transcript..." : "No persisted transcript for this run."}
+          emptyMessage={run.logRef ? tx("Waiting for transcript...") : tx("No persisted transcript for this run.")}
         />
         {hasMoreLog && (
           <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-border/60 pt-3">

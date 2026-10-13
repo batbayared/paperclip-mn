@@ -1,3 +1,4 @@
+import { xoRoleLabel } from "@/xo/labels";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@/lib/router";
 import { AGENT_ROLE_LABELS, type Agent, type AgentRuntimeState } from "@paperclipai/shared";
@@ -52,7 +53,7 @@ export function AgentProperties({ agent, runtimeState }: AgentPropertiesProps) {
           </PropertyRow>
         )}
         <PropertyRow label="Role">
-          <span className="text-sm">{roleLabels[agent.role] ?? agent.role}</span>
+          <span className="text-sm">{xoRoleLabel(agent.role, roleLabels[agent.role] ?? agent.role)}</span>
         </PropertyRow>
         {agent.title && (
           <PropertyRow label="Title">

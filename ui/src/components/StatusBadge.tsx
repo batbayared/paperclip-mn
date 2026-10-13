@@ -54,7 +54,7 @@ export function AgentStatusBadge({ status }: { status: string }) {
       className="status-chip inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium leading-none whitespace-nowrap shrink-0"
       style={scStyle(cssVar)}
     >
-      {label.replace(/_/g, " ")}
+      {xoStatusLabel(label, label.replace(/_/g, " "))}
     </span>
   );
 }
@@ -95,7 +95,7 @@ export function IssueStatusBadge({ status }: { status: string }) {
       style={scStyle(cssVar)}
     >
       <StatusGlyph status={status} size="sm" />
-      {sentenceCaseStatus(status)}
+      {xoStatusLabel(status, sentenceCaseStatus(status))}
     </span>
   );
 }
