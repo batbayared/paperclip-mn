@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { nextCronFires, parseCronExpression } from "../lib/cron-fires";
 import { xoLocaleDateTime } from "@/xo/date-format";
 import { tx } from "@/i18n/xo";
+import { i18n } from "@/i18n";
 
 export type SchedulePreset = "every_minute" | "every_hour" | "every_day" | "weekdays" | "weekly" | "monthly" | "custom";
 
@@ -24,13 +25,11 @@ function englishHourLabel(i: number): string {
   return i === 0 ? "12 AM" : i < 12 ? `${i} AM` : i === 12 ? "12 PM" : `${i - 12} PM`;
 }
 
-// XO: render үеийн цагийн шошго — en нь 12 цагийн хэлбэр (байт ижил), mn нь {{h24}} (24 цаг).
+// XO: render үеийн цагийн шошго — en нь 12 цагийн хэлбэр (байт ижил), mn нь 24 цаг («00»–«23»).
+// Каталогийн parity тест placeholder-ийн зөрүүг хориглодог тул tx биш locale салаалалт.
 function xoHourLabel(i: number): string {
-  const h24 = String(i).padStart(2, "0");
-  if (i === 0) return tx("12 AM", { h24 });
-  if (i < 12) return tx("{{h}} AM", { h: i, h24 });
-  if (i === 12) return tx("12 PM", { h24 });
-  return tx("{{h}} PM", { h: i - 12, h24 });
+  if (!(i18n.resolvedLanguage ?? i18n.language ?? "").startsWith("mn")) return englishHourLabel(i);
+  return String(i).padStart(2, "0");
 }
 
 const MINUTES = Array.from({ length: 12 }, (_, i) => ({

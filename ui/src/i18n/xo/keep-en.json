@@ -29,5 +29,8 @@
   "key from the",
   "JSON row for this instance, or set it back to",
   ". Unset and",
-  "both mean no default has been chosen yet."
+  "both mean no default has been chosen yet.",
+  "API",
+  "URL",
+  "high, medium, low"
 ]

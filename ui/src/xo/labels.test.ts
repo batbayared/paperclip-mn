@@ -479,3 +479,48 @@ describe("Ү6 7.8 helper-ууд (en)", () => {
     }
   });
 });
+
+describe("Ү6 7.8 helper-ууд (mn)", () => {
+  it("mn дээр routine хэсэг, идэвхжүүлэгч, гарын үсгийн горим, disposition, гараг, талбарыг орчуулна", async () => {
+    await i18n.changeLanguage("mn");
+    for (const v of ["Overview", "Schedule", "Variables", "Secrets", "Delivery", "Runs", "Activity", "Version history"]) {
+      expect(xoRoutineSectionLabel(v), v).not.toBe(v);
+    }
+    expect(xoRoutineSectionLabel("Version history")).toBe("Хувилбарын түүх");
+    expect(xoRoutineSectionLabel("Delivery")).toBe("Хүргэлт");
+    expect(xoRoutineSectionLabel("Something else")).toBe("Something else");
+    for (const v of ["schedule", "webhook"]) {
+      expect(xoTriggerKindLabel(v), v).not.toBe(v);
+    }
+    expect(xoSigningModeLabel("none")).not.toBe("none");
+    // bearer, HMAC нэрс латинаар үлдэж болно; мэдэгдэхгүй утгыг дамжуулна.
+    expect(xoSigningModeLabel("other")).toBe("other");
+    for (const v of ["bearer", "hmac_sha256", "github_hmac", "none"]) {
+      const d = xoSigningModeDescription(v);
+      expect(d, v).not.toBe("");
+      expect(d, v).not.toMatch(/^(Expect|Accept|No authentication)/);
+    }
+    expect(xoSigningModeDescription("other")).toBe("");
+    for (const v of ["queued", "would be coalesced", "would be skipped"]) {
+      expect(xoFireDispositionLabel(v), v).not.toBe(v);
+    }
+    expect(xoFireDispositionLabel("would be skipped")).toBe("алгасагдана");
+    expect(xoFireDispositionLabel("something")).toBe("something");
+    for (const v of ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]) {
+      expect(xoWeekdayName(v), v).not.toBe(v);
+    }
+    expect(xoWeekdayName("Someday")).toBe("Someday");
+    for (const v of ["the title", "the description", "the project", "the default agent", "the priority", "the concurrency policy", "the catch-up policy", "the advanced run policy", "the activity gate scope", "the variables", "the secrets", "the routine"]) {
+      expect(xoRoutineDirtyFieldLabel(v), v).not.toBe(v);
+    }
+    expect(xoRoutineDirtyFieldLabel("the title")).toBe("гарчиг");
+    expect(xoRoutineDirtyFieldLabel("the concurrency policy")).toBe("зэрэгцээ ажиллагааны бодлого");
+    expect(xoRoutineDirtyFieldLabel("the catch-up policy")).toBe("нөхөн ажиллуулах бодлого");
+    expect(xoRoutineDirtyFieldLabel("the unknown")).toBe("the unknown");
+    for (const v of ["Title", "Priority", "Status", "Default agent", "Project", "Concurrency", "Catch-up", "Variables"]) {
+      expect(xoRoutineHistoryFieldLabel(v), v).not.toBe(v);
+    }
+    expect(xoRoutineHistoryFieldLabel("Catch-up")).toBe("Нөхөн ажиллуулалт");
+    expect(xoRoutineHistoryFieldLabel("Unknown")).toBe("Unknown");
+  });
+});
