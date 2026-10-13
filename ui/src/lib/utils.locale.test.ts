@@ -1,10 +1,16 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { XO_LOCALE_STORAGE_KEY } from "@/xo/locale";
 import { formatDate, formatDateTime, formatNumber, formatShortDate, relativeTime } from "./utils";
 
 const sample = new Date(2026, 8, 7, 13, 2, 54);
 
+beforeEach(() => {
+  vi.useFakeTimers();
+  vi.setSystemTime(new Date(2026, 8, 7, 13, 2, 54));
+});
+
 afterEach(() => {
+  vi.useRealTimers();
   localStorage.removeItem(XO_LOCALE_STORAGE_KEY);
 });
 

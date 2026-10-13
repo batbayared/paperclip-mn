@@ -598,7 +598,7 @@ function titleCaseKey(value: string): string {
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
-function RuntimeQuestionHistory({
+export function RuntimeQuestionHistory({
   item,
 }: {
   item: TaskChatRuntimeRequestItem;
@@ -629,12 +629,12 @@ function RuntimeQuestionHistory({
           ))}
           <p className="text-xs text-muted-foreground">
             {item.status === "resolved"
-              ? "Answer details were not recorded by this older runtime."
+              ? tx("Answer details were not recorded by this older runtime.")
               : item.status === "cancelled"
                 ? tx("No answers were submitted; this request was cancelled.")
                 : item.status === "expired"
                   ? tx("No answers were submitted; this request was expired.")
-                  : tx("No answers were submitted; this request was {{status}}.", { status: item.status })}
+                  : tx("No answers were submitted; this request was {{status}}.", { status: item.status === "pending" ? tx("pending") : item.status })}
           </p>
         </div>
       )}

@@ -7,9 +7,9 @@ import { i18n } from "@/i18n";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { MemoryRouter } from "@/lib/router";
 import { parseRunnerGoalCommand } from "./TaskChatComposer";
-import { TaskChatProtocolCard } from "./TaskChatProtocolCard";
+import { RuntimeQuestionHistory, TaskChatProtocolCard } from "./TaskChatProtocolCard";
 import { TaskChatQueuedMessages } from "./TaskChatQueuedMessages";
-import type { TaskChatProtocolItem } from "./task-chat-model";
+import type { TaskChatProtocolItem, TaskChatRuntimeRequestItem } from "./task-chat-model";
 import { humanizeToolName } from "./tool-taxonomy";
 import { toolDisplayName, transcriptToTaskChatItems } from "./transcript-adapter";
 
@@ -119,6 +119,48 @@ describe("DOM", () => {
     await i18n.changeLanguage("mn");
     renderCard({ ...workspaceItem, id: "workspace-mn" } as TaskChatProtocolItem);
     expect(container.textContent).toContain("1 файл өөрчлөгдсөн · +1 −1");
+  });
+
+  const unansweredRequest = (status: "pending" | "resolved" | "cancelled" | "expired") =>
+    ({
+      id: `request-${status}`,
+      kind: "protocol",
+      surface: "runtime_request",
+      runId: "run-1",
+      requestId: `request-${status}`,
+      requestKind: "user_input",
+      turnId: "turn-1",
+      requestType: "input",
+      status,
+      prompt: "Codex needs your input.",
+      choices: [],
+      fields: [],
+      questionSet: {
+        schema: "paperclip.question_set.v1",
+        questions: [{ id: "q-1", prompt: "Which one?", required: true, answerMode: "text" }],
+      },
+      response: null,
+    }) as unknown as TaskChatRuntimeRequestItem;
+
+  // Хүлээгдэж буй хүсэлт карт дээр form харуулдаг тул fallback текстийг түүхийн хэсгээр шууд шалгана.
+  function renderHistory(status: "pending" | "resolved" | "cancelled" | "expired") {
+    flushSync(() => root.render(<RuntimeQuestionHistory item={unansweredRequest(status)} />));
+    return container.textContent;
+  }
+
+  it("хариултгүй хүсэлтийн төлөв: en хэвээр", () => {
+    expect(renderHistory("pending")).toContain("No answers were submitted; this request was pending.");
+    expect(renderHistory("resolved")).toContain("Answer details were not recorded by this older runtime.");
+    expect(renderHistory("cancelled")).toContain("No answers were submitted; this request was cancelled.");
+    expect(renderHistory("expired")).toContain("No answers were submitted; this request was expired.");
+  });
+
+  it("хариултгүй хүсэлтийн төлөв: mn орчуулагдсан", async () => {
+    await i18n.changeLanguage("mn");
+    expect(renderHistory("pending")).toContain("Хариулт ирүүлээгүй; энэ хүсэлтийн төлөв: хүлээгдэж буй.");
+    expect(renderHistory("resolved")).toContain("Энэ хуучин ажиллах орчин хариултын дэлгэрэнгүйг бүртгээгүй.");
+    expect(renderHistory("cancelled")).toContain("Хариулт ирүүлээгүй; хүсэлт цуцлагдсан.");
+    expect(renderHistory("expired")).toContain("Хариулт ирүүлээгүй; хүсэлтийн хугацаа дууссан.");
   });
 
   const queue = {

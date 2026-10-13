@@ -84,6 +84,8 @@ const Y6_7_3_KEYS: string[] = [
   "runtime {{requestType}}",
   "workspace changes",
   "workspace diff",
+  // Task 6
+  "Answer details were not recorded by this older runtime.",
 ];
 
 // mn утга нь англитай ижил байж болох түлхүүрүүд (оноосон нэр).
