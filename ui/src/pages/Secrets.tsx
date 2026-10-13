@@ -1,5 +1,7 @@
 import { xoLocaleDate, xoLocaleDateTime } from "@/xo/date-format";
 import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
+import { xoStatusLabel } from "@/xo/labels";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -263,9 +265,9 @@ function isAwsDiscoveryAccessDenied(error: unknown): boolean {
 }
 
 function readableErrorMessage(error: unknown): string {
-  if (error instanceof ApiError) return error.message || `Request failed: ${error.status}`;
+  if (error instanceof ApiError) return error.message || tx("Request failed: {{status}}", { status: error.status });
   if (error instanceof Error) return error.message;
-  return "Unexpected error";
+  return tx("Unexpected error");
 }
 
 function providerVaultFormFromConfig(config: CompanySecretProviderConfig): ProviderVaultForm {
@@ -346,20 +348,20 @@ function normalizeUserSecretKeyForPreview(input: string) {
 
 
 function modeLabel(managedMode: SecretManagedMode) {
-  return managedMode === "paperclip_managed" ? "Paperclip-managed" : "Linked external";
+  return managedMode === "paperclip_managed" ? tx("Paperclip-managed") : tx("Linked external");
 }
 
 function modeDescription(managedMode: SecretManagedMode, canWriteExternalValue = false) {
   if (managedMode === "paperclip_managed") {
-    return "Paperclip owns create and rotation writes for this provider secret.";
+    return tx("Paperclip owns create and rotation writes for this provider secret.");
   }
   return canWriteExternalValue
-    ? "Paperclip resolves this provider reference and can write new values to it via Update value."
-    : "Paperclip resolves this provider reference but does not rotate the provider value.";
+    ? tx("Paperclip resolves this provider reference and can write new values to it via Update value.")
+    : tx("Paperclip resolves this provider reference but does not rotate the provider value.");
 }
 
 function statusLabel(status: SecretStatus) {
-  return status.charAt(0).toUpperCase() + status.slice(1);
+  return xoStatusLabel(status, status.charAt(0).toUpperCase() + status.slice(1));
 }
 
 function statusDotTone(status: SecretStatus) {
@@ -404,8 +406,8 @@ function providerIndicatorLabel(
   const custody = modeLabel(secret.managedMode);
   return [
     `${custody} · ${provider}`,
-    vault ? `Vault: ${vault}` : null,
-    secret.externalRef ? `Reference: ${secret.externalRef}` : null,
+    vault ? tx("Vault: {{vault}}", { vault }) : null,
+    secret.externalRef ? tx("Reference: {{ref}}", { ref: secret.externalRef }) : null,
   ]
     .filter(Boolean)
     .join("\n");
@@ -472,12 +474,12 @@ export function getCreateProviderBlockReason(
   health: SecretProviderHealthResponse | null,
   providerConfig?: CompanySecretProviderConfig | null,
 ) {
-  if (!provider) return "Select a provider.";
+  if (!provider) return tx("Select a provider.");
   if (mode === "managed" && provider.supportsManagedValues === false) {
-    return `${provider.label} does not support Paperclip-managed secret values.`;
+    return tx("{{label}} does not support Paperclip-managed secret values.", { label: provider.label });
   }
   if (mode === "external" && provider.supportsExternalReferences === false) {
-    return `${provider.label} does not support linked external references.`;
+    return tx("{{label}} does not support linked external references.", { label: provider.label });
   }
   const selectedProviderConfigBlockReason = providerConfig?.provider === provider.id
     ? getProviderConfigBlockReason(providerConfig)
@@ -488,15 +490,17 @@ export function getCreateProviderBlockReason(
     if (selectedProviderConfigReady) return null;
     if (selectedProviderConfigBlockReason) return selectedProviderConfigBlockReason;
     const healthEntry = healthEntryForProvider(health, provider.id);
-    const deploymentMessage = `Deployment default ${provider.label} is not configured.`;
-    const nextStep = " Select a ready provider vault or configure the deployment default.";
+    const deploymentMessage = tx(
+      "Deployment default {{label}} is not configured. Select a ready provider vault or configure the deployment default.",
+      { label: provider.label },
+    );
     return healthEntry?.message
-      ? `${deploymentMessage}${nextStep} ${healthEntry.message}`
-      : `${deploymentMessage}${nextStep}`;
+      ? `${deploymentMessage} ${healthEntry.message}`
+      : deploymentMessage;
   }
   const healthEntry = healthEntryForProvider(health, provider.id);
   if (healthEntry?.status === "error") {
-    return `${provider.label} health check failed: ${healthEntry.message}`;
+    return tx("{{label}} health check failed: {{message}}", { label: provider.label, message: healthEntry.message });
   }
   return null;
 }
@@ -512,7 +516,7 @@ function providerHealthText(
     providerConfig?.provider === provider.id &&
     !getProviderConfigBlockReason(providerConfig)
   ) {
-    return `Using selected provider vault. Deployment default ${provider.label} is not configured.`;
+    return tx("Using selected provider vault. Deployment default {{label}} is not configured.", { label: provider.label });
   }
   const entry = healthEntryForProvider(health, provider.id);
   if (!entry) return null;
@@ -529,10 +533,10 @@ export function getProviderConfigBlockReason(
   config: CompanySecretProviderConfig | null | undefined,
 ) {
   if (!config) return null;
-  if (config.status === "disabled") return "This provider vault is disabled.";
-  if (config.status === "coming_soon") return "This provider vault is saved as draft metadata only.";
+  if (config.status === "disabled") return tx("This provider vault is disabled.");
+  if (config.status === "coming_soon") return tx("This provider vault is saved as draft metadata only.");
   if (config.healthStatus === "error") {
-    return config.healthMessage ?? "This provider vault health check failed.";
+    return config.healthMessage ?? tx("This provider vault health check failed.");
   }
   return null;
 }
@@ -589,8 +593,8 @@ export function findCreateProviderReplacement({
 }
 
 function providerVaultLabel(configs: CompanySecretProviderConfig[], id: string | null | undefined) {
-  if (!id) return "Deployment default";
-  return configs.find((config) => config.id === id)?.displayName ?? "Unknown vault";
+  if (!id) return tx("Deployment default");
+  return configs.find((config) => config.id === id)?.displayName ?? tx("Unknown vault");
 }
 
 function buildProviderVaultConfig(form: ProviderVaultForm): Record<string, unknown> {
@@ -1154,7 +1158,7 @@ export function Secrets() {
 
   const rotateMutation = useMutation({
     mutationFn: () => {
-      if (!selectedSecret) throw new Error("Select a secret first");
+      if (!selectedSecret) throw new Error(tx("Select a secret first"));
       if (selectedSecret.managedMode === "external_reference" && rotateMode === "reference") {
         return secretsApi.rotate(selectedSecret.id, {
           externalRef: rotateExternalRef.trim() || selectedSecret.externalRef || undefined,
@@ -1176,7 +1180,7 @@ export function Secrets() {
       invalidateAll([updated.id]);
     },
     onError: (error) => {
-      setRotateError(error instanceof Error ? error.message : "Rotate failed");
+      setRotateError(error instanceof Error ? error.message : tx("Rotate failed"));
     },
   });
 
@@ -1194,7 +1198,11 @@ export function Secrets() {
       }
     },
     onSuccess: (updated) => {
-      pushToast({ title: `Secret ${updated.status}`, body: updated.name, tone: "info" });
+      pushToast({
+        title: tx("Secret {{status}}", { status: xoStatusLabel(updated.status, updated.status) }),
+        body: updated.name,
+        tone: "info",
+      });
       invalidateAll([updated.id]);
     },
     onError: (error) => {
@@ -1210,7 +1218,11 @@ export function Secrets() {
     mutationFn: ({ definition, status }: { definition: UserSecretDefinition; status: SecretStatus }) =>
       secretsApi.updateUserSecretDefinition(selectedCompanyId!, definition.id, { status }),
     onSuccess: (updated) => {
-      pushToast({ title: `User-provided secret ${updated.status}`, body: updated.name, tone: "info" });
+      pushToast({
+        title: tx("User-provided secret {{status}}", { status: xoStatusLabel(updated.status, updated.status) }),
+        body: updated.name,
+        tone: "info",
+      });
       invalidateAll([updated.id]);
     },
     onError: (error) => {
@@ -1471,8 +1483,8 @@ export function Secrets() {
 
   function rotateActionLabel(secret: CompanySecret) {
     return secret.managedMode === "external_reference" && !secretSupportsExternalValueWrite(secret)
-      ? "Update reference"
-      : "Update value";
+      ? tx("Update reference")
+      : tx("Update value");
   }
 
   function openRotateSecret(secret: CompanySecret) {
@@ -1711,7 +1723,7 @@ export function Secrets() {
   }
 
   function renderUpRow(variant: "table" | "card") {
-    const parentLabel = parentFolderPath ? parentFolderPath.split("/").pop()! : "All secrets";
+    const parentLabel = parentFolderPath ? parentFolderPath.split("/").pop()! : tx("All secrets");
     return (
       <Link
         to={folderLinkTo(parentFolderPath)}
@@ -1730,10 +1742,10 @@ export function Secrets() {
   }
 
   function renderSecretsBreadcrumb() {
-    const currentName = breadcrumbs.length > 0 ? breadcrumbs[breadcrumbs.length - 1].name : "All secrets";
-    const parentLabel = parentFolderPath ? parentFolderPath.split("/").pop()! : "All secrets";
+    const currentName = breadcrumbs.length > 0 ? breadcrumbs[breadcrumbs.length - 1].name : tx("All secrets");
+    const parentLabel = parentFolderPath ? parentFolderPath.split("/").pop()! : tx("All secrets");
     const fullTrail: { name: string; path: string }[] = [
-      { name: "All secrets", path: "" },
+      { name: tx("All secrets"), path: "" },
       ...breadcrumbs,
     ];
     // Middle-truncate deep paths: root · … · last two.
@@ -1781,7 +1793,7 @@ export function Secrets() {
               >
                 <ChevronLeft className="h-4 w-4" />
               </Link>
-              {parentLabel !== "All secrets" ? (
+              {parentLabel !== tx("All secrets") ? (
                 <span className="shrink-0 text-muted-foreground">{parentLabel} /</span>
               ) : null}
               <span aria-current="page" className="truncate font-medium text-foreground">
@@ -1956,8 +1968,10 @@ export function Secrets() {
           <div>
             {secretsQuery.isError || userDefinitionsQuery.isError ? (
               <div className="text-sm text-destructive flex items-center gap-2 py-4">
-                <AlertCircle className="h-4 w-4" /> Failed to load secrets:{" "}
-                {((secretsQuery.error ?? userDefinitionsQuery.error) as Error).message}
+                <AlertCircle className="h-4 w-4" />{" "}
+                {tx("Failed to load secrets: {{message}}", {
+                  message: ((secretsQuery.error ?? userDefinitionsQuery.error) as Error).message,
+                })}
                 <Button
                   variant="ghost"
                   size="sm"
@@ -1992,8 +2006,10 @@ export function Secrets() {
                   <div className="mb-3">
                     <div className="text-sm font-medium text-foreground">Search results</div>
                     <div className="text-xs text-muted-foreground">
-                      {filteredRows.length} {filteredRows.length === 1 ? "match" : "matches"} across all
-                      folders{folderPath ? ` · searching everywhere, not just ${folderPath}` : ""}
+                      {filteredRows.length === 1
+                        ? tx("{{n}} match across all folders", { n: filteredRows.length })
+                        : tx("{{n}} matches across all folders", { n: filteredRows.length })}
+                      {folderPath ? ` · ${tx("searching everywhere, not just {{folder}}", { folder: folderPath })}` : ""}
                     </div>
                   </div>
                 ) : null}
@@ -2045,11 +2061,14 @@ export function Secrets() {
                       const updatedTooltip =
                         row.kind === "company"
                           ? [
-                              `Updated: ${formatRelative(row.secret.updatedAt)}`,
-                              `Last rotated: ${formatRelative(row.secret.lastRotatedAt)}`,
-                              `Last resolved: ${formatRelative(row.secret.lastResolvedAt)}`,
+                              tx("Updated: {{time}}", { time: formatRelative(row.secret.updatedAt) }),
+                              tx("Last rotated: {{time}}", { time: formatRelative(row.secret.lastRotatedAt) }),
+                              tx("Last resolved: {{time}}", { time: formatRelative(row.secret.lastResolvedAt) }),
                             ].join("\n")
-                          : `Updated: ${formatRelative(row.definition.updatedAt)}\nLast resolved: user values resolve per member`;
+                          : [
+                              tx("Updated: {{time}}", { time: formatRelative(row.definition.updatedAt) }),
+                              tx("Last resolved: user values resolve per member"),
+                            ].join("\n");
                       return (
                         <div
                           key={row.id}
@@ -2178,10 +2197,9 @@ export function Secrets() {
                         <div className="mt-2 flex items-center justify-between gap-2 text-xs text-muted-foreground">
                           <span className="min-w-0 truncate">
                             {row.kind === "company" ? (
-                              <>
-                                v{row.secret.latestVersion} ·{" "}
-                                {row.secret.managedMode === "external_reference" ? "linked" : "managed"}
-                              </>
+                              row.secret.managedMode === "external_reference"
+                                ? tx("v{{version}} · linked", { version: row.secret.latestVersion })
+                                : tx("v{{version}} · managed", { version: row.secret.latestVersion })
                             ) : (
                               "Member-owned values"
                             )}
@@ -2532,9 +2550,12 @@ export function Secrets() {
             <DialogTitle>Secret references</DialogTitle>
             <DialogDescription>
               {usageDialogSecret
-                ? `${usageDialogSecret.name} is referenced by ${usageDialogSecret.referenceCount ?? 0} ${
-                    (usageDialogSecret.referenceCount ?? 0) === 1 ? "place" : "places"
-                  }.`
+                ? (usageDialogSecret.referenceCount ?? 0) === 1
+                  ? tx("{{name}} is referenced by 1 place.", { name: usageDialogSecret.name })
+                  : tx("{{name}} is referenced by {{n}} places.", {
+                      name: usageDialogSecret.name,
+                      n: usageDialogSecret.referenceCount ?? 0,
+                    })
                 : null}
             </DialogDescription>
           </DialogHeader>
@@ -2731,7 +2752,7 @@ export function Secrets() {
                 </div>
                 <div className="space-y-1">
                   <label className="text-xs font-medium text-foreground" htmlFor="new-secret-usage-guidance">
-                    Usage guidance <span className="text-muted-foreground/70">(optional)</span>
+                    {tx("Usage guidance")}{" "}<span className="text-muted-foreground/70">(optional)</span>
                   </label>
                   <Textarea
                     id="new-secret-usage-guidance"
@@ -2791,7 +2812,7 @@ export function Secrets() {
 
             <div>
               <label className="text-xs font-medium" htmlFor="new-secret-description">
-                Description <span className="text-muted-foreground/70">(optional)</span>
+                {tx("Description")}{" "}<span className="text-muted-foreground/70">(optional)</span>
               </label>
               <Input
                 id="new-secret-description"
@@ -3145,7 +3166,11 @@ export function Secrets() {
               />
               {selectedSecret?.managedMode === "external_reference" ? (
                 <p className="mt-1 text-(length:--text-micro) text-muted-foreground">
-                  Written to <code className="font-mono">{selectedSecret.externalRef}</code> in the provider.
+                  <XoTrans
+                    i18nKey="Written to <c>{{ref}}</c> in the provider."
+                    values={{ ref: selectedSecret.externalRef }}
+                    components={{ c: <code className="font-mono" /> }}
+                  />
                 </p>
               ) : null}
             </div>
@@ -3182,7 +3207,11 @@ export function Secrets() {
           <DialogHeader>
             <DialogTitle>Delete secret</DialogTitle>
             <DialogDescription>
-              Permanently removes <strong>{deleteConfirm?.name}</strong>. Active bindings will fail until you remap them.
+              <XoTrans
+                i18nKey="Permanently removes <b>{{name}}</b>. Active bindings will fail until you remap them."
+                values={{ name: deleteConfirm?.name ?? "" }}
+                components={{ b: <strong /> }}
+              />
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -3207,8 +3236,11 @@ export function Secrets() {
           <DialogHeader>
             <DialogTitle>Delete user-provided secret</DialogTitle>
             <DialogDescription>
-              Permanently removes <strong>{definitionDeleteConfirm?.name}</strong> for the whole organization.
-              Existing member values become unreferenced and active bindings must be remapped.
+              <XoTrans
+                i18nKey="Permanently removes <b>{{name}}</b> for the whole organization. Existing member values become unreferenced and active bindings must be remapped."
+                values={{ name: definitionDeleteConfirm?.name ?? "" }}
+                components={{ b: <strong /> }}
+              />
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -3242,11 +3274,15 @@ export function Secrets() {
           <DialogHeader>
             <DialogTitle>Remove provider vault</DialogTitle>
             <DialogDescription>
-              Removes <strong>{removeVaultConfirm?.displayName}</strong> from Paperclip only.{" "}
+              <XoTrans
+                i18nKey="Removes <b>{{name}}</b> from Paperclip only."
+                values={{ name: removeVaultConfirm?.displayName ?? "" }}
+                components={{ b: <strong /> }}
+              />{" "}
               {removeVaultConfirm?.provider === "aws_secrets_manager"
                 ? "This does not delete the remote AWS Secrets Manager vault, secrets, or any AWS data."
                 : "This does not delete any remote provider data."}{" "}
-              Secrets using this vault will lose the vault association until you assign another one.
+              {tx("Secrets using this vault will lose the vault association until you assign another one.")}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -3275,8 +3311,11 @@ function SecretsHowToUse() {
         <p className="font-medium text-foreground">Use secrets by binding them to runtime environment variables.</p>
         <p>
           Create or link a secret here, then open an agent&apos;s Environment variables or a project&apos;s Env field.
-          Add the env key the process expects, for example <code className="font-mono">GH_TOKEN</code>, choose{" "}
-          <span className="font-medium text-foreground">Secret</span>, and select the stored secret version.
+          {" "}
+          <XoTrans
+            i18nKey="Add the env key the process expects, for example <c>GH_TOKEN</c>, choose <b>Secret</b>, and select the stored secret version."
+            components={{ c: <code className="font-mono" />, b: <span className="font-medium text-foreground" /> }}
+          />
         </p>
         <p>
           Paperclip resolves the value server-side when the run starts and injects it as that env var. Project env
@@ -3559,7 +3598,8 @@ export function ProviderVaultsTab({
   if (error) {
     return (
       <div className="py-4 text-sm text-destructive flex items-center gap-2">
-        <AlertCircle className="h-4 w-4" /> Failed to load provider vaults: {(error as Error).message}
+        <AlertCircle className="h-4 w-4" />{" "}
+        {tx("Failed to load provider vaults: {{message}}", { message: (error as Error).message })}
         <Button variant="ghost" size="sm" onClick={onRetry}>
           Retry
         </Button>
@@ -3899,8 +3939,12 @@ function AwsProviderVaultDiscoveryPanel({
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <Database className="h-3.5 w-3.5" />
             <span>
-              {preview.candidates.length} candidate{preview.candidates.length === 1 ? "" : "s"} from{" "}
-              {preview.sampledSecretCount} sampled secret{preview.sampledSecretCount === 1 ? "" : "s"}
+              {preview.candidates.length === 1
+                ? tx("1 candidate from")
+                : tx("{{n}} candidates from", { n: preview.candidates.length })}{" "}
+              {preview.sampledSecretCount === 1
+                ? tx("1 sampled secret")
+                : tx("{{n}} sampled secrets", { n: preview.sampledSecretCount })}
             </span>
           </div>
           <div className="space-y-2" data-testid="aws-vault-discovery-candidates">
@@ -3927,7 +3971,7 @@ function AwsProviderVaultDiscoveryError({
 }) {
   const details = apiErrorDetails(error);
   const isAccessDenied = isAwsDiscoveryAccessDenied(error);
-  const region = (details?.region ?? form.region.trim()) || "unspecified";
+  const region = (details?.region ?? form.region.trim()) || tx("unspecified");
   const message = readableErrorMessage(error);
   const safeDetails = {
     message,
@@ -4205,7 +4249,10 @@ function CoverageInline({
       <Users className="h-3 w-3" />
       <span className="truncate">
         {compact && summary
-          ? `${summary.configuredCount}/${summary.configuredCount + summary.missingCount + summary.inactiveCount} set`
+          ? tx("{{configured}}/{{total}} set", {
+              configured: summary.configuredCount,
+              total: summary.configuredCount + summary.missingCount + summary.inactiveCount,
+            })
           : coverageSummaryLabel(summary)}
       </span>
       {summary && summary.missingCount > 0 ? (
@@ -4315,9 +4362,11 @@ function UserSecretUsageTab({ definition }: { definition: UserSecretDefinition }
   return (
     <div className="space-y-3 text-xs text-muted-foreground">
       <div className="rounded-md border border-border bg-muted/20 p-3">
-        Bind runtime environment variables to this user-provided secret by choosing{" "}
-        <span className="font-medium text-foreground">User secret</span> and selecting{" "}
-        <code className="font-mono">{definition.key}</code>.
+        <XoTrans
+          i18nKey="Bind runtime environment variables to this user-provided secret by choosing <b>User secret</b> and selecting <c>{{key}}</c>."
+          values={{ key: definition.key }}
+          components={{ b: <span className="font-medium text-foreground" />, c: <code className="font-mono" /> }}
+        />
       </div>
       {definition.usageGuidance ? (
         <div>
@@ -4450,7 +4499,7 @@ function AgentAccessSection({
       const adapterConfig = { ...((detail.adapterConfig ?? {}) as Record<string, unknown>) };
       const env = { ...((adapterConfig.env ?? {}) as Record<string, unknown>) };
       if (env[key] !== undefined) {
-        throw new Error(`${detail.name} already has an env var named ${key}.`);
+        throw new Error(tx("{{name}} already has an env var named {{key}}.", { name: detail.name, key }));
       }
       env[key] =
         reference.kind === "company"
@@ -4576,7 +4625,7 @@ function AgentAccessSection({
                 value={selectedAgentId}
                 onChange={setSelectedAgentId}
                 triggerClassName="h-8 text-xs"
-                emptyMessage="No agents available."
+                emptyMessage={tx("No agents available.")}
               />
             </div>
             <div className="min-w-0 flex-1">
@@ -4638,8 +4687,8 @@ function SecretDetailsTab({
   onViewUsage: () => void;
 }) {
   const bindingLabel = (secret.referenceCount ?? 0) === 1
-    ? "1 binding"
-    : `${secret.referenceCount ?? 0} bindings`;
+    ? tx("1 binding")
+    : tx("{{n}} bindings", { n: secret.referenceCount ?? 0 });
 
   return (
     <dl className="divide-y divide-border/60 text-xs">
