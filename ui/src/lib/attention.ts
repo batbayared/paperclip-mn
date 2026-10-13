@@ -189,10 +189,6 @@ function quote(text: string | null | undefined): string | null {
   return `“${trimmed}”`;
 }
 
-function countNoun(count: number, singular: string): string {
-  return `${count} ${count === 1 ? singular : `${singular}s`}`;
-}
-
 /**
  * A concise human-readable detail line for a row, e.g.
  *   "2 questions — “Which auth provider…”"
@@ -212,21 +208,28 @@ export function attentionDetailLine(item: AttentionItem): string | null {
       return quote(detail.promptExcerpt);
     case "checkbox_confirmation": {
       const q = quote(detail.promptExcerpt);
-      return q ? `${countNoun(detail.optionCount, "option")} — ${q}` : countNoun(detail.optionCount, "option");
+      const count = detail.optionCount;
+      const label = count === 1 ? tx("{{count}} option", { count }) : tx("{{count}} options", { count });
+      return q ? `${label} — ${q}` : label;
     }
     case "questions": {
       const q = quote(detail.firstQuestionText);
-      const label = countNoun(detail.questionCount, "question");
+      const count = detail.questionCount;
+      const label = count === 1 ? tx("{{count}} question", { count }) : tx("{{count}} questions", { count });
       return q ? `${label} — ${q}` : label;
     }
     case "suggested_tasks": {
       const q = quote(detail.firstTaskTitle);
-      const label = countNoun(detail.taskCount, "suggested task");
+      const count = detail.taskCount;
+      const label =
+        count === 1 ? tx("{{count}} suggested task", { count }) : tx("{{count}} suggested tasks", { count });
       return q ? `${label} — ${q}` : label;
     }
     case "item_verdicts": {
       const q = quote(detail.promptExcerpt);
-      const label = `${countNoun(detail.itemCount, "item")} to verdict`;
+      const count = detail.itemCount;
+      const label =
+        count === 1 ? tx("{{count}} item to verdict", { count }) : tx("{{count}} items to verdict", { count });
       return q ? `${label} — ${q}` : label;
     }
     case "failed_run":
@@ -238,11 +241,19 @@ export function attentionDetailLine(item: AttentionItem): string | null {
     case "blocker": {
       const b = detail.blockingIssue;
       if (!b) return null;
-      const id = b.identifier ? `${b.identifier} ` : "";
-      return b.title ? `Blocked by ${id}${b.title}` : b.identifier ? `Blocked by ${b.identifier}` : null;
+      if (b.title) {
+        return b.identifier
+          ? tx("Blocked by {{identifier}} {{title}}", { identifier: b.identifier, title: b.title })
+          : tx("Blocked by {{title}}", { title: b.title });
+      }
+      return b.identifier ? tx("Blocked by {{identifier}}", { identifier: b.identifier }) : null;
     }
     case "budget":
-      return `${Math.round(detail.observedPercent)}% of budget used ($${detail.amountObserved} / $${detail.amountLimit})`;
+      return tx("{{percent}}% of budget used (${{observed}} / ${{limit}})", {
+        percent: Math.round(detail.observedPercent),
+        observed: detail.amountObserved,
+        limit: detail.amountLimit,
+      });
     case "generic":
       return quote(detail.summaryExcerpt);
     default:
