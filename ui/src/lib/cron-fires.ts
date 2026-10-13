@@ -9,6 +9,8 @@
  * This is preview-only — the authoritative `nextRunAt` is still computed server-side.
  */
 
+import { tx } from "@/i18n/xo";
+
 const WEEKDAY_INDEX: Record<string, number> = {
   Sun: 0,
   Mon: 1,
@@ -246,7 +248,7 @@ export function previewFirePolicies(
         at,
         disposition: "queued",
         label: DISPOSITION_LABEL.queued,
-        note: "runs immediately",
+        note: tx("runs immediately"),
       };
     }
     let disposition: FireDisposition;
@@ -266,7 +268,7 @@ export function previewFirePolicies(
       at,
       disposition,
       label: DISPOSITION_LABEL[disposition],
-      note: disposition === "queued" ? null : "if the previous run is still active",
+      note: disposition === "queued" ? null : tx("if the previous run is still active"),
     };
   });
 }

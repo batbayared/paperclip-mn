@@ -17,6 +17,7 @@ import { buildRoutineTriggerPatch } from "../lib/routine-trigger-patch";
 import { describeCron } from "../lib/cron-readable";
 import { xoLocaleDateTime } from "@/xo/date-format";
 import { tx } from "@/i18n/xo";
+import { xoSigningModeLabel, xoTriggerKindLabel } from "@/xo/labels";
 
 const signingModes = ["bearer", "hmac_sha256", "github_hmac", "none"];
 const SIGNING_MODES_WITHOUT_REPLAY_WINDOW = new Set(["github_hmac", "none"]);
@@ -71,7 +72,7 @@ export function RoutineTriggerCard({
 
   return (
     <form
-      aria-label={`Trigger: ${trigger.label ?? trigger.kind}`}
+      aria-label={tx("Trigger: {{name}}", { name: trigger.label ?? xoTriggerKindLabel(trigger.kind) })}
       className="space-y-4 rounded-lg border border-border p-4"
       onSubmit={(event) => event.preventDefault()}
     >
@@ -79,7 +80,7 @@ export function RoutineTriggerCard({
         <div className="min-w-0 space-y-1">
           <div className="flex items-center gap-2 text-sm font-medium">
             <KindIcon className="h-3.5 w-3.5 shrink-0" />
-            <span className="truncate">{trigger.label ?? trigger.kind}</span>
+            <span className="truncate">{trigger.label ?? xoTriggerKindLabel(trigger.kind)}</span>
           </div>
           {humanCron ? (
             <p id={`cron-readable-${trigger.id}`} className="text-xs text-muted-foreground">
@@ -140,7 +141,7 @@ export function RoutineTriggerCard({
                 <SelectContent>
                   {signingModes.map((mode) => (
                     <SelectItem key={mode} value={mode}>
-                      {mode}
+                      {xoSigningModeLabel(mode)}
                     </SelectItem>
                   ))}
                 </SelectContent>

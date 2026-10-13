@@ -36,6 +36,14 @@ import { EnvironmentVariablesEditor } from "../environment-variables-editor";
 import { createDefaultNewTrigger, useRoutineDetail } from "./context";
 import type { EnvBinding, RoutineDetail as RoutineDetailType } from "@paperclipai/shared";
 import { xoLocaleDateTime, xoZonedDateTime } from "@/xo/date-format";
+import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
+import {
+  xoFireDispositionLabel,
+  xoSigningModeDescription,
+  xoSigningModeLabel,
+  xoTriggerKindLabel,
+} from "@/xo/labels";
 
 const concurrencyPolicyOptions = [
   {
@@ -97,13 +105,14 @@ const activityGateScopeOptions = [
 
 const triggerKinds = ["schedule", "webhook"];
 const signingModes = ["bearer", "hmac_sha256", "github_hmac", "none"];
-const signingModeDescriptions: Record<string, string> = {
-  bearer: "Expect a shared bearer token in the Authorization header.",
-  hmac_sha256: "Expect an HMAC SHA-256 signature over the request using the shared secret.",
-  github_hmac: "Accept GitHub-style X-Hub-Signature-256 header (HMAC over raw body, no timestamp).",
-  none: "No authentication — the webhook URL itself acts as a shared secret.",
-};
 const SIGNING_MODES_WITHOUT_REPLAY_WINDOW = new Set(["github_hmac", "none"]);
+// XO: хэрэглэгчид харагдах литерал хаалт — i18next interpolation-оос гадуур хадгална.
+const PLACEHOLDER_TOKEN = "{{placeholder}}";
+const PLACEHOLDERS_TOKEN = "{{placeholders}}";
+
+function PlaceholdersCode() {
+  return <code className="font-mono">{PLACEHOLDERS_TOKEN}</code>;
+}
 
 export function OverviewSection({
   defaultDescriptionAnnotationsOpen = false,
@@ -469,7 +478,7 @@ export function TriggersSection() {
               <SelectContent>
                 {triggerKinds.map((kind) => (
                   <SelectItem key={kind} value={kind} disabled={kind === "webhook"}>
-                    {kind}
+                    {xoTriggerKindLabel(kind)}
                     {kind === "webhook" ? " — COMING SOON" : ""}
                   </SelectItem>
                 ))}
@@ -504,13 +513,13 @@ export function TriggersSection() {
                   <SelectContent>
                     {signingModes.map((mode) => (
                       <SelectItem key={mode} value={mode}>
-                        {mode}
+                        {xoSigningModeLabel(mode)}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
                 <p className="text-xs text-muted-foreground">
-                  {signingModeDescriptions[newTrigger.signingMode]}
+                  {xoSigningModeDescription(newTrigger.signingMode)}
                 </p>
               </div>
               {!SIGNING_MODES_WITHOUT_REPLAY_WINDOW.has(newTrigger.signingMode) && (
@@ -583,9 +592,10 @@ export function VariablesSection() {
     <div className="space-y-4">
       <div className="flex items-center gap-3 rounded-md border border-border bg-muted/20 px-4 py-3 text-xs">
         <span className="flex-1 text-muted-foreground">
-          Variables are auto-detected from <code className="font-mono">{"{{placeholders}}"}</code> in
-          the title &amp; instructions. The variable name is read-only — rename by editing the
-          placeholder.
+          <XoTrans
+            i18nKey="Variables are auto-detected from <code/> in the title & instructions. The variable name is read-only — rename by editing the placeholder."
+            components={{ code: <PlaceholdersCode /> }}
+          />
         </span>
         <Button variant="secondary" size="sm" onClick={() => navigateToSection("overview")}>
           <Edit3 className="mr-1.5 h-3.5 w-3.5" />
@@ -603,7 +613,9 @@ export function VariablesSection() {
       ) : (
         <EmptyState
           icon={Braces}
-          message="No variables yet. Add a {{placeholder}} in the title or instructions to create one."
+          message={tx("No variables yet. Add a {{token}} in the title or instructions to create one.", {
+            token: PLACEHOLDER_TOKEN,
+          })}
           action="Edit instructions"
           onAction={() => navigateToSection("overview")}
         />
@@ -634,8 +646,11 @@ export function SecretsSection() {
   return (
     <div className="space-y-4">
       <div className="rounded-md border border-border bg-muted/20 px-4 py-3 text-xs text-muted-foreground">
-        Routine secrets apply to every task this routine creates. They override matching keys in
-        project and agent env. <span className="font-mono">PAPERCLIP_*</span> names are reserved.
+        <XoTrans
+          i18nKey="Routine secrets apply to every task this routine creates. They override matching keys in project and agent env. <mono>{{prefix}}</mono> names are reserved."
+          values={{ prefix: "PAPERCLIP_*" }}
+          components={{ mono: <span className="font-mono" /> }}
+        />
       </div>
 
       {secretMessage ? (
@@ -808,7 +823,7 @@ function NextFiresPreview({
                 <span className="tabular-nums">{formatFireTime(entry.at, preview.timeZone)}</span>
                 <ArrowRight className="h-3 w-3 shrink-0 text-muted-foreground/50" />
                 <span className={cn("font-medium", dispositionToneClass[entry.disposition])}>
-                  {entry.label}
+                  {xoFireDispositionLabel(entry.label)}
                 </span>
                 {entry.note ? (
                   <span className="truncate text-muted-foreground/60">({entry.note})</span>

@@ -5,6 +5,9 @@
  * Falls back to the raw expression when it can't confidently describe it.
  */
 
+import { tx } from "@/i18n/xo";
+import { xoWeekdayName } from "@/xo/labels";
+
 const DOW_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 function pad2(value: number): string {
@@ -19,10 +22,11 @@ function describeTime(minute: string, hour: string): string | null {
   return `${pad2(h)}:${pad2(m)}`;
 }
 
-function describeDayOfWeek(dow: string): string | null {
-  if (dow === "*" || dow === "?") return "every day";
-  if (dow === "1-5") return "every weekday";
-  if (dow === "0,6" || dow === "6,0" || dow === "0,7") return "every weekend";
+// XO: өгүүлбэр бүр бүтэн литерал tx (цагтайгаа хамт), гарагийн нэрийг xoWeekdayName орчуулна.
+function describeDayOfWeekAt(dow: string, time: string): string | null {
+  if (dow === "*" || dow === "?") return tx("Every day at {{time}}", { time });
+  if (dow === "1-5") return tx("Every weekday at {{time}}", { time });
+  if (dow === "0,6" || dow === "6,0" || dow === "0,7") return tx("Every weekend at {{time}}", { time });
   const parts = dow.split(",").map((part) => part.trim());
   const names = parts.map((part) => {
     const n = Number(part);
@@ -30,8 +34,13 @@ function describeDayOfWeek(dow: string): string | null {
     return DOW_NAMES[n % 7];
   });
   if (names.some((name) => name === null)) return null;
-  if (names.length === 1) return `every ${names[0]}`;
-  return `every ${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`;
+  const days = names.map((name) => xoWeekdayName(name as string));
+  if (days.length === 1) return tx("Every {{day}} at {{time}}", { day: days[0], time });
+  return tx("Every {{days}} and {{last}} at {{time}}", {
+    days: days.slice(0, -1).join(", "),
+    last: days[days.length - 1],
+    time,
+  });
 }
 
 export function describeCron(expression: string | null | undefined): string | null {
@@ -45,18 +54,18 @@ export function describeCron(expression: string | null | undefined): string | nu
   // Every N minutes
   const everyMinutes = minute.match(/^\*\/(\d+)$/);
   if (everyMinutes && hour === "*" && dom === "*" && month === "*" && dow === "*") {
-    return `Every ${everyMinutes[1]} minutes`;
+    return tx("Every {{n}} minutes", { n: everyMinutes[1] });
   }
 
   // Every N hours, on the minute
   const everyHours = hour.match(/^\*\/(\d+)$/);
   if (everyHours && /^\d+$/.test(minute) && dom === "*" && month === "*" && dow === "*") {
-    return `Every ${everyHours[1]} hours at :${pad2(Number(minute))}`;
+    return tx("Every {{n}} hours at :{{mm}}", { n: everyHours[1], mm: pad2(Number(minute)) });
   }
 
   // Hourly
   if (/^\d+$/.test(minute) && hour === "*" && dom === "*" && month === "*" && dow === "*") {
-    return `Every hour at :${pad2(Number(minute))}`;
+    return tx("Every hour at :{{mm}}", { mm: pad2(Number(minute)) });
   }
 
   // Daily / weekly at a fixed time
@@ -64,14 +73,14 @@ export function describeCron(expression: string | null | undefined): string | nu
     const time = describeTime(minute, hour);
     if (!time) return null;
     if (dom === "*" && (dow === "*" || dow === "?")) {
-      return `Every day at ${time}`;
+      return tx("Every day at {{time}}", { time });
     }
     if (dom === "*") {
-      const dowText = describeDayOfWeek(dow);
-      if (dowText) return `${dowText[0].toUpperCase()}${dowText.slice(1)} at ${time}`;
+      const dowText = describeDayOfWeekAt(dow, time);
+      if (dowText) return dowText;
     }
     if (/^\d+$/.test(dom) && (dow === "*" || dow === "?")) {
-      return `Day ${dom} of every month at ${time}`;
+      return tx("Day {{n}} of every month at {{time}}", { n: dom, time });
     }
   }
 

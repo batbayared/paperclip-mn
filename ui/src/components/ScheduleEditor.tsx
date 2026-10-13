@@ -18,10 +18,20 @@ const PRESETS: { value: SchedulePreset; label: string }[] = [
   { value: "custom", label: "Custom (cron)" },
 ];
 
-const HOURS = Array.from({ length: 24 }, (_, i) => ({
-  value: String(i),
-  label: i === 0 ? "12 AM" : i < 12 ? `${i} AM` : i === 12 ? "12 PM" : `${i - 12} PM`,
-}));
+const HOURS = Array.from({ length: 24 }, (_, i) => ({ value: String(i) }));
+
+function englishHourLabel(i: number): string {
+  return i === 0 ? "12 AM" : i < 12 ? `${i} AM` : i === 12 ? "12 PM" : `${i - 12} PM`;
+}
+
+// XO: render үеийн цагийн шошго — en нь 12 цагийн хэлбэр (байт ижил), mn нь {{h24}} (24 цаг).
+function xoHourLabel(i: number): string {
+  const h24 = String(i).padStart(2, "0");
+  if (i === 0) return tx("12 AM", { h24 });
+  if (i < 12) return tx("{{h}} AM", { h: i, h24 });
+  if (i === 12) return tx("12 PM", { h24 });
+  return tx("{{h}} PM", { h: i - 12, h24 });
+}
 
 const MINUTES = Array.from({ length: 12 }, (_, i) => ({
   value: String(i * 5),
@@ -123,7 +133,7 @@ export function buildCron(preset: SchedulePreset, hour: string, minute: string, 
 
 function describeSchedule(cron: string): string {
   const { preset, hour, minute, dayOfWeek, dayOfMonth } = parseCronToPreset(cron);
-  const hourLabel = HOURS.find((h) => h.value === hour)?.label ?? `${hour}`;
+  const hourLabel = hasOption(HOURS, hour) ? englishHourLabel(Number(hour)) : `${hour}`;
   const timeStr = `${hourLabel.replace(/ (AM|PM)$/, "")}:${minute.padStart(2, "0")} ${hourLabel.match(/(AM|PM)$/)?.[0] ?? ""}`;
 
   switch (preset) {
@@ -314,7 +324,7 @@ export function ScheduleEditor({
                 <SelectContent>
                   {HOURS.map((h) => (
                     <SelectItem key={h.value} value={h.value}>
-                      {h.label}
+                      {xoHourLabel(Number(h.value))}
                     </SelectItem>
                   ))}
                 </SelectContent>
