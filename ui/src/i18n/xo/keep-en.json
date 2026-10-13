@@ -14,5 +14,15 @@
   "Smoke Lab",
   "{{brand}}",
   "Markdown",
-  "DevOps"
+  "DevOps",
+  "{\n  \"commands\": [\n    {\n      \"id\": \"web\",\n      \"name\": \"web\",\n      \"kind\": \"service\",\n      \"command\": \"pnpm dev\",\n      \"cwd\": \".\",\n      \"port\": { \"type\": \"auto\" },\n      \"readiness\": {\n        \"type\": \"http\",\n        \"urlTemplate\": \"http://127.0.0.1:${port}\"\n      },\n      \"expose\": {\n        \"type\": \"url\",\n        \"urlTemplate\": \"http://127.0.0.1:${port}\"\n      },\n      \"lifecycle\": \"shared\",\n      \"reuseScope\": \"project_workspace\"\n    },\n    {\n      \"id\": \"db-migrate\",\n      \"name\": \"db:migrate\",\n      \"kind\": \"job\",\n      \"command\": \"pnpm db:migrate\",\n      \"cwd\": \".\"\n    }\n  ]\n}",
+  "{{name}} → v{{latestVersion}}",
+  "API ·",
+  "Env ·",
+  "MY_SECRET",
+  "PERSONAL_GH_TOKEN",
+  "pkill -f vite || true",
+  "pnpm install && pnpm dev",
+  "v{{latestVersion}}",
+  "v{{versionSelector}}"
 ]

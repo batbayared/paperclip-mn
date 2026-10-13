@@ -165,4 +165,13 @@ export const XO_TRANSFORM_FILES: readonly string[] = [
   "ui/src/pages/Projects.tsx",
   "ui/src/pages/Search.tsx",
   "ui/src/pages/WhatNeedsMe.tsx",
+  // Ү6 7.5
+  "ui/src/components/InteractionGovernancePanel.tsx",
+  "ui/src/components/IssueThreadInteractionCard.tsx",
+  "ui/src/pages/Secrets.tsx",
+  "ui/src/components/AgentContextualSidebar.tsx",
+  "ui/src/pages/audit/AuditHub.tsx",
+  "ui/src/pages/audit/AuditRuns.tsx",
+  "ui/src/pages/audit/CompanyActivity.tsx",
+  "ui/src/pages/ProjectWorkspaceDetail.tsx",
 ];

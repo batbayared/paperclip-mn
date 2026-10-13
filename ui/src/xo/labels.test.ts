@@ -354,3 +354,16 @@ describe("Ү6 7.5 helper-ууд (en)", () => {
     expect(xoStatusLabel("withdrawn", "Withdrawn")).toBe("Withdrawn");
   });
 });
+
+describe("Ү6 7.5 helper-ууд (mn)", () => {
+  it("Ү6 7.5 helper-ууд mn дээр орчуулна", async () => {
+    await i18n.changeLanguage("mn");
+    expect(xoResolverPolicyLabel("Human only")).toBe("Зөвхөн хүн");
+    expect(xoResolverPolicyLabel("Anyone")).toBe("Хэн ч");
+    expect(xoNavLabel("Permissions / Trust")).toBe("Эрх / Итгэл");
+    expect(xoVerdictLabel("Defer")).toBe("Хойшлуулах");
+    expect(xoInteractionKindLabel("Suggested tasks")).toBe("Санал болгосон даалгаврууд");
+    expect(xoStatusLabel("withdrawn", "Withdrawn")).toBe("Буцаан татсан");
+    expect(xoStatusLabel("disabled", "Disabled")).toBe("Идэвхгүй");
+  });
+});
