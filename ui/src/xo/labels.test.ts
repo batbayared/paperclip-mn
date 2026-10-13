@@ -324,4 +324,14 @@ describe("xoRoleLabel / xoRunSourceLabel / xoTraceStatusLabel", () => {
     expect(xoStatusLabel("succeeded", "succeeded")).toBe("succeeded");
     expect(xoStatusLabel("pending_approval", "pending approval")).toBe("pending approval");
   });
+
+  it("mn дээр үүрэг, эх сурвалж, мөрдөлт, ажиллагааны статусыг орчуулна", async () => {
+    await i18n.changeLanguage("mn");
+    expect(xoRoleLabel("engineer", "Engineer")).toBe("Инженер");
+    expect(xoRunSourceLabel("assignment", "Assignment")).toBe("Даалгавар оноолт");
+    expect(xoTraceStatusLabel("Trace off")).toBe("Мөрдөлт унтраалттай");
+    expect(xoStatusLabel("succeeded", "succeeded")).toBe("Амжилттай");
+    expect(xoStatusLabel("idle", "idle")).toBe("Сул");
+    expect(xoStatusLabel("timed_out", "timed out")).toBe("Хугацаа хэтэрсэн");
+  });
 });
