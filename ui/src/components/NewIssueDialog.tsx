@@ -177,6 +177,8 @@ import {
   type IssueModelLane,
 } from "../lib/issue-assignee-overrides";
 import { xoStatusLabel } from "@/xo/labels";
+import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
 
 const STAGED_FILE_ACCEPT = "image/*,application/pdf,text/plain,text/markdown,application/json,text/csv,text/html,.md,.markdown";
 
@@ -1795,7 +1797,7 @@ export function NewIssueDialog() {
                       />
                     </div>
                     <div className="space-y-1.5">
-                      <div className="text-xs font-medium text-foreground">Instructions <span className="font-normal text-muted-foreground">(optional)</span></div>
+                      <div className="text-xs font-medium text-foreground">{tx("Instructions")} <span className="font-normal text-muted-foreground">{tx("(optional)")}</span></div>
                       <Textarea
                         value={watchdogInstructions}
                         onChange={(event) => setWatchdogInstructions(event.target.value)}
@@ -1884,7 +1886,10 @@ export function NewIssueDialog() {
               */}
               {executionWorkspaceMode === "reuse_existing" && selectedReusableExecutionWorkspace && (
                 <div className="text-(length:--text-micro) text-muted-foreground">
-                  Reusing {selectedReusableExecutionWorkspace.name} from {selectedReusableExecutionWorkspace.branchName ?? "existing execution workspace"}.
+                  {tx("Reusing {{name}} from {{source}}.", {
+                    name: selectedReusableExecutionWorkspace.name,
+                    source: selectedReusableExecutionWorkspace.branchName ?? tx("existing execution workspace"),
+                  })}
                 </div>
               )}
               {showParentWorkspaceWarning ? (
@@ -2282,7 +2287,10 @@ export function NewIssueDialog() {
           >
             <Flag className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-600 dark:text-amber-300" />
             <span className="leading-snug">
-              Assigning implies executable intent - leave status as <span className="font-medium">Backlog</span> only to deliberately park this. The assignee will not be woken until status moves to <span className="font-medium">Todo</span> or <span className="font-medium">In Progress</span>.
+              <XoTrans
+                i18nKey="Assigning implies executable intent - leave status as <b>Backlog</b> only to deliberately park this. The assignee will not be woken until status moves to <b>Todo</b> or <b>In Progress</b>."
+                components={{ b: <span className="font-medium" /> }}
+              />
             </span>
           </div>
         ) : null}
@@ -2290,8 +2298,19 @@ export function NewIssueDialog() {
         {selectedAssigneeAgent?.status === "paused" ? (
           <div data-testid="new-issue-paused-assignee-note" className="mx-4 mb-2">
             <InlineBanner tone="warning" icon={PauseCircle} compact>
-              <span className="font-medium">{selectedAssigneeAgent.name}</span> is paused and will not start work on this task until it is resumed
-              {selectedAssigneeAgent.pauseReason === "import" ? " — it arrived paused from an organization import" : ""}. You can resume it from the task page after creating the task.
+              {selectedAssigneeAgent.pauseReason === "import" ? (
+                <XoTrans
+                  i18nKey="<b>{{name}}</b> is paused and will not start work on this task until it is resumed — it arrived paused from an organization import. You can resume it from the task page after creating the task."
+                  values={{ name: selectedAssigneeAgent.name }}
+                  components={{ b: <span className="font-medium" /> }}
+                />
+              ) : (
+                <XoTrans
+                  i18nKey="<b>{{name}}</b> is paused and will not start work on this task until it is resumed. You can resume it from the task page after creating the task."
+                  values={{ name: selectedAssigneeAgent.name }}
+                  components={{ b: <span className="font-medium" /> }}
+                />
+              )}
             </InlineBanner>
           </div>
         ) : null}

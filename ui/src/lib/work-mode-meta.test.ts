@@ -1,6 +1,12 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
+import { i18n } from "@/i18n";
+import { tx } from "@/i18n/xo";
 
 import { nextWorkMode, titleForPendingWorkMode, workModeMetaList } from "./work-mode-meta";
+
+afterEach(async () => {
+  await i18n.changeLanguage("en");
+});
 
 describe("work mode metadata", () => {
   it("orders issue work modes as auto, planning, then ask", () => {
@@ -17,5 +23,15 @@ describe("work mode metadata", () => {
   it("uses graduated tooltip copy", () => {
     expect(titleForPendingWorkMode("standard")).toBe("Auto mode for this submission. Click to change.");
     expect(titleForPendingWorkMode("planning")).toBe("Plan mode is on for this submission. Click to change.");
+  });
+
+  it("translates pending work mode tooltips in mn", async () => {
+    await i18n.changeLanguage("mn");
+    expect(titleForPendingWorkMode("standard")).toBe("Энэ илгээлтэд авто горим. Солихын тулд дарна уу.");
+    expect(titleForPendingWorkMode("planning")).toBe("Энэ илгээлтэд төлөвлөх горим идэвхтэй. Солихын тулд дарна уу.");
+    expect(titleForPendingWorkMode("ask")).toBe(
+      "Энэ илгээлтэд асуух горим. Солихын тулд дарна уу. Хариуцагч энэ урсгалд хариулна; хэрэгжүүлэх ажил хийхгүй.",
+    );
+    expect(workModeMetaList().map((mode) => tx(mode.label))).toEqual(["Авто горим", "Төлөвлөх горим", "Асуух горим"]);
   });
 });

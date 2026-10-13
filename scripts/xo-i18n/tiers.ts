@@ -87,6 +87,9 @@ export const XO_TRANSFORM_FILES: readonly string[] = [
   "ui/src/components/IssueFiltersPopover.tsx",
   "ui/src/components/IssueColumns.tsx",
   "ui/src/components/MobileBottomNav.tsx",
+  "ui/src/components/NewIssueDialog.tsx",
+  "ui/src/components/issue-properties/helpers.ts",
+  "ui/src/lib/work-mode-meta.ts",
   // Хуудсууд
   "ui/src/pages/AgentDetail.tsx",
   "ui/src/pages/AgentDetail.production.tsx",
