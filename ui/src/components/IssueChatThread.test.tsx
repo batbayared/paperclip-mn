@@ -4705,6 +4705,26 @@ describe("IssueChatThread", () => {
   });
 });
 
+describe("resolveIssueChatHumanAuthor fallback (xo)", () => {
+  afterEach(async () => {
+    await i18n.changeLanguage("en");
+  });
+
+  it("en дээр Board / You / User", () => {
+    expect(resolveIssueChatHumanAuthor({ authorUserId: "local-board" }).authorName).toBe("Board");
+    expect(resolveIssueChatHumanAuthor({ authorUserId: "u1", currentUserId: "u1" }).authorName).toBe("You");
+    expect(resolveIssueChatHumanAuthor({ authorUserId: "u2", currentUserId: "u1" }).authorName).toBe("User");
+  });
+
+  it("mn дээр fallback нэрийг орчуулна", async () => {
+    await i18n.changeLanguage("mn");
+    expect(resolveIssueChatHumanAuthor({ authorUserId: "local-board" }).authorName).toBe("Удирдах зөвлөл");
+    expect(resolveIssueChatHumanAuthor({ authorUserId: "u1", currentUserId: "u1" }).authorName).toBe("Та");
+    expect(resolveIssueChatHumanAuthor({ authorUserId: "u2", currentUserId: "u1" }).authorName).toBe("Хэрэглэгч");
+    expect(resolveIssueChatHumanAuthor({ authorUserId: "u2", authorName: "Bat" }).authorName).toBe("Bat");
+  });
+});
+
 describe("IssueAssigneePausedNotice", () => {
   let container: HTMLDivElement;
 

@@ -6,9 +6,11 @@ import {
   xoColumnLabel,
   xoDateGroupLabel,
   xoFileKindLabel,
+  xoHumanizeValue,
   xoLabel,
   xoPermissionDecision,
   xoStatusLabel,
+  xoToolDetailLabel,
   xoWorkProductStatusLabel,
 } from "./labels";
 
@@ -155,5 +157,41 @@ describe("xoPermissionDecision", () => {
     expect(xoPermissionDecision("allowed")).toBe("Зөвшөөрсөн");
     expect(xoPermissionDecision("rejected")).toBe("Татгалзсан");
     expect(xoPermissionDecision("other")).toBe("other");
+  });
+});
+
+describe("xoHumanizeValue", () => {
+  it("en дээр upstream humanizeValue-тэй ижил", () => {
+    expect(xoHumanizeValue(null)).toBe("None");
+    expect(xoHumanizeValue("in_progress")).toBe("in progress");
+    expect(xoHumanizeValue("some_custom_value")).toBe("some custom value");
+  });
+
+  it("mn дээр статус ба None-ийг орчуулна", async () => {
+    await i18n.changeLanguage("mn");
+    expect(xoHumanizeValue(null)).toBe("Байхгүй");
+    expect(xoHumanizeValue("in_progress")).toBe("Хийгдэж буй");
+    expect(xoHumanizeValue("blocked")).toBe("Саатсан");
+    expect(xoHumanizeValue("some_custom_value")).toBe("some custom value");
+  });
+});
+
+describe("xoToolDetailLabel", () => {
+  it("en дээр хэвээр", () => {
+    expect(xoToolDetailLabel("Path")).toBe("Path");
+    expect(xoToolDetailLabel("Unknown")).toBe("Unknown");
+  });
+
+  it("mn дээр describeToolInput-ийн шошгыг орчуулна", async () => {
+    await i18n.changeLanguage("mn");
+    expect(xoToolDetailLabel("Path")).toBe("Зам");
+    expect(xoToolDetailLabel("Directory")).toBe("Хавтас");
+    expect(xoToolDetailLabel("Pattern")).toBe("Загвар");
+    expect(xoToolDetailLabel("Paths")).toBe("Замууд");
+    expect(xoToolDetailLabel("Command")).toBe("Команд");
+    expect(xoToolDetailLabel("Intent")).toBe("Зорилго");
+    expect(xoToolDetailLabel("Query")).toBe("Асуулга");
+    expect(xoToolDetailLabel("Name")).toBe("Нэр");
+    expect(xoToolDetailLabel("Unknown")).toBe("Unknown");
   });
 });

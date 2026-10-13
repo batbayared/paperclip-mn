@@ -27,6 +27,7 @@ import { restoreSubmittedCommentDraft } from "../lib/comment-submit-draft";
 import { copyTextToClipboard } from "../lib/clipboard";
 import { PluginSlotOutlet } from "@/plugins/slots";
 import { tx } from "@/i18n/xo";
+import { xoHumanizeValue } from "@/xo/labels";
 
 interface CommentWithRunMeta extends IssueComment {
   runId?: string | null;
@@ -168,11 +169,6 @@ function parseReassignment(target: string): CommentReassignment | null {
 function shouldImplicitlyReopenComment(issueStatus: string | undefined, assigneeValue: string) {
   const resumesToTodo = issueStatus === "done" || issueStatus === "cancelled" || issueStatus === "blocked";
   return resumesToTodo && assigneeValue.startsWith("agent:");
-}
-
-function humanizeValue(value: string | null): string {
-  if (!value) return "None";
-  return value.replace(/_/g, " ");
 }
 
 function formatTimelineAssigneeLabel(
@@ -501,11 +497,11 @@ function TimelineEventCard({
               Status
             </span>
             <span className="text-muted-foreground">
-              {humanizeValue(event.statusChange.from)}
+              {xoHumanizeValue(event.statusChange.from)}
             </span>
             <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
             <span className="font-medium text-foreground">
-              {humanizeValue(event.statusChange.to)}
+              {xoHumanizeValue(event.statusChange.to)}
             </span>
           </div>
         ) : null}

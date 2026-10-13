@@ -255,6 +255,7 @@ import { SourceTrustBadge } from "./SourceTrustBadge";
 import { CommentAttributionChip } from "./CommentAttributionChip";
 import { resolveCommentAttribution } from "../lib/comment-attribution";
 import { tx } from "@/i18n/xo";
+import { xoHumanizeValue, xoStatusLabel, xoToolDetailLabel } from "@/xo/labels";
 import { calledToolsWords, ranCommandsWords } from "@/xo/run-text";
 import { XoTrans } from "@/xo/XoTrans";
 
@@ -840,9 +841,9 @@ function fallbackAuthorLabel(message: ThreadMessage) {
   if (typeof custom?.["authorName"] === "string") return custom["authorName"];
   if (typeof custom?.["runAgentName"] === "string")
     return custom["runAgentName"];
-  if (message.role === "assistant") return "Agent";
-  if (message.role === "user") return "You";
-  return "System";
+  if (message.role === "assistant") return tx("Agent");
+  if (message.role === "user") return tx("You");
+  return tx("System");
 }
 
 function fallbackTextParts(message: ThreadMessage) {
@@ -1120,11 +1121,6 @@ export function SuccessfulRunHandoffCommentCallout({
   );
 }
 
-function humanizeValue(value: string | null) {
-  if (!value) return "None";
-  return value.replace(/_/g, " ");
-}
-
 function initialsForName(name: string) {
   const parts = name.trim().split(/\s+/);
   if (parts.length >= 2) {
@@ -1146,10 +1142,10 @@ function formatInteractionActorLabel(args: {
     return (
       userLabelMap?.get(userId) ??
       formatAssigneeUserLabel(userId, currentUserId, userLabelMap) ??
-      "Board"
+      tx("Board")
     );
   }
-  return "System";
+  return tx("System");
 }
 
 export function resolveIssueChatHumanAuthor(args: {
@@ -1168,7 +1164,7 @@ export function resolveIssueChatHumanAuthor(args: {
   const resolvedAuthorName =
     profile?.label?.trim() ||
     authorName?.trim() ||
-    (authorUserId === "local-board" ? "Board" : isCurrentUser ? "You" : "User");
+    (authorUserId === "local-board" ? tx("Board") : isCurrentUser ? tx("You") : tx("User"));
 
   return {
     isCurrentUser,
@@ -1683,7 +1679,7 @@ function IssueChatToolPart({
                   {nonIntentDetails.map((detail) => (
                     <div key={`${detail.label}:${detail.value}`}>
                       <dt className="text-(length:--text-nano) font-medium text-muted-foreground/60">
-                        {detail.label}
+                        {xoToolDetailLabel(detail.label)}
                       </dt>
                       <dd
                         className={cn(
@@ -1831,7 +1827,7 @@ function IssueChatProviderActivity({
                   <span className="font-medium">
                     {String(child.role ?? tx("Child agent"))}
                   </span>{" "}
-                  · {String(child.status ?? "unknown")}
+                  · {child.status != null ? xoStatusLabel(String(child.status), String(child.status)) : tx("unknown")}
                   {child.summary ? ` — ${String(child.summary)}` : ""}
                 </div>
               );
@@ -2324,7 +2320,7 @@ function IssueChatAssistantMessage({
       ? custom.authorName
       : typeof custom.runAgentName === "string"
         ? custom.runAgentName
-        : "Agent";
+        : tx("Agent");
   const authorAgentId =
     typeof custom.authorAgentId === "string" ? custom.authorAgentId : null;
   const runId = typeof custom.runId === "string" ? custom.runId : null;
@@ -3854,11 +3850,11 @@ function IssueChatSystemMessage({ message }: { message: ThreadMessage }) {
               Status
             </span>
             <span className="text-muted-foreground">
-              {humanizeValue(statusChange.from)}
+              {xoHumanizeValue(statusChange.from)}
             </span>
             <ArrowRight className="h-3 w-3 text-muted-foreground/70" />
             <span className="font-medium text-foreground">
-              {humanizeValue(statusChange.to)}
+              {xoHumanizeValue(statusChange.to)}
             </span>
           </div>
         ) : null}

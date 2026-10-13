@@ -158,3 +158,29 @@ export function xoPermissionDecision(decision: string): string {
     default: return decision;
   }
 }
+
+// IssueChatThread/CommentThread-ийн humanizeValue (статусын өөрчлөлт). en дээр upstream-тэй
+// ижил гаралт: null → "None", "_" → зай. mn дээр статусыг xoStatusLabel орчуулна.
+export function xoHumanizeValue(value: string | null): string {
+  if (!value) return tx("None");
+  return xoStatusLabel(value, value.replace(/_/g, " "));
+}
+
+// transcriptPresentation.ts-ийн describeToolInput() шошго. Харьцуулалт (d.label === "Intent")
+// англиар хэвээр; зөвхөн render үед орчуулна.
+export function xoToolDetailLabel(english: string): string {
+  switch (english) {
+    case "Command": return tx("Command");
+    case "Input": return tx("Input");
+    case "Intent": return tx("Intent");
+    case "Path": return tx("Path");
+    case "Directory": return tx("Directory");
+    case "Query": return tx("Query");
+    case "Target": return tx("Target");
+    case "Prompt": return tx("Prompt");
+    case "Pattern": return tx("Pattern");
+    case "Name": return tx("Name");
+    case "Paths": return tx("Paths");
+    default: return english;
+  }
+}
