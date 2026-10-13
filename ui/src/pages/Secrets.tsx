@@ -155,9 +155,17 @@ function readStoredViewMode(): SecretsViewMode | null {
 
 /** "12 secrets · 3 folders" — folder part omitted when there are no subfolders. */
 function formatSecretPathCounts(secretCount: number, folderCount: number): string {
-  const parts = [`${secretCount} ${secretCount === 1 ? "secret" : "secrets"}`];
+  const parts = [
+    secretCount === 1
+      ? tx("{{n}} secret", { n: secretCount })
+      : tx("{{n}} secrets", { n: secretCount }),
+  ];
   if (folderCount > 0) {
-    parts.push(`${folderCount} ${folderCount === 1 ? "folder" : "folders"}`);
+    parts.push(
+      folderCount === 1
+        ? tx("{{n}} folder", { n: folderCount })
+        : tx("{{n}} folders", { n: folderCount }),
+    );
   }
   return parts.join(" · ");
 }
@@ -1906,7 +1914,7 @@ export function Secrets() {
                       : "text-muted-foreground hover:text-foreground",
                   )}
                 >
-                  {mode}
+                  {mode === "folders" ? tx("folders") : tx("flat")}
                 </button>
               ))}
             </div>

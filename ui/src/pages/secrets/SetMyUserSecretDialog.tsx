@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { tx } from "@/i18n/xo";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { CompanySecret, UserSecretDefinition } from "@paperclipai/shared";
 import {
@@ -57,7 +58,7 @@ export function SetMyUserSecretDialog({
 
   const save = useMutation({
     mutationFn: async () => {
-      if (!definition) throw new Error("No definition selected");
+      if (!definition) throw new Error(tx("No definition selected"));
       const payload = isExternal
         ? { externalRef: externalRef.trim() }
         : { value: value.trim() };
@@ -88,7 +89,7 @@ export function SetMyUserSecretDialog({
           ? err.message
           : err instanceof Error
             ? err.message
-            : "Failed to save value",
+            : tx("Failed to save value"),
       );
     },
   });

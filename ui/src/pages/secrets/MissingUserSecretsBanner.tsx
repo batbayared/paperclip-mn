@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { tx } from "@/i18n/xo";
 import { useQuery } from "@tanstack/react-query";
 import { AlertTriangle } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -20,7 +21,7 @@ import { SetMyUserSecretDialog } from "./SetMyUserSecretDialog";
 export function MissingUserSecretsBanner({
   companyId,
   definitionKeys,
-  title = "Set your user secrets",
+  title = tx("Set your user secrets"),
   secretsPath,
   className,
 }: {

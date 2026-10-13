@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { tx } from "@/i18n/xo";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { CompanySecret } from "@paperclipai/shared";
 import { AlertCircle, KeyRound, Trash2, UserRound } from "lucide-react";
@@ -72,8 +73,10 @@ export function MyUserSecretsTab({ companyId }: { companyId: string }) {
       <div>
         {mySecretsQuery.isError ? (
           <div className="flex items-center gap-2 py-4 text-sm text-destructive">
-            <AlertCircle className="h-4 w-4" /> Failed to load your secrets:{" "}
-            {(mySecretsQuery.error as Error).message}
+            <AlertCircle className="h-4 w-4" />{" "}
+            {tx("Failed to load your secrets: {{message}}", {
+              message: (mySecretsQuery.error as Error).message,
+            })}
             <Button variant="ghost" size="sm" onClick={() => mySecretsQuery.refetch()}>
               Retry
             </Button>
