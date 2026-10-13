@@ -185,4 +185,11 @@ export const XO_TRANSFORM_FILES: readonly string[] = [
   "ui/src/components/folders/FolderControls.tsx",
   "ui/src/components/AttentionQueueRow.tsx",
   "ui/src/pages/InstanceGeneralSettings.tsx",
+  // Ү6 7.7
+  "ui/src/components/DecisionsToolbar.tsx",
+  "ui/src/components/DecisionDateChips.tsx",
+  "ui/src/components/DecisionQueueRail.tsx",
+  "ui/src/components/DecisionTriageStrip.tsx",
+  "ui/src/pages/DecisionQueuePage.tsx",
+  "ui/src/components/DecisionShelf.tsx",
 ];

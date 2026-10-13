@@ -427,3 +427,16 @@ describe("Ү6 7.7 helper-ууд (en)", () => {
     }
   });
 });
+
+describe("Ү6 7.7 helper-ууд (mn)", () => {
+  it("mn дээр decision option, snooze, нууц утгын төлөвийг орчуулна", async () => {
+    await i18n.changeLanguage("mn");
+    expect(xoDecisionOptionLabel("Last 7 days")).toBe("Сүүлийн 7 хоног");
+    expect(xoDecisionOptionLabel("Critical")).toBe("Яаралтай");
+    expect(xoDecisionOptionLabel("Newest first")).toBe("Шинэ нь эхэндээ");
+    expect(xoDecisionOptionLabel("No project")).toBe("Төсөлгүй");
+    expect(xoDecisionOptionLabel("Something else")).toBe("Something else");
+    expect(xoStatusLabel("archived", "archived")).toBe("Архивласан");
+    expect(xoSnoozePresetLabel("Tomorrow")).toBe("Маргааш");
+  });
+});
