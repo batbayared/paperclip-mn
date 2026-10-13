@@ -1,4 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
+import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Copy, Fingerprint, KeyRound, Link2, ShieldAlert, Variable, ServerCog } from "lucide-react";
 import type {
@@ -41,8 +43,8 @@ import { SecretPathName } from "./SecretPathName";
 
 /** Short, non-reversible fingerprint label. Never renders the value. */
 export function fingerprintLabel(fingerprint: string | null, length: number | null): string {
-  const digest = fingerprint ? `sha256:${fingerprint.slice(0, 10)}…` : "no fingerprint";
-  const size = typeof length === "number" ? `${length} ${length === 1 ? "byte" : "bytes"}` : null;
+  const digest = fingerprint ? `sha256:${fingerprint.slice(0, 10)}…` : tx("no fingerprint");
+  const size = typeof length === "number" ? `${length} ${length === 1 ? tx("byte") : tx("bytes")}` : null;
   return size ? `${digest} · ${size}` : digest;
 }
 
@@ -180,15 +182,15 @@ export function bindingSecretLabel(proposal: SecretProposalView): {
   pending: boolean;
 } {
   if (proposal.secretProposalId) {
-    return { name: proposal.secretProposalName ?? "proposed secret", pending: true };
+    return { name: proposal.secretProposalName ?? tx("proposed secret"), pending: true };
   }
-  return { name: proposal.secretName ?? "secret", pending: false };
+  return { name: proposal.secretName ?? tx("secret"), pending: false };
 }
 
 function readableError(error: unknown): string {
-  if (error instanceof ApiError) return error.message || `Request failed: ${error.status}`;
+  if (error instanceof ApiError) return error.message || tx("Request failed: {{status}}", { status: error.status });
   if (error instanceof Error) return error.message;
-  return "Something went wrong. Try again.";
+  return tx("Something went wrong. Try again.");
 }
 
 /* -------------------------------------------------------------------------- */
@@ -265,7 +267,7 @@ export function useProposalReview(
         body:
           result.kind === "secret"
             ? (result.proposedName ?? "Secret created")
-            : `${result.target?.name ?? "Agent"} · ${bindingEnvKey(result) || "binding"}`,
+            : `${result.target?.name ?? tx("Agent")} · ${bindingEnvKey(result) || tx("binding")}`,
         tone: "success",
       });
       setApproveDraft(null);
@@ -567,9 +569,11 @@ function BindingApproveBody({
             aria-label="Also approve the proposed secret"
           />
           <span className="text-foreground/90">
-            Also approve the proposed secret{" "}
-            <span className="font-medium">{secret.name}</span> and create it in the same step. The
-            binding can’t land without it.
+            <XoTrans
+              i18nKey="Also approve the proposed secret <b>{{name}}</b> and create it in the same step. The binding can’t land without it."
+              values={{ name: secret.name }}
+              components={{ b: <span className="font-medium" /> }}
+            />
           </span>
         </label>
       ) : null}
@@ -607,9 +611,12 @@ function RejectDialog({
             <DialogHeader>
               <DialogTitle>Reject proposal</DialogTitle>
               <DialogDescription>
-                The reason is sent back to{" "}
-                <AgentRefChip agent={proposal.proposedBy} className="text-foreground" />. Dependent
-                bindings are rejected too.
+                <XoTrans
+                  i18nKey="The reason is sent back to <agent/>. Dependent bindings are rejected too."
+                  components={{
+                    agent: <AgentRefChip agent={proposal.proposedBy} className="text-foreground" />,
+                  }}
+                />
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-1">

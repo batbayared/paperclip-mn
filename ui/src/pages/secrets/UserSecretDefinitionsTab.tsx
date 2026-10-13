@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { SecretStatus, UserSecretDefinition } from "@paperclipai/shared";
 import { AlertCircle, Pencil, Plus, Trash2, UserRound, Users } from "lucide-react";
@@ -130,7 +132,7 @@ export function UserSecretDefinitionsTab({ companyId }: { companyId: string }) {
       setDialogOpen(false);
     },
     onError: (err) =>
-      setError(err instanceof ApiError || err instanceof Error ? err.message : "Failed to save"),
+      setError(err instanceof ApiError || err instanceof Error ? err.message : tx("Failed to save")),
   });
 
   const remove = useMutation({
@@ -156,9 +158,10 @@ export function UserSecretDefinitionsTab({ companyId }: { companyId: string }) {
       <div className="flex items-start gap-2 rounded-md border border-violet-500/30 bg-violet-500/5 px-4 py-3 text-xs text-violet-800 dark:text-violet-200">
         <UserRound className="h-4 w-4 mt-0.5 shrink-0" />
         <p>
-          Define credentials that <span className="font-medium">each member supplies for
-          themselves</span>. You set the shape here; every user enters their own value under My
-          secrets. Coverage shows how many members have set a value — never the values themselves.
+          <XoTrans
+            i18nKey="Define credentials that <b>each member supplies for themselves</b>. You set the shape here; every user enters their own value under My secrets. Coverage shows how many members have set a value — never the values themselves."
+            components={{ b: <span className="font-medium" /> }}
+          />
         </p>
       </div>
 
@@ -171,7 +174,7 @@ export function UserSecretDefinitionsTab({ companyId }: { companyId: string }) {
       <div className="min-h-0 flex-1 overflow-y-auto">
         {definitionsQuery.isError ? (
           <div className="flex items-center gap-2 py-4 text-sm text-destructive">
-            <AlertCircle className="h-4 w-4" /> Failed to load definitions:{" "}
+            <AlertCircle className="h-4 w-4" /> {tx("Failed to load definitions:")}{" "}
             {(definitionsQuery.error as Error).message}
             <Button variant="ghost" size="sm" onClick={() => definitionsQuery.refetch()}>
               Retry
@@ -272,7 +275,8 @@ export function UserSecretDefinitionsTab({ companyId }: { companyId: string }) {
                 disabled={Boolean(editing)}
               />
               <p className="text-(length:--text-micro) text-muted-foreground">
-                Stable identifier referenced by env bindings. {editing ? "Cannot be changed." : ""}
+                {tx("Stable identifier referenced by env bindings.")}{" "}
+                {editing ? tx("Cannot be changed.") : ""}
               </p>
             </div>
             <div className="space-y-1">
@@ -287,7 +291,10 @@ export function UserSecretDefinitionsTab({ companyId }: { companyId: string }) {
             </div>
             <div className="space-y-1">
               <label className="text-xs font-medium text-foreground">
-                Usage guidance <span className="text-muted-foreground">(optional)</span>
+                <XoTrans
+                  i18nKey="Usage guidance <b>(optional)</b>"
+                  components={{ b: <span className="text-muted-foreground" /> }}
+                />
               </label>
               <Textarea
                 value={form.usageGuidance}
@@ -338,8 +345,11 @@ export function UserSecretDefinitionsTab({ companyId }: { companyId: string }) {
           <DialogHeader>
             <DialogTitle>Remove user secret?</DialogTitle>
             <DialogDescription>
-              This removes the definition <span className="font-mono">{deleteTarget?.key}</span> for
-              the whole company. Existing member values become unreferenced. This cannot be undone.
+              <XoTrans
+                i18nKey="This removes the definition <b>{{key}}</b> for the whole company. Existing member values become unreferenced. This cannot be undone."
+                values={{ key: deleteTarget?.key ?? "" }}
+                components={{ b: <span className="font-mono" /> }}
+              />
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { tx } from "@/i18n/xo";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import {
@@ -31,12 +32,12 @@ import {
 /** ISO expiry → "expires in 12d" / "expires in 5h" / "expired". */
 function expiryLabel(expiresAt: string): { text: string; urgent: boolean } {
   const ms = new Date(expiresAt).getTime() - Date.now();
-  if (Number.isNaN(ms)) return { text: "no expiry", urgent: false };
-  if (ms <= 0) return { text: "expired", urgent: true };
+  if (Number.isNaN(ms)) return { text: tx("no expiry"), urgent: false };
+  if (ms <= 0) return { text: tx("expired"), urgent: true };
   const hours = Math.floor(ms / 3_600_000);
-  if (hours < 24) return { text: `expires in ${hours}h`, urgent: true };
+  if (hours < 24) return { text: tx("expires in {{hours}}h", { hours }), urgent: true };
   const days = Math.floor(hours / 24);
-  return { text: `expires in ${days}d`, urgent: days <= 2 };
+  return { text: tx("expires in {{days}}d", { days }), urgent: days <= 2 };
 }
 
 function ProposalRow({
