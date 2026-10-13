@@ -531,3 +531,112 @@ export function xoDecisionOptionLabel(english: string): string {
     default: return english;
   }
 }
+
+/** RoutineDetail SECTION_TITLES (Ү6 7.8). */
+export function xoRoutineSectionLabel(english: string): string {
+  if (!(i18n.resolvedLanguage ?? i18n.language ?? "").startsWith("mn")) return english;
+  switch (english) {
+    case "Overview": return tx("Overview");
+    case "Schedule": return tx("Schedule");
+    case "Variables": return tx("Variables");
+    case "Secrets": return tx("Secrets");
+    case "Delivery": return tx("Delivery");
+    case "Runs": return tx("Runs");
+    case "Activity": return tx("Activity");
+    case "Version history": return tx("Version history");
+    default: return english;
+  }
+}
+
+/** editable-sections triggerKinds — en дээр raw kind (жижиг үсгээр) хэвээр. */
+export function xoTriggerKindLabel(kind: string): string {
+  if (!(i18n.resolvedLanguage ?? i18n.language ?? "").startsWith("mn")) return kind;
+  switch (kind) {
+    case "schedule": return tx("schedule");
+    case "webhook": return tx("webhook");
+    default: return kind;
+  }
+}
+
+/** Webhook signing mode нэр: bearer / hmac_sha256 / github_hmac латинаар үлдэнэ, зөвхөн none орчуулна. */
+export function xoSigningModeLabel(mode: string): string {
+  if (!(i18n.resolvedLanguage ?? i18n.language ?? "").startsWith("mn")) return mode;
+  switch (mode) {
+    case "none": return tx("none");
+    default: return mode;
+  }
+}
+
+/** editable-sections signingModeDescriptions — mode түлхүүрээр англи өгүүлбэр эсвэл орчуулга. */
+export function xoSigningModeDescription(mode: string): string {
+  switch (mode) {
+    case "bearer": return tx("Expect a shared bearer token in the Authorization header.");
+    case "hmac_sha256": return tx("Expect an HMAC SHA-256 signature over the request using the shared secret.");
+    case "github_hmac": return tx("Accept GitHub-style X-Hub-Signature-256 header (HMAC over raw body, no timestamp).");
+    case "none": return tx("No authentication — the webhook URL itself acts as a shared secret.");
+    default: return "";
+  }
+}
+
+/** cron-fires DISPOSITION_LABEL. */
+export function xoFireDispositionLabel(english: string): string {
+  if (!(i18n.resolvedLanguage ?? i18n.language ?? "").startsWith("mn")) return english;
+  switch (english) {
+    case "queued": return tx("queued");
+    case "would be coalesced": return tx("would be coalesced");
+    case "would be skipped": return tx("would be skipped");
+    default: return english;
+  }
+}
+
+/** cron-readable DOW_NAMES. */
+export function xoWeekdayName(english: string): string {
+  if (!(i18n.resolvedLanguage ?? i18n.language ?? "").startsWith("mn")) return english;
+  switch (english) {
+    case "Sunday": return tx("Sunday");
+    case "Monday": return tx("Monday");
+    case "Tuesday": return tx("Tuesday");
+    case "Wednesday": return tx("Wednesday");
+    case "Thursday": return tx("Thursday");
+    case "Friday": return tx("Friday");
+    case "Saturday": return tx("Saturday");
+    default: return english;
+  }
+}
+
+/** RoutineDetail dirtyFields ба RoutineHistoryTab ConflictBanner-ийн «the …» шошго (mn-д артикльгүй нэр үг). */
+export function xoRoutineDirtyFieldLabel(english: string): string {
+  if (!(i18n.resolvedLanguage ?? i18n.language ?? "").startsWith("mn")) return english;
+  switch (english) {
+    case "the title": return tx("the title");
+    case "the description": return tx("the description");
+    case "the project": return tx("the project");
+    case "the default agent": return tx("the default agent");
+    case "the priority": return tx("the priority");
+    case "the concurrency policy": return tx("the concurrency policy");
+    case "the catch-up policy": return tx("the catch-up policy");
+    case "the advanced run policy": return tx("the advanced run policy");
+    case "the activity gate scope": return tx("the activity gate scope");
+    case "the variables": return tx("the variables");
+    case "the secrets": return tx("the secrets");
+    case "the routine": return tx("the routine");
+    default: return english;
+  }
+}
+
+/** RoutineHistoryTab-ын тогтмол field шошго (snapshot мөр ба diff). */
+export function xoRoutineHistoryFieldLabel(english: string): string {
+  if (!(i18n.resolvedLanguage ?? i18n.language ?? "").startsWith("mn")) return english;
+  switch (english) {
+    case "Title": return tx("Title");
+    case "Priority": return tx("Priority");
+    case "Status": return tx("Status");
+    case "Default agent": return tx("Default agent");
+    case "Project": return tx("Project");
+    case "Concurrency": return tx("Concurrency");
+    case "Catch-up": return tx("Catch-up");
+    case "Env": return tx("Env");
+    case "Variables": return tx("Variables");
+    default: return english;
+  }
+}

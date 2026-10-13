@@ -32,6 +32,14 @@ import {
   xoFolderItemLabel,
   xoCompactKindLabel,
   xoDecisionOptionLabel,
+  xoRoutineSectionLabel,
+  xoTriggerKindLabel,
+  xoSigningModeLabel,
+  xoSigningModeDescription,
+  xoFireDispositionLabel,
+  xoWeekdayName,
+  xoRoutineDirtyFieldLabel,
+  xoRoutineHistoryFieldLabel,
 } from "./labels";
 
 afterEach(async () => {
@@ -438,5 +446,36 @@ describe("Ү6 7.7 helper-ууд (mn)", () => {
     expect(xoDecisionOptionLabel("Something else")).toBe("Something else");
     expect(xoStatusLabel("archived", "archived")).toBe("Архивласан");
     expect(xoSnoozePresetLabel("Tomorrow")).toBe("Маргааш");
+  });
+});
+
+describe("Ү6 7.8 helper-ууд (en)", () => {
+  it("en дээр англи утгаа буцаана, мэдэгдэхгүйг дамжуулна", () => {
+    for (const v of ["Overview", "Schedule", "Variables", "Secrets", "Delivery", "Runs", "Activity", "Version history", "Something else"]) {
+      expect(xoRoutineSectionLabel(v)).toBe(v);
+    }
+    for (const v of ["schedule", "webhook", "api"]) {
+      expect(xoTriggerKindLabel(v)).toBe(v);
+    }
+    for (const v of ["bearer", "hmac_sha256", "github_hmac", "none", "other"]) {
+      expect(xoSigningModeLabel(v)).toBe(v);
+    }
+    expect(xoSigningModeDescription("bearer")).toBe("Expect a shared bearer token in the Authorization header.");
+    expect(xoSigningModeDescription("hmac_sha256")).toBe("Expect an HMAC SHA-256 signature over the request using the shared secret.");
+    expect(xoSigningModeDescription("github_hmac")).toBe("Accept GitHub-style X-Hub-Signature-256 header (HMAC over raw body, no timestamp).");
+    expect(xoSigningModeDescription("none")).toBe("No authentication — the webhook URL itself acts as a shared secret.");
+    expect(xoSigningModeDescription("other")).toBe("");
+    for (const v of ["queued", "would be coalesced", "would be skipped", "something"]) {
+      expect(xoFireDispositionLabel(v)).toBe(v);
+    }
+    for (const v of ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Someday"]) {
+      expect(xoWeekdayName(v)).toBe(v);
+    }
+    for (const v of ["the title", "the description", "the project", "the default agent", "the priority", "the concurrency policy", "the catch-up policy", "the advanced run policy", "the activity gate scope", "the variables", "the secrets", "the routine", "the unknown"]) {
+      expect(xoRoutineDirtyFieldLabel(v)).toBe(v);
+    }
+    for (const v of ["Title", "Priority", "Status", "Default agent", "Project", "Concurrency", "Catch-up", "Env", "Variables", "Unknown"]) {
+      expect(xoRoutineHistoryFieldLabel(v)).toBe(v);
+    }
   });
 });
