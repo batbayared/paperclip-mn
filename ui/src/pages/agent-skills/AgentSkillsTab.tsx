@@ -16,6 +16,8 @@ import { Input } from "@/components/ui/input";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { PageSkeleton } from "../../components/PageSkeleton";
+import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
 import {
   applyAgentSkillSnapshot,
   isReadOnlyUnmanagedSkillEntry,
@@ -26,9 +28,6 @@ import { AgentSkillRow, type AgentSkillRowData } from "./AgentSkillRow";
 import { filterAgentSkills } from "./agent-skill-filter";
 import { buildAgentSkillSourceMeta } from "./agent-skill-source";
 import { AgentSkillReleasePicker, releaseShortLabel } from "./AgentSkillReleasePicker";
-
-const MATERIALIZATION_NOTE =
-  "Enabled skills are materialized into the stable Paperclip-managed prompt bundle on the agent's next run.";
 
 /** Company skill key of the Paperclip core skill that carries beta releases. */
 const PAPERCLIP_CORE_SKILL_KEY = "paperclipai/paperclip/paperclip";
@@ -294,11 +293,11 @@ export function AgentSkillsTab({ agent, companyId }: { agent: Agent; companyId?:
   const applicationLabel = useMemo(() => {
     switch (skillSnapshot?.mode) {
       case "persistent":
-        return "Kept in workspace";
+        return tx("Kept in workspace");
       case "ephemeral":
-        return "Applied on next run";
+        return tx("Applied on next run");
       case "unsupported":
-        return "Tracked only";
+        return tx("Tracked only");
       default:
         return null;
     }
@@ -311,12 +310,12 @@ export function AgentSkillsTab({ agent, companyId }: { agent: Agent; companyId?:
       typeof agent.adapterConfig.agent === "string" &&
       agent.adapterConfig.agent === "custom"
     ) {
-      return "Paperclip cannot manage skills for custom ACP commands yet.";
+      return tx("{{brand}} cannot manage skills for custom ACP commands yet.");
     }
     if (agent.adapterType === "openclaw_gateway") {
-      return "Paperclip cannot manage OpenClaw skills here. Visit your OpenClaw instance to manage this agent's skills.";
+      return tx("{{brand}} cannot manage OpenClaw skills here. Visit your OpenClaw instance to manage this agent's skills.");
     }
-    return "Paperclip cannot manage skills for this adapter yet. Manage them in the adapter directly.";
+    return tx("{{brand}} cannot manage skills for this adapter yet. Manage them in the adapter directly.");
   }, [agent.adapterConfig.agent, agent.adapterType, unsupported]);
 
   const hasUnsavedChanges = !sameSkillSelection(skillDraft, lastSavedSkills);
@@ -353,7 +352,7 @@ export function AgentSkillsTab({ agent, companyId }: { agent: Agent; companyId?:
       && row.key === PAPERCLIP_CORE_SKILL_KEY;
     const rowDisabled = unsupported || legacyPaperclipBlocked;
     const rowDisabledReason = legacyPaperclipBlocked
-      ? "Paperclip Runner uses native semantic coordination and cannot attach the legacy Paperclip operational skill."
+      ? tx("{{brand}} Runner uses native semantic coordination and cannot attach the legacy {{brand}} operational skill.")
       : unsupportedMessage;
     const showReleasePicker =
       releasePickerActive && variant === "enabled" && row.key === PAPERCLIP_CORE_SKILL_KEY;
@@ -374,7 +373,7 @@ export function AgentSkillsTab({ agent, companyId }: { agent: Agent; companyId?:
         badge={
           showReleasePicker && pinnedRelease ? (
             <Badge variant="secondary" className="text-(length:--text-nano)">
-              Beta · {releaseShortLabel(pinnedRelease)}
+              {tx("Beta · {{release}}", { release: releaseShortLabel(pinnedRelease) })}
             </Badge>
           ) : undefined
         }
@@ -410,7 +409,9 @@ export function AgentSkillsTab({ agent, companyId }: { agent: Agent; companyId?:
                 </span>
               </TooltipTrigger>
               <TooltipContent side="bottom" className="max-w-xs">
-                {unsupported ? unsupportedMessage : MATERIALIZATION_NOTE}
+                {unsupported
+                  ? unsupportedMessage
+                  : tx("Enabled skills are materialized into the stable {{brand}}-managed prompt bundle on the agent's next run.")}
               </TooltipContent>
             </Tooltip>
           ) : null}
@@ -462,7 +463,11 @@ export function AgentSkillsTab({ agent, companyId }: { agent: Agent; companyId?:
               className="flex items-center justify-between gap-3 border-b border-amber-300/40 bg-amber-50/60 px-3 py-2 text-xs text-amber-800 last:border-b-0 dark:border-amber-500/20 dark:bg-amber-950/20 dark:text-amber-200"
             >
               <span className="min-w-0 truncate">
-                <span className="font-medium">{key}</span> is enabled but missing from the organization library.
+                <XoTrans
+                  i18nKey="<b>{{key}}</b> is enabled but missing from the organization library."
+                  values={{ key }}
+                  components={{ b: <span className="font-medium" /> }}
+                />
               </span>
               <button
                 type="button"

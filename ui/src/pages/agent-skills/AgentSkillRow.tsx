@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Lock, type LucideIcon } from "lucide-react";
 import { Link } from "@/lib/router";
 import { cn } from "@/lib/utils";
+import { tx } from "@/i18n/xo";
 import { ToggleSwitch } from "@/components/ui/toggle-switch";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { SkillCardIcon, type SkillIconCard } from "../../components/SkillCardIcon";
@@ -128,7 +129,7 @@ export function AgentSkillRow({
           checked={checked}
           disabled={disabled}
           onCheckedChange={(next) => onCheckedChange?.(next)}
-          aria-label={`${checked ? "Disable" : "Enable"} ${data.name}`}
+          aria-label={checked ? tx("Disable {{name}}", { name: data.name }) : tx("Enable {{name}}", { name: data.name })}
         />
       );
       if (disabled && disabledReason) {

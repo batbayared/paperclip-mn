@@ -17,6 +17,8 @@
  */
 
 import { ApiError } from "../api/client";
+import { tx } from "@/i18n/xo";
+import { xoSkillPolicyDenialRemediation, xoSkillPolicyDenialTitle } from "@/xo/labels";
 
 /** Machine-readable error codes the server attaches to skill mutation failures. */
 export const SKILL_POLICY_DENIAL_CODE = "skill_policy_denied";
@@ -57,11 +59,6 @@ export interface SkillDenial {
   /** Human remediation — never a curl/API-key snippet. */
   remediation: string;
 }
-
-const DEFAULT_POLICY_REMEDIATION =
-  "An organization administrator can change the skill policy to allow this.";
-const DEFAULT_ADMIN_REMEDIATION =
-  "This requires organization administration access. Ask an administrator to make this change.";
 
 /** Human-readable titles for the platform-invariant codes (State C). */
 const PLATFORM_TITLES: Record<string, string> = {
@@ -119,14 +116,14 @@ export function classifySkillDenial(
     || reason === "policy_default";
   if (isPolicyDenial) {
     const title = actionLabel
-      ? `${actionLabel} is restricted by your organization policy.`
-      : "This action is restricted by your organization policy.";
+      ? tx("{{action}} is restricted by your organization policy.", { action: actionLabel })
+      : tx("This action is restricted by your organization policy.");
     return {
       state: "policy",
       code,
       reason,
       title,
-      remediation: remediation ?? DEFAULT_POLICY_REMEDIATION,
+      remediation: remediation ?? tx("An organization administrator can change the skill policy to allow this."),
     };
   }
 
@@ -136,8 +133,10 @@ export function classifySkillDenial(
       state: "platform_admin",
       code,
       reason,
-      title: "This change needs administration access.",
-      remediation: remediation ?? DEFAULT_ADMIN_REMEDIATION,
+      title: tx("This change needs administration access."),
+      remediation:
+        remediation
+        ?? tx("This requires organization administration access. Ask an administrator to make this change."),
     };
   }
 
@@ -150,11 +149,14 @@ export function classifySkillDenial(
       state: "platform",
       code,
       reason,
-      title: (code && PLATFORM_TITLES[code]) ?? "This action is blocked by a platform safety rule.",
+      title: code && PLATFORM_TITLES[code]
+        ? xoSkillPolicyDenialTitle(code, PLATFORM_TITLES[code])
+        : tx("This action is blocked by a platform safety rule."),
       remediation:
         remediation
-        ?? (code && PLATFORM_REMEDIATIONS[code])
-        ?? "Fix the flagged issue and try again.",
+        ?? (code && PLATFORM_REMEDIATIONS[code]
+          ? xoSkillPolicyDenialRemediation(code, PLATFORM_REMEDIATIONS[code])
+          : tx("Fix the flagged issue and try again.")),
     };
   }
 
