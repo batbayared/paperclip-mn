@@ -174,4 +174,15 @@ export const XO_TRANSFORM_FILES: readonly string[] = [
   "ui/src/pages/audit/AuditRuns.tsx",
   "ui/src/pages/audit/CompanyActivity.tsx",
   "ui/src/pages/ProjectWorkspaceDetail.tsx",
+  // Ү6 7.6
+  "ui/src/pages/secrets/ImportFromVaultDialog.tsx",
+  "ui/src/pages/secrets/proposal-review.tsx",
+  "ui/src/pages/secrets/UserSecretDefinitionsTab.tsx",
+  "ui/src/pages/secrets/SetMyUserSecretDialog.tsx",
+  "ui/src/pages/secrets/MyUserSecretsTab.tsx",
+  "ui/src/pages/secrets/ProposalsTab.tsx",
+  "ui/src/pages/secrets/MissingUserSecretsBanner.tsx",
+  "ui/src/components/folders/FolderControls.tsx",
+  "ui/src/components/AttentionQueueRow.tsx",
+  "ui/src/pages/InstanceGeneralSettings.tsx",
 ];

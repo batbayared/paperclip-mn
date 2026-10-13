@@ -388,3 +388,27 @@ describe("Ү6 7.6 helper-ууд (en)", () => {
     }
   });
 });
+
+describe("Ү6 7.6 helper-ууд (mn)", () => {
+  it("Ү6 7.6 helper-ууд mn дээр орчуулна", async () => {
+    await i18n.changeLanguage("mn");
+    expect(xoAttentionSourceLabel("Failed run")).toBe("Амжилтгүй ажиллагаа");
+    expect(xoAttentionSourceLabel("Approval")).toBe("Зөвшөөрөл");
+    expect(xoAttentionSourceLabel("Decision requested")).toBe("Шийдвэр хүссэн");
+    expect(xoSnoozePresetLabel("1 hour")).toBe("1 цаг");
+    expect(xoSnoozePresetLabel("Next week")).toBe("Дараа долоо хоног");
+    expect(xoFolderItemLabel("routines")).toBe("тогтмол ажлууд");
+    expect(xoFolderItemLabel("Skills")).toBe("Чадварууд");
+    expect(xoCompactKindLabel("Choose options")).toBe("Сонголт хийх");
+    expect(xoCompactKindLabel("Suggested tasks")).toBe("Санал болгосон даалгаврууд");
+  });
+
+  it("T1 transform-оор модулийн түвшинд орчуулсан snooze шошгыг давхар орчуулахгүй дамжуулна", async () => {
+    // AttentionQueueRow T1-д орсноор SNOOZE_PRESETS-ийн label импортын үед tx() болно
+    // (locale солиход хуудас reload хийгддэг тул тухайн locale-ийн утга). Helper mn утгыг хэвээр буцаана.
+    await i18n.changeLanguage("mn");
+    expect(xoSnoozePresetLabel("Маргааш өглөө")).toBe("Маргааш өглөө");
+    await i18n.changeLanguage("en");
+    expect(xoSnoozePresetLabel("Tomorrow morning")).toBe("Tomorrow morning");
+  });
+});

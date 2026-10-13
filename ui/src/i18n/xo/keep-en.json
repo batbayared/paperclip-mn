@@ -24,5 +24,10 @@
   "pkill -f vite || true",
   "pnpm install && pnpm dev",
   "v{{latestVersion}}",
-  "v{{versionSelector}}"
+  "v{{versionSelector}}",
+  "To retest the first-use prompt in local dev, remove the",
+  "key from the",
+  "JSON row for this instance, or set it back to",
+  ". Unset and",
+  "both mean no default has been chosen yet."
 ]
