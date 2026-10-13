@@ -165,8 +165,8 @@ export function DecisionTriageStrip({ item, companyId, agents }: DecisionTriageS
 
       {/* When to decide — the importance signal that drives desk ordering. */}
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-xs font-medium text-muted-foreground">When to decide</span>
-        <div className="flex flex-wrap items-center gap-1" role="group" aria-label="When to decide">
+        <span className="text-xs font-medium text-muted-foreground">{tx("When to decide")}</span>
+        <div className="flex flex-wrap items-center gap-1" role="group" aria-label={tx("When to decide")}>
           {DECIDE_BY_OPTIONS.map(([value, label]) => (
             <SegmentButton
               key={value}
@@ -174,7 +174,7 @@ export function DecisionTriageStrip({ item, companyId, agents }: DecisionTriageS
               disabled={pending}
               onClick={() => setDecideBy.mutate(decideBy === value ? null : value)}
             >
-              {label}
+              {tx(label)}
             </SegmentButton>
           ))}
           <Popover>
