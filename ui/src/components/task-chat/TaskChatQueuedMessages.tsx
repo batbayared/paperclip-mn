@@ -28,6 +28,7 @@ import type {
   IssueQueuedCommentEntry,
   IssueQueuedCommentQueue,
 } from "@paperclipai/shared";
+import { tx } from "@/i18n/xo";
 import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
@@ -106,10 +107,10 @@ function SortableQueuedMessage({
     queueMutationDisabled || queue.steeringDisposition !== "available";
   const steerTitle =
     queue.steeringDisposition === "unsupported"
-      ? "This runner does not support steering"
+      ? tx("This runner does not support steering")
       : queue.steeringDisposition === "temporarily_unavailable"
-        ? "Steering is temporarily unavailable"
-        : "Steer this message into the active turn";
+        ? tx("Steering is temporarily unavailable")
+        : tx("Steer this message into the active turn");
 
   return (
     <div
@@ -276,7 +277,7 @@ export function TaskChatQueuedMessages({
     setReordering(true);
     setVisibleError(null);
     setAnnouncement(
-      `Moved queued message to position ${to + 1} of ${next.length}.`,
+      tx("Moved queued message to position {{position}} of {{total}}.", { position: to + 1, total: next.length }),
     );
     try {
       await onReorder(orderedIds, queue.revision);
@@ -285,8 +286,8 @@ export function TaskChatQueuedMessages({
       setAnnouncement("");
       setVisibleError(
         queueActionErrorCode(error) === "queued_comment_revision_conflict"
-          ? "The queue changed in another session. Its latest order has been restored."
-          : "Couldn’t reorder. Previous order restored.",
+          ? tx("The queue changed in another session. Its latest order has been restored.")
+          : tx("Couldn’t reorder. Previous order restored."),
       );
     } finally {
       setReordering(false);
@@ -311,10 +312,10 @@ export function TaskChatQueuedMessages({
     setVisibleError(null);
     setAnnouncement(
       action === "steer"
-        ? "Steering queued message."
+        ? tx("Steering queued message.")
         : action === "interrupt"
-          ? "Sending queued messages."
-          : "Discarding queued message.",
+          ? tx("Sending queued messages.")
+          : tx("Discarding queued message."),
     );
     if (action === "steer") {
       setEntries((current) =>
@@ -332,10 +333,10 @@ export function TaskChatQueuedMessages({
       }
       setAnnouncement(
         action === "steer"
-          ? "Message steered into the active turn."
+          ? tx("Message steered into the active turn.")
           : action === "interrupt"
-            ? "Queued messages will be sent when the previous run has stopped."
-            : "Queued message discarded.",
+            ? tx("Queued messages will be sent when the previous run has stopped.")
+            : tx("Queued message discarded."),
       );
     } catch (error) {
       if (action === "steer") setEntries(previous);
@@ -343,14 +344,14 @@ export function TaskChatQueuedMessages({
       const code = queueActionErrorCode(error);
       setVisibleError(
         code === "queued_comment_already_dispatching"
-          ? "Too late to discard: this message is already being sent."
+          ? tx("Too late to discard: this message is already being sent.")
           : action === "steer"
-            ? "Couldn’t steer. Message is still queued."
+            ? tx("Couldn’t steer. Message is still queued.")
             : action === "interrupt"
-              ? "Couldn’t interrupt. Message is still queued."
+              ? tx("Couldn’t interrupt. Message is still queued.")
               : code === "queued_comment_revision_conflict"
-                ? "The queue changed in another session. Review it and try again."
-                : "Couldn’t discard. Message is still queued.",
+                ? tx("The queue changed in another session. Review it and try again.")
+                : tx("Couldn’t discard. Message is still queued."),
       );
     } finally {
       setPending(null);

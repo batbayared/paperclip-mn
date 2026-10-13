@@ -393,14 +393,16 @@ function WorkspaceChangeCard({ item }: { item: TaskChatWorkspaceChangeItem }) {
     item.files.find((file) => file.path === selectedPath) ?? null;
   const visibleFiles = expanded ? item.files : item.files.slice(0, 3);
   const fileCount = item.totals.files || item.files.length;
-  const fileLabel = `${fileCount} ${fileCount === 1 ? "file" : "files"}`;
+  const fileLabel = fileCount === 1
+    ? tx("{{n}} file changed", { n: fileCount })
+    : tx("{{n}} files changed", { n: fileCount });
   const stats = [
     item.totals.additions == null ? null : `+${item.totals.additions}`,
     item.totals.deletions == null ? null : `−${item.totals.deletions}`,
   ].filter(Boolean).join(" ");
   const summary = item.complete
-    ? `${fileLabel} changed${stats ? ` · ${stats}` : ""}`
-    : "Workspace changes in progress";
+    ? `${fileLabel}${stats ? ` · ${stats}` : ""}`
+    : tx("Workspace changes in progress");
   return (
     <>
       <CardShell
@@ -628,7 +630,11 @@ function RuntimeQuestionHistory({
           <p className="text-xs text-muted-foreground">
             {item.status === "resolved"
               ? "Answer details were not recorded by this older runtime."
-              : `No answers were submitted; this request was ${item.status}.`}
+              : item.status === "cancelled"
+                ? tx("No answers were submitted; this request was cancelled.")
+                : item.status === "expired"
+                  ? tx("No answers were submitted; this request was expired.")
+                  : tx("No answers were submitted; this request was {{status}}.", { status: item.status })}
           </p>
         </div>
       )}
@@ -643,12 +649,12 @@ function RuntimeQuestionReceipt({
 }) {
   const label =
     item.status === "resolved"
-      ? "Questions answered"
+      ? tx("Questions answered")
       : item.status === "cancelled"
-        ? "Questions cancelled"
+        ? tx("Questions cancelled")
         : item.status === "expired"
-          ? "Questions expired"
-          : "Questions resolved";
+          ? tx("Questions expired")
+          : tx("Questions resolved");
   return (
     <details className="group" data-testid="task-chat-runtime-request">
       <summary className="flex min-h-8 cursor-pointer list-none items-center gap-2 rounded-sm px-1 py-1.5 text-sm leading-5 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
@@ -700,8 +706,8 @@ function RuntimeRequestCard({
   const title =
     item.questionSet?.title ??
     (item.requestType === "permission"
-      ? "Runtime permission"
-      : "Runtime input");
+      ? tx("Runtime permission")
+      : tx("Runtime input"));
   const fields =
     item.fields.length > 0
       ? item.fields
@@ -741,7 +747,7 @@ function RuntimeRequestCard({
       setError(
         cause instanceof Error
           ? cause.message
-          : "The runtime request could not be resolved.",
+          : tx("The runtime request could not be resolved."),
       );
     }
   };

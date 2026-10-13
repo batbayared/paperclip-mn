@@ -197,7 +197,7 @@ export function summarizeToolInput(input: unknown): string | undefined {
  */
 export function toolDisplayName(name: string | undefined | null): string {
   const raw = (name ?? "").trim();
-  return isGenericToolName(raw) ? "Unnamed tool" : humanizeToolName(raw);
+  return isGenericToolName(raw) ? tx("Unnamed tool") : humanizeToolName(raw);
 }
 
 /** "Thought for Ns" once a coalesced thinking group spans ≥1s. */
@@ -212,8 +212,8 @@ function thoughtDurationLabel(
   const secs = Math.round((end - start) / 1000);
   if (secs < 1) return undefined;
   return secs < 60
-    ? `Thought for ${secs}s`
-    : `Thought for ${Math.floor(secs / 60)}m ${secs % 60}s`;
+    ? tx("Thought for {{secs}}s", { secs })
+    : tx("Thought for {{min}}m {{sec}}s", { min: Math.floor(secs / 60), sec: secs % 60 });
 }
 
 /** Append token deltas onto the open logical line while preserving real newlines. */

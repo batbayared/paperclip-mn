@@ -210,7 +210,7 @@ export function parseRunnerGoalCommand(value: string): ParsedRunnerGoalCommand {
     if (extra.length > 0) {
       return {
         matched: true,
-        error: `/goal ${subcommand} does not accept extra arguments.`,
+        error: tx("/goal {{subcommand}} does not accept extra arguments.", { subcommand }),
       };
     }
     return {
@@ -656,7 +656,7 @@ export function TaskChatComposer({
     disabled: goalUnavailable && runnerGoalCapability !== null,
     disabledReason:
       runnerGoalCapability?.reason ??
-      "Session goals are unsupported by this agent.",
+      tx("Session goals are unsupported by this agent."),
   };
 
   function updatePendingAssignee(value: string | null) {
@@ -682,9 +682,9 @@ export function TaskChatComposer({
       const url = onAttachImage
         ? attachment?.contentPath
         : await onImageUpload?.(file);
-      if (!url) throw new Error("Upload did not return a file URL");
+      if (!url) throw new Error(tx("Upload did not return a file URL"));
       if (!attachmentsRef.current.some((item) => item.id === id))
-        throw new Error("Attachment was removed");
+        throw new Error(tx("Attachment was removed"));
       setAttachments((prev) =>
         prev.map((item) =>
           item.id === id
@@ -738,7 +738,7 @@ export function TaskChatComposer({
       }
       const attachment = await onAttachImage(file);
       if (!attachment?.contentPath)
-        throw new Error("Upload did not return a file URL");
+        throw new Error(tx("Upload did not return a file URL"));
       const name = attachment?.originalFilename ?? file.name;
       setAttachments((prev) =>
         prev.map((item) =>
@@ -871,13 +871,13 @@ export function TaskChatComposer({
         return;
       }
       if (attachmentsRef.current.length > 0) {
-        setActionError("Remove attachments before using /goal.");
+        setActionError(tx("Remove attachments before using /goal."));
         return;
       }
       if (!onRunnerGoalCommand) {
         setActionError(
           runnerGoalCapability?.reason ??
-            "Session goals are unsupported by this agent.",
+            tx("Session goals are unsupported by this agent."),
         );
         return;
       }
@@ -887,7 +887,7 @@ export function TaskChatComposer({
       ) {
         setActionError(
           runnerGoalCapability.reason ??
-            "Session goals are unsupported by this agent.",
+            tx("Session goals are unsupported by this agent."),
         );
         return;
       }
@@ -897,7 +897,7 @@ export function TaskChatComposer({
         if (hasReassignment && goalCommand.command.action !== "focus") {
           const reassignment = parseAssigneeValue(assigneeValue);
           if (!reassignment || !onRunnerGoalReassign) {
-            setActionError("Select an agent before starting a session goal.");
+            setActionError(tx("Select an agent before starting a session goal."));
             return;
           }
           await onRunnerGoalReassign(reassignment);
@@ -915,7 +915,7 @@ export function TaskChatComposer({
         setActionError(
           error instanceof Error
             ? error.message
-            : "The goal action could not be applied.",
+            : tx("The goal action could not be applied."),
         );
       }
       return;

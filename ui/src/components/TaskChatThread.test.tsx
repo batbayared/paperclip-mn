@@ -1057,6 +1057,54 @@ describe("TaskChatThread runtime transcript selection", () => {
     expect(onRetryFailedRun).toHaveBeenCalledWith("native-failed");
   });
 
+  it("keeps a failed native run actionable in mn", async () => {
+    await i18n.changeLanguage("mn");
+    try {
+      const onRetryFailedRun = vi.fn();
+      nativeTranscriptState.transcriptByRun.set("native-failed-mn", [
+        {
+          kind: "assistant",
+          ts: "2026-08-25T18:00:01.000Z",
+          text: "Started the provider request.",
+          channel: "progress",
+        },
+      ]);
+
+      render(
+        <TaskChatThread
+          comments={[]}
+          onAdd={async () => {}}
+          issueStatus="blocked"
+          onRetryFailedRun={onRetryFailedRun}
+          linkedRuns={[
+            {
+              runId: "native-failed-mn",
+              runtimeMode: "native",
+              status: "failed",
+              errorCode: "provider_transport_failed",
+              agentId: "agent-1",
+              agentName: "Runner",
+              adapterType: "paperclip_runner",
+              createdAt: "2026-08-25T18:00:00.000Z",
+              startedAt: "2026-08-25T18:00:00.000Z",
+              finishedAt: "2026-08-25T18:00:02.000Z",
+            },
+          ]}
+        />,
+      );
+
+      const marker = container.querySelector('[data-testid="task-chat-collapsible-marker"]');
+      expect(marker?.textContent).toContain("Ажиллагаа амжилтгүй болсон");
+      const retry = container.querySelector<HTMLButtonElement>('[data-testid="task-chat-run-failed-try-again"]');
+      expect(retry).not.toBeNull();
+      flushSync(() => retry!.click());
+      await Promise.resolve();
+      expect(onRetryFailedRun).toHaveBeenCalledWith("native-failed-mn");
+    } finally {
+      await i18n.changeLanguage("en");
+    }
+  });
+
   it.each([false, true])("keeps a later bootstrap failure actionable only after the old recovery has a successor: %s", async (continued) => {
     const onRetryFailedRun = vi.fn();
     render(<TaskChatThread comments={[]} onAdd={async () => {}} issueStatus="blocked"

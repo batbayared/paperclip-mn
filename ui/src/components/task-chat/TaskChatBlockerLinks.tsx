@@ -9,6 +9,7 @@ import {
   type WaitingBlockerStatus,
   type WaitingBlockerStep,
 } from "@/lib/issue-blockers";
+import { tx } from "@/i18n/xo";
 import { Link } from "@/lib/router";
 import { useStreamlinedTaskChatPresentation } from "./presentation-mode";
 
@@ -130,7 +131,7 @@ function BlockerRow({
 }
 
 function LiveWorkGlyph({ status }: { status: WaitingBlockerStatus }) {
-  const label = status === "done" ? "Done" : status === "running" ? "Running" : "Waiting";
+  const label = status === "done" ? tx("Done") : status === "running" ? tx("Running") : tx("Waiting");
   if (status === "done") {
     return (
       <CheckCircle2
@@ -193,10 +194,10 @@ export function TaskChatBlockerLinks({
   placement: "top" | "bottom";
 }) {
   const streamlined = useStreamlinedTaskChatPresentation();
-  const directLabel = streamlined && placement === "bottom" ? "Still blocked by" : "Blocked by";
+  const directLabel = streamlined && placement === "bottom" ? tx("Still blocked by") : tx("Blocked by");
   const rootLabel = streamlined
-    ? placement === "bottom" ? "Root blocker remains" : "Root blocker"
-    : "Ultimately blocked by";
+    ? placement === "bottom" ? tx("Root blocker remains") : tx("Root blocker")
+    : tx("Ultimately blocked by");
   return (
     <div
       aria-label="Task blockers"
@@ -220,7 +221,7 @@ export function TaskChatLiveWorkLinks({
   placement: "top" | "bottom";
 }) {
   const streamlined = useStreamlinedTaskChatPresentation();
-  const heading = streamlined && placement === "bottom" ? "Still waiting on live work" : "Waiting on live work";
+  const heading = streamlined && placement === "bottom" ? tx("Still waiting on live work") : tx("Waiting on live work");
   return (
     <div
       aria-label="Tasks waiting on live work"

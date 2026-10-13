@@ -35,6 +35,25 @@ const Y6_7_2_KEYS: string[] = [
   "Open a new tab",
   "Revision {{n}}",
   "Recent files are temporarily unavailable.",
+  // Task 5
+  "/goal {{subcommand}} does not accept extra arguments.",
+  "Session goals are unsupported by this agent.",
+  "This runner does not support steering",
+  "Moved queued message to position {{position}} of {{total}}.",
+  "Couldn’t steer. Message is still queued.",
+  "Waiting",
+  "Still blocked by",
+  "Root blocker",
+  "Root blocker remains",
+  "Ultimately blocked by",
+  "Waiting on live work",
+  "Still waiting on live work",
+  "{{n}} files changed",
+  "Workspace changes in progress",
+  "Questions answered",
+  "The runtime request could not be resolved.",
+  "Unnamed tool",
+  "Thought for {{min}}m {{sec}}s",
 ];
 
 const enCatalog = en as Record<string, string>;

@@ -21,6 +21,7 @@ import {
   Wrench,
 } from "lucide-react";
 import type { ComponentType, SVGProps } from "react";
+import { tx } from "@/i18n/xo";
 import { McpIcon } from "./McpIcon";
 
 /** Lucide icons and hand-rolled SVGs (the MCP logo) share this shape. */
@@ -126,7 +127,7 @@ function sentenceCase(words: readonly string[]): string {
 
 export function humanizeToolName(name: string | undefined | null): string {
   const raw = (name ?? "").trim();
-  if (isGenericToolName(raw)) return "Unnamed tool";
+  if (isGenericToolName(raw)) return tx("Unnamed tool");
   const mcp = mcpToolIdentity(raw);
   return sentenceCase(identifierWords(mcp?.name ?? raw));
 }
@@ -382,7 +383,7 @@ export function toolActivityPresentation(input: ToolActivityPresentationInput): 
         : isGenericToolName(semanticName)
           ? "unnamed"
           : "fallback";
-  const displayName = isGenericToolName(semanticName) ? "Unnamed tool" : humanizeToolName(semanticName);
+  const displayName = isGenericToolName(semanticName) ? tx("Unnamed tool") : humanizeToolName(semanticName);
   const identifierLikeName = /^[A-Za-z][A-Za-z0-9_.:-]*$/.test(semanticName);
   const objectWords = inferred && identifierLikeName && words.length > 1 ? words.slice(1) : [];
   const object = objectWords.length ? sentenceCase(objectWords).replace(/^./, (letter) => letter.toLowerCase()) : undefined;
