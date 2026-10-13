@@ -18,6 +18,8 @@ import { agentsApi } from "@/api/agents";
 import { useCompany } from "@/context/CompanyContext";
 import { useChatConnectorsEnabled } from "@/hooks/useChatConnectorsEnabled";
 import { queryKeys } from "@/lib/queryKeys";
+import { tx } from "@/i18n/xo";
+import { xoNavLabel } from "@/xo/labels";
 import { ContextualSidebarFrame } from "./ContextualSidebarFrame";
 import { SidebarNavItem } from "./SidebarNavItem";
 import { contextualSidebarStyles } from "./contextual-sidebar-styles";
@@ -52,7 +54,7 @@ export function AgentContextualSidebar({
   agentRef,
   agentId,
   agentName,
-  labels = { secrets: "Secrets & variables" },
+  labels = { secrets: tx("Secrets & variables") },
 }: {
   agentRef: string;
   agentId?: string;
@@ -68,7 +70,7 @@ export function AgentContextualSidebar({
     enabled: shouldResolveAgent && Boolean(agentRef && selectedCompanyId),
   });
   const resolvedId = agentId ?? resolvedAgent?.id;
-  const resolvedName = agentName ?? resolvedAgent?.name ?? "Agent";
+  const resolvedName = agentName ?? resolvedAgent?.name ?? tx("Agent");
 
   return (
     <ContextualSidebarFrame
@@ -79,13 +81,13 @@ export function AgentContextualSidebar({
       className="border-r border-border bg-background"
     >
       <nav
-        aria-label={`${resolvedName} navigation`}
+        aria-label={tx("{{name}} navigation", { name: resolvedName })}
         data-slot="contextual-sidebar-nav"
         className={contextualSidebarStyles.nav}
       >
         {AGENT_DETAIL_NAVIGATION.map((section) => (
           <div
-            key={section.label}
+            key={xoNavLabel(section.label)}
             data-slot="contextual-sidebar-section"
             className={contextualSidebarStyles.section}
           >
@@ -104,7 +106,7 @@ export function AgentContextualSidebar({
                     <SidebarNavItem
                       key={item.value}
                       to={href}
-                      label={labels?.[item.value] ?? item.label}
+                      label={labels?.[item.value] ?? xoNavLabel(item.label)}
                       icon={localIcons[item.value]}
                     />
                   );
@@ -125,7 +127,7 @@ export function AgentContextualSidebar({
               <SidebarNavItem
                 key={item.section}
                 to={agentScopedAuditHref(resolvedId, item.section)}
-                label={item.label}
+                label={xoNavLabel(item.label)}
                 icon={item.icon}
               />
             )) : (

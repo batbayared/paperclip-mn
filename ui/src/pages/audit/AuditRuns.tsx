@@ -18,6 +18,8 @@ import {
 import { queryKeys } from "@/lib/queryKeys";
 import { Link, useSearchParams } from "@/lib/router";
 import { relativeTime } from "@/lib/utils";
+import { tx } from "@/i18n/xo";
+import { xoRunSourceLabel } from "@/xo/labels";
 
 const ALL = "__all";
 const RUN_LIMIT = 200;
@@ -33,9 +35,9 @@ function runDuration(run: HeartbeatRun) {
   const end = run.finishedAt ? new Date(run.finishedAt).getTime() : null;
   if (start == null || end == null || !Number.isFinite(start) || !Number.isFinite(end)) return null;
   const seconds = Math.max(0, Math.round((end - start) / 1000));
-  if (seconds < 60) return `${seconds}s`;
+  if (seconds < 60) return tx("{{seconds}}s", { seconds });
   const minutes = Math.floor(seconds / 60);
-  return `${minutes}m ${seconds % 60}s`;
+  return tx("{{minutes}}m {{seconds}}s", { minutes, seconds: seconds % 60 });
 }
 
 function readableSource(source: string) {
@@ -43,7 +45,7 @@ function readableSource(source: string) {
 }
 
 function routineRunTitle(run: RoutineRunSummary) {
-  return run.linkedIssue?.title ?? run.trigger?.label ?? "Routine run";
+  return run.linkedIssue?.title ?? run.trigger?.label ?? tx("Routine run");
 }
 
 function RoutineScopedRuns({
@@ -289,11 +291,11 @@ export function AuditRuns({ companyId, routineId }: { companyId: string; routine
                       <StatusBadge status={run.status} />
                     </div>
                     <p className="mt-1 truncate text-sm text-muted-foreground">
-                      {summary ?? `${readableSource(run.invocationSource)} run`}
+                      {summary ?? tx("{{source}} run", { source: xoRunSourceLabel(run.invocationSource, readableSource(run.invocationSource)) })}
                     </p>
                   </div>
                   <div className="flex shrink-0 items-center gap-2 text-xs text-muted-foreground sm:justify-end">
-                    <span className="capitalize">{readableSource(run.invocationSource)}</span>
+                    <span className="capitalize">{xoRunSourceLabel(run.invocationSource, readableSource(run.invocationSource))}</span>
                     {duration ? <span>{duration}</span> : null}
                     <time dateTime={new Date(run.createdAt).toISOString()}>
                       {relativeTime(run.createdAt)}

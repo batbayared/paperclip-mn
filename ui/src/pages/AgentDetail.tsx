@@ -1,4 +1,4 @@
-import { xoRoleLabel, xoRunSourceLabel } from "@/xo/labels";
+import { xoNavLabel, xoRoleLabel, xoRunSourceLabel } from "@/xo/labels";
 import { xoLocaleTime } from "@/xo/date-format";
 import { tx } from "@/i18n/xo";
 import { XoTrans } from "@/xo/XoTrans";
@@ -1018,7 +1018,7 @@ export function AgentDetail() {
       }
     },
     onError: (err) => {
-      setActionError(err instanceof Error ? err.message : "Action failed");
+      setActionError(err instanceof Error ? err.message : tx("Action failed"));
     },
   });
 
@@ -1059,13 +1059,13 @@ export function AgentDetail() {
     } else {
       crumbs.push({ label: agentName, href: agentDetailHref(canonicalAgentRef) });
       if (urlRunId) {
-        crumbs.push({ label: "Runs", href: agent?.id ? agentScopedAuditHref(agent.id, "runs") : undefined });
+        crumbs.push({ label: xoNavLabel("Runs"), href: agent?.id ? agentScopedAuditHref(agent.id, "runs") : undefined });
         crumbs.push({ label: tx("Run {{id}}", { id: urlRunId.slice(0, 8) }) });
       } else {
         const item = AGENT_DETAIL_NAVIGATION
           .flatMap((section) => section.items)
           .find((candidate) => candidate.value === activeView);
-        crumbs.push({ label: item?.label ?? "Overview" });
+        crumbs.push({ label: xoNavLabel(item?.label ?? "Overview") });
       }
     }
     setBreadcrumbs(crumbs);
@@ -1391,7 +1391,7 @@ export function AgentDetail() {
         </div>
       )}
 
-      {activeView !== "run-detail" && activeView !== "channels" && <h2 className="text-xl font-semibold">{activeView === "secrets" ? "Secrets & variables" : AGENT_DETAIL_NAVIGATION.flatMap(section => section.items).find(item => item.value === activeView)?.label}</h2>}
+      {activeView !== "run-detail" && activeView !== "channels" && <h2 className="text-xl font-semibold">{xoNavLabel(activeView === "secrets" ? "Secrets & variables" : AGENT_DETAIL_NAVIGATION.flatMap(section => section.items).find(item => item.value === activeView)?.label ?? "")}</h2>}
 
       {/* View content */}
       {activeView === "overview" && (

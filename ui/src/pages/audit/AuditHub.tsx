@@ -5,6 +5,7 @@ import { PageTabBar } from "@/components/PageTabBar";
 import { Tabs } from "@/components/ui/tabs";
 import { useBreadcrumbs } from "@/context/BreadcrumbContext";
 import { useCompany } from "@/context/CompanyContext";
+import { xoNavLabel } from "@/xo/labels";
 import { useNavigate, useSearchParams } from "@/lib/router";
 import { Costs } from "@/pages/Costs";
 import { Timeline } from "@/pages/Timeline";
@@ -43,7 +44,7 @@ export function AuditHub({ section }: { section: AuditSection }) {
     const current = AUDIT_SECTIONS.find((candidate) => candidate.value === section);
     setBreadcrumbs([
       { label: "Audit", href: section === "activity" ? undefined : "/activity" },
-      ...(section === "activity" || !current ? [] : [{ label: current.label }]),
+      ...(section === "activity" || !current ? [] : [{ label: xoNavLabel(current.label) }]),
     ]);
   }, [section, setBreadcrumbs]);
 
@@ -98,7 +99,7 @@ export function AuditHub({ section }: { section: AuditSection }) {
           navigate(auditSectionHref(next, scope));
         }}
       >
-        <PageTabBar items={AUDIT_SECTIONS} value={section} align="start" />
+        <PageTabBar items={AUDIT_SECTIONS.map((s) => ({ ...s, label: xoNavLabel(s.label) }))} value={section} align="start" />
       </Tabs>
 
       {section === "activity" && routineId ? (
