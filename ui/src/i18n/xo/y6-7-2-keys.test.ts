@@ -86,5 +86,6 @@ const ASSIGNING_KEY = Object.keys(en).find((k) => k.startsWith("Assigning implie
 
 it("7.1 Minor: Assigning түлхүүр каталогт орчуулагдсан", () => {
   expect(ASSIGNING_KEY).toBeDefined();
-  expect((mn as Record<string, string>)[ASSIGNING_KEY!]).not.toBe(ASSIGNING_KEY);
+  expect(mnCatalog[ASSIGNING_KEY!]).toBeDefined();
+  expect(mnCatalog[ASSIGNING_KEY!]).not.toBe(ASSIGNING_KEY);
 });

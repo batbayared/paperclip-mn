@@ -6,19 +6,28 @@ function hm(d: Date, includeSeconds = false): string {
   return includeSeconds ? `${base}:${String(d.getSeconds()).padStart(2, "0")}` : base;
 }
 
+// Хүчингүй огноонд en замтай адил «Invalid Date» буцаана («NaN оны NaN-р сарын NaN» биш).
+function invalid(d: Date): boolean {
+  return Number.isNaN(d.getTime());
+}
+
 export function mnShortDate(d: Date): string {
+  if (invalid(d)) return String(d);
   return `${d.getMonth() + 1}-р сарын ${d.getDate()}`;
 }
 
 export function mnDate(d: Date): string {
+  if (invalid(d)) return String(d);
   return `${d.getFullYear()} оны ${mnShortDate(d)}`;
 }
 
 export function mnDateTime(d: Date, includeSeconds = false): string {
+  if (invalid(d)) return String(d);
   return `${mnDate(d)} ${hm(d, includeSeconds)}`;
 }
 
 export function mnShortDateTime(d: Date): string {
+  if (invalid(d)) return String(d);
   return `${mnShortDate(d)} ${hm(d)}`;
 }
 

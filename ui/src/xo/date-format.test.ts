@@ -17,6 +17,14 @@ describe("mn огнооны формат (ICU-гүй)", () => {
     expect(mnShortDateTime(morning)).toBe("1-р сарын 3 9:05");
   });
 
+  it("хүчингүй огноо en замтай адил «Invalid Date»", () => {
+    const bad = new Date("not-a-date");
+    expect(mnDate(bad)).toBe("Invalid Date");
+    expect(mnShortDate(bad)).toBe("Invalid Date");
+    expect(mnDateTime(bad)).toBe("Invalid Date");
+    expect(mnShortDateTime(bad)).toBe("Invalid Date");
+  });
+
   it("харьцангуй хугацаа", () => {
     expect(mnRelative(5, "minute")).toBe("5 мин өмнө");
     expect(mnRelative(3, "hour")).toBe("3 ц өмнө");
