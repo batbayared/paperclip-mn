@@ -22,6 +22,11 @@ import {
   xoToolDetailLabel,
   xoTraceStatusLabel,
   xoWorkProductStatusLabel,
+  xoResolverPolicyLabel,
+  xoResolverPolicyEffect,
+  xoInteractionKindLabel,
+  xoVerdictLabel,
+  xoNavLabel,
 } from "./labels";
 
 afterEach(async () => {
@@ -333,5 +338,19 @@ describe("xoRoleLabel / xoRunSourceLabel / xoTraceStatusLabel", () => {
     expect(xoStatusLabel("succeeded", "succeeded")).toBe("Амжилттай");
     expect(xoStatusLabel("idle", "idle")).toBe("Сул");
     expect(xoStatusLabel("timed_out", "timed out")).toBe("Хугацаа хэтэрсэн");
+  });
+});
+
+describe("Ү6 7.5 helper-ууд (en)", () => {
+  it("en дээр англи утгаа буцаана, мэдэгдэхгүйг дамжуулна", () => {
+    expect(xoResolverPolicyLabel("Anyone except creator")).toBe("Anyone except creator");
+    expect(xoResolverPolicyEffect("A request keeps whatever audience it asks for.")).toBe(
+      "A request keeps whatever audience it asks for.",
+    );
+    expect(xoInteractionKindLabel("Checkbox confirmations")).toBe("Checkbox confirmations");
+    expect(xoVerdictLabel("Defer")).toBe("Defer");
+    expect(xoNavLabel("Permissions / Trust")).toBe("Permissions / Trust");
+    expect(xoNavLabel("Something else")).toBe("Something else");
+    expect(xoStatusLabel("withdrawn", "Withdrawn")).toBe("Withdrawn");
   });
 });

@@ -66,6 +66,16 @@ export function xoStatusLabel(status: string, english: string): string {
     case "completed": return tx("Completed");
     case "pending": return tx("Pending");
     case "draft": return tx("Draft");
+    case "accepted": return tx("Accepted");
+    case "answered": return tx("Answered");
+    case "expired": return tx("Expired");
+    case "withdrawn": return tx("Withdrawn");
+    case "declined": return tx("Declined");
+    case "deferred": return tx("Deferred");
+    case "disabled": return tx("Disabled");
+    case "archived": return tx("Archived");
+    case "deleted": return tx("Deleted");
+    case "executed": return tx("Executed");
     default: return english;
   }
 }
@@ -337,6 +347,101 @@ export function xoTraceStatusLabel(english: string): string {
     case "Trace deleted": return tx("Trace deleted");
     case "Trace requested": return tx("Trace requested");
     case "Trace off": return tx("Trace off");
+    default: return english;
+  }
+}
+
+export function xoResolverPolicyLabel(english: string): string {
+  if (!(i18n.resolvedLanguage ?? i18n.language ?? "").startsWith("mn")) return english;
+  switch (english) {
+    case "Anyone": return tx("Anyone");
+    case "Anyone except creator": return tx("Anyone except creator");
+    case "Human only": return tx("Human only");
+    case "Addressed": return tx("Addressed");
+    case "Anyone (default)": return tx("Anyone (default)");
+    case "No cap": return tx("No cap");
+    default: return english;
+  }
+}
+
+export function xoResolverPolicyEffect(english: string): string {
+  if (!(i18n.resolvedLanguage ?? i18n.language ?? "").startsWith("mn")) return english;
+  switch (english) {
+    case "Anyone in the organization can respond — the board or any agent, including the one that asked.":
+      return tx("Anyone in the organization can respond — the board or any agent, including the one that asked.");
+    case "Anyone in the organization except the agent that created the card, and its run. Use this when the answer has to come from someone else.":
+      return tx("Anyone in the organization except the agent that created the card, and its run. Use this when the answer has to come from someone else.");
+    case "Only a person on the board can respond. Agents are turned away.":
+      return tx("Only a person on the board can respond. Agents are turned away.");
+    case "New cards are open — the board or any agent can respond, including the one that asked.":
+      return tx("New cards are open — the board or any agent can respond, including the one that asked.");
+    case "A request keeps whatever audience it asks for.": return tx("A request keeps whatever audience it asks for.");
+    case "New cards exclude the agent that created them, so the answer comes from someone else.":
+      return tx("New cards exclude the agent that created them, so the answer comes from someone else.");
+    case "New cards wait for a person on the board. Agents are turned away.":
+      return tx("New cards wait for a person on the board. Agents are turned away.");
+    case "Even a card that asks for Anyone is narrowed to exclude its creator.":
+      return tx("Even a card that asks for Anyone is narrowed to exclude its creator.");
+    case "Every card of this kind waits for a person, whatever it asked for.":
+      return tx("Every card of this kind waits for a person, whatever it asked for.");
+    default: return english;
+  }
+}
+
+export function xoInteractionKindLabel(english: string): string {
+  if (!(i18n.resolvedLanguage ?? i18n.language ?? "").startsWith("mn")) return english;
+  switch (english) {
+    case "Suggested tasks": return tx("Suggested tasks");
+    case "Ask user questions": return tx("Ask user questions");
+    case "Confirmations": return tx("Confirmations");
+    case "Confirmation": return tx("Confirmation");
+    case "Checkbox confirmations": return tx("Checkbox confirmations");
+    case "Checkbox confirmation": return tx("Checkbox confirmation");
+    case "Item verdicts": return tx("Item verdicts");
+    case "Connection requests": return tx("Connection requests");
+    case "Connection request": return tx("Connection request");
+    case "Plan": return tx("Plan");
+    default: return english;
+  }
+}
+
+export function xoVerdictLabel(english: string): string {
+  if (!(i18n.resolvedLanguage ?? i18n.language ?? "").startsWith("mn")) return english;
+  switch (english) {
+    case "Approve": return tx("Approve");
+    case "Reject": return tx("Reject");
+    case "Defer": return tx("Defer");
+    case "Revise…": return tx("Revise…");
+    case "Approved": return tx("Approved");
+    case "Rejected": return tx("Rejected");
+    case "Deferred": return tx("Deferred");
+    default: return english;
+  }
+}
+
+export function xoNavLabel(english: string): string {
+  if (!(i18n.resolvedLanguage ?? i18n.language ?? "").startsWith("mn")) return english;
+  switch (english) {
+    case "Agent": return tx("Agent");
+    case "Runtime": return tx("Runtime");
+    case "Governance": return tx("Governance");
+    case "Audit": return tx("Audit");
+    case "Overview": return tx("Overview");
+    case "Instructions": return tx("Instructions");
+    case "Skills": return tx("Skills");
+    case "Harness / Runtime": return tx("Harness / Runtime");
+    case "Secrets": return tx("Secrets");
+    case "Secrets & variables": return tx("Secrets & variables");
+    case "Tools": return tx("Tools");
+    case "Channels": return tx("Channels");
+    case "Permissions / Trust": return tx("Permissions / Trust");
+    case "API Keys": return tx("API Keys");
+    case "Revisions": return tx("Revisions");
+    case "Activity": return tx("Activity");
+    case "Runs": return tx("Runs");
+    case "Costs": return tx("Costs");
+    case "Budgets": return tx("Budgets");
+    case "Timeline": return tx("Timeline");
     default: return english;
   }
 }
