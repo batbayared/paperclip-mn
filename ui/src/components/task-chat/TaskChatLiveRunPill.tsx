@@ -6,6 +6,8 @@ import { useSecondTick } from "@/hooks/useSecondTick";
 import { formatDurationWords } from "@/lib/issue-chat-messages";
 import { isCommandTool } from "@/lib/transcriptPresentation";
 import { isTerminalRunStatus } from "@/components/task-chat/transcript-adapter";
+import { tx } from "@/i18n/xo";
+import { calledToolsWords, ranCommandsWords } from "@/xo/run-text";
 
 /**
  * "ran N commands, called M tools" for the live tail's status pill, counted off
@@ -29,8 +31,8 @@ export function toolCountSummaryFromEntries(entries: readonly TranscriptEntry[])
     else other += 1;
   }
   const parts: string[] = [];
-  if (commands > 0) parts.push(`ran ${commands} command${commands === 1 ? "" : "s"}`);
-  if (other > 0) parts.push(`called ${other} tool${other === 1 ? "" : "s"}`);
+  if (commands > 0) parts.push(ranCommandsWords(commands));
+  if (other > 0) parts.push(calledToolsWords(other));
   return parts.length > 0 ? parts.join(", ") : null;
 }
 
@@ -68,8 +70,8 @@ export function TaskChatLiveRunPill({
     ? formatDurationWords(elapsedMs)
     : null;
   const failed = ["failed", "timed_out", "cancelled", "interrupted"].includes(status);
-  const verb = active ? "Working" : failed ? "Stopped" : "Worked";
-  const suffix = elapsed ? `for ${elapsed}` : null;
+  const verb = active ? tx("Working") : failed ? tx("Stopped") : tx("Worked");
+  const suffix = elapsed ? tx("for {{duration}}", { duration: elapsed }) : null;
 
   return (
     <div

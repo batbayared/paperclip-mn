@@ -9,6 +9,8 @@ import type {
 } from "./task-chat-model";
 import { TaskChatStatusPill } from "./TaskChatStatusPill";
 import { TaskChatAgentIdentity } from "./TaskChatBubble";
+import { tx } from "@/i18n/xo";
+import { toolsCountWords } from "@/xo/run-text";
 
 interface TaskChatTurnProps {
   item: TaskChatTurnItem;
@@ -34,9 +36,7 @@ export function turnSummaryMetrics(
   const parts: string[] = [];
   if (summary.durationLabel) parts.push(summary.durationLabel);
   if (summary.toolCount > 0)
-    parts.push(
-      `${summary.toolCount} tool${summary.toolCount === 1 ? "" : "s"}`,
-    );
+    parts.push(toolsCountWords(summary.toolCount));
   if (summary.added > 0 || summary.removed > 0)
     parts.push(`+${summary.added} −${summary.removed}`);
   if (summary.tokensLabel) parts.push(summary.tokensLabel);
@@ -46,7 +46,7 @@ export function turnSummaryMetrics(
 /** "✓ Worked · 38s · 3 tools · +34 −3 · 12.3k tokens" (parts omitted when unknown). */
 export function turnSummaryText(summary: TaskChatTurnItem["summary"]): string {
   const metrics = turnSummaryMetrics(summary);
-  const label = summary.failed ? "Stopped" : "Worked";
+  const label = summary.failed ? tx("Stopped") : tx("Worked");
   return metrics ? `${label} · ${metrics}` : label;
 }
 
@@ -100,12 +100,14 @@ export function TaskChatTurn({
             />
           ) : null}
           <span className="min-w-0 truncate">
-            {item.continuedAfterSteering ? "Continued after steering · " : ""}
+            {item.continuedAfterSteering ? tx("Continued after steering · ") : ""}
             {item.summary.durationLabel
-              ? `${item.summary.failed ? "Stopped" : "Worked"} for ${item.summary.durationLabel}`
+              ? item.summary.failed
+                ? tx("Stopped for {{duration}}", { duration: item.summary.durationLabel })
+                : tx("Worked for {{duration}}", { duration: item.summary.durationLabel })
               : item.summary.failed
-                ? "Stopped"
-                : "Worked"}
+                ? tx("Stopped")
+                : tx("Worked")}
           </span>
         </div>
         {item.items.length > 0 ? (
@@ -206,10 +208,12 @@ export function TaskChatTurn({
       ) : null}
       <span>
         {item.standaloneHeader && item.summary.durationLabel
-          ? `${item.summary.failed ? "Stopped" : "Worked"} for ${item.summary.durationLabel}`
+          ? item.summary.failed
+            ? tx("Stopped for {{duration}}", { duration: item.summary.durationLabel })
+            : tx("Worked for {{duration}}", { duration: item.summary.durationLabel })
           : item.summary.failed
-            ? "Stopped"
-            : "Worked"}
+            ? tx("Stopped")
+            : tx("Worked")}
       </span>
       {!item.standaloneHeader && turnSummaryMetrics(item.summary) ? (
         // Time/tools/tokens is demoted, not deleted (PAP-502): it stays in the

@@ -6,6 +6,7 @@ import { MarkdownBody } from "@/components/MarkdownBody";
 import type { TaskChatActivityPhaseItem } from "./task-chat-model";
 import { protocolActivityPresentation } from "./task-chat-activity-presentation";
 import { toolTaxonomy, type ToolIcon } from "./tool-taxonomy";
+import { tx } from "@/i18n/xo";
 
 function representativeIcon(item: TaskChatActivityPhaseItem): ToolIcon {
   // Prefer a concrete operation over bookkeeping/reasoning. A phase can own
@@ -93,7 +94,11 @@ export function TaskChatActivityPhase({
         <button
           type="button"
           aria-expanded={open}
-          aria-label={`${open ? "Collapse" : "Expand"} activity: ${item.summary}`}
+          aria-label={
+            open
+              ? tx("Collapse activity: {{summary}}", { summary: item.summary })
+              : tx("Expand activity: {{summary}}", { summary: item.summary })
+          }
           onClick={() => setOpen((value) => !value)}
           className={cn(
             runnerAppearance

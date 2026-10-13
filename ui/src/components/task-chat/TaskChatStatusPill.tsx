@@ -5,20 +5,21 @@ import type { TaskChatStatusItem } from "./task-chat-model";
 import { statusLabelIcon, toolTaxonomy } from "./tool-taxonomy";
 import { isGenericStatusLabel, whimsyWord } from "./status-whimsy";
 import { parseCssTimeMs } from "./motion-tokens";
+import { tx } from "@/i18n/xo";
 
 function elapsedLabel(ms?: number): string | null {
   if (ms == null) return null;
   const s = Math.round(ms / 1000);
-  if (s < 60) return `${s}s`;
-  return `${Math.floor(s / 60)}m ${s % 60}s`;
+  if (s < 60) return tx("{{n}}s", { n: s });
+  return tx("{{min}}m {{sec}}s", { min: Math.floor(s / 60), sec: s % 60 });
 }
 
 /** Tenths-precision elapsed ("24.3s", "1m 24.3s") so the readout visibly moves. */
 function liveElapsedLabel(ms?: number): string | null {
   if (ms == null) return null;
   const s = Math.max(0, ms) / 1000;
-  if (s < 60) return `${s.toFixed(1)}s`;
-  return `${Math.floor(s / 60)}m ${(s % 60).toFixed(1)}s`;
+  if (s < 60) return tx("{{n}}s", { n: s.toFixed(1) });
+  return tx("{{min}}m {{sec}}s", { min: Math.floor(s / 60), sec: (s % 60).toFixed(1) });
 }
 
 /** Elapsed ms since `startedAtMs`, ticking ten times a second while `live`. */

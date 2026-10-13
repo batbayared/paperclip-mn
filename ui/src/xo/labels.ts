@@ -56,3 +56,38 @@ export function xoFileKindLabel(english: string): string {
     default: return english;
   }
 }
+
+// completed-activity-summary.ts-ийн хураангуй шошго. Түлхүүр нь англи тексттэй ижил
+// тул en дээр tx() түлхүүрээ буцаана, guard хэрэггүй.
+export function xoActivityLabel(english: string): string {
+  switch (english) {
+    case "Ran commands": return tx("Ran commands");
+    case "Searched files": return tx("Searched files");
+    case "Read files": return tx("Read files");
+    case "Edited files": return tx("Edited files");
+    case "Searched the web": return tx("Searched the web");
+    case "Worked on a plan": return tx("Worked on a plan");
+    case "Requested input": return tx("Requested input");
+    case "Worked with agents": return tx("Worked with agents");
+    case "Reviewed safety": return tx("Reviewed safety");
+    case "Worked with images": return tx("Worked with images");
+    case "Waited": return tx("Waited");
+    case "Used connected tools": return tx("Used connected tools");
+    case "Used tools": return tx("Used tools");
+    case "Worked with artifacts": return tx("Worked with artifacts");
+    case "Managed context": return tx("Managed context");
+    case "Checked memory": return tx("Checked memory");
+    case "Checked model settings": return tx("Checked model settings");
+    case "Worked in review mode": return tx("Worked in review mode");
+    case "Ran hooks": return tx("Ran hooks");
+    case "Received a provider update": return tx("Received a provider update");
+    case "Worked on files": return tx("Worked on files");
+    case "Referenced files": return tx("Referenced files");
+    case "Added resources": return tx("Added resources");
+    case "Checked files": return tx("Checked files");
+    case "Thought through the task": return tx("Thought through the task");
+    case "Activity stopped": return tx("Activity stopped");
+    case "Recorded usage": return tx("Recorded usage");
+    default: return english;
+  }
+}

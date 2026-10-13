@@ -6,6 +6,8 @@ import {
   type ToolIcon,
 } from "./tool-taxonomy";
 import { protocolActivityPresentation } from "./task-chat-activity-presentation";
+import { tx } from "@/i18n/xo";
+import { xoActivityLabel } from "@/xo/labels";
 
 type Activity = TaskChatActivityPhaseItem["items"][number];
 const labels: Record<ToolFamily, string> = {
@@ -120,11 +122,11 @@ export function completedActivitySummary(items: Activity[]) {
     parts
       .map((p, i) => (i ? p.charAt(0).toLowerCase() + p.slice(1) : p))
       .join(", ");
-  const fullLabel = join(values.map((v) => v.label));
+  const fullLabel = join(values.map((v) => xoActivityLabel(v.label)));
   return {
     label:
       values.length > 3
-        ? `${join(values.slice(0, 2).map((v) => v.label))}, and more`
+        ? tx("{{items}}, and more", { items: join(values.slice(0, 2).map((v) => xoActivityLabel(v.label))) })
         : fullLabel,
     fullLabel,
     icon: values.length === 1 ? values[0].icon : Layers3,

@@ -27,6 +27,8 @@ import {
   toolActivityPresentation,
   toolTaxonomy,
 } from "./tool-taxonomy";
+import { tx } from "@/i18n/xo";
+import { compactDuration } from "@/xo/run-text";
 
 const TERMINAL_STATUSES = new Set([
   "failed",
@@ -1753,19 +1755,13 @@ export function buildActivityPhases(
 }
 
 function formatDurationLabel(ms: number): string | undefined {
-  if (!Number.isFinite(ms) || ms <= 0) return undefined;
-  const totalSec = Math.round(ms / 1000);
-  if (totalSec < 1) return "1s";
-  if (totalSec < 60) return `${totalSec}s`;
-  const min = Math.floor(totalSec / 60);
-  const sec = totalSec % 60;
-  return sec === 0 ? `${min}m` : `${min}m ${sec}s`;
+  return compactDuration(ms);
 }
 
 function formatTokensLabel(tokens: number): string | undefined {
   if (!Number.isFinite(tokens) || tokens <= 0) return undefined;
   const label = tokens >= 1000 ? `${(tokens / 1000).toFixed(1)}k` : `${tokens}`;
-  return `${label} tokens`;
+  return tx("{{n}} tokens", { n: label });
 }
 
 /** First→last ts span of a transcript, or undefined when unknowable. */
