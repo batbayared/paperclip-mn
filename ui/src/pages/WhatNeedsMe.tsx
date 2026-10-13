@@ -1,4 +1,5 @@
 import { tx } from "@/i18n/xo";
+import { xoLabel } from "@/xo/labels";
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { CheckCircle2, Inbox } from "lucide-react";
@@ -564,7 +565,7 @@ export function WhatNeedsMe() {
                 <section key={group.key} className="space-y-2">
                   {groupLabel !== null && (
                     <IssueGroupHeader
-                      label={groupLabel}
+                      label={xoLabel(groupLabel)}
                       collapsible
                       collapsed={collapsed}
                       onToggle={() => toggleGroupCollapse(group.key)}

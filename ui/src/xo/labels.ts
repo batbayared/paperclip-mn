@@ -16,6 +16,16 @@ export function xoLabel(english: string): string {
     case "Make changes and run work": return tx("Make changes and run work");
     case "Draft a plan before acting": return tx("Draft a plan before acting");
     case "Answer questions only, no changes": return tx("Answer questions only, no changes");
+    case "Decide now": return tx("Decide now");
+    case "New today": return tx("New today");
+    case "Earlier": return tx("Earlier");
+    case "Status": return tx("Status");
+    case "Priority": return tx("Priority");
+    case "Responsible": return tx("Responsible");
+    case "Project": return tx("Project");
+    case "Workspace": return tx("Workspace");
+    case "Parent Task": return tx("Parent Task");
+    case "None": return tx("None");
     default: return english;
   }
 }

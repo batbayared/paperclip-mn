@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Check, Loader2, Settings2, X } from "lucide-react";
 import type { Agent, AttentionItem } from "@paperclipai/shared";
 import { useParams } from "@/lib/router";
+import { xoLabel } from "@/xo/labels";
 import { attentionApi } from "../api/attention";
 import { agentsApi } from "../api/agents";
 import { authApi } from "../api/auth";
@@ -284,7 +285,7 @@ export function DecisionQueuePage() {
                 <section key={group.key} className="space-y-2">
                   {groupLabel !== null && (
                     <IssueGroupHeader
-                      label={groupLabel}
+                      label={xoLabel(groupLabel)}
                       collapsible
                       collapsed={collapsed}
                       onToggle={() => toggleGroupCollapse(group.key)}

@@ -48,6 +48,15 @@ describe("xoLabel", () => {
     expect(xoLabel("Draft a plan before acting")).toBe("Ажиллахаас өмнө төлөвлөгөө боловсруулах");
     expect(xoLabel("Answer questions only, no changes")).toBe("Зөвхөн асуултад хариулна, өөрчлөлт хийхгүй");
   });
+
+  it("xoLabel: desk shelves ба group-by (mn)", async () => {
+    await i18n.changeLanguage("mn");
+    expect(xoLabel("Decide now")).toBe("Одоо шийдэх");
+    expect(xoLabel("New today")).toBe("Өнөөдрийн шинэ");
+    expect(xoLabel("Parent Task")).toBe("Эцэг даалгавар");
+    expect(xoLabel("None")).toBe("Байхгүй");
+    expect(xoLabel("Unknown label")).toBe("Unknown label");
+  });
 });
 
 describe("xoStatusLabel", () => {

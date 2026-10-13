@@ -1,5 +1,5 @@
 import { tx } from "@/i18n/xo";
-import { xoCreateIssueLabels, xoDateGroupLabel, xoIssueFilterLabel, xoStatusLabel } from "@/xo/labels";
+import { xoCreateIssueLabels, xoDateGroupLabel, xoIssueFilterLabel, xoLabel, xoStatusLabel } from "@/xo/labels";
 import { startTransition, useDeferredValue, useEffect, useMemo, useState, useCallback, useRef } from "react";
 import type { ReactNode } from "react";
 import { useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -1967,7 +1967,7 @@ function StreamlinedIssuesList({
                       }`}
                       onClick={() => updateView({ groupBy: value })}
                     >
-                      <span>{label}</span>
+                      <span>{xoLabel(label)}</span>
                       {viewState.groupBy === value && <Check className="h-3.5 w-3.5" />}
                     </button>
                   ))}

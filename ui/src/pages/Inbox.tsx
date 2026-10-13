@@ -1,4 +1,5 @@
 import { tx } from "@/i18n/xo";
+import { xoDateGroupLabel } from "@/xo/labels";
 import { XoTrans } from "@/xo/XoTrans";
 import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "@/lib/router";
@@ -3039,14 +3040,14 @@ function StreamlinedInbox() {
                           className="flex items-center gap-3 px-3 py-1.5 sm:pl-0 sm:pr-4"
                           data-testid="inbox-date-group"
                           role="separator"
-                          aria-label={dateGroupLabel}
+                          aria-label={xoDateGroupLabel(dateGroupLabel)}
                         >
                           <span className="h-px min-w-0 flex-1 bg-border/80" aria-hidden="true" data-date-group-rule="" />
                           <span
                             className="shrink-0 text-(length:--text-nano) font-medium uppercase tracking-wider text-muted-foreground/70"
                             data-date-group-label=""
                           >
-                            {dateGroupLabel}
+                            {xoDateGroupLabel(dateGroupLabel)}
                           </span>
                           <span className="h-px min-w-0 flex-1 bg-border/80" aria-hidden="true" data-date-group-rule="" />
                         </div>,

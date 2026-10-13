@@ -36,6 +36,13 @@ const Y6_7_3_KEYS: string[] = [
   "Source IP {{ip}}",
   "Last mail check: {{value}}",
   "Not checked yet",
+  // Task 4
+  "Parent Task",
+  "Decide now",
+  "New today",
+  "Tool: {{name}}",
+  "Args:",
+  "Result:",
 ];
 
 // mn утга нь англитай ижил байж болох түлхүүрүүд (оноосон нэр).

@@ -422,7 +422,7 @@ function durableInputLabel(
   interaction: TaskChatInteractionItem["interaction"],
 ): string {
   if (interaction.kind === "ask_user_questions")
-    return interaction.title ?? "Questions";
+    return interaction.title ?? tx("Questions");
   if (interaction.kind === "suggest_tasks")
     return interaction.title ?? "Suggested tasks";
   if (interaction.kind === "request_checkbox_confirmation")
