@@ -43,6 +43,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { tx } from "@/i18n/xo";
+import { xoSkillReservedRootLabel } from "@/xo/labels";
 import { FolderSwatch, type FolderSelection } from "./FolderControls";
 import {
   buildSkillFolderTree,
@@ -311,7 +313,7 @@ export function SkillFolderRail({
           ) : null}
 
           {/* Company — plain top-level company folders */}
-          <RailHeading label="Organization" onCreate={() => onCreateFolder(null)} />
+          <RailHeading label="Organization" createTitle={tx("New organization folder")} onCreate={() => onCreateFolder(null)} />
           {model.company.length > 0 ? (
             model.company.map((node) => (
               <TreeBranch
@@ -469,7 +471,15 @@ export function SkillFolderRail({
   );
 }
 
-function RailHeading({ label, onCreate }: { label: string; onCreate: () => void }) {
+function RailHeading({
+  label,
+  createTitle,
+  onCreate,
+}: {
+  label: string;
+  createTitle: string;
+  onCreate: () => void;
+}) {
   return (
     <div className="group/heading flex items-center justify-between px-2 pb-0.5 pt-3">
       <span className="text-(length:--text-micro) font-medium uppercase tracking-wide text-muted-foreground">
@@ -478,7 +488,7 @@ function RailHeading({ label, onCreate }: { label: string; onCreate: () => void 
       <button
         type="button"
         onClick={onCreate}
-        title={`New ${label.toLowerCase()} folder`}
+        title={createTitle}
         className="opacity-0 transition-opacity group-hover/heading:opacity-100"
       >
         <Plus className="h-3 w-3 text-muted-foreground" />
@@ -569,7 +579,7 @@ function TreeBranch({
   const editable = folderIsEditable(folder);
   const canNest = !isBundledFolder(folder) && !isProjectsFolder(folder) && folder.depth < 4;
   const isInMySkills = folder.path.startsWith("my/");
-  const label = rootLabel ?? folder.name;
+  const label = rootLabel ? xoSkillReservedRootLabel(rootLabel) : folder.name;
 
   return (
     <div>
@@ -649,7 +659,7 @@ function TreeBranch({
                   <DropdownMenuItem onSelect={() => onEditFolder(folder)}>Edit color</DropdownMenuItem>
                   <DropdownMenuItem onSelect={() => onMoveFolder(folder, isInMySkills ? "company" : "my")}>
                     <MoveRight className="h-3.5 w-3.5" />
-                    Move to {isInMySkills ? "Organization" : "My Skills"}
+                    {isInMySkills ? tx("Move to Organization") : tx("Move to My Skills")}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem variant="destructive" onSelect={() => onDeleteFolder(folder)}>
@@ -857,7 +867,7 @@ export function MoveToFolderDialog({
   const previewPath = chosen === undefined
     ? null
     : chosen === null
-      ? "Unfiled"
+      ? tx("Unfiled")
       : chosenFolder?.path ?? null;
 
   async function submitNewFolder() {
