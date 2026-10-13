@@ -23,6 +23,7 @@ import { TaskMessageScroller } from "./TaskMessageScroller";
 import { TaskChatProtocolCard } from "./TaskChatProtocolCard";
 import { TaskChatProtocolActivityRow } from "./TaskChatProtocolActivityRow";
 import { TaskChatPlanPreviewCard } from "./TaskChatPlanPreviewCard";
+import { tx } from "@/i18n/xo";
 
 const EMPTY_ATTACHMENTS: IssueAttachment[] = [];
 
@@ -310,8 +311,8 @@ export function TaskChatThreadView({
             (item) =>
               item.kind === "marker" &&
               item.variant === "interrupted" &&
-              (item.label === "Run failed" ||
-                item.label === "Usage limit reached"),
+              (item.label === tx("Run failed") ||
+                item.label === tx("Usage limit reached")),
           )?.id
       : undefined;
   // Streaming tail and header updates must not rebuild settled markdown/tool trees.

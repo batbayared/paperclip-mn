@@ -8,6 +8,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { TaskChatThread } from "./TaskChatThread";
+import { i18n } from "@/i18n";
 import type {
   IssueDocument,
   IssueQueuedCommentQueue,
@@ -1139,6 +1140,61 @@ describe("TaskChatThread runtime transcript selection", () => {
     flushSync(() => retry!.click());
     await Promise.resolve();
     expect(onRetryFailedRun).toHaveBeenCalledWith("native-usage-limit");
+  });
+
+  it("mn дээр хэрэглээний хязгаарын шошгыг орчуулж, дахин оролдох товчийг хадгална", async () => {
+    await i18n.changeLanguage("mn");
+    try {
+      const onRetryFailedRun = vi.fn();
+      render(
+        <TaskChatThread
+          comments={[]}
+          onAdd={async () => {}}
+          issueStatus="blocked"
+          onRetryFailedRun={onRetryFailedRun}
+          linkedRuns={[
+            {
+              runId: "native-usage-limit",
+              runtimeMode: "native",
+              status: "failed",
+              errorCode: "native_provider_usage_limit",
+              agentId: "agent-1",
+              agentName: "Runner",
+              adapterType: "paperclip_runner",
+              createdAt: "2026-08-25T18:00:00.000Z",
+              startedAt: "2026-08-25T18:00:00.000Z",
+              finishedAt: "2026-08-25T18:00:02.000Z",
+            },
+          ]}
+        />,
+      );
+
+      const marker = container.querySelector(
+        '[data-testid="task-chat-collapsible-marker"]',
+      );
+      expect(marker?.textContent).toContain("Хэрэглээний хязгаарт хүрсэн");
+      expect(marker?.textContent).not.toContain("Usage limit reached");
+      const disclosure = marker?.querySelector<HTMLButtonElement>(
+        'button[aria-expanded="false"]',
+      );
+      expect(disclosure).not.toBeNull();
+      flushSync(() => disclosure!.click());
+      const details = container.querySelector(
+        '[data-testid="task-chat-collapsible-marker-details"]',
+      );
+      expect(details?.textContent).toContain(
+        "Загварын үйлчилгээ үзүүлэгч одоогийн хэрэглээний хязгаартаа хүрсэн.",
+      );
+      const retry = container.querySelector<HTMLButtonElement>(
+        '[data-testid="task-chat-run-failed-try-again"]',
+      );
+      expect(retry).not.toBeNull();
+      flushSync(() => retry!.click());
+      await Promise.resolve();
+      expect(onRetryFailedRun).toHaveBeenCalledWith("native-usage-limit");
+    } finally {
+      await i18n.changeLanguage("en");
+    }
   });
 
   it("explains a legacy run prevented from starting by a reconciliation hold", () => {

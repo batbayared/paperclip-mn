@@ -2,6 +2,7 @@ import type { IssueDocument } from "@paperclipai/shared";
 import { Lightbulb, Maximize2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { TaskChatProviderActivityItem } from "./task-chat-model";
+import { tx } from "@/i18n/xo";
 
 const PLAN_PREVIEW_LINE_COUNT = 3;
 
@@ -147,7 +148,7 @@ export function TaskChatPlanPreviewCard({
       <a
         href={href}
         data-testid={testId}
-        aria-label={ariaLabel ?? `Open Plan${revision == null ? "" : ` revision ${revision}`}`}
+        aria-label={ariaLabel ?? (revision == null ? tx("Open Plan") : tx("Open Plan revision {{revision}}", { revision }))}
         className={sharedClassName}
       >
         {body}

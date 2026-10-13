@@ -115,6 +115,7 @@ import { issuesApi } from "@/api/issues";
 import { queryKeys } from "@/lib/queryKeys";
 import { useQueryClient } from "@tanstack/react-query";
 import { TaskChatPresentationProvider } from "@/components/task-chat/presentation-mode";
+import { tx } from "@/i18n/xo";
 
 function toMs(value: Date | string | null | undefined): number {
   if (!value) return 0;
@@ -1559,36 +1560,36 @@ export function TaskChatThread(props: TaskChatThreadProps) {
             : "native_runner_process_exited");
         const label =
           code === "native_provider_approval_required" && source.status === "failed"
-            ? "Approval required"
+            ? tx("Approval required")
             : code === "native_provider_usage_limit" && source.status === "failed"
-            ? "Usage limit reached"
+            ? tx("Usage limit reached")
             : source.status === "cancelled"
-              ? "Run cancelled"
+              ? tx("Run cancelled")
               : source.status === "interrupted"
-                ? "Run interrupted"
+                ? tx("Run interrupted")
                 : source.status === "timed_out"
-                  ? "Run timed out"
-                  : "Run failed";
+                  ? tx("Run timed out")
+                  : tx("Run failed");
         const responseBoundary = sourceHasNativeResponse
-          ? "after returning a final response"
-          : "before returning an answer";
+          ? tx("after returning a final response")
+          : tx("before returning an answer");
         const detail =
           source.status === "cancelled"
-            ? `The run was cancelled ${responseBoundary}.`
+            ? tx("The run was cancelled {{responseBoundary}}.", { responseBoundary })
             : source.status === "interrupted"
-              ? `The run was interrupted ${responseBoundary}.`
+              ? tx("The run was interrupted {{responseBoundary}}.", { responseBoundary })
               : code === "native_provider_approval_required"
-                ? "This operation requires approval, but this runner has no interactive approval handler. Review the operation and update the agent's permission setting before retrying."
+                ? tx("This operation requires approval, but this runner has no interactive approval handler. Review the operation and update the agent's permission setting before retrying.")
                 : code === "native_provider_model_rejected"
-                ? "The provider rejected the selected model. Check the model ID and your account's access, save the agent configuration, then retry. View the run for the provider's full error."
+                ? tx("The provider rejected the selected model. Check the model ID and your account's access, save the agent configuration, then retry. View the run for the provider's full error.")
                 : code === "native_provider_usage_limit" &&
                     source.status === "failed"
-                  ? "The model provider has reached its current usage limit. Try again after the limit resets."
+                  ? tx("The model provider has reached its current usage limit. Try again after the limit resets.")
                   : code === "provider_frame_too_large"
-                    ? "Provider output exceeded the safe limit."
+                    ? tx("Provider output exceeded the safe limit.")
                     : source.status === "timed_out"
-                      ? `The runner timed out ${responseBoundary} (${code}).`
-                      : `The runner stopped ${responseBoundary} (${code}).`;
+                      ? tx("The runner timed out {{responseBoundary}} ({{code}}).", { responseBoundary, code })
+                      : tx("The runner stopped {{responseBoundary}} ({{code}}).", { responseBoundary, code });
         const id = `${source.id}:failure`;
         const runAgent = meta?.agentId
           ? agentMap?.get(meta.agentId)
@@ -2746,9 +2747,9 @@ export function TaskChatThread(props: TaskChatThreadProps) {
                   role="status"
                   className="absolute inset-x-0 top-0 z-20 mx-auto flex w-full max-w-(--tc-shell-max-w) items-center gap-2 border border-border bg-background px-4 py-2 text-sm text-muted-foreground"
                 >
-                  Some task history could not be loaded.
+                  {tx("Some task history could not be loaded.")}
                   <Button variant="ghost" size="sm" onClick={retryHistory}>
-                    Retry
+                    {tx("Retry")}
                   </Button>
                 </div>
               ) : null}

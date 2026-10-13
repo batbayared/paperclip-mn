@@ -5,6 +5,7 @@ import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import type { IssueDocument } from "@paperclipai/shared";
 import { ThemeProvider } from "@/context/ThemeContext";
+import { i18n } from "@/i18n";
 import {
   planPreviewContent,
   TaskChatPlanPreviewCard,
@@ -86,6 +87,22 @@ describe("TaskChatPlanPreviewCard", () => {
     expect(preview?.textContent).toContain("Streaming task UX");
     expect(preview?.textContent).toContain("Extract the shared card.");
     expect(preview?.textContent).not.toContain("Verify the mobile layout.");
+  });
+
+  it("mn дээр Plan-pane холбоосын aria-label-ийг орчуулна", async () => {
+    await i18n.changeLanguage("mn");
+    try {
+      act(() => root.render(
+        <ThemeProvider>
+          <TaskChatPlanPreviewCard source={{ kind: "saved", document: planDocument() }} />
+        </ThemeProvider>,
+      ));
+
+      const preview = container.querySelector('[data-testid="task-chat-plan-preview"]');
+      expect(preview?.getAttribute("aria-label")).toBe("Төлөвлөгөө нээх (хувилбар 4)");
+    } finally {
+      await i18n.changeLanguage("en");
+    }
   });
 
   it("replaces saved preview content when the canonical revision updates", () => {
