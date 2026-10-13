@@ -10,6 +10,7 @@ import { useIssuePlanDocument } from "@/hooks/useIssuePlanDocument";
 import { useLocation } from "@/lib/router";
 import { tx } from "@/i18n/xo";
 import { localeTag } from "@/xo/locale";
+import { mnShortDateTime } from "@/xo/date-format";
 
 interface IssuePropertiesPlansTabProps {
   issue: Issue;
@@ -84,12 +85,14 @@ export function IssuePropertiesPlansTab({ issue }: IssuePropertiesPlansTabProps)
           <div className="flex items-center gap-1 text-xs text-muted-foreground">
             {tx("Revision {{n}} · updated {{date}}", {
               n: planDocument.latestRevisionNumber ?? 1,
-              date: new Date(planDocument.updatedAt).toLocaleString(localeTag() === "mn-MN" ? "mn-MN" : [], {
-                month: "short",
-                day: "numeric",
-                hour: "numeric",
-                minute: "2-digit",
-              }),
+              date: localeTag() === "mn-MN"
+                ? mnShortDateTime(new Date(planDocument.updatedAt))
+                : new Date(planDocument.updatedAt).toLocaleString([], {
+                    month: "short",
+                    day: "numeric",
+                    hour: "numeric",
+                    minute: "2-digit",
+                  }),
             })}
             <DocumentAnnotationsCountChip
               issueId={issue.id}

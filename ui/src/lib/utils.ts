@@ -3,6 +3,7 @@ import { twMerge } from "tailwind-merge";
 import { deriveAgentUrlKey, deriveProjectUrlKey, normalizeProjectUrlKey, hasNonAsciiContent } from "@paperclipai/shared";
 import type { BillingType, FinanceDirection, FinanceEventKind } from "@paperclipai/shared";
 import { localeTag } from "@/xo/locale";
+import { mnDate, mnDateTime, mnRelative, mnShortDate } from "@/xo/date-format";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -52,6 +53,7 @@ export function formatProjectBudget(budget: { amountCents: number; windowKind: s
 }
 
 export function formatDate(date: Date | string): string {
+  if (localeTag() === "mn-MN") return mnDate(new Date(date));
   return new Date(date).toLocaleDateString(localeTag(), {
     month: "short",
     day: "numeric",
@@ -63,6 +65,7 @@ export function formatDateTime(
   date: Date | string,
   options: { includeSeconds?: boolean } = {},
 ): string {
+  if (localeTag() === "mn-MN") return mnDateTime(new Date(date), options.includeSeconds);
   return new Date(date).toLocaleString(localeTag(), {
     month: "short",
     day: "numeric",
@@ -74,6 +77,7 @@ export function formatDateTime(
 }
 
 export function formatShortDate(date: Date | string): string {
+  if (localeTag() === "mn-MN") return mnShortDate(new Date(date));
   return new Date(date).toLocaleString(localeTag(), {
     month: "short",
     day: "numeric",
@@ -102,12 +106,18 @@ export function relativeTime(date: Date | string): string {
   const then = new Date(date).getTime();
   const diffSec = Math.round((now - then) / 1000);
   if (diffSec < 60) return JUST_NOW[tag];
-  const rtf = relativeFormatter(tag);
   const diffMin = Math.round(diffSec / 60);
-  if (diffMin < 60) return rtf.format(-diffMin, "minute");
   const diffHr = Math.round(diffMin / 60);
-  if (diffHr < 24) return rtf.format(-diffHr, "hour");
   const diffDay = Math.round(diffHr / 24);
+  if (tag === "mn-MN") {
+    if (diffMin < 60) return mnRelative(diffMin, "minute");
+    if (diffHr < 24) return mnRelative(diffHr, "hour");
+    if (diffDay < 30) return mnRelative(diffDay, "day");
+    return formatDate(date);
+  }
+  const rtf = relativeFormatter(tag);
+  if (diffMin < 60) return rtf.format(-diffMin, "minute");
+  if (diffHr < 24) return rtf.format(-diffHr, "hour");
   if (diffDay < 30) return rtf.format(-diffDay, "day");
   return formatDate(date);
 }
