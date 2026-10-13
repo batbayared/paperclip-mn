@@ -1,3 +1,4 @@
+import { xoLocaleDate } from "@/xo/date-format";
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Shield, ShieldCheck } from "lucide-react";
@@ -252,7 +253,7 @@ export function InstanceAccess() {
                         </div>
                       </div>
                       <div className="text-xs text-muted-foreground">
-                        {new Date(membership.updatedAt).toLocaleDateString()}
+                        {xoLocaleDate(new Date(membership.updatedAt))}
                       </div>
                     </div>
                   ))}

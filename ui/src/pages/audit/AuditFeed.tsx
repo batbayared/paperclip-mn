@@ -1,3 +1,4 @@
+import { xoLocaleDateTime } from "@/xo/date-format";
 import { useEffect, useMemo, useState } from "react";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { Download, ScrollText, ShieldAlert } from "lucide-react";
@@ -249,7 +250,7 @@ function AuditRow({
         <time
           className="shrink-0 whitespace-nowrap text-xs text-muted-foreground"
           dateTime={record.createdAt}
-          title={new Date(record.createdAt).toLocaleString()}
+          title={xoLocaleDateTime(new Date(record.createdAt))}
         >
           {relativeTime(record.createdAt)}
         </time>

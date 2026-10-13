@@ -1,3 +1,4 @@
+import { xoLocaleDateTime } from "@/xo/date-format";
 import type { ReactNode } from "react";
 import type {
   ToolRiskLevel,
@@ -131,7 +132,7 @@ export function RelativeTime({ value }: { value: Date | string | null | undefine
     text = isFuture ? `in ${value}` : `${value} ago`;
   }
   return (
-    <span title={date.toLocaleString()} className="text-muted-foreground">
+    <span title={xoLocaleDateTime(date)} className="text-muted-foreground">
       {text}
     </span>
   );

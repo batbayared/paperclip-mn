@@ -1,3 +1,4 @@
+import { xoLocaleDateTime } from "@/xo/date-format";
 import { tx } from "@/i18n/xo";
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -321,7 +322,7 @@ export function CompanyAccess() {
                       ? `${request.invite.allowedJoinTypes} join invite${request.invite.humanRole ? ` • default role ${request.invite.humanRole}` : ""}`
                       : "Invite metadata unavailable"
                   }
-                  detail={tx("Submitted {{date}}", { date: new Date(request.createdAt).toLocaleString() })}
+                  detail={tx("Submitted {{date}}", { date: xoLocaleDateTime(new Date(request.createdAt)) })}
                   approveLabel="Approve human"
                   rejectLabel="Reject human"
                   disabled={joinRequestActionPending}

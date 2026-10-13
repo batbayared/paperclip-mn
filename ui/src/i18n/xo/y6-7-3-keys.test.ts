@@ -24,6 +24,18 @@ const Y6_7_3_KEYS: string[] = [
   "Promoted from low-trust.",
   "Authored by a low-trust review agent. Raw {{artifact}} is not auto-shared with higher-trust agents.",
   "Snoozed until {{date}}",
+  // Task 3
+  "{{n}}s ago",
+  "{{n}}h ago",
+  "{{n}}d ago",
+  "Last checked: {{time}}",
+  "Default ref",
+  "{{from}} to {{to}}",
+  "window capped",
+  "Request details",
+  "Source IP {{ip}}",
+  "Last mail check: {{value}}",
+  "Not checked yet",
 ];
 
 // mn утга нь англитай ижил байж болох түлхүүрүүд (оноосон нэр).

@@ -1,3 +1,4 @@
+import { xoLocaleDateTime } from "@/xo/date-format";
 import { XoTrans } from "@/xo/XoTrans";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "@/lib/router";
@@ -344,7 +345,7 @@ export function ApprovalDetail() {
                   <Identity name="Board" size="sm" />
                 )}
                 <span className="text-xs text-muted-foreground">
-                  {new Date(comment.createdAt).toLocaleString()}
+                  {xoLocaleDateTime(new Date(comment.createdAt))}
                 </span>
               </div>
               <MarkdownBody className="text-sm">{comment.body}</MarkdownBody>

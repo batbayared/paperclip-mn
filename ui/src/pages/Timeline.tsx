@@ -5,6 +5,8 @@
  * (`GET /companies/:companyId/timeline`). Rendering is the board-locked
  * Direction C (PAP-12422): dense rows, mini-map brush, custom inline SVG.
  */
+import { xoLocaleDateTime } from "@/xo/date-format";
+import { tx } from "@/i18n/xo";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Bot, Clock3, Coins, GanttChartSquare, Minus, Plus, RotateCcw, type LucideIcon } from "lucide-react";
@@ -529,9 +531,9 @@ export function Timeline({ embedded = false }: { embedded?: boolean } = {}) {
             </Card>
             <div className="flex flex-wrap items-center justify-between gap-3">
               <p className="text-xs text-muted-foreground">
-                {data.spans.length} run{data.spans.length === 1 ? "" : "s"} ·{" "}
-                {new Date(data.window.from).toLocaleString()} to {new Date(data.window.to).toLocaleString()}
-                {data.window.capped ? " · window capped" : ""}
+                {data.spans.length === 1 ? tx("{{n}} run", { n: data.spans.length }) : tx("{{n}} runs", { n: data.spans.length })} ·{" "}
+                {tx("{{from}} to {{to}}", { from: xoLocaleDateTime(new Date(data.window.from)), to: xoLocaleDateTime(new Date(data.window.to)) })}
+                {data.window.capped ? ` · ${tx("window capped")}` : ""}
               </p>
               {rangeControls}
             </div>

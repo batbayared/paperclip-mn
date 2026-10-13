@@ -1,3 +1,5 @@
+import { xoLocaleDateTime } from "@/xo/date-format";
+import { tx } from "@/i18n/xo";
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -770,7 +772,7 @@ export function EmailEndpointSettings({
         {inbox.receiveMode === "websocket" ? "Live connection" : "Webhook"}
       </p>
       <p className="text-sm text-muted-foreground">
-        Last mail check: {inbox.lastSyncAt ? new Date(inbox.lastSyncAt).toLocaleString() : "Not checked yet"}
+        {tx("Last mail check: {{value}}", { value: inbox.lastSyncAt ? xoLocaleDateTime(new Date(inbox.lastSyncAt)) : tx("Not checked yet") })}
       </p>
       <p className="text-sm">
         Each email conversation is a task. Task comments stay internal; use

@@ -1,3 +1,5 @@
+import { xoLocaleDate } from "@/xo/date-format";
+import { tx } from "@/i18n/xo";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -188,16 +190,16 @@ function formatRelativeShort(value: string | null | undefined): string {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "—";
   const diff = Date.now() - date.getTime();
-  if (diff < 0) return date.toLocaleDateString();
+  if (diff < 0) return xoLocaleDate(date);
   const seconds = Math.floor(diff / 1000);
-  if (seconds < 60) return `${seconds}s ago`;
+  if (seconds < 60) return tx("{{n}}s ago", { n: seconds });
   const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m ago`;
+  if (minutes < 60) return tx("{{n}}m ago", { n: minutes });
   const hours = Math.floor(minutes / 60);
-  if (hours < 48) return `${hours}h ago`;
+  if (hours < 48) return tx("{{n}}h ago", { n: hours });
   const days = Math.floor(hours / 24);
-  if (days < 30) return `${days}d ago`;
-  return date.toLocaleDateString();
+  if (days < 30) return tx("{{n}}d ago", { n: days });
+  return xoLocaleDate(date);
 }
 
 function readableErrorMessage(error: unknown): string {
