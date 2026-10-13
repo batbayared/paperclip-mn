@@ -375,7 +375,9 @@ function SeedRulesCard({
         <div className="flex min-w-0 items-start gap-2">
           <Settings2 className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
           <div className="min-w-0 space-y-1">
-            <p className="text-sm font-medium text-foreground">Auto-seeding is {enabled ? "on" : "off"}</p>
+            <p className="text-sm font-medium text-foreground">
+              {enabled ? "Auto-seeding is on" : "Auto-seeding is off"}
+            </p>
             <p className="text-xs text-muted-foreground">
               {enabled
                 ? "This queue fills itself automatically. Decisions are added the moment they match any of its rules:"

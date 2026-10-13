@@ -1,6 +1,7 @@
 import { type ReactNode } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Loader2, Sun } from "lucide-react";
+import { xoLabel } from "@/xo/labels";
 import type { Agent, AttentionItem } from "@paperclipai/shared";
 import { decisionQueuesApi } from "../api/decisionQueues";
 import { useToastActions } from "../context/ToastContext";
@@ -31,7 +32,7 @@ export function Curtain({
   return (
     <section className="space-y-2">
       <IssueGroupHeader
-        label={count == null ? label : `${label} (${count})`}
+        label={count == null ? label : `${xoLabel(label)} (${count})`}
         collapsible
         collapsed={!open}
         onToggle={onToggle}
