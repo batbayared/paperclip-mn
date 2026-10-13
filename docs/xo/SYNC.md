@@ -529,7 +529,7 @@ XO-ийн өмч: ui/src/xo/labels.ts (xoDecisionOptionLabel шинэ; xoSnoozeP
 - *.production.tsx хувилбарууд англиар үлдэнэ; 7.8/7.9-д зөвхөн Streamlined хувилбарыг орчуулна (ED шийдвэр Х2).
 - buildAnsweredQuestionsDeliveryText англиар үлдэнэ: загварт очих текст (ED шийдвэр Х3).
 - DecisionTriageStrip-ээс агент руу чиглүүлэх comment body англиар үлдэнэ: агентад очих текст.
-- Browser шалгалт: хүлээгдэж байна (3110 restart ED-ийн зөвшөөрлөөр).
+- Browser шалгалт (3110, mn, 2026-10-13, ED-ийн зөвшөөрлөөр restart): /YB/decisions дээр «N шийдвэр», шүүлтүүрийн chip (Бүгд / Өнөөдөр / Өчигдөр / Сүүлийн 7 хоног / Энэ сар / Өөрөө сонгох), shelf (Өмнөх / Шийдвэрлэсэн / Хугацаа дууссан), «Дарааллаас хасах: …» Монгол. Дарааллын хуудас (/decisions/queues/questions): «Автомат нэмэлт асаалттай», тайлбар, «Идэвхгүй болгох», «Хасах» Монгол. ModeBadge «Локал итгэмжлэгдсэн». Нууц утгын хуудас Монгол; seed-д нууц утга байхгүй тул төлвийн шошгыг unit тестээр баталсан. Англиар үлдсэн (UI хүрээнээс гадуур): дарааллын гарчиг, тайлбар, дүрмийн бичвэр («Questions», «Structured questions waiting for a board response.», «Pending ask_user_questions interactions.») серверийн автомат seed өгөгдөл; «Questions need answers» server/src/services/attention.ts:667-оос; Secrets.tsx-ийн гар утасны select-д «proposals» option (PageTabBar JSX шошготой үед value-г харуулдаг, 7.6-аас үлдсэн).
 
 ## Lockfile
 

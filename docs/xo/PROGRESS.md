@@ -21,12 +21,12 @@ ED шийдвэр: Х1 7.7 = шийдвэрийн хэсэг ба жижиг ү�
 
 Түлхүүр: 3647 (7.6-ын төгсгөл 3521, 7.7-д +126).
 
-Төлөв: commit хийсэн, push хийгээгүй. Browser шалгалт хүлээгдэж байна (3110 restart ED-ийн зөвшөөрлөөр).
+Төлөв: commit хийсэн, push хийгээгүй. Browser шалгалт хийгдсэн.
 
 ### Шалгалтын үр дүн
 
 - Gates (2026-10-13): xo:i18n:check keys=3647 (+126), xo:i18n:test 81, xo:i18n:typecheck OK, xo:brand-scan 161 файл / 586 (baseline-аас илүүгүй), ui tsc цэвэр, vitest (VITE_XO_DEFAULT_LOCALE=en) 621 файл / 6544 тест passed.
-- Browser шалгалт: хүлээгдэж байна.
+- Browser шалгалт (3110, mn, 2026-10-13, ED-ийн зөвшөөрлөөр restart): /YB/decisions дээр «N шийдвэр», шүүлтүүрийн chip (Бүгд / Өнөөдөр / Өчигдөр / Сүүлийн 7 хоног / Энэ сар / Өөрөө сонгох), shelf (Өмнөх / Шийдвэрлэсэн / Хугацаа дууссан), «Дарааллаас хасах: …» Монгол. Дарааллын хуудас (/decisions/queues/questions): «Автомат нэмэлт асаалттай», тайлбар, «Идэвхгүй болгох», «Хасах» Монгол. ModeBadge «Локал итгэмжлэгдсэн». Нууц утгын хуудас Монгол; seed-д нууц утга байхгүй тул төлвийн шошгыг unit тестээр баталсан. Англиар үлдсэн (UI хүрээнээс гадуур): дарааллын гарчиг, тайлбар, дүрмийн бичвэр («Questions», «Structured questions waiting for a board response.», «Pending ask_user_questions interactions.») серверийн автомат seed өгөгдөл; «Questions need answers» server/src/services/attention.ts:667-оос; Secrets.tsx-ийн гар утасны select-д «proposals» option (PageTabBar JSX шошготой үед value-г харуулдаг, 7.6-аас үлдсэн).
 
 ### Хязгаарлалт
 
