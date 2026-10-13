@@ -21,6 +21,8 @@ import { useToastActions } from "../context/ToastContext";
 import { useStreamlinedUiEnabled } from "../hooks/useStreamlinedUiEnabled";
 import { queryKeys } from "../lib/queryKeys";
 import { copyTextToClipboard } from "../lib/clipboard";
+import { tx } from "@/i18n/xo";
+import { xoRoutineSectionLabel } from "@/xo/labels";
 import { buildMarkdownMentionOptions } from "../lib/company-members";
 import { ToggleSwitch } from "@/components/ui/toggle-switch";
 import { EmptyState } from "../components/EmptyState";
@@ -346,10 +348,24 @@ export function RoutineDetail() {
     async (label: string, value: string) => {
       try {
         await copyTextToClipboard(value);
-        pushToast({ title: `${label} copied`, tone: "success" });
-      } catch (copyError) {
         pushToast({
-          title: `Failed to copy ${label.toLowerCase()}`,
+          title:
+            label === "Webhook URL"
+              ? tx("Webhook URL copied")
+              : label === "Webhook secret"
+                ? tx("Webhook secret copied")
+                : `${label} copied`,
+          tone: "success",
+        });
+      } catch (copyError) {
+        const lowerLabel = label.toLowerCase();
+        pushToast({
+          title:
+            label === "Webhook URL"
+              ? tx("Failed to copy webhook url")
+              : label === "Webhook secret"
+                ? tx("Failed to copy webhook secret")
+                : `Failed to copy ${lowerLabel}`,
           body: copyError instanceof Error ? copyError.message : "Clipboard access was denied.",
           tone: "error",
         });
@@ -894,7 +910,7 @@ export function RoutineDetail() {
             }
           >
             <h2 id="routine-section-title" className="mb-4 text-lg font-semibold">
-              {SECTION_TITLES[section]}
+              {xoRoutineSectionLabel(SECTION_TITLES[section])}
             </h2>
 
             {section === "overview" && (overviewEditing ? <OverviewSection /> : <RoutineOverview />)}

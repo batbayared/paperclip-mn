@@ -21,6 +21,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { xoRoutineDirtyFieldLabel } from "@/xo/labels";
 import type { RoutineHistoryDirtyFieldDescriptor } from "./RoutineHistoryTab";
 
 /**
@@ -104,7 +105,7 @@ export function RoutineSaveBar({
                 {dirtyFields.map((field) => (
                   <li key={field.key} className="flex items-center gap-2">
                     <span className="h-1 w-1 rounded-full bg-amber-500" />
-                    <span className="capitalize">{field.label}</span>
+                    <span className="capitalize">{xoRoutineDirtyFieldLabel(field.label)}</span>
                   </li>
                 ))}
               </ul>
