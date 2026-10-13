@@ -117,12 +117,12 @@ function statusToneClasses(status: RemoteSecretImportCandidate["status"]) {
 function statusBadgeLabel(status: RemoteSecretImportCandidate["status"]) {
   switch (status) {
     case "duplicate":
-      return "Imported";
+      return tx("Imported");
     case "conflict":
-      return "Conflict";
+      return tx("Conflict");
     case "ready":
     default:
-      return "Ready";
+      return tx("Ready");
   }
 }
 
@@ -204,10 +204,10 @@ function formatRelativeShort(value: string | null | undefined): string {
 
 function readableErrorMessage(error: unknown): string {
   if (error instanceof ApiError) {
-    return error.message || `Request failed: ${error.status}`;
+    return error.message || tx("Request failed: {{status}}", { status: error.status });
   }
   if (error instanceof Error) return error.message;
-  return "Unexpected error";
+  return tx("Unexpected error");
 }
 
 function apiErrorCode(error: ApiError): string | null {
@@ -272,34 +272,34 @@ function validateDraftRow(
   existing: CompanySecret[],
   otherDrafts: DraftSelection[],
 ): string | null {
-  if (!draft.name.trim()) return "Name is required.";
-  if (draft.name.length > 160) return "Name must be 160 characters or fewer.";
-  if (!draft.key.trim()) return "Key is required.";
+  if (!draft.name.trim()) return tx("Name is required.");
+  if (draft.name.length > 160) return tx("Name must be 160 characters or fewer.");
+  if (!draft.key.trim()) return tx("Key is required.");
   if (!KEY_PATTERN.test(draft.key)) {
-    return "Key may only contain lowercase letters, numbers, dot, underscore, or hyphen.";
+    return tx("Key may only contain lowercase letters, numbers, dot, underscore, or hyphen.");
   }
-  if (draft.key.length > 120) return "Key must be 120 characters or fewer.";
-  if (draft.description.length > 500) return "Description must be 500 characters or fewer.";
+  if (draft.key.length > 120) return tx("Key must be 120 characters or fewer.");
+  if (draft.description.length > 500) return tx("Description must be 500 characters or fewer.");
 
   const lowerName = draft.name.trim().toLowerCase();
   const lowerKey = draft.key.trim().toLowerCase();
 
   for (const existingSecret of existing) {
     if (existingSecret.name.trim().toLowerCase() === lowerName) {
-      return "A Paperclip secret already uses this name.";
+      return tx("A Paperclip secret already uses this name.");
     }
     if (existingSecret.key.trim().toLowerCase() === lowerKey) {
-      return "A Paperclip secret already uses this key.";
+      return tx("A Paperclip secret already uses this key.");
     }
   }
 
   for (const other of otherDrafts) {
     if (other === draft) continue;
     if (other.name.trim().toLowerCase() === lowerName) {
-      return "Another row in this batch already uses this name.";
+      return tx("Another row in this batch already uses this name.");
     }
     if (other.key.trim().toLowerCase() === lowerKey) {
-      return "Another row in this batch already uses this key.";
+      return tx("Another row in this batch already uses this key.");
     }
   }
 
@@ -616,7 +616,9 @@ export function ImportFromVaultDialog({
     if (importMutation.isPending) return;
     if (!force && step !== "result" && selection.size > 0 && !importResult) {
       const ok = window.confirm(
-        `Discard ${selection.size} pending import${selection.size === 1 ? "" : "s"}?`,
+        selection.size === 1
+          ? tx("Discard {{n}} pending import?", { n: selection.size })
+          : tx("Discard {{n}} pending imports?", { n: selection.size }),
       );
       if (!ok) return;
     }
@@ -1348,10 +1350,10 @@ function ResultStep({ result, draftList }: ResultStepProps) {
 
   const heading =
     result.errorCount === result.results.length && result.errorCount > 0
-      ? "Import failed"
+      ? tx("Import failed")
       : result.errorCount === 0 && result.skippedCount === 0
-        ? `All ${result.importedCount} secrets imported`
-        : "Import complete";
+        ? tx("All {{importedCount}} secrets imported", { importedCount: result.importedCount })
+        : tx("Import complete");
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
