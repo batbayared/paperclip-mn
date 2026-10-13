@@ -1,5 +1,47 @@
 # XO ахицын бүртгэл
 
+## Ү6 7.9 — Skills (2026-10-14)
+
+Зорилго: чадварын (skill) Streamlined UI-г монгол болгох: /YB/skills (CompanySkills.tsx: Суулгасан / Олох / Бүтээх табууд, шүүлтүүр, эрэмбэ, суулгах ба импортын урсгал), хавтасны мод (SkillFolderTree.tsx, reservedRootLabel), хажуу самбар, Чадварын студи (SkillStudio.tsx, lib/skill-studio.ts), төслөөс импортлох цонх, агентын чадварын таб ба гаргалт сонгогч, skill-studio цонхнууд (Салаалах, чадвар ашигладаг агентууд, гарал үүсэл), lib/skill-policy-denial.ts-ийн клиент текст. en гаралт 9282a6b0c-тэй байт ижил (брэндийн үл хамаарах зүйлийг доор бичсэн).
+
+Төлөвлөгөө: docs/superpowers/plans/2026-10-14-xo-y6-7-9-skills.md. BASE 9282a6b0c.
+
+ED шийдвэр: Х1 нэг давалгаа. Х2 зөвхөн Streamlined хувилбар, CompanySkills.production.tsx англиар. Х3 lib/skill-policy-denial.ts-ийн клиент текстийг орчуулна, серверийн error.message англиар. Х4 Skill Studio «Чадварын студи», Fork «Салаалах» (forked «салаалсан»), release «гаргалт» («Бета гаргалт»), табууд «Суулгасан / Олох / Бүтээх».
+
+Батлагдсан нэр томьёо: Star «Од» (Starred «Одтой», tooltip «…одоор тэмдэглэх»), Move «шилжүүлэх», Forked from «Салаалсан эх:», Optional «Заавал биш», Trust «Итгэмжлэл», core «үндсэн», actor «гүйцэтгэгч», managed-skill directory «удирддаг чадварын хавтас», Most forks «Хамгийн олон салаатай». Import-ын бичлэгийг mn каталог даяар «импортлосон / Импортлож» болгож нэгтгэв (19 + 2 утга). Ганц breadcrumb «Студи» ба «Студийн цэс» хэвээр.
+
+| Task | Commit |
+|---|---|
+| 1 labels.ts: xoSkillSourceFilterLabel, xoSkillDiscoverySortLabel, xoSkillReservedRootLabel, xoSkillPolicyDenialTitle, xoSkillPolicyDenialRemediation | 2fee577a7 |
+| 2 CompanySkills.tsx (шүүлтүүр, эрэмбэ, toast, managed шошго, суулгах/импортын урсгал) | 601852d9c |
+| 3 SkillStudio.tsx (confirm, toast, загвар, «Restore as v…»), lib/skill-studio.ts (reason текст) | 3b279aa2c |
+| 4 ImportSkillsFromProjectDialog.tsx (XoTrans, импортын toast ганц/олон) | 20e1bd709 |
+| 5 SkillFolderTree.tsx, skill-folder-tree.ts (reservedRootLabel, «New organization folder», «Move to …») | 88d8830bd |
+| 6 AgentSkillsTab.tsx, AgentSkillRow.tsx, AgentSkillReleasePicker.tsx, agent-skill-source.ts, lib/skill-policy-denial.ts | 29be6d5bc |
+| 7 AgentsUsingSkillDialog.tsx, ForkSkillDialog.tsx, SkillProvenance.tsx, lib/skill-fork.ts | a8f63a19f |
+| 8 tiers.ts (12 файл T1), каталог (+662 түлхүүр), y6-7-9-keys тест, tiers-y6-7-9 тест, labels тест | 53206d6bf |
+| 9 SYNC.md ба бүртгэл | энэ commit |
+
+Түлхүүр: 4706 (7.8-ын төгсгөл 4044, 7.9-д +662).
+
+Төлөв: Task 1–8 commit хийсэн, push хийгээгүй. Task 9: SYNC.md, PROGRESS.md, browser шалгалт хийгдсэн; шалгалтаар олдсон «Unfiled» засвар энэ commit-д.
+
+### Шалгалтын үр дүн
+
+- Gates (2026-10-14): xo:i18n:check OK keys=4706 (+662), xo:i18n:test 109/109 (9 файл), xo:i18n:typecheck цэвэр, xo:brand-scan 161 файл / 577 (baseline 585/161-ээс доош), ui tsc цэвэр, vitest (VITE_XO_DEFAULT_LOCALE=en) ui/src 623 файл / 6561 тест passed, vitest ui/src/i18n/xo ui/src/xo 200/200.
+- keep-en.json +9: «· v{{revisionNumber}}», «git», «GitHub», «SKILL.md», «Slug», «v{{packageVersion}}», «v{{revision}}», «v{{revisionNumber}}», «v{{version}}».
+- Browser шалгалт (2026-10-14, 3110, ED-ийн зөвшөөрлөөр нэг удаа асаасан, HMR): mn: /YB/skills (Суулгасан чадварууд, эрэмбэ «Хамгийн олон агенттай», «Шинэ хавтас», «8 чадвар», «Зохиогч:», «Ямар ч агентад идэвхжүүлээгүй»), Олох таб («Эх үүсвэр / Бүгд», «Суулгах боломжтой», «Заавал биш»), чадварын дэлгэрэнгүй («Чадварын студид нээх», «суулгалт / Од / Салаалах», Тойм / Файлууд / Хувилбарууд / Агентууд / Тухай, «Ангилаагүй», «Замыг хуулах / Шилжүүлэх»), салаалах хуудас («Чадвар салаалах», «Салаалж буй чадвар: …», «Салаа үүсгэх»), студи (сонгогч «Чадвар сонгох / САЯХАН ШИНЭЧИЛСЭН», засварлагч «Хувилбарын түүх», «Оролт болгон хадгалах», «ТУРШИЛТЫН АЖИЛЛАГААНУУД»), агентын чадварын таб («8-аас 0 идэвхтэй», «Зөвхөн хянагдана», «Сангаас авах боломжтой») Монголоор гарсан. en: дэлгэрэнгүй хуудас англиар хэвээр. Шалгалтын явцад олдож засагдсан: CompanySkills.tsx-ийн байршлын карт ба хавтасны тэмдэг «Unfiled» (ternary доторх мөр, T1 барьдаггүй) → tx("Unfiled"). Англиар үлдсэн (үлдэгдэл): серверийн sourceLabel «Paperclip bundled / Paperclip workspace», хувилбарын label «Initial version», туршилтын загварын нэр «Default test template» (серверийн өгөгдөл); FrontmatterPanel.tsx («Frontmatter», «Fields», «N issues», нийтлэг компонент, хүрээнээс гадуур); студийн хавтасны гарчиг «root» (SkillPaneTitle folder="root"); анхдагч салааны нэр «… Fork» (серверт хадгалагдах өгөгдөл). Release picker-ийг Process адаптер удирддаггүй тул browser-т харуулж чадаагүй; unit тестээр баталгаажсан.
+
+### Хязгаарлалт
+
+- CompanySkills.production.tsx англиар (Х2).
+- Серверийн error.message англиар (Х3); skill-policy-denial-д серверээс ирсэн remediation-ийг орчуулахгүй, зөвхөн клиентийн анхдагч текст ба PLATFORM_TITLES / PLATFORM_REMEDIATIONS (кодоор) орчуулагдана.
+- Хадгалагдах ба серверт очих өгөгдөл англиар: skill-create.ts-ийн анхдагч skill агуулга (агентад очдог), хувилбарын label «Restore of vN» (SkillStudio, const restoreLabel болгож салгасан), хуулбарын анхдагч нэр «{name} copy».
+- «Slug» ба «Agent Skills markdown» латинаар үлдсэн.
+- Суулгалт ба хувилбарын тооны _one / _other mn утга ижил (зөвшөөрөгдөх).
+- en гаралтад брэнд солигдсон (T1 брэнд дүрэм, «Paperclip» → «{{brand}}», en «XO»): AgentSkillsTab-ийн adapter / ACP / OpenClaw мессеж, Runner тэмдэглэл, materialization тэмдэглэл; «Paperclip managed» → «XO managed» (agent-skill-source.ts, CompanySkills.tsx); CompanySkills-ийн «…in the Paperclip workspace.» → «XO workspace». en байт ижил байх зарчмаас ухамсартай гажсан.
+- Эх код өөрчлөгдөөгүй: SkillsContextualSidebar.tsx ба SkillPolicySurfaces.tsx (зөвхөн tiers.ts-ээр T1), skills-navigation.ts, agent-skill-filter.ts, skill-create.ts.
+
 ## Ү6 7.8 — Routines (2026-10-14)
 
 Зорилго: тогтмол ажлын (routine) Streamlined UI-г монгол болгох: жагсаалт (/YB/routines), дэлгэрэнгүй (/YB/routines/:id: overview, triggers, schedule, variables, secrets, delivery, runs, activity, history), хуваарь засварлагч, хувьсагч, хадгалах самбар, хувилбарын түүх, cron тайлбар (lib/cron-readable.ts), галлагааны урьдчилсан харагдац (lib/cron-fires.ts). en гаралт 83326f71b-тэй байт ижил (нэг үл хамаарах зүйлийг доор бичсэн).
@@ -41,7 +83,7 @@ ED шийдвэр: Х1 зөвхөн Streamlined хувилбар, *.production.t
 - Техникийн утгууд «plain (set)», «secret_ref → …», «latest», «replay Ns» англиар.
 - relativeTime() mn-д англиар гарвал «Saved … by …» өгүүлбэрт хоёр хэл холилдоно.
 - RoutineVariablesEditor-ийн тусламжийн цонхонд en гаралт «Paperclip detects» → «XO detects» болсон (T1 брэнд дүрэм): en байт ижил байх зарчмаас цорын ганц гажилт.
-- Skills хуудас, SkillFolderTree.tsx, reservedRootLabel → Ү6 7.9.
+- Skills хуудас, SkillFolderTree.tsx, reservedRootLabel — хэрэгжсэн (Ү6 7.9).
 
 ## Ү6 7.7 — Шийдвэрийн хэсэг ба жижиг үлдэгдэл (2026-10-13)
 
@@ -77,7 +119,7 @@ ED шийдвэр: Х1 7.7 = шийдвэрийн хэсэг ба жижиг ү�
 - DecisionTriageStrip-ээс агент руу чиглүүлэх comment body англиар (агентад очих текст).
 - buildAnsweredQuestionsDeliveryText англиар (Х3).
 - DecisionQueueRail.tsx зөвхөн tiers.ts-ээр T1-д орсон, эх код өөрчлөгдөөгүй.
-- Англиар үлдсэн (хүрээнээс гадуур): Routines (7.8), Skills, SkillFolderTree.tsx, reservedRootLabel (7.9), *.production.tsx хувилбарууд (Х2).
+- Англиар үлдсэн (хүрээнээс гадуур): Routines (7.8); Skills, SkillFolderTree.tsx, reservedRootLabel (7.9) — хэрэгжсэн (Ү6 7.9); *.production.tsx хувилбарууд (Х2).
 
 ## Ү6 7.6 — нууц утгын дэд хуудас, хавтас, инстанцын тохиргоо (2026-10-13)
 

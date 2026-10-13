@@ -493,12 +493,12 @@ XO-ийн өмч: ui/src/xo/labels.ts (xoAttentionSourceLabel, xoSnoozePresetLab
 Нэр томьёо (7.6-аас нэгдсэн): proposal = санал, secret = нууц утга, folder = хавтас, unfiled = ангилаагүй, runtime config = ажиллах орчны тохиргоо. 7.5-ын Minor («удирдлага» / «засаглалын бодлого» зөрүү, «runtime тохиргоо») 372a9edb7-д каталогт засагдсан.
 
 Үлдэгдэл (Ү6 7.6):
-- Англиар үлдсэн (хүрээнээс гадуур): SkillFolderTree.tsx ба reservedRootLabel (7.9-д); ModeBadge.tsx («Local trusted» / «Authenticated …») — хэрэгжсэн (Ү6 7.7); MyUserSecretsTab ба UserSecretDefinitionsTab дахь {definition.status} enum — хэрэгжсэн (Ү6 7.7, xoStatusLabel).
+- Англиар үлдсэн (хүрээнээс гадуур): SkillFolderTree.tsx ба reservedRootLabel (7.9-д) — хэрэгжсэн (Ү6 7.9); ModeBadge.tsx («Local trusted» / «Authenticated …») — хэрэгжсэн (Ү6 7.7); MyUserSecretsTab ба UserSecretDefinitionsTab дахь {definition.status} enum — хэрэгжсэн (Ү6 7.7, xoStatusLabel).
 - Ү6 7.7-д шилжүүлсэн: issue-thread-interactions summary, interaction-resolution-error — хэрэгжсэн (Ү6 7.7).
 - «by» одоо ерөнхий каталогийн түлхүүр («санал гаргасан:»); өөр газар дахин ашиглавал утга буруу гарна.
 - en түлхүүр «Could not approved / rejected / sent for revision» upstream-ийн дүрмийн алдааг хадгална; en гаралт байт ижил байхын тулд засаагүй.
 - AttentionQueueRow.tsx-ийн SNOOZE_PRESETS (L76-81) модулийн түвшинд tx() дууддаг. i18n синхрон эхэлдэг, locale солиход хуудас дахин ачаалагддаг тул хүлээн зөвшөөрсөн.
-- Browser шалгалт (3110, mn, 2026-10-13): нууц утгын 4 таб (Нууц утгууд / Миний нууц утгууд / Нийлүүлэгчийн сангууд / Саналууд), «Хавтсаар / Жагсаалтаар» товч, хоосон төлөвүүд Монгол. Инстанцын тохиргоо (байгууллагын тохиргоонд embedded) Монгол; «Paperclip Labs» нэр, dev тэмдэглэл, «Local trusted» (ModeBadge) шийдвэрийн дагуу англиар. /decisions дээр AttentionQueueRow-ийн эх сурвалжийн шошго («Шийдвэр хүссэн») ба snooze сонголт (Өнөөдөр / Энэ долоо хоногт / Хэзээ ч болно) Монгол. Хүрээнээс гадуур англиар үлдсэн (7.7-д): WhatNeedsMe шүүлтүүр («N decisions», All/Today/Yesterday…), DecisionTriageStrip («Pick date», «Snooze», «Queue», «Ask agent for recommendation»), lib/attention.ts («N questions — …») — хэрэгжсэн (Ү6 7.7); Routines.tsx ба Skills хуудас («New folder» нь Routines.tsx:961-ээс) — 7.8 / 7.9-д. FolderControls-ын хавтасны rail ба compact interaction card-ыг өгөгдөлгүйгээс browser-т харуулж чадаагүй; unit тестээр баталгаажсан.
+- Browser шалгалт (3110, mn, 2026-10-13): нууц утгын 4 таб (Нууц утгууд / Миний нууц утгууд / Нийлүүлэгчийн сангууд / Саналууд), «Хавтсаар / Жагсаалтаар» товч, хоосон төлөвүүд Монгол. Инстанцын тохиргоо (байгууллагын тохиргоонд embedded) Монгол; «Paperclip Labs» нэр, dev тэмдэглэл, «Local trusted» (ModeBadge) шийдвэрийн дагуу англиар. /decisions дээр AttentionQueueRow-ийн эх сурвалжийн шошго («Шийдвэр хүссэн») ба snooze сонголт (Өнөөдөр / Энэ долоо хоногт / Хэзээ ч болно) Монгол. Хүрээнээс гадуур англиар үлдсэн (7.7-д): WhatNeedsMe шүүлтүүр («N decisions», All/Today/Yesterday…), DecisionTriageStrip («Pick date», «Snooze», «Queue», «Ask agent for recommendation»), lib/attention.ts («N questions — …») — хэрэгжсэн (Ү6 7.7); Routines.tsx ба Skills хуудас («New folder» нь Routines.tsx:961-ээс) — 7.8 / 7.9-д; Skills хуудас — хэрэгжсэн (Ү6 7.9). FolderControls-ын хавтасны rail ба compact interaction card-ыг өгөгдөлгүйгээс browser-т харуулж чадаагүй; unit тестээр баталгаажсан.
 
 ## Ү6 7.7-д хөндсөн upstream файлууд
 
@@ -525,7 +525,7 @@ XO-ийн өмч: ui/src/xo/labels.ts (xoDecisionOptionLabel шинэ; xoSnoozeP
 
 Үлдэгдэл (Ү6 7.7):
 - Routines.tsx (Routines хуудас, «New folder» Routines.tsx:961) — хэрэгжсэн (Ү6 7.8, Streamlined).
-- Skills хуудас, SkillFolderTree.tsx, reservedRootLabel → Ү6 7.9.
+- Skills хуудас, SkillFolderTree.tsx, reservedRootLabel — хэрэгжсэн (Ү6 7.9).
 - *.production.tsx хувилбарууд англиар үлдэнэ; 7.8/7.9-д зөвхөн Streamlined хувилбарыг орчуулна (ED шийдвэр Х2).
 - buildAnsweredQuestionsDeliveryText англиар үлдэнэ: загварт очих текст (ED шийдвэр Х3).
 - DecisionTriageStrip-ээс агент руу чиглүүлэх comment body англиар үлдэнэ: агентад очих текст.
@@ -566,7 +566,7 @@ XO-ийн өмч: ui/src/xo/labels.ts (xoRoutineSectionLabel, xoTriggerKindLabel
 - Routine prompt, агентад очих текст англиар үлдэнэ (ED шийдвэр Х2).
 - lib/cron-fires.ts-ийн throw new Error мессеж англиар: catch {}-д залгигдаж UI-д харагддаггүй.
 - Серверээс ирэх мессеж (toast-ийн error.message) англиар үлдэнэ (ED шийдвэр Х3).
-- Skills хуудас, SkillFolderTree.tsx, reservedRootLabel → Ү6 7.9.
+- Skills хуудас, SkillFolderTree.tsx, reservedRootLabel — хэрэгжсэн (Ү6 7.9).
 - Routine run.source / run.status badge ба шүүлтүүрийн «any» англиар; xoStatusLabel-д routine-ийн төлөв байхгүй.
 - Routines.tsx-ийн breadcrumb «Recent Runs» (createIssueDetailLocationState-ийн аргумент) англиар.
 - InlineEntitySelector-ийн searchPlaceholder / emptyMessage бусад газарт (CommentThread, IssueProperties, RepositoryEditor, ConnectionSetupFlow) англиар.
@@ -574,6 +574,45 @@ XO-ийн өмч: ui/src/xo/labels.ts (xoRoutineSectionLabel, xoTriggerKindLabel
 - relativeTime() mn-д англиар гарвал «Saved … by …» өгүүлбэрт хоёр хэл холилдоно.
 - RoutineVariablesEditor-ийн тусламжийн цонхонд en гаралт «Paperclip detects» → «XO detects» болсон (T1 брэнд дүрэм); en байт ижил байх зарчмаас ухамсартай гажсан.
 - Browser шалгалт (2026-10-14, 3110, restart хийгээгүй, HMR): туршилтын «Туршилт 7.8» routine үүсгэж, хуваарийн идэвхжүүлэгч нэмэв. mn: жагсаалт, үүсгэх цонх («Агент: / төсөл: / хавтас:»), triggers (cron тайлбар «Өдөр бүр 10:00 цагт», цаг 00–23), overview, variables («{{placeholder}}» хаалт зөв), delivery (бодлого, «Дараагийн 5 идэвхжилт», «нэгтгэгдэнэ / дараалалд орно»), history («хув. N», талбарын шошго) Монголоор гарсан. en: triggers (12 цаг AM/PM), delivery англи хэвээр. Англиар үлдсэн (үлдэгдэл): толгойн «Draft» төлөвийн тэмдэг; RoutineOverview L178 «No runs yet» (JSX attribute доторх ternary, T1 барьдаггүй); secrets хэсгийн орчны хувьсагчийн засварлагч («No environment variables», «Add variable»); history-ийн enum утгууд (medium, paused, coalesce if active, skip missed, SCHEDULE); серверийн өгөгдөл: идэвхжүүлэгчийн анхдагч label «schedule», changeSummary, activity event нэрс.
+
+## Ү6 7.9-д хөндсөн upstream файлууд
+
+7.8-ын «Үлдэгдэл»-ийн Skills хэсгийг (Streamlined хувилбар) хаасан: /YB/skills (Суулгасан / Олох / Бүтээх табууд, шүүлтүүр, эрэмбэ, суулгах ба импортын урсгал), хавтасны мод ба reservedRootLabel, хажуу самбар, Чадварын студи, төслөөс импортлох цонх, агентын чадварын таб ба гаргалт сонгогч, skill-studio цонхнууд, lib/skill-policy-denial.ts-ийн клиент текст. tiers.ts-д 12 файл T1 болж нэмэгдсэн. Тэмдэглэгээ 7.5-ын хүснэгттэй ижил. BASE 9282a6b0c. ED шийдвэр: Х1 нэг давалгаа; Х2 зөвхөн Streamlined хувилбар (CompanySkills.production.tsx англиар); Х3 skill-policy-denial-ийн клиент текстийг орчуулна, серверийн error.message англиар. Нэр томьёо: Skill Studio «Чадварын студи», Fork «Салаалах» (forked «салаалсан», Forked from «Салаалсан эх:»), release «гаргалт» («Бета гаргалт»), табууд «Суулгасан / Олох / Бүтээх», Star «Од» («Одтой», «…одоор тэмдэглэх»), Move «шилжүүлэх», Optional «Заавал биш», Trust «Итгэмжлэл», core «үндсэн», actor «гүйцэтгэгч», managed-skill directory «удирддаг чадварын хавтас», Most forks «Хамгийн олон салаатай». Import-ын бичлэгийг mn каталог даяар «импортлосон / Импортлож» болгож нэгтгэв (19 + 2 утга); ганц breadcrumb «Студи» ба «Студийн цэс» хэвээр.
+
+| Файл | Өөрчлөлт |
+|---|---|
+| ui/src/pages/CompanySkills.tsx | T1; эх сурвалжийн шүүлтүүр xoSkillSourceFilterLabel, олох эрэмбэ xoSkillDiscoverySortLabel; суулгах / импорт / устгах / шинэчлэх алдааны toast гар tx; хавтас руу зөөх toast «Moved "{{title}}" to {{folder}}.», нэргүй хавтас ба «Unfiled»-д тусдаа литерал; агентын тоо ба workspace-ийн тоо ганц / олон тооны тусдаа литерал; давхардсан түлхүүрийн анхааруулга XoTrans (<code>); managed шошго (GitHub / URL / Folder / Catalog / skills.sh / {{brand}} managed); «Paperclip workspace» → «{{brand}} workspace» (en «XO» болсон) |
+| ui/src/pages/SkillStudio.tsx | T1; window.confirm (файл солих, файл устгах «Delete {{path}}?», оролт хаях, загвар устгах) гар tx; toast «Couldn't …»; «Placeholders: <list/>.» XoTrans; «Restore as v{{revisionNumber}}»; хувилбарын label «Restore of vN» const restoreLabel болгож салгасан, англиар (хадгалагдах өгөгдөл) |
+| ui/src/lib/skill-studio.ts | гар tx (T1 биш): туршилтын товчны reason («Pick an agent to run», «A run is already in progress» гэх мэт), Test task expired / deleted / unavailable, «Unknown editor» |
+| ui/src/pages/skills/ImportSkillsFromProjectDialog.tsx | T1; эх сурвалжийн төрөл (git / local / folder / remote), «Request failed: {{status}}», импортын toast «{{n}} skill(s) imported as references from {{project}}.» ганц / олон тусдаа литерал; SKILL.md хайлтын тайлбар, «Import from path or URL» товч, «No files were copied.» XoTrans |
+| ui/src/components/folders/SkillFolderTree.tsx | T1; RailHeading-д createTitle prop («New organization folder» литерал, `New ${label.toLowerCase()} folder`-ийн оронд); root шошго xoSkillReservedRootLabel; «Move to Organization» / «Move to My Skills» тусдаа литерал; «Unfiled» |
+| ui/src/components/folders/skill-folder-tree.ts | гар tx (T1 биш): reservedRootLabel ба breadcrumb шошго xoSkillReservedRootLabel-ээр, key-д англиар |
+| ui/src/components/SkillsContextualSidebar.tsx | T1 (эх код өөрчлөгдөөгүй, зөвхөн tiers.ts-д) |
+| ui/src/pages/agent-skills/AgentSkillsTab.tsx | T1; materialization тэмдэглэл, adapter / ACP / OpenClaw / Runner мессеж «Paperclip» → «{{brand}}» (en «XO» болсон); «Beta · {{release}}»; «<b>{{key}}</b> is enabled but missing…» XoTrans; Kept in workspace / Applied on next run / Tracked only |
+| ui/src/pages/agent-skills/AgentSkillRow.tsx | T1; aria-label «Enable / Disable {{name}}» тусдаа литерал |
+| ui/src/pages/agent-skills/AgentSkillReleasePicker.tsx | T1; модулийн DEFAULT_LABEL-ийг render доторх tx болгосон; «{{name}} · released {{date}}», «Release» fallback |
+| ui/src/pages/agent-skills/agent-skill-source.ts | гар tx (T1 биш): «Local folder», «Catalog», «Paperclip managed» → «{{brand}} managed» (en «XO managed») |
+| ui/src/lib/skill-policy-denial.ts | гар tx (T1 биш): DEFAULT_*_REMEDIATION тогтмолыг хассан, функц доторх литерал; «{{action}} is restricted by your organization policy.»; PLATFORM_TITLES / PLATFORM_REMEDIATIONS Record англиар үлдэж, буцаах цэгт xoSkillPolicyDenialTitle / xoSkillPolicyDenialRemediation (кодоор); серверийн remediation ба error.message хөндөгдөөгүй |
+| ui/src/components/skill-studio/AgentsUsingSkillDialog.tsx | T1; «{{n}} agent(s) use(s) this skill» ганц / олон тусдаа литерал; «Latest (v{{revision}})», «v{{revision}}»; InlineEntitySelector loadingMessage / searchPlaceholder / emptyMessage гар tx |
+| ui/src/components/skill-studio/ForkSkillDialog.tsx | T1; «Create copy & switch {{n}} agent(s)» ганц / олон тусдаа литерал, «Create copy» |
+| ui/src/components/skill-studio/SkillPolicySurfaces.tsx | T1 (эх код өөрчлөгдөөгүй, зөвхөн tiers.ts-д) |
+| ui/src/components/skill-studio/SkillProvenance.tsx | T1; «This skill lives in <path>{{location}}</path>…» XoTrans; «the original skill», «the project working tree» fallback |
+| ui/src/lib/skill-fork.ts | гар tx (T1 биш): эх сурвалжийн тайлбар (a URL / the catalog / a local path / its source); агентын тоо «No agents …», «{{n}} agent(s) currently use(s) this skill» ганц / олон тусдаа литерал |
+
+Хөндөгдөөгүй: ui/src/pages/skills/skills-navigation.ts, ui/src/pages/agent-skills/agent-skill-filter.ts, ui/src/lib/skill-create.ts (анхдагч skill агуулга агентад очдог тул англиар), ui/src/pages/CompanySkills.production.tsx (Х2).
+
+XO-ийн өмч: ui/src/xo/labels.ts (xoSkillSourceFilterLabel, xoSkillDiscoverySortLabel, xoSkillReservedRootLabel, xoSkillPolicyDenialTitle, xoSkillPolicyDenialRemediation шинэ), scripts/xo-i18n/tiers.ts (12 файл T1), ui/src/i18n/xo/* (keys=4706, +662; keep-en.json +9: «· v{{revisionNumber}}», «git», «GitHub», «SKILL.md», «Slug», «v{{packageVersion}}», «v{{revision}}», «v{{revisionNumber}}», «v{{version}}»).
+
+Шинэ XO-ийн тестүүд: ui/src/i18n/xo/y6-7-9-keys.test.ts (242 гар түлхүүр ба каталог даяарх шалгалт), scripts/xo-i18n/tiers-y6-7-9.test.ts (12), ui/src/xo/labels.test.ts (5 helper-ийн mn describe).
+
+Үлдэгдэл (Ү6 7.9):
+- CompanySkills.production.tsx англиар үлдэнэ (ED шийдвэр Х2).
+- Серверээс ирэх мессеж (toast-ийн error.message, skill-policy-denial-ийн серверийн remediation) англиар үлдэнэ (ED шийдвэр Х3).
+- Хадгалагдах ба агентад очих өгөгдөл англиар: skill-create.ts-ийн анхдагч skill агуулга, хувилбарын label «Restore of vN» (SkillStudio restoreLabel), хуулбарын анхдагч нэр «{name} copy».
+- «Slug» ба «Agent Skills markdown» латинаар үлдсэн.
+- Суулгалт ба хувилбарын тооны _one / _other mn утга ижил (зөвшөөрөгдөх).
+- en гаралтад брэнд солигдсон (T1 брэнд дүрэм): AgentSkillsTab-ийн мессежүүд, «Paperclip managed» → «XO managed» (agent-skill-source.ts, CompanySkills.tsx), «Paperclip workspace» → «XO workspace»; en байт ижил байх зарчмаас ухамсартай гажсан.
+- Browser шалгалт (2026-10-14, 3110, ED-ийн зөвшөөрлөөр нэг удаа асаасан, HMR): mn: /YB/skills (Суулгасан чадварууд, эрэмбэ «Хамгийн олон агенттай», «Шинэ хавтас», «8 чадвар», «Зохиогч:», «Ямар ч агентад идэвхжүүлээгүй»), Олох таб («Эх үүсвэр / Бүгд», «Суулгах боломжтой», «Заавал биш»), чадварын дэлгэрэнгүй («Чадварын студид нээх», «суулгалт / Од / Салаалах», Тойм / Файлууд / Хувилбарууд / Агентууд / Тухай, «Ангилаагүй», «Замыг хуулах / Шилжүүлэх»), салаалах хуудас («Чадвар салаалах», «Салаалж буй чадвар: …», «Салаа үүсгэх»), студи (сонгогч «Чадвар сонгох / САЯХАН ШИНЭЧИЛСЭН», засварлагч «Хувилбарын түүх», «Оролт болгон хадгалах», «ТУРШИЛТЫН АЖИЛЛАГААНУУД»), агентын чадварын таб («8-аас 0 идэвхтэй», «Зөвхөн хянагдана», «Сангаас авах боломжтой») Монголоор гарсан. en: дэлгэрэнгүй хуудас англиар хэвээр. Шалгалтын явцад олдож засагдсан: CompanySkills.tsx-ийн байршлын карт ба хавтасны тэмдэг «Unfiled» (ternary доторх мөр, T1 барьдаггүй) → tx("Unfiled"). Англиар үлдсэн (үлдэгдэл): серверийн sourceLabel «Paperclip bundled / Paperclip workspace», хувилбарын label «Initial version», туршилтын загварын нэр «Default test template» (серверийн өгөгдөл); FrontmatterPanel.tsx («Frontmatter», «Fields», «N issues», нийтлэг компонент, хүрээнээс гадуур); студийн хавтасны гарчиг «root» (SkillPaneTitle folder="root"); анхдагч салааны нэр «… Fork» (серверт хадгалагдах өгөгдөл). Release picker-ийг Process адаптер удирддаггүй тул browser-т харуулж чадаагүй; unit тестээр баталгаажсан.
 
 ## Lockfile
 
