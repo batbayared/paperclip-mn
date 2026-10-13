@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ToggleSwitch } from "@/components/ui/toggle-switch";
 import { xoLocaleDateTime } from "@/xo/date-format";
+import { tx } from "@/i18n/xo";
 
 export type RoutineListProjectSummary = {
   name: string;
@@ -36,7 +37,7 @@ export type RoutineListRowItem = {
 };
 
 export function formatLastRunTimestamp(value: Date | string | null | undefined) {
-  if (!value) return "Never";
+  if (!value) return tx("Never");
   return xoLocaleDateTime(new Date(value));
 }
 

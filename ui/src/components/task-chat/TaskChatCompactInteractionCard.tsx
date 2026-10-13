@@ -66,6 +66,7 @@ import {
 import { TaskChatPlanPreviewCard } from "./TaskChatPlanPreviewCard";
 import { TaskChatRichInput } from "./TaskChatRichInput";
 import { tx } from "@/i18n/xo";
+import { xoLocaleDateTime } from "@/xo/date-format";
 
 const TAKEOVER_TEXTAREA_CLASS =
   "min-h-16 resize-y border-0 bg-muted/35 text-sm shadow-none focus-visible:ring-0 focus-visible:ring-offset-0";
@@ -532,9 +533,7 @@ function ReceiptDisclosure({
             </p>
             <p className="mt-1">
               Expires{" "}
-              {new Date(
-                interaction.payload.toolAction.expiresAt,
-              ).toLocaleString()}
+              {xoLocaleDateTime(new Date(interaction.payload.toolAction.expiresAt))}
             </p>
             <div className="mt-2">
               <MarkdownBody externalReferences={externalReferences}>
@@ -569,9 +568,7 @@ function ReceiptDisclosure({
             <div>
               <dt className="text-xs text-muted-foreground">Expires</dt>
               <dd>
-                {new Date(
-                  interaction.payload.secretProposal.expiresAt,
-                ).toLocaleString()}
+                {xoLocaleDateTime(new Date(interaction.payload.secretProposal.expiresAt))}
               </dd>
             </div>
           </dl>
@@ -893,9 +890,7 @@ function ConfirmationCard({
             </span>
             <span className="ml-auto text-xs text-muted-foreground">
               Expires{" "}
-              {new Date(
-                interaction.payload.toolAction.expiresAt,
-              ).toLocaleString()}
+              {xoLocaleDateTime(new Date(interaction.payload.toolAction.expiresAt))}
             </span>
           </div>
           <MarkdownBody externalReferences={externalReferences}>
@@ -934,9 +929,7 @@ function ConfirmationCard({
           <div>
             <dt className="text-xs text-muted-foreground">Expires</dt>
             <dd>
-              {new Date(
-                interaction.payload.secretProposal.expiresAt,
-              ).toLocaleString()}
+              {xoLocaleDateTime(new Date(interaction.payload.secretProposal.expiresAt))}
             </dd>
           </div>
         </dl>

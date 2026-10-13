@@ -2,7 +2,7 @@
 
 ## Ү6 7.3 — хэрэглэгчид харагдах үлдэгдэл (2026-10-13)
 
-Зорилго: Ү6 7.2-ын дараа mn дээр англиар үлдсэн зүйлийг монгол болгох. toLocale* огнооны дуудлагыг ICU-гүй xoLocale* wrapper руу шилжүүлсэн (49 файл), огнооны хажуугийн шошгыг tx-ээр орчуулсан, browser шалгалтаар илэрсэн 6 зүйл (огнооны хуваагч, desk shelf, group-by, Helpful/Needs work, Questions/None, clipboard угтвар), RunTranscriptView-ийг T1 болгосон, 7.2-ын Minor #6/#7/#8-ийг хаасан.
+Зорилго: Ү6 7.2-ын дараа mn дээр англиар үлдсэн зүйлийг монгол болгох. toLocale* огнооны дуудлагыг ICU-гүй xoLocale* wrapper руу шилжүүлсэн (48 файл), огнооны хажуугийн шошгыг tx-ээр орчуулсан, browser шалгалтаар илэрсэн 6 зүйл (огнооны хуваагч, desk shelf, group-by, Helpful/Needs work, Questions/None, clipboard угтвар), RunTranscriptView-ийг T1 болгосон, 7.2-ын Minor #6/#7/#8-ийг хаасан.
 
 Төлөвлөгөө: docs/superpowers/plans/2026-10-13-xo-y6-7-3-user-visible-leftovers.md. BASE 53135060b.
 
@@ -15,6 +15,10 @@
 | 5 RunTranscriptView T1, routine run subtitle, Markdown (44 түлхүүр) | daf3f5504 |
 | 6 7.2 Minor #6 pending төлөв, #7 mn.json хоёр утга, #8 relativeTime тест | 4d5624628 |
 | 7 SYNC.md ба бүртгэл | энэ commit |
+
+### Эцсийн review-ийн засвар
+
+Эцсийн review-ийн засвар (энэ commit): TaskChatCompactInteractionCard-ийн 4 «Expires» огноо xoLocaleDateTime, ProviderTraceStatusBadge/RunnerInspector/RoutineList-ийн үлдсэн 4 шошго (+4 түлхүүр), SYNC/PROGRESS-ийн залруулга. Gates: xo:i18n:check keys=2536; xo:i18n:test 57; brand-scan 161 файл/586 hit; tsc цэвэр; vitest run ui/src 617 файл, 6509 тест PASS.
 
 ### Шалгалтын үр дүн (Task 7)
 

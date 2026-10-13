@@ -75,7 +75,7 @@ export function ProviderTraceStatusBadge({
           ? tx("{{frames}} frames · {{bytes}} bytes · expires {{date}}", { frames: trace.frameCount, bytes: trace.byteCount, date: xoLocaleDateTime(new Date(trace.expiresAt)) })
           : requested
             ? tx("This run requested sensitive provider-frame capture.")
-            : "Raw provider-frame capture was disabled for this run."
+            : tx("Raw provider-frame capture was disabled for this run.")
       }
     >
       <Icon className="h-3 w-3" />

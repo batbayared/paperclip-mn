@@ -291,7 +291,17 @@ XO-ийн өмч (upstream биш): ui/src/xo/labels.ts (xoHumanizeValue, xoTool
 
 Шинэ XO-ийн тестүүд: ui/src/xo/date-format.test.ts, ui/src/i18n/xo/y6-7-2-keys.test.ts, scripts/xo-i18n/tiers-y6-7-2.test.ts, ui/src/components/task-chat/TaskChat.y6-7-2.xo.test.tsx, ui/src/xo/labels.test.ts (нэмэлт).
 
-Үлдэгдэл (Ү6 7.3): хэрэгжсэн (доорх "Ү6 7.3-д хөндсөн upstream файлууд"). Үлдсэн: clipboard-ын `d.label === "Intent"` харьцуулалт (IssueChatThread.tsx:1637, lib/transcriptPresentation.ts:233 — тэр цэгт шошго англи, render үед xoToolDetailLabel орчуулдаг); dev-only T2 (TweakPanel, motion-tokens, task-chat-states, task-chat-fixtures, DesignGuide, TaskChatLab); LegacyIssuesList; mn-д цагийн бүсийн нэр (Codex/ClaudeSubscriptionPanel) ба UTC огноо (attention.ts:431) харагдахгүй; RunTranscriptView.tsx:881 "Unavailable source"; ProjectWorkspaceDetail.tsx:704 repoUrl-ийн `: "None"` (tx-гүй); Intl.DateTimeFormat timeStyle дуудлагууд (RoutineOverview.tsx:33, SidebarServerInfo.tsx:13, SmokeLabDashboardCard.tsx:29, tools/SmokeLabTab.tsx:46) toLocale* хүрээнээс гадуур тул англиар үлдсэн.
+Үлдэгдэл (Ү6 7.3): хэрэгжсэн (доорх "Ү6 7.3-д хөндсөн upstream файлууд"). Үлдсэн:
+
+- clipboard-ын `d.label === "Intent"` харьцуулалт (IssueChatThread.tsx:1637, lib/transcriptPresentation.ts:233 — тэр цэгт шошго англи, render үед xoToolDetailLabel орчуулдаг).
+- dev-only T2 (TweakPanel, motion-tokens, task-chat-states, task-chat-fixtures, DesignGuide, TaskChatLab); LegacyIssuesList.
+- mn-д цагийн бүсийн нэр (Codex/ClaudeSubscriptionPanel) ба UTC огноо (attention.ts:431) харагдахгүй.
+- RunTranscriptView.tsx:881 "Unavailable source".
+- ProjectWorkspaceDetail.tsx:693 `workspace.cwd ?? "None"` ба :704 repoUrl-ийн `: "None"` (tx-гүй).
+- Intl.DateTimeFormat timeStyle дуудлагууд (RoutineOverview.tsx:33, SidebarServerInfo.tsx:13, SmokeLabDashboardCard.tsx:29, tools/SmokeLabTab.tsx:46) toLocale* хүрээнээс гадуур тул англиар үлдсэн.
+- Pipelines.tsx:4168 formatShortDate, editable-sections.tsx:836 ба editable-sections.production.tsx:846 formatFireTime нь `new Intl.DateTimeFormat(undefined, …)` тул mn-д англи формат гарна.
+- Pipelines.tsx:575-585 formatPipelineActivity: «just now / min ago / weeks ago» англи, 30 хоногоос дээш үед xoLocaleDate-ээр mn огноо гарч нэг баганад хоёр хэл холилдоно.
+- ui/src/xo/date-format.ts:47 xoLocaleDateTime нь year-гүй богино options (month/day/hour/minute)-ыг mn-д үл хайхарч урт «2026 оны 9-р сарын 7 13:02» хэлбэр өгнө (xoLocaleDate нь mnShortDate руу шилждэг, mnShortDateTime ашиглагдаагүй). Хамаарах газрууд: SystemNotice.tsx:104, IssueRecoveryActionCard.tsx:790 ба 893, Claude/CodexSubscriptionPanel. Мөн weekday, timeZoneName, timeStyle medium/long-ийг mn зам үл хайхарна (operate-sections.tsx:213).
 
 ## Ү6 7.3-д хөндсөн upstream файлууд
 
@@ -312,12 +322,12 @@ T1 = scripts/xo-i18n/tiers.ts-ийн tier-1 жагсаалтад нэмсэн. "
 | ui/src/components/OnboardingWizard.tsx | xoLocaleTime (mn үед H:MM:SS, доорх тэмдэглэл) |
 | ui/src/components/OutputFeedbackButtons.tsx | «Helpful»/«Needs work» гар tx |
 | ui/src/components/ProviderQuotaCard.tsx | xoLocaleDate; «resets {{date}}» гар tx |
-| ui/src/components/ProviderTraceStatusBadge.tsx | xoLocaleDateTime; frames/bytes/expires ба sensitive capture тайлбар гар tx |
+| ui/src/components/ProviderTraceStatusBadge.tsx | xoLocaleDateTime; frames/bytes/expires, sensitive capture болон «capture was disabled» тайлбар гар tx |
 | ui/src/components/RoutineActivityRow.tsx | xoLocaleTime |
-| ui/src/components/RoutineList.tsx | xoLocaleDateTime |
+| ui/src/components/RoutineList.tsx | xoLocaleDateTime; «Never» гар tx |
 | ui/src/components/RoutineOverview.tsx | xoLocaleDateTime |
 | ui/src/components/RoutineTriggerCard.tsx | xoLocaleDateTime; «Next: {{date}}» гар tx |
-| ui/src/components/RunnerInspector.tsx | xoLocaleDateTime; frames/expires мөр гар tx |
+| ui/src/components/RunnerInspector.tsx | xoLocaleDateTime; frames/expires мөр, «Download exact trace»/«Delete trace» товч гар tx |
 | ui/src/components/ScheduleEditor.tsx | xoLocaleDateTime; «Next: {{dates}}.» гар tx |
 | ui/src/components/SourceResolvedFoldCallout.tsx | xoLocaleDateTime |
 | ui/src/components/SourceTrustBadge.tsx | xoLocaleDateTime; low-trust тайлбар гар tx |
@@ -328,6 +338,7 @@ T1 = scripts/xo-i18n/tiers.ts-ийн tier-1 жагсаалтад нэмсэн. "
 | ui/src/components/routine-sections/editable-sections.tsx | xoLocaleDateTime |
 | ui/src/components/routine-sections/editable-sections.production.tsx | xoLocaleDateTime (хос файл) |
 | ui/src/components/routine-sections/operate-sections.tsx | xoLocaleDate; «Earlier» гар tx; subtitle xoRunRowSubtitle |
+| ui/src/components/task-chat/TaskChatCompactInteractionCard.tsx | xoLocaleDateTime («Expires» огноо, 4 газар; олон мөрт `new Date(…).toLocaleString()` дуудлага) |
 | ui/src/components/task-chat/TaskChatProtocolCard.tsx | RuntimeQuestionHistory-д export нэмсэн (mn тестэд хэрэгтэй; нэг түлхүүр үг); «Answer details…» ба «pending» гар tx |
 | ui/src/components/task-chat/task-chat-adapter.ts | xoLocaleTime |
 | ui/src/components/task-chat/TaskChat.y6-7-2.xo.test.tsx | mn тест нэмсэн (RuntimeQuestionHistory) |
@@ -365,7 +376,7 @@ T1 = scripts/xo-i18n/tiers.ts-ийн tier-1 жагсаалтад нэмсэн. "
 - Desk shelf шошгыг attention.ts-д биш render цэг болох WhatNeedsMe.tsx ба DecisionQueuePage.tsx-д орчуулсан (xoLabel); энэ хоёр файл анхны планд байгаагүй.
 - TaskChatProtocolCard.tsx-д RuntimeQuestionHistory-г export болгосон (upstream файлд нэг түлхүүр үг); mn тест шууд render хийхэд хэрэгтэй.
 - ui/src/i18n/xo/keep-en.json-д "Markdown" нэмсэн (файлын төрлийн шошго mn-д ч Markdown хэвээр).
-- mn xoLocaleTime нь options-д hour/minute/second/timeStyle аль нь ч байхгүй үед секундтэй гаргана (en-ий toLocaleTimeString-тай адил). Үр дүнд OnboardingWizard, AgentConfigForm-ийн холболт шалгасан цаг mn-д H:MM:SS болсон.
+- mn xoLocaleTime нь options-д hour/minute/second/timeStyle аль нь ч байхгүй үед секундтэй гаргана (en-ий toLocaleTimeString-тай адил). Үр дүнд OnboardingWizard, AgentConfigForm-ийн холболт шалгасан цаг, мөн PluginSettings.tsx:425/460, AgentDetail.tsx:638/4447, AgentDetail.production.tsx:637/4370 дахь цаг mn-д H:MM:SS болсон (en-тэй адил зан төлөв).
 
 XO-ийн өмч (upstream биш): ui/src/xo/date-format.ts (mnTime, xoLocaleDateTime, xoLocaleDate, xoLocaleTime), ui/src/xo/labels.ts (xoRunRowSubtitle, xoLabel нэмэлт, xoFileKindLabel Markdown), scripts/xo-i18n/tiers.ts (RunTranscriptView T1), ui/src/i18n/xo/* (en.json, mn.json, keep-en.json).
 
