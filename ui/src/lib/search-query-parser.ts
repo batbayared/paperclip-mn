@@ -8,6 +8,7 @@ import {
   type IssueStatus,
 } from "@paperclipai/shared";
 import type { CompanySearchParams } from "@/api/search";
+import { tx } from "@/i18n/xo";
 
 const SEARCH_FILTER_PARAM_KEYS = [
   "status",
@@ -132,7 +133,31 @@ export function searchOperatorSuggestions(input: string, limit = 5): SearchOpera
   const candidates = normalized.length > 0
     ? SEARCH_OPERATOR_SUGGESTIONS.filter((suggestion) => suggestion.token.toLowerCase().startsWith(normalized))
     : SEARCH_OPERATOR_SUGGESTIONS;
-  return candidates.slice(0, limit);
+  return candidates.slice(0, limit).map((suggestion) => ({
+    ...suggestion,
+    label: xoSearchSuggestionCopy(suggestion.label),
+    description: xoSearchSuggestionCopy(suggestion.description),
+  }));
+}
+
+function xoSearchSuggestionCopy(english: string): string {
+  switch (english) {
+    case "Open todo tasks": return tx("Open todo tasks");
+    case "Filter by task status": return tx("Filter by task status");
+    case "Blocked tasks": return tx("Blocked tasks");
+    case "Find blocked work": return tx("Find blocked work");
+    case "Assigned to me": return tx("Assigned to me");
+    case "Use your current board user": return tx("Use your current board user");
+    case "Project name": return tx("Project name");
+    case "Quote multi-word project names": return tx("Quote multi-word project names");
+    case "Label": return tx("Label");
+    case "Filter by issue label": return tx("Filter by issue label");
+    case "High priority": return tx("High priority");
+    case "Filter by priority": return tx("Filter by priority");
+    case "Recently updated": return tx("Recently updated");
+    case "Updated in the last 7 days": return tx("Updated in the last 7 days");
+    default: return english;
+  }
 }
 
 export function applySearchOperatorSuggestion(input: string, token: string): string {

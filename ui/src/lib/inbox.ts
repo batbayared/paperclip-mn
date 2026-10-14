@@ -14,6 +14,7 @@ import {
   type IssueFilterWorkspaceContext,
 } from "./issue-filters";
 import { formatAssigneeUserLabel } from "./assignees";
+import { tx } from "@/i18n/xo";
 
 export const RECENT_ISSUES_LIMIT = 100;
 export const FAILED_RUN_STATUSES = new Set(["failed", "timed_out"]);
@@ -533,7 +534,7 @@ export function getInboxSearchSupplementIssues({
 
 function formatDefaultWorkspaceGroupLabel(name: string | null | undefined): string {
   const normalizedName = name?.trim();
-  return normalizedName ? `${normalizedName} (default)` : "Default workspace";
+  return normalizedName ? tx("{{name}} (default)", { name: normalizedName }) : tx("Default workspace");
 }
 
 function resolveDefaultProjectWorkspaceInfo(
@@ -649,7 +650,7 @@ export function resolveIssueWorkspaceGroup(
 
   return {
     key: "workspace:none",
-    label: "No workspace",
+    label: tx("No workspace"),
   };
 }
 
@@ -874,6 +875,16 @@ const inboxWorkItemKindLabels: Record<InboxWorkItem["kind"], string> = {
   join_request: "Join requests",
 };
 
+function inboxWorkItemKindLabel(kind: InboxWorkItem["kind"]): string {
+  switch (kind) {
+    case "issue": return tx("Tasks");
+    case "approval": return tx("Approvals");
+    case "failed_run": return tx("Failed runs");
+    case "join_request": return tx("Join requests");
+    default: return inboxWorkItemKindLabels[kind];
+  }
+}
+
 function resolveIssueAssigneeGroup(
   issue: Pick<Issue, "assigneeAgentId" | "assigneeUserId">,
   {
@@ -893,18 +904,18 @@ function resolveIssueAssigneeGroup(
   if (issue.assigneeUserId) {
     return {
       key: `assignee:user:${issue.assigneeUserId}`,
-      label: formatAssigneeUserLabel(issue.assigneeUserId, currentUserId, userLabelById) ?? "User",
+      label: formatAssigneeUserLabel(issue.assigneeUserId, currentUserId, userLabelById) ?? tx("User"),
     };
   }
 
-  return { key: "assignee:none", label: "Unassigned" };
+  return { key: "assignee:none", label: tx("Unassigned") };
 }
 
 function resolveIssueProjectGroup(
   issue: Pick<Issue, "projectId">,
   { projectById }: Pick<InboxWorkspaceGroupingOptions, "projectById">,
 ): { key: string; label: string } {
-  if (!issue.projectId) return { key: "project:none", label: "No project" };
+  if (!issue.projectId) return { key: "project:none", label: tx("No project") };
 
   const projectName = projectById?.get(issue.projectId)?.name?.trim();
   return {
@@ -921,7 +932,7 @@ function groupInboxWorkItemsByIssueGroup(
   for (const item of items) {
     const resolvedGroup = item.kind === "issue"
       ? resolveIssueGroup(item.issue)
-      : { key: `kind:${item.kind}`, label: inboxWorkItemKindLabels[item.kind] };
+      : { key: `kind:${item.kind}`, label: inboxWorkItemKindLabel(item.kind) };
     const existing = groups.get(resolvedGroup.key);
     if (existing) {
       existing.items.push(item);
@@ -988,7 +999,7 @@ export function groupInboxWorkItems(
     if (groupItems.length === 0) continue;
     orderedGroups.push({
         key: kind,
-        label: inboxWorkItemKindLabels[kind],
+        label: inboxWorkItemKindLabel(kind),
         items: groupItems,
     });
   }

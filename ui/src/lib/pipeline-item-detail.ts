@@ -76,34 +76,46 @@ function humanizeKey(key: string) {
     .replace(/^./, (char) => char.toUpperCase());
 }
 
+// XO: "Open" is also the catalog key for the «Нээх» button verb, so the status
+// adjective uses its own key and keeps the English literal byte-identical in en.
+function openStatusLabel() {
+  return resolveLocale() === "mn" ? tx("Open (item status)") : "Open";
+}
+
 export function humanizePipelineItemStatus(status: string | null | undefined) {
-  if (!status) return "Open";
+  if (!status) return openStatusLabel();
   const normalized = status.trim().toLowerCase();
-  if (!normalized) return "Open";
-  const labels: Record<string, string> = {
-    open: "Open",
-    working: "In progress",
-    done: "Done",
-    cancelled: "Removed",
-    in_review: "In review",
-    review: "In review",
-    in_progress: "In progress",
-  };
-  return labels[normalized] ?? humanizeKey(normalized);
+  if (!normalized) return openStatusLabel();
+  switch (normalized) {
+    case "open":
+      return openStatusLabel();
+    case "working":
+    case "in_progress":
+      return tx("In progress");
+    case "done":
+      return tx("Done");
+    case "cancelled":
+      return tx("Removed");
+    case "in_review":
+    case "review":
+      return tx("In review");
+    default:
+      return humanizeKey(normalized);
+  }
 }
 
 export function formatFieldValue(value: unknown): string {
   if (Array.isArray(value)) {
     const formatted = value.map(formatFieldValue).filter(Boolean);
-    return formatted.length ? formatted.join(", ") : "None";
+    return formatted.length ? formatted.join(", ") : tx("None");
   }
-  if (value == null || value === "") return "None";
-  if (typeof value === "boolean") return value ? "Yes" : "No";
+  if (value == null || value === "") return tx("None");
+  if (typeof value === "boolean") return value ? tx("Yes") : tx("No");
   if (typeof value === "number") return String(value);
   if (typeof value === "string") return value;
   const record = readRecord(value);
   if (record) {
-    return readString(record.label) ?? readString(record.name) ?? readString(record.title) ?? "Added details";
+    return readString(record.label) ?? readString(record.name) ?? readString(record.title) ?? tx("Added details");
   }
   return String(value);
 }
@@ -124,7 +136,7 @@ const LONG_FIELD_CHARACTER_THRESHOLD = 180;
 
 export function isLongPipelineItemField(field: Pick<PipelineItemDisplayField, "value">) {
   const value = field.value.trim();
-  if (!value || value === "None") return false;
+  if (!value || value === tx("None")) return false;
   return value.includes("\n") || value.length >= LONG_FIELD_CHARACTER_THRESHOLD;
 }
 
@@ -238,7 +250,7 @@ export function getPendingTransitionBannerState(item: Pick<PipelineCase, "pendin
     visible: true as const,
     suggestionId: suggestion?.id ?? null,
     toStageKey,
-    stageName: stageNameFromLookup(stages, toStageKey) ?? "the next stage",
+    stageName: stageNameFromLookup(stages, toStageKey) ?? tx("the next stage"),
     rationale: suggestion?.rationale ?? null,
   };
 }
@@ -251,8 +263,8 @@ export function itemHasChangedNotice(item: Pick<PipelineCase, "fields"> & {
   if (item.changeAcknowledgedAt || fields.changeAcknowledgedAt) return null;
   if (item.thisChanged || fields.thisChanged || fields.upstreamChanged || fields.upstreamDrift) {
     return {
-      title: "This changed",
-      body: "Upstream work changed after this item was created. Review the latest details before continuing.",
+      title: tx("This changed"),
+      body: tx("Upstream work changed after this item was created. Review the latest details before continuing."),
     };
   }
   return null;
@@ -275,8 +287,8 @@ export function eventsHaveUnacknowledgedDrift(events: PipelineCaseEvent[]) {
 export function changedNoticeFromEvents(events: PipelineCaseEvent[]) {
   if (!eventsHaveUnacknowledgedDrift(events)) return null;
   return {
-    title: "This changed",
-    body: "Upstream work changed after this item was created. Review the latest details before continuing.",
+    title: tx("This changed"),
+    body: tx("Upstream work changed after this item was created. Review the latest details before continuing."),
   };
 }
 

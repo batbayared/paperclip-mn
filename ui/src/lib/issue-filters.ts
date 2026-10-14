@@ -1,4 +1,5 @@
 import type { ExternalObjectSummary, Issue } from "@paperclipai/shared";
+import { tx } from "@/i18n/xo";
 
 export type IssueFilterWorkspaceLookup = {
   mode?: string | null;
@@ -73,7 +74,16 @@ const EXTERNAL_OBJECT_FILTER_LABELS: Record<string, string> = {
 };
 
 export function externalObjectFilterLabel(value: string): string {
-  return EXTERNAL_OBJECT_FILTER_LABELS[value] ?? issueFilterLabel(value);
+  switch (value) {
+    case "failed": return tx("Any failed");
+    case "waiting": return tx("Any waiting");
+    case "running": return tx("Any running");
+    case "auth_required": return tx("Auth required");
+    case "unreachable": return tx("Unreachable");
+    case "stale": return tx("Stale");
+    case "none": return tx("No external objects");
+    default: return EXTERNAL_OBJECT_FILTER_LABELS[value] ?? issueFilterLabel(value);
+  }
 }
 
 export const issueStatusOrder = ["in_progress", "todo", "backlog", "in_review", "blocked", "done", "cancelled"];

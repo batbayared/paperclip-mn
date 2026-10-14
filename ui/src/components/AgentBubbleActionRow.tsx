@@ -1,4 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
+import { XoTrans } from "@/xo/XoTrans";
 import type {
   FeedbackDataSharingPreference,
   FeedbackVoteValue,
@@ -337,10 +338,10 @@ export function IssueChatFeedbackButtons({
           <div className="space-y-3 text-sm text-muted-foreground">
             <p>This vote is always saved locally.</p>
             <p>
-              Choose <span className="font-medium text-foreground">Always allow</span> to share
-              this vote and future voted AI outputs. Choose{" "}
-              <span className="font-medium text-foreground">Don't allow</span> to keep this vote
-              and future votes local.
+              <XoTrans
+                i18nKey="Choose <b>Always allow</b> to share this vote and future voted AI outputs. Choose <b>Don't allow</b> to keep this vote and future votes local."
+                components={{ b: <span className="font-medium text-foreground" /> }}
+              />
             </p>
             <p>You can change this later in Settings &gt; General.</p>
             {termsUrl ? (

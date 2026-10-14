@@ -24,6 +24,7 @@ import {
   deriveStatusCardLifecycle,
   describeRefreshPolicy,
   STATUS_CARD_LIFECYCLE_PRESENTATION,
+  statusCardLifecycleLabel,
 } from "@/lib/status-card-state";
 import {
   StatusCardSettingsForm,
@@ -212,7 +213,7 @@ export function StatusCardDetailDrawer({
           <div className="flex items-center gap-2 pr-8">
             <span className={cn("inline-block h-2.5 w-2.5 shrink-0 rounded-full", presentation.dotClassName)} aria-hidden="true" />
             <SheetTitle className="min-w-0 flex-1 truncate text-lg">{card.title ?? "Untitled card"}</SheetTitle>
-            <Badge variant="outline">{presentation.label}</Badge>
+            <Badge variant="outline">{statusCardLifecycleLabel(lifecycle)}</Badge>
             {lifecycle === "compiling" ? (
               <Button
                 variant="outline"

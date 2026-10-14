@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import type { ComponentType, SVGProps } from "react";
 import { tx } from "@/i18n/xo";
+import { xoBrandVars } from "@/xo/labels";
 import { McpIcon } from "./McpIcon";
 
 /** Lucide icons and hand-rolled SVGs (the MCP logo) share this shape. */
@@ -333,6 +334,157 @@ function actionCopy(action: Action, object: string | undefined): { running: stri
   }
 }
 
+// XO: actionCopy-ийн монгол хувилбар. en дээр tx англи түлхүүрээ буцаах тул гаралт ижил.
+function xoActionCopy(action: Action, object: string | undefined): { running: string; completed: string } {
+  switch (action) {
+    case "read": return object ? { running: tx("Reading {{object}}", { object }), completed: tx("Read {{object}}", { object }) } : { running: tx("Reading data"), completed: tx("Read data") };
+    case "list": return object ? { running: tx("Listing {{object}}", { object }), completed: tx("Listed {{object}}", { object }) } : { running: tx("Listing items"), completed: tx("Listed items") };
+    case "search": return object ? { running: tx("Searching {{object}}", { object }), completed: tx("Searched {{object}}", { object }) } : { running: tx("Searching"), completed: tx("Searched") };
+    case "fetch": return object ? { running: tx("Fetching {{object}}", { object }), completed: tx("Fetched {{object}}", { object }) } : { running: tx("Fetching data"), completed: tx("Fetched data") };
+    case "open": return object ? { running: tx("Opening {{object}}", { object }), completed: tx("Opened {{object}}", { object }) } : { running: tx("Opening an item"), completed: tx("Opened an item") };
+    case "update": return object ? { running: tx("Updating {{object}}", { object }), completed: tx("Updated {{object}}", { object }) } : { running: tx("Updating data"), completed: tx("Updated data") };
+    case "create": return object ? { running: tx("Creating {{object}}", { object }), completed: tx("Created {{object}}", { object }) } : { running: tx("Creating an item"), completed: tx("Created an item") };
+    case "delete": return object ? { running: tx("Deleting {{object}}", { object }), completed: tx("Deleted {{object}}", { object }) } : { running: tx("Deleting an item"), completed: tx("Deleted an item") };
+    case "move": return object ? { running: tx("Moving {{object}}", { object }), completed: tx("Moved {{object}}", { object }) } : { running: tx("Moving an item"), completed: tx("Moved an item") };
+    case "run": return { running: tx("Running a command"), completed: tx("Ran a command") };
+    case "request": return object ? { running: tx("Requesting {{object}}", { object }), completed: tx("Requested {{object}}", { object }) } : { running: tx("Requesting input"), completed: tx("Requested input") };
+    case "post": return object ? { running: tx("Posting {{object}}", { object }), completed: tx("Posted {{object}}", { object }) } : { running: tx("Posting an update"), completed: tx("Posted an update") };
+    case "start": return object ? { running: tx("Starting {{object}}", { object }), completed: tx("Started {{object}}", { object }) } : { running: tx("Starting an operation"), completed: tx("Started an operation") };
+    case "stop": return object ? { running: tx("Stopping {{object}}", { object }), completed: tx("Stopped {{object}}", { object }) } : { running: tx("Stopping an operation"), completed: tx("Stopped an operation") };
+    case "wait": return { running: tx("Waiting"), completed: tx("Finished waiting") };
+    case "finish": return { running: tx("Reporting completion"), completed: tx("Reported completion") };
+    case "block": return { running: tx("Reporting a blocker"), completed: tx("Reported a blocker") };
+    case "think": return { running: tx("Thinking"), completed: tx("Finished thinking") };
+    case "switch": return object ? { running: tx("Switching {{object}}", { object }), completed: tx("Switched {{object}}", { object }) } : { running: tx("Switching mode"), completed: tx("Switched mode") };
+    case "other": return { running: tx("Running"), completed: tx("Ran") };
+  }
+}
+
+// XO: EXACT_ACTIONS-ийн англи хуулбарыг (модулийн Record) хэрэглэх үед орчуулна.
+function xoExactCopy(english: string): string {
+  if (english === EXACT_ACTIONS.generic_api_request?.running) return tx("Calling the {{brand}} API", xoBrandVars());
+  if (english === EXACT_ACTIONS.generic_api_request?.completed) return tx("Called the {{brand}} API", xoBrandVars());
+  switch (english) {
+    case "Applying a patch": return tx("Applying a patch");
+    case "Applied a patch": return tx("Applied a patch");
+    case "Reading a file": return tx("Reading a file");
+    case "Read a file": return tx("Read a file");
+    case "Writing a file": return tx("Writing a file");
+    case "Wrote a file": return tx("Wrote a file");
+    case "Editing a file": return tx("Editing a file");
+    case "Edited a file": return tx("Edited a file");
+    case "Reading a notebook": return tx("Reading a notebook");
+    case "Read a notebook": return tx("Read a notebook");
+    case "Editing a notebook": return tx("Editing a notebook");
+    case "Edited a notebook": return tx("Edited a notebook");
+    case "Searching files": return tx("Searching files");
+    case "Searched files": return tx("Searched files");
+    case "Searching file contents": return tx("Searching file contents");
+    case "Searched file contents": return tx("Searched file contents");
+    case "Searching available tools": return tx("Searching available tools");
+    case "Searched available tools": return tx("Searched available tools");
+    case "Searching the web": return tx("Searching the web");
+    case "Searched the web": return tx("Searched the web");
+    case "Fetching a web page": return tx("Fetching a web page");
+    case "Fetched a web page": return tx("Fetched a web page");
+    case "Updating the task list": return tx("Updating the task list");
+    case "Updated the task list": return tx("Updated the task list");
+    case "Creating a task": return tx("Creating a task");
+    case "Created a task": return tx("Created a task");
+    case "Updating a task": return tx("Updating a task");
+    case "Updated a task": return tx("Updated a task");
+    case "Listing tasks": return tx("Listing tasks");
+    case "Listed tasks": return tx("Listed tasks");
+    case "Reading a task": return tx("Reading a task");
+    case "Read a task": return tx("Read a task");
+    case "Entering plan mode": return tx("Entering plan mode");
+    case "Entered plan mode": return tx("Entered plan mode");
+    case "Leaving plan mode": return tx("Leaving plan mode");
+    case "Left plan mode": return tx("Left plan mode");
+    case "Loading a skill": return tx("Loading a skill");
+    case "Loaded a skill": return tx("Loaded a skill");
+    case "Requesting input": return tx("Requesting input");
+    case "Requested input": return tx("Requested input");
+    case "Starting a subagent": return tx("Starting a subagent");
+    case "Started a subagent": return tx("Started a subagent");
+    case "Checking subagent progress": return tx("Checking subagent progress");
+    case "Checked subagent progress": return tx("Checked subagent progress");
+    case "Stopping a subagent": return tx("Stopping a subagent");
+    case "Stopped a subagent": return tx("Stopped a subagent");
+    case "Messaging a subagent": return tx("Messaging a subagent");
+    case "Messaged a subagent": return tx("Messaged a subagent");
+    case "Checking task progress": return tx("Checking task progress");
+    case "Checked task progress": return tx("Checked task progress");
+    case "Interrupting a subagent": return tx("Interrupting a subagent");
+    case "Interrupted a subagent": return tx("Interrupted a subagent");
+    case "Reporting findings": return tx("Reporting findings");
+    case "Reported findings": return tx("Reported findings");
+    case "Reviewing safety": return tx("Reviewing safety");
+    case "Reviewed safety": return tx("Reviewed safety");
+    case "Inspecting code intelligence": return tx("Inspecting code intelligence");
+    case "Inspected code intelligence": return tx("Inspected code intelligence");
+    case "Compacting context": return tx("Compacting context");
+    case "Compacted context": return tx("Compacted context");
+    case "Generating an image": return tx("Generating an image");
+    case "Generated an image": return tx("Generated an image");
+    case "Viewing an image": return tx("Viewing an image");
+    case "Viewed an image": return tx("Viewed an image");
+    case "Running tools in parallel": return tx("Running tools in parallel");
+    case "Ran tools in parallel": return tx("Ran tools in parallel");
+    case "Reading task context": return tx("Reading task context");
+    case "Read task context": return tx("Read task context");
+    case "Reading task history": return tx("Reading task history");
+    case "Read task history": return tx("Read task history");
+    case "Listing documents": return tx("Listing documents");
+    case "Listed documents": return tx("Listed documents");
+    case "Reading a document": return tx("Reading a document");
+    case "Read a document": return tx("Read a document");
+    case "Listing document revisions": return tx("Listing document revisions");
+    case "Listed document revisions": return tx("Listed document revisions");
+    case "Reporting progress": return tx("Reporting progress");
+    case "Reported progress": return tx("Reported progress");
+    case "Answering a status question": return tx("Answering a status question");
+    case "Answered a status question": return tx("Answered a status question");
+    case "Writing a document": return tx("Writing a document");
+    case "Wrote a document": return tx("Wrote a document");
+    case "Registering a deliverable": return tx("Registering a deliverable");
+    case "Registered a deliverable": return tx("Registered a deliverable");
+    case "Reporting completion": return tx("Reporting completion");
+    case "Reported completion": return tx("Reported completion");
+    case "Reporting a blocker": return tx("Reporting a blocker");
+    case "Reported a blocker": return tx("Reported a blocker");
+    case "Requesting review": return tx("Requesting review");
+    case "Requested review": return tx("Requested review");
+    case "Listing agents": return tx("Listing agents");
+    case "Listed agents": return tx("Listed agents");
+    case "Reading agent details": return tx("Reading agent details");
+    case "Read agent details": return tx("Read agent details");
+    case "Searching tasks": return tx("Searching tasks");
+    case "Searched tasks": return tx("Searched tasks");
+    case "Listing approvals": return tx("Listing approvals");
+    case "Listed approvals": return tx("Listed approvals");
+    case "Reading an approval": return tx("Reading an approval");
+    case "Read an approval": return tx("Read an approval");
+    case "Reading approval context": return tx("Reading approval context");
+    case "Read approval context": return tx("Read approval context");
+    case "Reading workspace status": return tx("Reading workspace status");
+    case "Read workspace status": return tx("Read workspace status");
+    case "Controlling a workspace service": return tx("Controlling a workspace service");
+    case "Controlled a workspace service": return tx("Controlled a workspace service");
+    case "Updating task dependencies": return tx("Updating task dependencies");
+    case "Updated task dependencies": return tx("Updated task dependencies");
+    case "Requesting approval": return tx("Requesting approval");
+    case "Requested approval": return tx("Requested approval");
+    case "Deciding an approval": return tx("Deciding an approval");
+    case "Decided an approval": return tx("Decided an approval");
+    case "Commenting on an approval": return tx("Commenting on an approval");
+    case "Commented on an approval": return tx("Commented on an approval");
+    case "Scheduling a wake-up": return tx("Scheduling a wake-up");
+    case "Scheduled a wake-up": return tx("Scheduled a wake-up");
+    default: return english;
+  }
+}
+
 function defaultSummaryGroup(action: Action): ToolSummaryGroup {
   switch (action) {
     case "run": return group("command", "command", "commands");
@@ -361,6 +513,21 @@ function paperclipSummaryGroup(action: Action): ToolSummaryGroup {
  * fallback. MCP remains visible as the source icon without losing semantics.
  */
 export function toolActivityPresentation(input: ToolActivityPresentationInput): ToolActivityPresentation {
+  return resolveToolActivity(input).presentation;
+}
+
+/**
+ * XO: англи runningLabel — зөвхөн харьцуулалтад (task-chat-activity-presentation),
+ * харагдах текстэд биш. mn дээр presentation.runningLabel орчуулагдсан байна.
+ */
+export function toolActivityEnglishRunningLabel(input: ToolActivityPresentationInput): string {
+  return resolveToolActivity(input).englishRunningLabel;
+}
+
+function resolveToolActivity(input: ToolActivityPresentationInput): {
+  presentation: ToolActivityPresentation;
+  englishRunningLabel: string;
+} {
   const rawName = (input.name ?? "").trim();
   const parsedMcp = mcpToolIdentity(rawName);
   const namespace = (input.namespace ?? parsedMcp?.namespace ?? "").trim();
@@ -394,6 +561,13 @@ export function toolActivityPresentation(input: ToolActivityPresentationInput): 
         ? { running: "Running an unnamed tool", completed: "Ran an unnamed tool" }
         : { running: `Running ${displayName}`, completed: `Ran ${displayName}` }
       : actionCopy(action, exact ? undefined : object);
+  const xoCopy = exact?.running && exact.completed
+    ? { running: xoExactCopy(exact.running), completed: xoExactCopy(exact.completed) }
+    : action === "other"
+      ? isGenericToolName(semanticName)
+        ? { running: tx("Running an unnamed tool"), completed: tx("Ran an unnamed tool") }
+        : { running: tx("Running {{name}}", { name: displayName }), completed: tx("Ran {{name}}", { name: displayName }) }
+      : xoActionCopy(action, exact ? undefined : object);
   const semanticFamily = exact?.family ?? actionFamily(action);
   const family = transport === "mcp" ? "mcp" : semanticFamily;
   const sourceLabel = namespace
@@ -406,17 +580,20 @@ export function toolActivityPresentation(input: ToolActivityPresentationInput): 
     : exact?.group ?? defaultSummaryGroup(action);
 
   return {
-    icon: FAMILY_ICONS[family],
-    family,
-    runningLabel: copy.running,
-    completedLabel: copy.completed,
-    failedLabel: `${copy.completed} · failed`,
-    interruptedLabel: `${copy.running} · stopped`,
-    displayName,
-    sourceLabel,
-    technicalName: rawName || undefined,
-    confidence,
-    summaryGroup,
+    presentation: {
+      icon: FAMILY_ICONS[family],
+      family,
+      runningLabel: xoCopy.running,
+      completedLabel: xoCopy.completed,
+      failedLabel: tx("{{label}} · failed", { label: xoCopy.completed }),
+      interruptedLabel: tx("{{label}} · stopped", { label: xoCopy.running }),
+      displayName,
+      sourceLabel,
+      technicalName: rawName || undefined,
+      confidence,
+      summaryGroup,
+    },
+    englishRunningLabel: copy.running,
   };
 }
 

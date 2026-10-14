@@ -17,6 +17,7 @@ import {
   Cpu,
 } from "lucide-react";
 import { OpenCodeLogoIcon } from "@/components/OpenCodeLogoIcon";
+import { tx } from "@/i18n/xo";
 
 // ---------------------------------------------------------------------------
 // Type suffix parsing
@@ -187,15 +188,46 @@ export function getAdapterLabels(): Record<string, string> {
   return labels;
 }
 
+// XO: adapterDisplayMap-ийн англи description / disabledLabel-ийг дуудах үед орчуулна.
+function xoAdapterCopy(english: string): string {
+  switch (english) {
+    case "Retired standalone ACPX adapter": return tx("Retired standalone ACPX adapter");
+    case "Use Claude Code or Codex with the ACP engine": return tx("Use Claude Code or Codex with the ACP engine");
+    case "Claude Code CLI harness": return tx("Claude Code CLI harness");
+    case "Codex CLI harness": return tx("Codex CLI harness");
+    case "Experimental Rust runner with a Codex provider": return tx("Experimental Rust runner with a Codex provider");
+    case "Gemini CLI harness": return tx("Gemini CLI harness");
+    case "Grok Build harness": return tx("Grok Build harness");
+    case "Kimi Code CLI harness": return tx("Kimi Code CLI harness");
+    case "Remote Hermes API server": return tx("Remote Hermes API server");
+    case "Hermes harness": return tx("Hermes harness");
+    case "OpenCode multi-provider harness": return tx("OpenCode multi-provider harness");
+    case "Pi harness": return tx("Pi harness");
+    case "Cursor CLI harness": return tx("Cursor CLI harness");
+    case "Managed remote Cursor agent": return tx("Managed remote Cursor agent");
+    case "External gateway adapter": return tx("External gateway adapter");
+    case "Invite external agents from the add-agent modal": return tx("Invite external agents from the add-agent modal");
+    case "Internal process adapter": return tx("Internal process adapter");
+    case "Internal HTTP adapter": return tx("Internal HTTP adapter");
+    default: return english;
+  }
+}
+
 export function getAdapterDisplay(type: string): AdapterDisplayInfo {
   const known = adapterDisplayMap[type];
-  if (known) return known;
+  if (known) {
+    return {
+      ...known,
+      description: xoAdapterCopy(known.description),
+      ...(known.disabledLabel ? { disabledLabel: xoAdapterCopy(known.disabledLabel) } : {}),
+    };
+  }
 
   const suffix = getTypeSuffix(type);
   const label = withSuffix(humanizeType(type), suffix);
   return {
     label,
-    description: suffix ? `External ${suffix} adapter` : "External adapter",
+    description: suffix ? tx("External {{suffix}} adapter", { suffix }) : tx("External adapter"),
     icon: Cpu,
   };
 }

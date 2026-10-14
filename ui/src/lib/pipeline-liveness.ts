@@ -1,4 +1,6 @@
 import type { PipelineCaseLiveness } from "@paperclipai/shared";
+import { tx } from "@/i18n/xo";
+import { xoBrandVars } from "@/xo/labels";
 
 /**
  * Visual tone for a pipeline item liveness banner. Each tone maps to a palette
@@ -39,8 +41,13 @@ export interface LivenessBannerView {
   helperNote: string | null;
 }
 
-const AUTO_RETRY_NOTE =
-  "Paperclip retries automatically once the blocker clears — you don't need to move the item by hand.";
+// XO: built at call time so tx() resolves the active locale.
+function autoRetryNote(): string {
+  return tx(
+    "{{brand}} retries automatically once the blocker clears — you don't need to move the item by hand.",
+    xoBrandVars(),
+  );
+}
 
 /**
  * Prosumer-voice body for the `no_action_path` "stuck" banner. The server's
@@ -48,9 +55,12 @@ const AUTO_RETRY_NOTE =
  * review, or breakdown action path is visible.") leaks implementation vocabulary
  * the PAP-11245 voice rule forbids, so we translate it here. See PAP-11259.
  */
-const NO_ACTION_PATH_BODY =
-  "Paperclip can't see anything to work on next here — no automation, retry, blocker, or review. " +
-  "Re-run the stage to nudge it, or use the ⋯ menu to move it by hand.";
+function noActionPathBody(): string {
+  return tx(
+    "{{brand}} can't see anything to work on next here — no automation, retry, blocker, or review. Re-run the stage to nudge it, or use the ⋯ menu to move it by hand.",
+    xoBrandVars(),
+  );
+}
 
 /**
  * The `pipelines:write` permission key is the only permission the Phase 2
@@ -106,7 +116,7 @@ export function derivePipelineLivenessBanner(
       return {
         reason: liveness.reason,
         tone: "blocked",
-        title: "Automation paused — waiting on a blocker",
+        title: tx("Automation paused — waiting on a blocker"),
         body: liveness.message,
         blockerLink: blockerLinkFromLiveness(liveness),
         automationLink: automationLinkFromLiveness(liveness),
@@ -114,14 +124,14 @@ export function derivePipelineLivenessBanner(
         showRetry: false,
         retryKind: null,
         retryLabel: "",
-        helperNote: AUTO_RETRY_NOTE,
+        helperNote: autoRetryNote(),
       };
 
     case "linked_issue_blocked":
       return {
         reason: liveness.reason,
         tone: "blocked",
-        title: "Automation paused — waiting on a blocker",
+        title: tx("Automation paused — waiting on a blocker"),
         body: liveness.message,
         blockerLink: blockerLinkFromLiveness(liveness),
         automationLink: automationLinkFromLiveness(liveness),
@@ -129,14 +139,14 @@ export function derivePipelineLivenessBanner(
         showRetry: false,
         retryKind: null,
         retryLabel: "",
-        helperNote: AUTO_RETRY_NOTE,
+        helperNote: autoRetryNote(),
       };
 
     case "permission_preflight_failed":
       return {
         reason: liveness.reason,
         tone: "permission",
-        title: "Permission needed before this can run",
+        title: tx("Permission needed before this can run"),
         body: liveness.message,
         blockerLink: null,
         automationLink: automationLinkFromLiveness(liveness),
@@ -144,8 +154,10 @@ export function derivePipelineLivenessBanner(
         showRetry: false,
         retryKind: null,
         retryLabel: "",
-        helperNote:
-          "Grant the access above to the configured responsible, then Paperclip retries automatically.",
+        helperNote: tx(
+          "Grant the access above to the configured responsible, then {{brand}} retries automatically.",
+          xoBrandVars(),
+        ),
       };
 
     case "automation_failed": {
@@ -157,15 +169,15 @@ export function derivePipelineLivenessBanner(
       return {
         reason: liveness.reason,
         tone: recovered ? "retry" : "attention",
-        title: recovered ? "Blocker resolved — ready to retry" : "Automation failed",
+        title: recovered ? tx("Blocker resolved — ready to retry") : tx("Automation failed"),
         body: liveness.message,
         blockerLink: null,
         automationLink: automationLinkFromLiveness(liveness),
         permissionKey: null,
         showRetry: true,
         retryKind: automationId ? "automation" : "stage",
-        retryLabel: "Retry now",
-        helperNote: recovered ? AUTO_RETRY_NOTE : null,
+        retryLabel: tx("Retry now"),
+        helperNote: recovered ? autoRetryNote() : null,
       };
     }
 
@@ -173,14 +185,14 @@ export function derivePipelineLivenessBanner(
       return {
         reason: liveness.reason,
         tone: "attention",
-        title: "Waiting on breakdown evidence",
+        title: tx("Waiting on breakdown evidence"),
         body: liveness.message,
         blockerLink: null,
         automationLink: null,
         permissionKey: null,
         showRetry: true,
         retryKind: "stage",
-        retryLabel: "Re-run stage automation",
+        retryLabel: tx("Re-run stage automation"),
         helperNote: null,
       };
 
@@ -188,14 +200,14 @@ export function derivePipelineLivenessBanner(
       return {
         reason: liveness.reason,
         tone: "blocked",
-        title: "Breakdown is incomplete",
+        title: tx("Breakdown is incomplete"),
         body: missingPiecesBody(liveness),
         blockerLink: null,
         automationLink: null,
         permissionKey: null,
         showRetry: true,
         retryKind: "stage",
-        retryLabel: "Re-run stage automation",
+        retryLabel: tx("Re-run stage automation"),
         helperNote: null,
       };
 
@@ -203,14 +215,14 @@ export function derivePipelineLivenessBanner(
       return {
         reason: liveness.reason,
         tone: "attention",
-        title: "This item is stuck",
-        body: NO_ACTION_PATH_BODY,
+        title: tx("This item is stuck"),
+        body: noActionPathBody(),
         blockerLink: null,
         automationLink: null,
         permissionKey: null,
         showRetry: true,
         retryKind: "stage",
-        retryLabel: "Re-run stage automation",
+        retryLabel: tx("Re-run stage automation"),
         helperNote: null,
       };
 
@@ -222,7 +234,11 @@ export function derivePipelineLivenessBanner(
 function missingPiecesBody(liveness: PipelineCaseLiveness): string {
   const missing = liveness.breakdown?.missingRequestKeys?.length ?? 0;
   if (missing > 0) {
-    return `${liveness.message} ${missing} expected ${missing === 1 ? "piece is" : "pieces are"} still missing.`;
+    const tail =
+      missing === 1
+        ? tx("{{missing}} expected piece is still missing.", { missing })
+        : tx("{{missing}} expected pieces are still missing.", { missing });
+    return `${liveness.message} ${tail}`;
   }
   return liveness.message;
 }

@@ -1,5 +1,7 @@
 import { checkMcpRemoteHeaderName, checkMcpRemoteHeaderValue, mcpRemoteHeaderRejectionMessage } from "@paperclipai/shared";
 import type { GenericMcpAuthMode } from "@paperclipai/shared";
+import { tx } from "@/i18n/xo";
+import { xoBrandVars } from "@/xo/labels";
 
 /**
  * Logic behind the guided "Connect your own MCP server" flow (PAP-17087).
@@ -97,68 +99,68 @@ export function genericConnectGuidance(
   code: string | null | undefined,
   message: string | null | undefined,
 ): GenericConnectGuidance {
-  const fallback = message?.trim() || "Paperclip couldn't connect to that address. Check it and try again.";
+  const fallback = message?.trim() || tx("{{brand}} couldn't connect to that address. Check it and try again.", xoBrandVars());
   switch (code) {
     case "mcp_remote_url_missing":
     case "mcp_remote_url_invalid":
       return {
-        title: "That doesn't look like a server address",
-        body: "Paste the full address, starting with https:// — for example https://mcp.example.com/mcp.",
+        title: tx("That doesn't look like a server address"),
+        body: tx("Paste the full address, starting with https:// — for example https://mcp.example.com/mcp."),
         focus: "url",
       };
     case "remote_http_private_endpoint":
       return {
-        title: "That address is inside a private network",
-        body: "This Paperclip is reachable from the internet, so it won't call addresses on your local network. Use the server's public address instead.",
+        title: tx("That address is inside a private network"),
+        body: tx("This {{brand}} is reachable from the internet, so it won't call addresses on your local network. Use the server's public address instead.", xoBrandVars()),
         focus: "url",
       };
     case "remote_http_dns_failed":
       return {
-        title: "We couldn't find that host",
-        body: "The address didn't resolve. Check the spelling, or confirm the server is published on the internet.",
+        title: tx("We couldn't find that host"),
+        body: tx("The address didn't resolve. Check the spelling, or confirm the server is published on the internet."),
         focus: "url",
       };
     case "mcp_header_rejected":
       return {
-        title: "Paperclip can't send that header",
+        title: tx("{{brand}} can't send that header", xoBrandVars()),
         body: fallback,
         focus: "credentials",
       };
     case "tool_access_name_conflict":
       return {
-        title: "Paperclip couldn’t name this connection",
-        body: "Try connecting again.",
+        title: tx("{{brand}} couldn’t name this connection", xoBrandVars()),
+        body: tx("Try connecting again."),
         focus: "none",
       };
     case "oauth_challenge":
       return {
-        title: "This server wants a credential",
-        body: "It asked us to authenticate but didn't offer a sign-in Paperclip can complete on its own. Add the key or headers its docs list under Advanced authentication.",
+        title: tx("This server wants a credential"),
+        body: tx("It asked us to authenticate but didn't offer a sign-in {{brand}} can complete on its own. Add the key or headers its docs list under Advanced authentication.", xoBrandVars()),
         focus: "credentials",
       };
     case "oauth_manual_client_required":
     case "oauth_manual_client_rebinding_required":
       return {
-        title: "This server needs sign-in details you create yourself",
-        body: "Register Paperclip in the provider's settings, then add the client ID and secret it gives you under Advanced authentication.",
+        title: tx("This server needs sign-in details you create yourself"),
+        body: tx("Register {{brand}} in the provider's settings, then add the client ID and secret it gives you under Advanced authentication.", xoBrandVars()),
         focus: "credentials",
       };
     case "oauth_redirect_origin_unsupported":
     case "oauth_redirect_uri_invalid":
       return {
-        title: "This Paperclip needs a public HTTPS address first",
-        body: "Sign-in sends the operator back to Paperclip, so this instance has to be reachable over HTTPS. Ask your Paperclip admin to configure it.",
+        title: tx("This {{brand}} needs a public HTTPS address first", xoBrandVars()),
+        body: tx("Sign-in sends the operator back to {{brand}}, so this instance has to be reachable over HTTPS. Ask your {{brand}} admin to configure it.", xoBrandVars()),
         focus: "deployment",
       };
     case "runtime_error":
       return {
-        title: "We couldn't reach that server",
-        body: "Nothing answered at that address. Confirm the server is running and the address is right, then try again.",
+        title: tx("We couldn't reach that server"),
+        body: tx("Nothing answered at that address. Confirm the server is running and the address is right, then try again."),
         focus: "url",
       };
     default:
       return {
-        title: "Paperclip couldn't connect",
+        title: tx("{{brand}} couldn't connect", xoBrandVars()),
         body: fallback,
         focus: "none",
       };
@@ -179,9 +181,9 @@ export function customHeaderError(rows: CustomHeaderRow[]): string | null {
     if (!nameCheck.ok) return mcpRemoteHeaderRejectionMessage(name, nameCheck.reason!);
     const valueCheck = checkMcpRemoteHeaderValue(row.value);
     if (!valueCheck.ok) return mcpRemoteHeaderRejectionMessage(name, valueCheck.reason!);
-    if (!row.value.trim()) return `Add a value for "${name}", or remove the row.`;
+    if (!row.value.trim()) return tx("Add a value for \"{{name}}\", or remove the row.", { name });
     const lower = name.toLowerCase();
-    if (seen.has(lower)) return `"${name}" is listed twice.`;
+    if (seen.has(lower)) return tx("\"{{name}}\" is listed twice.", { name });
     seen.add(lower);
   }
   return null;

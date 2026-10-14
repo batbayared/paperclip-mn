@@ -1,5 +1,6 @@
 import { UserCheck, UserMinus, type LucideIcon } from "lucide-react";
 import { ISSUE_REVIEW_POLICIES, type IssueReviewPolicy } from "@paperclipai/shared";
+import { tx } from "@/i18n/xo";
 
 /**
  * Copy for an issue's `reviewPolicy` (PAP-16506 P4).
@@ -59,7 +60,25 @@ export function issueReviewPolicyBadge(
   policy: IssueReviewPolicy | null | undefined,
 ): IssueReviewPolicyBadge | null {
   if (typeof policy !== "string") return null;
-  return BADGES[policy as IssueReviewPolicy] ?? null;
+  const badge = BADGES[policy as IssueReviewPolicy];
+  if (!badge) return null;
+  // XO: BADGES stays English; label/description are localized at call time.
+  switch (badge.value) {
+    case "not_creator":
+      return {
+        ...badge,
+        label: tx("Anyone else"),
+        description: tx("Anyone except whoever asked for the review can approve it."),
+      };
+    case "human_only":
+      return {
+        ...badge,
+        label: tx("Human only"),
+        description: tx("Only a person can approve this review. Agents cannot give the verdict."),
+      };
+    default:
+      return badge;
+  }
 }
 
 /**
@@ -67,10 +86,26 @@ export function issueReviewPolicyBadge(
  * cleared column must read "anyone" rather than "none".
  */
 export function formatReviewPolicyValue(value: unknown): string {
-  if (value === null || value === undefined) return VALUE_LABELS.anyone;
-  if (typeof value !== "string") return VALUE_LABELS.anyone;
+  if (value === null || value === undefined) return reviewPolicyValueLabel("anyone");
+  if (typeof value !== "string") return reviewPolicyValueLabel("anyone");
   // Forward-compatible: a policy this build does not know reads as itself.
-  return VALUE_LABELS[value as IssueReviewPolicy] ?? value.replace(/_/g, " ");
+  return value in VALUE_LABELS
+    ? reviewPolicyValueLabel(value as IssueReviewPolicy)
+    : value.replace(/_/g, " ");
+}
+
+/** XO: localized mid-sentence wording; VALUE_LABELS stays the English source. */
+function reviewPolicyValueLabel(policy: IssueReviewPolicy): string {
+  switch (policy) {
+    case "anyone":
+      return tx("anyone");
+    case "not_creator":
+      return tx("anyone else");
+    case "human_only":
+      return tx("human only");
+    default:
+      return VALUE_LABELS[policy];
+  }
 }
 
 /**

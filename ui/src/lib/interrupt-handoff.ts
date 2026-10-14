@@ -1,4 +1,6 @@
 import { parseAgentMentionHref } from "@paperclipai/shared";
+import { tx } from "@/i18n/xo";
+import { xoStatusLabel } from "@/xo/labels";
 
 /**
  * Shared logic for the "interrupt handoff" UX clarity surfaces (PAP-10669).
@@ -71,13 +73,13 @@ export function resolveRunStatusPresentation(
 ): RunStatusPresentation {
   if (status === "cancelled" && opts.operatorInterrupted) {
     return {
-      label: "interrupted",
+      label: xoStatusLabel("interrupted", "interrupted"),
       className: "text-amber-700 dark:text-amber-300",
-      srHint: "interrupted by board comment",
+      srHint: tx("interrupted by board comment"),
     };
   }
   return {
-    label: status === "timed_out" ? "timed out" : status.replace(/_/g, " "),
+    label: xoStatusLabel(status, status === "timed_out" ? "timed out" : status.replace(/_/g, " ")),
     className: runStatusClassName(status),
     srHint: null,
   };
@@ -225,13 +227,13 @@ export function computeComposerHandoffPreview(
         ? {
             kind: "interrupt_handoff_agent",
             tone: "neutral",
-            text: "Interrupt current run, hand off to",
+            text: tx("Interrupt current run, hand off to"),
             chip: { kind: "agent", id: target.id },
           }
         : {
             kind: "wake_agent",
             tone: "neutral",
-            text: "Wake",
+            text: tx("Wake"),
             chip: { kind: "agent", id: target.id },
           };
     }
@@ -239,16 +241,16 @@ export function computeComposerHandoffPreview(
       return {
         kind: "user_handoff",
         tone: "neutral",
-        text: "Hand off to",
+        text: tx("Hand off to"),
         chip: { kind: "user", id: target.id },
-        suffix: "— no agent will be notified",
+        suffix: tx("— no agent will be notified"),
       };
     }
     // Cleared / no target chosen for the mutation.
     return {
       kind: "clear_assignee",
       tone: "neutral",
-      text: "Clear responsible — no agent will be notified",
+      text: tx("Clear responsible — no agent will be notified"),
     };
   }
 
@@ -256,9 +258,9 @@ export function computeComposerHandoffPreview(
     return {
       kind: "notify_agent",
       tone: "neutral",
-      text: "Notify",
+      text: tx("Notify"),
       chip: input.mentionedAgentId ? { kind: "agent", id: input.mentionedAgentId } : undefined,
-      suffix: input.mentionedAgentId ? undefined : "the mentioned agent",
+      suffix: input.mentionedAgentId ? undefined : tx("the mentioned agent"),
     };
   }
 
@@ -266,7 +268,7 @@ export function computeComposerHandoffPreview(
     return {
       kind: "plain_text_only",
       tone: "warn",
-      text: "No agent will be notified. Use @ to mention an agent.",
+      text: tx("No agent will be notified. Use @ to mention an agent."),
     };
   }
 
@@ -298,19 +300,21 @@ export function classifyAssigneeHandoff(
   opts: { agentName?: string | null; interruptedRunAttached?: boolean } = {},
 ): AssigneeHandoffInfo {
   if (to.agentId) {
-    const who = opts.agentName ?? "the responsible agent";
-    const suffix = opts.interruptedRunAttached ? " (interrupted run attached)" : "";
-    return { kind: "agent_wake", wakeText: `queued for ${who}${suffix}` };
+    const who = opts.agentName ?? tx("the responsible agent");
+    const wakeText = opts.interruptedRunAttached
+      ? tx("queued for {{who}} (interrupted run attached)", { who })
+      : tx("queued for {{who}}", { who });
+    return { kind: "agent_wake", wakeText };
   }
   if (to.userId) {
     return {
       kind: "user_handoff",
-      wakeText: "not created — this is a handoff to a board user",
+      wakeText: tx("not created — this is a handoff to a board user"),
     };
   }
   return {
     kind: "unassigned",
-    wakeText: "not created — no agent selected. Mention @agent or pick a responsible to dispatch.",
+    wakeText: tx("not created — no agent selected. Mention @agent or pick a responsible to dispatch."),
   };
 }
 
@@ -334,12 +338,12 @@ export interface ReassignInterruptCopy {
  * the interrupt consequence concrete instead of a bare "are you sure".
  */
 export function describeReassignInterrupt(opts: { runningAgentName?: string | null } = {}): ReassignInterruptCopy {
-  const who = opts.runningAgentName?.trim() || "An agent";
+  const who = opts.runningAgentName?.trim() || tx("An agent");
   return {
-    banner: `${who} is running — changing the responsible will interrupt this run.`,
-    confirmTitle: "Interrupt the current run?",
-    confirmAction: "Interrupt & assign",
-    cancelAction: "Cancel",
+    banner: tx("{{who}} is running — changing the responsible will interrupt this run.", { who }),
+    confirmTitle: tx("Interrupt the current run?"),
+    confirmAction: tx("Interrupt & assign"),
+    cancelAction: tx("Cancel"),
   };
 }
 
@@ -375,21 +379,36 @@ export interface PauseAffectsSummary {
   nothingLive: boolean;
 }
 
-const PAUSE_BUCKET_LABEL: Record<PauseAffectsBucketKey, string> = {
-  live_runs: "Live agent runs",
-  queued_wakes: "Queued wakes",
-  agent_owned: "Agent-owned",
-  human_owned: "Human-owned",
-  static: "Static",
-};
+// XO: bucket copy is resolved at call time so tx() follows the active locale.
+function pauseBucketLabel(key: PauseAffectsBucketKey): string {
+  switch (key) {
+    case "live_runs":
+      return tx("Live agent runs");
+    case "queued_wakes":
+      return tx("Queued wakes");
+    case "agent_owned":
+      return tx("Agent-owned");
+    case "human_owned":
+      return tx("Human-owned");
+    case "static":
+      return tx("Static");
+  }
+}
 
-const PAUSE_BUCKET_DETAIL: Record<PauseAffectsBucketKey, string> = {
-  live_runs: "interrupted now, re-queued when you resume",
-  queued_wakes: "held — they won't start until you resume",
-  agent_owned: "responsible agent; no run is live",
-  human_owned: "owned by a board user; pausing won't notify them",
-  static: "no responsible; nothing was going to run",
-};
+function pauseBucketDetail(key: PauseAffectsBucketKey): string {
+  switch (key) {
+    case "live_runs":
+      return tx("interrupted now, re-queued when you resume");
+    case "queued_wakes":
+      return tx("held — they won't start until you resume");
+    case "agent_owned":
+      return tx("responsible agent; no run is live");
+    case "human_owned":
+      return tx("owned by a board user; pausing won't notify them");
+    case "static":
+      return tx("no responsible; nothing was going to run");
+  }
+}
 
 /**
  * Partition the issues an operation affects into the five disjoint buckets the
@@ -429,9 +448,9 @@ export function computePauseAffectsSummary(
   return {
     buckets: order.map((key) => ({
       key,
-      label: PAUSE_BUCKET_LABEL[key],
+      label: pauseBucketLabel(key),
       count: counts[key],
-      detail: PAUSE_BUCKET_DETAIL[key],
+      detail: pauseBucketDetail(key),
     })),
     affectedIssueCount,
     nothingLive: counts.live_runs === 0 && counts.queued_wakes === 0,

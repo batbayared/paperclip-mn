@@ -259,6 +259,23 @@ Gates (2026-10-14): xo:i18n:check OK 5894, xo:i18n:test 11 / 129, tsc 0, vitest 
 - company-members.ts-ийн «Board» шошго.
 - en-д ConnectionSetupFlow-ийн брэнд «XO» гэж гарна (en байт ижил зарчмаас ухамсартай гажсан).
 
+## Ү6 7.17-д хөндсөн upstream файлууд
+
+Tier-гүй үлдсэн .tsx, .ts. BASE e42211749.
+
+| Файл | Өөрчлөлт |
+|---|---|
+| ui/src/components/{AgentBubbleActionRow, OutputFeedbackButtons, PipelineLivenessBanner}.tsx | T1; XoTrans |
+| ui/src/components/{ExecutionParticipantPicker, ProjectRepositoryInput}.tsx | T1; tx |
+| ui/src/components/task-chat/{tool-taxonomy, task-chat-activity-presentation}.ts | tx switch helper; toolActivityEnglishRunningLabel() англи харьцуулалтад |
+| ui/src/components/transcript/native-run-events.ts, ui/src/lib/transcriptPresentation.ts | fallback tx |
+| ui/src/lib/{workspace-access-state, status-card-state, review-policy, pipeline-liveness, pipeline-item-detail, interrupt-handoff, inbox, issue-filters, search-filters, search-query-parser}.ts | Record → thunk/helper; tx |
+| ui/src/pages/StatusCards/StatusCardDetailDrawer.tsx | statusCardLifecycleLabel() |
+| ui/src/components/search/{SearchSortMenu, SearchFilterSheet}.tsx, ui/src/pages/Search.tsx | searchSortLabel() |
+| ui/src/adapters/{adapter-display-registry.ts, paperclip-runner/index.ts} | тайлбар, шошго tx; брэнд {{brand}} |
+| ui/src/pages/apps/generic-mcp-connect.ts | заавар tx |
+| Tier-д нэмсэн бусад 16 .tsx (StatusIcon, FeedCard, PageTabBar г.м.) | T1 л |
+
 ## Ү6 7.16-д хөндсөн upstream файлууд
 
 7.15-ын үлдэгдэл. BASE 69d230b2e.

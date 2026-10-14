@@ -48,7 +48,7 @@ import { SearchSortMenu } from "../components/search/SearchSortMenu";
 import { ZeroResultsRecovery } from "../components/search/ZeroResultsRecovery";
 import { useSidebar } from "../context/SidebarContext";
 import {
-  SORT_LABELS,
+  searchSortLabel,
   countActiveFilters,
   parseSearchSort,
   type FilterChipLookups,
@@ -701,7 +701,7 @@ export function Search() {
                 totalResults={totalResults}
                 allMatchTotal={allMatchTotal}
                 activeFilterCount={activeFilterCount}
-                sortLabel={SORT_LABELS[sort]}
+                sortLabel={searchSortLabel(sort)}
                 zeroResultsSlot={zeroResultsSlot}
                 isFetching={isFetching && !!data}
                 agentsById={agentsById}

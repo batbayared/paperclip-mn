@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { tx } from "@/i18n/xo";
 import type { Agent, Issue } from "@paperclipai/shared";
 import { useQuery } from "@tanstack/react-query";
 import { accessApi } from "../api/access";
@@ -116,7 +117,7 @@ export function ExecutionParticipantPicker({
       <PopoverContent className="p-1 w-56" align="start" collisionPadding={16}>
         <input
           className="w-full px-2 py-1.5 text-xs bg-transparent outline-none border-b border-border mb-1 placeholder:text-muted-foreground/50"
-          placeholder={`Search ${label.toLowerCase()}...`}
+          placeholder={tx("Search {{label}}...", { label: label.toLowerCase() })}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           autoFocus

@@ -3,6 +3,8 @@ import {
   type CompanySearchSort,
 } from "@paperclipai/shared";
 import type { ParsedSearchQuery } from "./search-query-parser";
+import { tx } from "@/i18n/xo";
+import { xoStatusLabel } from "@/xo/labels";
 
 /**
  * The issue-scoped filter model for /search. This is the SAME shape the query
@@ -28,7 +30,24 @@ export const UPDATED_WITHIN_LABELS: Record<string, string> = {
 };
 
 export function updatedWithinLabel(value: string): string {
-  return UPDATED_WITHIN_LABELS[value] ?? `Updated ≤ ${value}`;
+  switch (value) {
+    case "24h": return tx("Last 24 hours");
+    case "7d": return tx("Last 7 days");
+    case "30d": return tx("Last 30 days");
+    case "90d": return tx("Last 90 days");
+    default: return UPDATED_WITHIN_LABELS[value] ?? tx("Updated ≤ {{value}}", { value });
+  }
+}
+
+/** Display label for a sort option (SORT_LABELS stays English for keys/tests). */
+export function searchSortLabel(sort: CompanySearchSort): string {
+  switch (sort) {
+    case "relevance": return tx("Relevance");
+    case "updated": return tx("Recently updated");
+    case "created": return tx("Newest created");
+    case "priority": return tx("Priority");
+    default: return SORT_LABELS[sort];
+  }
 }
 
 const SORT_SET = new Set<string>(COMPANY_SEARCH_SORTS);
@@ -108,16 +127,30 @@ function humanize(value: string): string {
   return value.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
+function statusText(status: string): string {
+  return xoStatusLabel(status, humanize(status));
+}
+
+function priorityText(priority: string): string {
+  switch (priority) {
+    case "critical": return tx("Critical");
+    case "high": return tx("High");
+    case "medium": return tx("Medium");
+    case "low": return tx("Low");
+    default: return humanize(priority);
+  }
+}
+
 function assigneeChipLabel(filters: SearchFilters, lookups: FilterChipLookups): string {
-  if (filters.assigneeAgentId === null) return "Unassigned";
+  if (filters.assigneeAgentId === null) return tx("Unassigned");
   if (typeof filters.assigneeAgentId === "string") {
-    return lookups.agentName(filters.assigneeAgentId) ?? "Agent";
+    return lookups.agentName(filters.assigneeAgentId) ?? tx("Agent");
   }
   if (filters.assigneeUserId) {
-    if (filters.assigneeUserId === lookups.currentUserId) return "Me";
-    return lookups.userName(filters.assigneeUserId) ?? "User";
+    if (filters.assigneeUserId === lookups.currentUserId) return tx("Me");
+    return lookups.userName(filters.assigneeUserId) ?? tx("User");
   }
-  return "Assignee";
+  return tx("Assignee");
 }
 
 /** Removable chip descriptors for the active-filter row. */
@@ -126,7 +159,7 @@ export function buildFilterChips(filters: SearchFilters, lookups: FilterChipLook
   for (const status of filters.status ?? []) {
     chips.push({
       id: `status:${status}`,
-      label: `Status: ${humanize(status)}`,
+      label: tx("Status: {{value}}", { value: statusText(status) }),
       remove: (current) => {
         const next = { ...current };
         const remaining = (current.status ?? []).filter((value) => value !== status);
@@ -144,7 +177,7 @@ export function buildFilterChips(filters: SearchFilters, lookups: FilterChipLook
   for (const priority of filters.priority ?? []) {
     chips.push({
       id: `priority:${priority}`,
-      label: `Priority: ${humanize(priority)}`,
+      label: tx("Priority: {{value}}", { value: priorityText(priority) }),
       remove: (current) => {
         const next = { ...current };
         const remaining = (current.priority ?? []).filter((value) => value !== priority);
@@ -157,7 +190,7 @@ export function buildFilterChips(filters: SearchFilters, lookups: FilterChipLook
   if (filters.assigneeAgentId !== undefined || filters.assigneeUserId) {
     chips.push({
       id: "assignee",
-      label: `Assignee: ${assigneeChipLabel(filters, lookups)}`,
+      label: tx("Assignee: {{value}}", { value: assigneeChipLabel(filters, lookups) }),
       remove: (current) => {
         const next = { ...current };
         delete next.assigneeAgentId;
@@ -169,7 +202,7 @@ export function buildFilterChips(filters: SearchFilters, lookups: FilterChipLook
   if (filters.projectId) {
     chips.push({
       id: "project",
-      label: `Project: ${lookups.projectName(filters.projectId) ?? "Project"}`,
+      label: tx("Project: {{value}}", { value: lookups.projectName(filters.projectId) ?? tx("Project") }),
       remove: (current) => {
         const next = { ...current };
         delete next.projectId;
@@ -180,7 +213,7 @@ export function buildFilterChips(filters: SearchFilters, lookups: FilterChipLook
   if (filters.labelId) {
     chips.push({
       id: "label",
-      label: `Label: ${lookups.labelName(filters.labelId) ?? "Label"}`,
+      label: tx("Label: {{value}}", { value: lookups.labelName(filters.labelId) ?? tx("Label") }),
       remove: (current) => {
         const next = { ...current };
         delete next.labelId;
@@ -191,7 +224,7 @@ export function buildFilterChips(filters: SearchFilters, lookups: FilterChipLook
   if (filters.updatedWithin) {
     chips.push({
       id: "updated",
-      label: `Updated: ${updatedWithinLabel(filters.updatedWithin)}`,
+      label: tx("Updated: {{value}}", { value: updatedWithinLabel(filters.updatedWithin) }),
       remove: (current) => {
         const next = { ...current };
         delete next.updatedWithin;
@@ -207,20 +240,20 @@ export function buildFilterChips(filters: SearchFilters, lookups: FilterChipLook
 export function describeLoosenSuggestion(filterKey: string, values: string[], lookups: FilterChipLookups): string {
   switch (filterKey) {
     case "status":
-      return `Status: ${values.map(humanize).join(", ")}`;
+      return tx("Status: {{value}}", { value: values.map(statusText).join(", ") });
     case "priority":
-      return `Priority: ${values.map(humanize).join(", ")}`;
+      return tx("Priority: {{value}}", { value: values.map(priorityText).join(", ") });
     case "assigneeAgentId":
-      return `Assignee: ${values.map((id) => lookups.agentName(id) ?? "Agent").join(", ")}`;
+      return tx("Assignee: {{value}}", { value: values.map((id) => lookups.agentName(id) ?? tx("Agent")).join(", ") });
     case "assigneeUserId":
-      return `Assignee: ${values.map((id) => (id === lookups.currentUserId ? "Me" : lookups.userName(id) ?? "User")).join(", ")}`;
+      return tx("Assignee: {{value}}", { value: values.map((id) => (id === lookups.currentUserId ? tx("Me") : lookups.userName(id) ?? tx("User"))).join(", ") });
     case "projectId":
-      return `Project: ${values.map((id) => lookups.projectName(id) ?? "Project").join(", ")}`;
+      return tx("Project: {{value}}", { value: values.map((id) => lookups.projectName(id) ?? tx("Project")).join(", ") });
     case "labelId":
-      return `Label: ${values.map((id) => lookups.labelName(id) ?? "Label").join(", ")}`;
+      return tx("Label: {{value}}", { value: values.map((id) => lookups.labelName(id) ?? tx("Label")).join(", ") });
     case "updatedWithin":
     case "updatedAfter":
-      return "Updated window";
+      return tx("Updated window");
     default:
       return humanize(filterKey);
   }

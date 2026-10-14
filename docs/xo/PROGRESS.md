@@ -1,5 +1,28 @@
 # XO ахицын бүртгэл
 
+## Ү6 7.17 Tier-гүй үлдсэн .tsx ба .ts-ийн англи UI мөр (2026-10-14)
+
+Зорилго: tier-д ороогүй 21 .tsx бүрэлдэхүүн болон tier-гүй .ts helper-үүдийн хэрэглэгчид харагдах англи мөрийг орчуулах.
+
+BASE e42211749.
+
+| Хэсэг | Агуулга |
+|---|---|
+| Хүрээ | tiers.ts «// Ү6 7.17» блокт 21 .tsx; scripts/xo-i18n/tiers-y6-7-17.test.ts. .ts файлуудыг tier-д нэмээгүй (модулийн түвшний label-ыг transform ороох эрсдэлтэй), tx-ийг гараар тавьсан |
+| .tsx manual | AgentBubbleActionRow, OutputFeedbackButtons, PipelineLivenessBanner → XoTrans; ExecutionParticipantPicker, ProjectRepositoryInput → tx |
+| task-chat | tool-taxonomy xoExactCopy()/xoActionCopy(), toolActivityEnglishRunningLabel() (англи харьцуулалтад); task-chat-activity-presentation-ийн running/completed/failed/interrupted шошго; native-run-events, transcriptPresentation fallback |
+| lib | workspace-access-state (thunk), status-card-state statusCardLifecycleLabel(), review-policy, pipeline-liveness, pipeline-item-detail, interrupt-handoff, inbox, issue-filters |
+| Хайлт, adapter | search-filters searchSortLabel() + chip загвар, search-query-parser, adapter-display-registry тайлбар, paperclip-runner шошго ({{brand}}), generic-mcp-connect |
+| Каталог | +468 түлхүүр (11309); «https://-ээр» хэлбэр locale-validation-д унасан тул mn утгыг дахин бичсэн |
+| Шалгалт | xo:i18n check OK (11309), xo:i18n:test 438, UI 6585, tsc цэвэр, brand 487/150 |
+
+Үлдэгдэл (шийдвэргүй, мэдээллийн чанартай):
+- ui/src/lib/tool-installs.ts INSTALLED_HINT ашиглагдаагүй код, устгаагүй.
+- Pipelines.tsx targetStageName-ийн fallback humanizePipelineItemStatus-ийг ашигладаг (зөвхөн дэлгэц).
+- adapter-display-registry-д adapter-ийн бүтээгдэхүүний нэр англиар.
+- Inbox-ийн mn эрэмбэлэлт орчуулсан шошгоор localeCompare хийнэ.
+- completed-activity-summary.ts-ийн хураангуй шошго, task-chat-states.ts (зөвхөн lab) хөндөөгүй.
+
 ## Ү6 7.16 7.15-ын үлдэгдэл: хяналтын хугацаа, frontmatter шошго (2026-10-14)
 
 Зорилго: 7.15-ын дараа үлдсэн хяналтын (monitor) хугацааны бичвэр ба импорт/экспортын frontmatter шошгыг орчуулах.

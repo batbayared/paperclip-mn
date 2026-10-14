@@ -1,4 +1,5 @@
 import type { StatusCard, StatusCardRefreshPolicy } from "@paperclipai/shared";
+import { tx } from "@/i18n/xo";
 
 /**
  * The lifecycle states a status card renders as on the board (plan §7,
@@ -111,6 +112,28 @@ export const STATUS_CARD_LIFECYCLE_PRESENTATION: Record<
   },
 };
 
+/** XO: localized lifecycle badge label (the presentation record stays English). */
+export function statusCardLifecycleLabel(lifecycle: StatusCardLifecycle): string {
+  switch (lifecycle) {
+    case "compiling":
+      return tx("Setting up");
+    case "fresh":
+      return tx("Fresh");
+    case "stale":
+      return tx("Stale");
+    case "updating":
+      return tx("Updating");
+    case "error":
+      return tx("Error");
+    case "paused_budget":
+      return tx("Paused — budget");
+    case "paused_hours":
+      return tx("Paused — hours");
+    case "archived":
+      return tx("Archived");
+  }
+}
+
 /** Compact token count, e.g. `1.1k`, `950`, `12.4k`. */
 export function formatTokens(tokens: number): string {
   if (tokens < 1000) return `${tokens}`;
@@ -128,16 +151,16 @@ export function formatUsdFromCents(cents: number): string {
 export function describeRefreshPolicy(policy: StatusCardRefreshPolicy): string {
   switch (policy.mode) {
     case "manual":
-      return "manual";
+      return tx("manual");
     case "interval":
       return policy.intervalMinutes
-        ? `every ${policy.intervalMinutes}m if changed`
-        : "on a schedule if changed";
+        ? tx("every {{minutes}}m if changed", { minutes: policy.intervalMinutes })
+        : tx("on a schedule if changed");
     case "reactive": {
       const debounce = policy.debounceSeconds ?? 60;
-      return `on change (${debounce}s)`;
+      return tx("on change ({{debounce}}s)", { debounce });
     }
     default:
-      return "manual";
+      return tx("manual");
   }
 }

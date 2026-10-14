@@ -2,6 +2,8 @@ import type { PaperclipQuestion, PaperclipQuestionResponse, PaperclipQuestionSet
 import type { UIAdapterModule } from "../types";
 import { parseCodexStdoutLine, buildPaperclipRunnerConfig } from "@paperclipai/adapter-codex-local/ui";
 import { CodexLocalConfigFields } from "../codex-local/config-fields";
+import { tx } from "@/i18n/xo";
+import { xoBrandVars } from "@/xo/labels";
 
 type JsonRecord = Record<string, unknown>;
 
@@ -444,10 +446,10 @@ function runtimeRequestEntry(
     .filter((choice) => choice.key && choice.label)
     .slice(0, 32);
   const actionLabels: Record<string, string> = {
-    accept: "Allow once",
-    accept_for_session: "Allow for session",
-    decline: "Deny",
-    cancel: "Cancel",
+    accept: tx("Allow once"),
+    accept_for_session: tx("Allow for session"),
+    decline: tx("Deny"),
+    cancel: tx("Cancel"),
   };
   const actions = (Array.isArray(request.actions) ? request.actions : [])
     .filter((action): action is string => typeof action === "string" && action in actionLabels)
@@ -473,7 +475,7 @@ function runtimeRequestEntry(
     .map(record)
     .map((field, index) => ({
       name: text(field.name, `answer_${index + 1}`).slice(0, 160),
-      label: text(field.label, text(field.name, `Answer ${index + 1}`)).slice(0, 240),
+      label: text(field.label, text(field.name, tx("Answer {{n}}", { n: index + 1 }))).slice(0, 240),
       placeholder: nullableText(field.placeholder)?.slice(0, 500) ?? null,
     }))
     .filter((field) => field.name && field.label)
@@ -490,7 +492,7 @@ function runtimeRequestEntry(
     turnId: nullableText(request.turnId) ?? nullableText(payload.turnId) ?? nullableText(event.turnId) ?? previous?.turnId ?? null,
     requestType,
     status,
-    prompt: text(request.prompt, previous?.prompt ?? "Runtime approval requested"),
+    prompt: text(request.prompt, previous?.prompt ?? tx("Runtime approval requested")),
     choices,
     fields,
     questionSet,
@@ -537,7 +539,7 @@ function parseQuestionSet(value: unknown): PaperclipQuestionSet | null {
     const answerMode: PaperclipQuestion["answerMode"] = question.answerMode === "single_select" || question.answerMode === "multi_select" ? question.answerMode : "text";
     const options = (Array.isArray(question.options) ? question.options : []).map(record).slice(0, 128).map((option, optionIndex) => ({
       id: text(option.id, `option-${optionIndex + 1}`).slice(0, 160),
-      label: text(option.label, `Option ${optionIndex + 1}`).slice(0, 1_000),
+      label: text(option.label, tx("Option {{n}}", { n: optionIndex + 1 })).slice(0, 1_000),
       ...(nullableText(option.description) ? { description: text(option.description).slice(0, 4_000) } : {}),
     }));
     const customAnswer = record(question.customAnswer);
@@ -590,21 +592,21 @@ function runResultEntry(payload: JsonRecord, ts: string): Extract<TranscriptEntr
     kind: "run_result",
     ts,
     disposition,
-    summary: text(payload.summary, "Run completed"),
+    summary: text(payload.summary, tx("Run completed")),
     objectiveSatisfied: typeof completion.objectiveSatisfied === "boolean" ? completion.objectiveSatisfied : null,
     verification: (Array.isArray(payload.verification) ? payload.verification : []).map(record).slice(0, 64).map((item) => ({
-      commandOrCheck: text(item.commandOrCheck, "Verification"),
+      commandOrCheck: text(item.commandOrCheck, tx("Verification")),
       status: item.status === "passed" || item.status === "failed" ? item.status : "not_run",
       detail: nullableText(item.detail) ?? undefined,
       artifactRef: nullableText(item.artifactRef) ?? undefined,
     })),
     remainingWork: (Array.isArray(completion.remainingWork) ? completion.remainingWork : []).map(record).slice(0, 64).map((item) => ({
-      description: text(item.description, "Remaining work"),
+      description: text(item.description, tx("Remaining work")),
       blocksCompletion: item.blocksCompletion === true,
     })),
     blocker: Object.keys(blocker).length > 0 ? {
       reasonCode: text(blocker.reasonCode, "blocked"),
-      unblockAction: text(blocker.unblockAction, "Resolve the blocker to continue."),
+      unblockAction: text(blocker.unblockAction, tx("Resolve the blocker to continue.")),
       scope: blocker.scope === "task_wide" ? "task_wide" : "current_track",
     } : null,
     artifacts: (Array.isArray(payload.artifacts) ? payload.artifacts : []).map(record).slice(0, 64).map((item) => ({
@@ -689,7 +691,7 @@ function parsePrpEvent(
       : rawStatus === "failed" || rawStatus === "denied" ? "failed"
         : rawStatus === "interrupted" || rawStatus === "cancelled" ? "interrupted"
           : (family === "plan" && payload.complete === true) || eventType.endsWith("completed") || rawStatus === "completed" ? "completed" : "informational";
-    const title = ({ plan: "Plan", tool_execution: "Tool execution", research: "Research", delegation: "Delegation", model_identity: "Model", context: "Context", artifact: "Artifact", review: "Review mode", hook: "Hook", memory: "Memory citation", safety: "Safety review", terminal: "Terminal input", wait: "Intentional wait", provider_notice: "Provider notice" } as const)[family];
+    const title = ({ plan: tx("Plan"), tool_execution: tx("Tool execution"), research: tx("Research"), delegation: tx("Delegation"), model_identity: tx("Model"), context: tx("Context"), artifact: tx("Artifact"), review: tx("Review mode"), hook: tx("Hook"), memory: tx("Memory citation"), safety: tx("Safety review"), terminal: tx("Terminal input"), wait: tx("Intentional wait"), provider_notice: tx("Provider notice") })[family];
     const summary = family === "model_identity"
       ? text(payload.summary, text(payload.effectiveModel, text(payload.requestedModel, text(payload.provider, eventType))))
       : text(payload.summary, text(payload.name, text(payload.query, eventType)));
@@ -700,7 +702,7 @@ function parsePrpEvent(
   }
   if (eventType === "workspace.file.referenced") {
     const entry = workspaceFileReferenceEntry(payload, ts);
-    return entry ? [entry] : [{ kind: "system", ts, text: "Runner: Ignored an unsafe workspace file reference" }];
+    return entry ? [entry] : [{ kind: "system", ts, text: tx("Runner: Ignored an unsafe workspace file reference") }];
   }
   if (eventType.startsWith("runtime_request.")) {
     const entry = runtimeRequestEntry(eventType, payload, event, ts, state);
@@ -718,11 +720,11 @@ function parsePrpEvent(
     const context = record(payload.context);
     const model = text(context.model, text(record(payload.model).name, "Paperclip runner"));
     const sessionId = text(payload.providerSessionId, text(payload.driverSessionId, text(event.normalizedSessionId)));
-    return [{ kind: "system", ts, text: `Paperclip session ${eventType === "session.resumed" ? "resumed" : "started"} · ${model}${sessionId ? ` · ${sessionId}` : ""}` }];
+    return [{ kind: "system", ts, text: `${eventType === "session.resumed" ? tx("{{brand}} session resumed", xoBrandVars()) : tx("{{brand}} session started", xoBrandVars())} · ${model}${sessionId ? ` · ${sessionId}` : ""}` }];
   }
-  if (eventType === "turn.started") return [{ kind: "system", ts, text: "Turn started" }];
-  if (eventType === "turn.completed") return [{ kind: "system", ts, text: "Turn completed" }];
-  if (eventType === "turn.failed") return [{ kind: "stderr", ts, text: text(record(payload.error).message, "Turn failed") }];
+  if (eventType === "turn.started") return [{ kind: "system", ts, text: tx("Turn started") }];
+  if (eventType === "turn.completed") return [{ kind: "system", ts, text: tx("Turn completed") }];
+  if (eventType === "turn.failed") return [{ kind: "stderr", ts, text: text(record(payload.error).message, tx("Turn failed")) }];
   if (eventType === "item.started" || eventType === "item.completed") {
     if (payload.kind === "usage") return [usageEntry(payload, ts)];
     return parseItemEvent(event, payload, eventType === "item.started" ? "started" : "completed", ts, state);
@@ -730,7 +732,7 @@ function parsePrpEvent(
   if (eventType === "item.failed") {
     const item = record(payload.item);
     const error = record(payload.error);
-    return [{ kind: "stderr", ts, text: text(error.message, text(item.error, "Runner item failed")) }];
+    return [{ kind: "stderr", ts, text: text(error.message, text(item.error, tx("Runner item failed"))) }];
   }
   if (eventType === "item.delta") return parseDeltaEvent(event, payload, ts, state);
   if (eventType === "usage.reported") return [usageEntry(payload, ts)];

@@ -16,6 +16,7 @@ import {
   TerminalSquare,
   Users,
 } from "lucide-react";
+import { tx } from "@/i18n/xo";
 import type {
   TaskChatMaterializedResourceItem,
   TaskChatProtocolItem,
@@ -27,6 +28,7 @@ import {
   humanizeToolName,
   isGenericToolName,
   mcpToolIdentity,
+  toolActivityEnglishRunningLabel,
   toolActivityPresentation,
   type ToolIcon,
 } from "./tool-taxonomy";
@@ -56,25 +58,26 @@ export function providerActivityPresentation(item: TaskChatProviderActivityItem)
     case "research": {
       const action = providerDetail(item, "Action")?.toLowerCase();
       if (action === "open_page") {
-        return { icon: Search, runningLabel: "Opening a web page", completedLabel: "Opened a web page", failedLabel: "Couldn’t open the web page", interruptedLabel: "Stopped opening the web page", detail };
+        return { icon: Search, runningLabel: tx("Opening a web page"), completedLabel: tx("Opened a web page"), failedLabel: tx("Couldn’t open the web page"), interruptedLabel: tx("Stopped opening the web page"), detail };
       }
       if (action === "find_in_page") {
-        return { icon: Search, runningLabel: "Searching the page", completedLabel: "Searched the page", failedLabel: "Page search failed", interruptedLabel: "Page search stopped", detail };
+        return { icon: Search, runningLabel: tx("Searching the page"), completedLabel: tx("Searched the page"), failedLabel: tx("Page search failed"), interruptedLabel: tx("Page search stopped"), detail };
       }
-      return { icon: Search, runningLabel: "Searching the web", completedLabel: "Searched the web", failedLabel: "Web search failed", interruptedLabel: "Web search stopped", detail };
+      return { icon: Search, runningLabel: tx("Searching the web"), completedLabel: tx("Searched the web"), failedLabel: tx("Web search failed"), interruptedLabel: tx("Web search stopped"), detail };
     }
     case "tool_execution": {
       const name = providerDetail(item, "Name");
       const target = providerDetail(item, "Target");
       const progress = providerDetail(item, "Progress");
-      const tool = toolActivityPresentation({
+      const toolInput = {
         name,
         transport: providerDetail(item, "Transport"),
         namespace: providerDetail(item, "Namespace"),
         operation: providerDetail(item, "Operation"),
         target,
         progress,
-      });
+      };
+      const tool = toolActivityPresentation(toolInput);
       const boundedActivity = meaningfulToolDetail(item.summary)
         ?? meaningfulToolDetail(progress)
         ?? meaningfulToolDetail(target);
@@ -84,7 +87,7 @@ export function providerActivityPresentation(item: TaskChatProviderActivityItem)
       const technicalName = name ? mcpToolIdentity(name)?.name ?? name : tool.displayName;
       const source = tool.sourceLabel
         ? `${tool.sourceLabel} · ${technicalName}`
-        : name && !isGenericToolName(name) && humanizeToolName(name) !== tool.runningLabel.replace(/^Running /, "")
+        : name && !isGenericToolName(name) && humanizeToolName(name) !== toolActivityEnglishRunningLabel(toolInput).replace(/^Running /, "")
           ? name
           : undefined;
       return {
@@ -97,59 +100,59 @@ export function providerActivityPresentation(item: TaskChatProviderActivityItem)
       };
     }
     case "plan":
-      return { icon: ListChecks, runningLabel: "Updating the plan", completedLabel: "Updated the plan", failedLabel: "Plan update failed", interruptedLabel: "Plan update stopped", detail };
+      return { icon: ListChecks, runningLabel: tx("Updating the plan"), completedLabel: tx("Updated the plan"), failedLabel: tx("Plan update failed"), interruptedLabel: tx("Plan update stopped"), detail };
     case "delegation": {
       const action = providerDetail(item, "Action")?.toLowerCase();
-      if (action === "message") return { icon: Users, runningLabel: "Messaging a subagent", completedLabel: "Messaged a subagent", failedLabel: "Subagent message failed", interruptedLabel: "Subagent message stopped", detail };
-      if (action === "resume") return { icon: Users, runningLabel: "Resuming a subagent", completedLabel: "Resumed a subagent", failedLabel: "Couldn’t resume the subagent", interruptedLabel: "Subagent resume stopped", detail };
-      if (action === "close") return { icon: Users, runningLabel: "Closing a subagent", completedLabel: "Closed a subagent", failedLabel: "Couldn’t close the subagent", interruptedLabel: "Subagent close stopped", detail };
-      if (action === "wait") return { icon: Users, runningLabel: "Waiting for subagents", completedLabel: "Finished waiting for subagents", failedLabel: "Subagent wait failed", interruptedLabel: "Stopped waiting for subagents", detail };
-      return { icon: Users, runningLabel: "Starting a subagent", completedLabel: "Started a subagent", failedLabel: "Subagent start failed", interruptedLabel: "Subagent start stopped", detail };
+      if (action === "message") return { icon: Users, runningLabel: tx("Messaging a subagent"), completedLabel: tx("Messaged a subagent"), failedLabel: tx("Subagent message failed"), interruptedLabel: tx("Subagent message stopped"), detail };
+      if (action === "resume") return { icon: Users, runningLabel: tx("Resuming a subagent"), completedLabel: tx("Resumed a subagent"), failedLabel: tx("Couldn’t resume the subagent"), interruptedLabel: tx("Subagent resume stopped"), detail };
+      if (action === "close") return { icon: Users, runningLabel: tx("Closing a subagent"), completedLabel: tx("Closed a subagent"), failedLabel: tx("Couldn’t close the subagent"), interruptedLabel: tx("Subagent close stopped"), detail };
+      if (action === "wait") return { icon: Users, runningLabel: tx("Waiting for subagents"), completedLabel: tx("Finished waiting for subagents"), failedLabel: tx("Subagent wait failed"), interruptedLabel: tx("Stopped waiting for subagents"), detail };
+      return { icon: Users, runningLabel: tx("Starting a subagent"), completedLabel: tx("Started a subagent"), failedLabel: tx("Subagent start failed"), interruptedLabel: tx("Subagent start stopped"), detail };
     }
     case "model_identity":
       return item.eventType === "model.route.changed"
-        ? { icon: Bot, runningLabel: "Switching models", completedLabel: "Switched models", failedLabel: "Model switch failed", interruptedLabel: "Model switch stopped", detail }
-        : { icon: Bot, runningLabel: "Verifying the model", completedLabel: "Verified the model", failedLabel: "Model verification failed", interruptedLabel: "Model verification stopped", detail };
+        ? { icon: Bot, runningLabel: tx("Switching models"), completedLabel: tx("Switched models"), failedLabel: tx("Model switch failed"), interruptedLabel: tx("Model switch stopped"), detail }
+        : { icon: Bot, runningLabel: tx("Verifying the model"), completedLabel: tx("Verified the model"), failedLabel: tx("Model verification failed"), interruptedLabel: tx("Model verification stopped"), detail };
     case "context":
-      return { icon: Database, runningLabel: "Compacting context", completedLabel: "Compacted context", failedLabel: "Context compaction failed", interruptedLabel: "Context compaction stopped", detail };
+      return { icon: Database, runningLabel: tx("Compacting context"), completedLabel: tx("Compacted context"), failedLabel: tx("Context compaction failed"), interruptedLabel: tx("Context compaction stopped"), detail };
     case "artifact": {
       const viewed = item.eventType === "artifact.viewed";
       return viewed
-        ? { icon: Box, runningLabel: "Viewing an artifact", completedLabel: "Viewed an artifact", failedLabel: "Couldn’t view the artifact", interruptedLabel: "Artifact view stopped", detail }
-        : { icon: Box, runningLabel: "Generating an artifact", completedLabel: "Generated an artifact", failedLabel: "Artifact generation failed", interruptedLabel: "Artifact generation stopped", detail };
+        ? { icon: Box, runningLabel: tx("Viewing an artifact"), completedLabel: tx("Viewed an artifact"), failedLabel: tx("Couldn’t view the artifact"), interruptedLabel: tx("Artifact view stopped"), detail }
+        : { icon: Box, runningLabel: tx("Generating an artifact"), completedLabel: tx("Generated an artifact"), failedLabel: tx("Artifact generation failed"), interruptedLabel: tx("Artifact generation stopped"), detail };
     }
     case "review": {
       const state = providerDetail(item, "State")?.toLowerCase();
       return state === "exited"
-        ? { icon: FileCheck2, runningLabel: "Leaving review mode", completedLabel: "Left review mode", failedLabel: "Couldn’t leave review mode", interruptedLabel: "Review-mode change stopped", detail }
-        : { icon: FileCheck2, runningLabel: "Entering review mode", completedLabel: "Entered review mode", failedLabel: "Couldn’t enter review mode", interruptedLabel: "Review-mode change stopped", detail };
+        ? { icon: FileCheck2, runningLabel: tx("Leaving review mode"), completedLabel: tx("Left review mode"), failedLabel: tx("Couldn’t leave review mode"), interruptedLabel: tx("Review-mode change stopped"), detail }
+        : { icon: FileCheck2, runningLabel: tx("Entering review mode"), completedLabel: tx("Entered review mode"), failedLabel: tx("Couldn’t enter review mode"), interruptedLabel: tx("Review-mode change stopped"), detail };
     }
     case "hook":
-      return { icon: GitBranch, runningLabel: "Running a hook", completedLabel: "Ran a hook", failedLabel: "Hook failed", interruptedLabel: "Hook stopped", detail };
+      return { icon: GitBranch, runningLabel: tx("Running a hook"), completedLabel: tx("Ran a hook"), failedLabel: tx("Hook failed"), interruptedLabel: tx("Hook stopped"), detail };
     case "memory":
-      return { icon: BookOpen, runningLabel: "Checking memory", completedLabel: "Referenced memory", failedLabel: "Memory lookup failed", interruptedLabel: "Memory lookup stopped", detail };
+      return { icon: BookOpen, runningLabel: tx("Checking memory"), completedLabel: tx("Referenced memory"), failedLabel: tx("Memory lookup failed"), interruptedLabel: tx("Memory lookup stopped"), detail };
     case "safety":
-      return { icon: ShieldCheck, runningLabel: "Reviewing safety", completedLabel: "Reviewed safety", failedLabel: "Safety review failed", interruptedLabel: "Safety review stopped", detail };
+      return { icon: ShieldCheck, runningLabel: tx("Reviewing safety"), completedLabel: tx("Reviewed safety"), failedLabel: tx("Safety review failed"), interruptedLabel: tx("Safety review stopped"), detail };
     case "terminal":
-      return { icon: TerminalSquare, runningLabel: "Sending terminal input", completedLabel: "Sent terminal input", failedLabel: "Terminal input failed", interruptedLabel: "Terminal input stopped", detail };
+      return { icon: TerminalSquare, runningLabel: tx("Sending terminal input"), completedLabel: tx("Sent terminal input"), failedLabel: tx("Terminal input failed"), interruptedLabel: tx("Terminal input stopped"), detail };
     case "wait":
-      return { icon: Clock3, runningLabel: "Waiting", completedLabel: "Finished waiting", failedLabel: "Wait failed", interruptedLabel: "Wait stopped", detail };
+      return { icon: Clock3, runningLabel: tx("Waiting"), completedLabel: tx("Finished waiting"), failedLabel: tx("Wait failed"), interruptedLabel: tx("Wait stopped"), detail };
     case "provider_notice":
-      return { icon: AlertTriangle, runningLabel: "Provider notice", completedLabel: "Provider notice", failedLabel: "Provider error", interruptedLabel: "Provider notice", detail };
+      return { icon: AlertTriangle, runningLabel: tx("Provider notice"), completedLabel: tx("Provider notice"), failedLabel: tx("Provider error"), interruptedLabel: tx("Provider notice"), detail };
   }
 }
 
 function workspaceChangePresentation(item: TaskChatWorkspaceChangeItem): TaskChatActivityPresentation {
   const count = item.totals.files || item.files.length;
-  const detail = count > 0 ? `${count} ${count === 1 ? "file" : "files"}` : undefined;
-  return { icon: FilePenLine, runningLabel: "Editing files", completedLabel: "Edited files", detail };
+  const detail = count > 0 ? (count === 1 ? tx("{{n}} file", { n: count }) : tx("{{n}} files", { n: count })) : undefined;
+  return { icon: FilePenLine, runningLabel: tx("Editing files"), completedLabel: tx("Edited files"), detail };
 }
 
 function workspaceFilePresentation(item: TaskChatWorkspaceFileItem): TaskChatActivityPresentation {
   return {
     icon: FileText,
-    runningLabel: "Referencing a file",
-    completedLabel: "Referenced a file",
+    runningLabel: tx("Referencing a file"),
+    completedLabel: tx("Referenced a file"),
     detail: item.line == null ? item.path : `${item.path}:${item.line}`,
   };
 }
@@ -157,8 +160,8 @@ function workspaceFilePresentation(item: TaskChatWorkspaceFileItem): TaskChatAct
 function resourcePresentation(item: TaskChatMaterializedResourceItem): TaskChatActivityPresentation {
   return {
     icon: item.resourceKind === "document" ? FileText : PackageCheck,
-    runningLabel: "Saving a resource",
-    completedLabel: item.resourceKind === "document" ? "Added a document" : "Added a deliverable",
+    runningLabel: tx("Saving a resource"),
+    completedLabel: item.resourceKind === "document" ? tx("Added a document") : tx("Added a deliverable"),
     detail: item.title,
   };
 }
@@ -186,7 +189,7 @@ export function protocolActivityLabel(item: TaskChatProtocolItem, presentation: 
   if (item.surface !== "provider_activity") {
     return protocolActivityIsRunning(item) ? presentation.runningLabel : presentation.completedLabel;
   }
-  if (item.status === "failed") return presentation.failedLabel ?? `${presentation.completedLabel} · failed`;
-  if (item.status === "interrupted") return presentation.interruptedLabel ?? `${presentation.completedLabel} · interrupted`;
+  if (item.status === "failed") return presentation.failedLabel ?? tx("{{label}} · failed", { label: presentation.completedLabel });
+  if (item.status === "interrupted") return presentation.interruptedLabel ?? tx("{{label}} · interrupted", { label: presentation.completedLabel });
   return item.status === "running" ? presentation.runningLabel : presentation.completedLabel;
 }

@@ -1,4 +1,5 @@
 import { AlertTriangle, ExternalLink, Loader2, Lock, RefreshCw } from "lucide-react";
+import { XoTrans } from "@/xo/XoTrans";
 import type { PipelineCaseLiveness } from "@paperclipai/shared";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/lib/router";
@@ -115,11 +116,11 @@ export function PipelineLivenessBanner({
           <p className="text-sm opacity-85">{view.body}</p>
           {view.permissionKey ? (
             <p className="text-sm opacity-85">
-              Required permission:{" "}
-              <code className="rounded-sm bg-black/10 px-1 py-0.5 text-xs font-medium dark:bg-white/10">
-                {view.permissionKey}
-              </code>{" "}
-              on the target pipeline.
+              <XoTrans
+                i18nKey="Required permission: <code>{{permissionKey}}</code> on the target pipeline."
+                values={{ permissionKey: view.permissionKey }}
+                components={{ code: <code className="rounded-sm bg-black/10 px-1 py-0.5 text-xs font-medium dark:bg-white/10" /> }}
+              />
             </p>
           ) : null}
           {view.blockerLink || view.automationLink ? (
