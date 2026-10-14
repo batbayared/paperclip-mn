@@ -246,4 +246,6 @@ export const XO_TRANSFORM_FILES: readonly string[] = [
   "ui/src/pages/tools/AuditTab.tsx",
   "ui/src/components/IssueRunLedger.tsx",
   "ui/src/components/CommentAttributionChip.tsx",
+  // Ү6 7.12 — 7.11-ийн үлдэгдэл: dev серверийн дахин эхлүүлэх баннер
+  "ui/src/components/DevRestartBanner.tsx",
 ];

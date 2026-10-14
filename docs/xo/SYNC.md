@@ -259,6 +259,30 @@ Gates (2026-10-14): xo:i18n:check OK 5894, xo:i18n:test 11 / 129, tsc 0, vitest 
 - company-members.ts-ийн «Board» шошго.
 - en-д ConnectionSetupFlow-ийн брэнд «XO» гэж гарна (en байт ижил зарчмаас ухамсартай гажсан).
 
+## Ү6 7.12-д хөндсөн upstream файлууд
+
+7.11-ийн үлдэгдлийг хаасан. BASE 1252e0d74. ED шийдвэр (2026-10-14): *.production.tsx хүрээнээс гадуур; нэр томьёог Claude засаж тайлагнана (PROGRESS.md-ийн 7.12 хүснэгт).
+
+| Файл | Өөрчлөлт |
+|---|---|
+| ui/src/components/DevRestartBanner.tsx | T1; describeReason, live run ганц/олон тоо, confirm, alert гар tx; XoTrans <code>; «Restart Paperclip now?» түлхүүр литерал (mn-д XO) |
+| ui/src/components/IssueRunLedger.tsx | statusLabel → xoStatusLabel; тоолууртай 2 мөр tx |
+| ui/src/lib/company-members.ts | local-board «Board» нэр tx (fallbackUserLabel, baseMemberLabel) |
+| ui/src/components/SidebarAccountMenu.tsx | local-board «Board» нэр tx |
+
+Хөндөгдөөгүй: серверийн код, *.production.tsx (SidebarAccountMenu.production.tsx-ийн «Board» англиар).
+
+XO-ийн өмч: scripts/xo-i18n/tiers.ts (+1 файл T1), ui/src/i18n/xo/* (keys=5914, +20; mn.json-д нэр томьёоны 4 засвар).
+
+XO-ийн тестүүд: scripts/xo-i18n/tiers-y6-7-12.test.ts (шинэ).
+
+Gates (2026-10-14): xo:i18n:check OK 5914, xo:i18n:test 12 / 131, tsc 0, xo:brand-scan OK 566 / 161; vitest ui/src-ийн timeout-аар унасан тестүүд тусад нь давсан.
+
+Үлдэгдэл (Ү6 7.12):
+- *.production.tsx англиар.
+- Activity-ийн дотоод action англи fallback.
+- en-д ConnectionSetupFlow-ийн брэнд «XO» гэж гарна (7.11-ээс).
+
 ## Lockfile" хэсгийн дүрмээр зохицуулагдана.
 
 ## Ү3-А-д хөндсөн upstream файлууд

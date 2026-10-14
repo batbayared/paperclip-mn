@@ -10,6 +10,7 @@ import {
   UserRoundPen,
 } from "lucide-react";
 import type { DeploymentMode } from "@paperclipai/shared";
+import { tx } from "@/i18n/xo";
 import { Link } from "@/lib/router";
 import { authApi } from "@/api/auth";
 import { queryKeys } from "@/lib/queryKeys";
@@ -128,7 +129,10 @@ export function SidebarAccountMenu({
 
   const signOutMutation = useSignOut({ onSignedOut: closeNavigationChrome });
 
-  const displayName = session?.user.name?.trim() || "Board";
+  const sessionName = session?.user.name?.trim();
+  // local_trusted горимд сервер «Board» нэр өгдөг — mn-д орчуулна, en-д хэвээр.
+  const displayName =
+    !sessionName || (session?.user.id === "local-board" && sessionName === "Board") ? tx("Board") : sessionName;
   const secondaryLabel =
     session?.user.email?.trim() || (deploymentMode === "authenticated" ? "Signed in" : "Local workspace board");
   const initials = deriveInitials(displayName);

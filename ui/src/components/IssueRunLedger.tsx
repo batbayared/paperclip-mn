@@ -8,6 +8,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@/lib/router";
 import { tx } from "@/i18n/xo";
 import { XoTrans } from "@/xo/XoTrans";
+import { xoStatusLabel } from "@/xo/labels";
 import { accessApi, type CurrentBoardAccess } from "../api/access";
 import {
   activityApi,
@@ -282,7 +283,7 @@ function mergeRuns(
 }
 
 function statusLabel(status: string) {
-  return status.replace(/_/g, " ");
+  return xoStatusLabel(status, status.replace(/_/g, " "));
 }
 
 function isActiveRun(run: Pick<LedgerRun, "status" | "isLive">) {
@@ -733,7 +734,7 @@ export function IssueRunLedgerContent({
               ))}
               {children.active.length > 4 ? (
                 <span className="rounded-md border border-border px-2 py-1 text-(length:--text-micro) text-muted-foreground">
-                  +{children.active.length - 4} more
+                  {tx("+{{n}} more", { n: children.active.length - 4 })}
                 </span>
               ) : null}
             </div>
@@ -1043,7 +1044,7 @@ export function IssueRunLedgerContent({
           })}
           {feedItems.length > 20 ? (
             <div className="px-3 py-2 text-xs text-muted-foreground">
-              {feedItems.length - 20} older items not shown
+              {tx("{{n}} older items not shown", { n: feedItems.length - 20 })}
             </div>
           ) : null}
         </div>

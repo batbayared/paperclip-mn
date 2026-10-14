@@ -1,3 +1,4 @@
+import { tx } from "@/i18n/xo";
 import type { CompanyMember, CompanyUserDirectoryEntry } from "@/api/access";
 import type { InlineEntityOption } from "@/components/InlineEntitySelector";
 import type { MentionOption } from "@/components/MarkdownEditor";
@@ -12,12 +13,14 @@ type CompanyUserRecord = Pick<CompanyMember, "principalId" | "status" | "user">
   | CompanyUserDirectoryEntry;
 
 function fallbackUserLabel(userId: string): string {
-  if (userId === "local-board") return "Board";
+  if (userId === "local-board") return tx("Board");
   return userId.slice(0, 5);
 }
 
 function baseMemberLabel(member: Pick<CompanyUserRecord, "principalId" | "user">): string {
   const name = member.user?.name?.trim();
+  // local_trusted горимд сервер «Board» нэр өгдөг — mn-д орчуулна, en-д хэвээр.
+  if (name === "Board" && member.principalId === "local-board") return tx("Board");
   if (name) return name;
   const email = member.user?.email?.trim();
   if (email) return email;

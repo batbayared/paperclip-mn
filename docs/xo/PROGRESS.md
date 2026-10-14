@@ -1,5 +1,40 @@
 # XO ахицын бүртгэл
 
+## Ү6 7.12 7.11-ийн үлдэгдэл (2026-10-14)
+
+Зорилго: 7.11-ийн үлдэгдлийг хаах: dev серверийн «RESTART REQUIRED» баннер, IssueRunLedger-ийн тоолуур ба run.status, local-board хэрэглэгчийн «Board» нэр, нэр томьёоны засвар. Серверийн код хөндөгдөөгүй. en гаралт 1252e0d74-тэй байт ижил.
+
+Төлөвлөгөө: docs/superpowers/plans/2026-10-14-xo-y6-7-12-leftovers.md. BASE 1252e0d74.
+
+ED шийдвэр (2026-10-14): *.production.tsx хүрээнээс гадуур хэвээр. Нэр томьёог Claude засаж, өмнө ба дараах утгыг тайлагнана.
+
+| Хэсэг | Агуулга |
+|---|---|
+| DevRestartBanner | tiers «// Ү6 7.12» (+1 файл); describeReason, live run ганц/олон тоо, confirm («Restart Paperclip now?» түлхүүр литерал, mn-д XO), алдаа, « +{{n}} more», «Waiting for …», XoTrans <code>pnpm dev:once</code> |
+| IssueRunLedger | statusLabel → xoStatusLabel (en-д хуучин replace), «+{{n}} more», «{{n}} older items not shown» |
+| company-members.ts | fallbackUserLabel ба baseMemberLabel: local-board хэрэглэгчийн «Board» нэр mn-д «Удирдах зөвлөл» |
+| SidebarAccountMenu | local-board-ийн «Board» нэр mn-д «Удирдах зөвлөл» (аватар «УЗ») |
+| mn.json | нэр томьёоны 4 засвар (доор) |
+
+Нэр томьёоны засвар (mn.json):
+
+| Түлхүүр | Өмнө | Дараа |
+|---|---|---|
+| Integration smoke | Интеграцийн шалгалт | Интеграцийн шуурхай шалгалт |
+| on behalf of {{responsibleLabel}} | {{responsibleLabel}}-ийн нэрийн өмнөөс | нэрийн өмнөөс: {{responsibleLabel}} |
+| Acting on behalf of {{onBehalfOfLabel}} | {{onBehalfOfLabel}}-ийн нэрийн өмнөөс ажиллаж байна | Нэрийн өмнөөс ажиллаж байна: {{onBehalfOfLabel}} |
+| Posted on behalf of {{user}} | {{user}}-ийн нэрийн өмнөөс нийтэлсэн | Нэрийн өмнөөс нийтэлсэн: {{user}} |
+
+Каталогийн бусад газартай нийцүүлэхээр хэвээр үлдээсэн: «Товлосон heartbeat» (heartbeat бүх газар латинаар), «орчны түрээс» («Сэндбоксын N түрээс»-тэй ижил), «Idempotent баталгаа» (техникийн нэр томьёо), «хариуцагч оноолоо:».
+
+Түлхүүр: 5914 (+20).
+
+### Шалгалтын үр дүн
+
+- Gates (2026-10-14): xo:i18n:check OK keys=5914, xo:i18n:test 12 файл / 131, ui tsc 0 алдаа, xo:brand-scan OK 566 / 161. vitest ui/src 625 файл / 6582: машины ачаалал өндөр (load 24) үед ажиллуулалт бүрт өөр 2–5 тест timeout-д унасан (IssueDetail, NewAgent, AgentConfigForm, IssueProperties, CompanySettings); тусад нь ажиллуулахад бүгд давсан, 7.12-ийн файлтай холбоогүй.
+- Хөтчийн шалгалт (3110, mn): dev баннер бүхэлдээ Монголоор («ДАХИН ЭХЛҮҮЛЭХ ШААРДЛАГАТАЙ», «сервер асснаас хойш backend файлууд өөрчлөгдсөн · шинэчилсэн 4 мин өмнө», «Одоо дахин эхлүүлэх»), /YB/activity «нэрийн өмнөөс: Удирдах зөвлөл», хажуугийн цэс «УЗ Удирдах зөвлөл», даалгаврын «Үүсгэгч: Удирдах зөвлөл». en-д нэг удаа харьцуулав: баннер, «Originating Board», хажуугийн цэс «BO Board» хуучин хэвээр.
+- IssueRunLedger Streamlined UI-ийн даалгаврын хуудсанд харагдаагүй; transform тест (tiers-y6-7-12.test.ts) ба unit тестээр баталгаажсан.
+
 ## Ү6 7.11 Үлдэгдэл (2026-10-14)
 
 Зорилго: 7.10-ын «Үлдэгдэл»-ийг хаах: серверийн changeSummary / editableReason / «Plan approval - {title}»-ийг labels.ts helper-ээр буулгах, Activity бүртгэлийн хэрэглэгчид харагдах action-ууд, хянах самбар, ConnectionSetupFlow, туршилтын тохиргооны карт, аудит хуудсууд, recovery шошго. Серверийн код хөндөгдөөгүй. en гаралт d36e28452-тэй байт ижил (брэндийн гажилтыг доор бичсэн).
