@@ -22,6 +22,8 @@ import {
   Wrench,
 } from "lucide-react";
 import { Link } from "@/lib/router";
+import { xoBrandVars } from "@/xo/labels";
+import { XoTrans } from "@/xo/XoTrans";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -130,32 +132,38 @@ export interface IssueRecoveryActionCardProps {
   className?: string;
 }
 
-const KIND_LABEL: Record<IssueRecoveryActionKind, string> = {
-  missing_disposition: "Missing Disposition",
-  deliberate_wait_without_target: "Wait Without A Target",
-  stranded_assigned_issue: "Stranded Task",
-  workspace_validation: "Workspace Validation",
-  configuration_validation: "Configuration Validation",
-  active_run_watchdog: "Active Watchdog",
-  issue_graph_liveness: "Task Needs Next Step",
-};
+function kindLabel(kind: IssueRecoveryActionKind): string | undefined {
+  switch (kind) {
+    case "missing_disposition": return tx("Missing Disposition");
+    case "deliberate_wait_without_target": return tx("Wait Without A Target");
+    case "stranded_assigned_issue": return tx("Stranded Task");
+    case "workspace_validation": return tx("Workspace Validation");
+    case "configuration_validation": return tx("Configuration Validation");
+    case "active_run_watchdog": return tx("Active Watchdog");
+    case "issue_graph_liveness": return tx("Task Needs Next Step");
+    default: return undefined;
+  }
+}
 
-const KIND_HEADLINE: Record<IssueRecoveryActionKind, string> = {
-  missing_disposition:
-    "This task's run finished, but no next step was chosen. Choose what happens next — try the task again, mark it done, or send it for review.",
-  deliberate_wait_without_target:
-    "This task's last run stopped to wait, but there is no reviewer, blocker, monitor, or approval to wait for. Paperclip is repairing the next step; the task stays with its owner.",
-  stranded_assigned_issue:
-    "Paperclip retried this task's last run, but there is still no queued run, reviewer, blocker, or other next owner. To get it moving, choose what happens next — try the task again, mark it done, or send it for review.",
-  workspace_validation:
-    "Paperclip stopped this run because the task's git workspace could not be validated.",
-  configuration_validation:
-    "Paperclip stopped before dispatching this run because required secret/env bindings are missing.",
-  active_run_watchdog:
-    "The active run has been silent. Recovery is observing without interrupting it.",
-  issue_graph_liveness:
-    "Paperclip could not find a clear next step for this open task. Choose whether to continue work, send it for review, mark it done, or record what is blocking it.",
-};
+function kindHeadline(kind: IssueRecoveryActionKind): string {
+  switch (kind) {
+    case "deliberate_wait_without_target":
+      return tx("This task's last run stopped to wait, but there is no reviewer, blocker, monitor, or approval to wait for. {{brand}} is repairing the next step; the task stays with its owner.", xoBrandVars());
+    case "stranded_assigned_issue":
+      return tx("{{brand}} retried this task's last run, but there is still no queued run, reviewer, blocker, or other next owner. To get it moving, choose what happens next — try the task again, mark it done, or send it for review.", xoBrandVars());
+    case "workspace_validation":
+      return tx("{{brand}} stopped this run because the task's git workspace could not be validated.", xoBrandVars());
+    case "configuration_validation":
+      return tx("{{brand}} stopped before dispatching this run because required secret/env bindings are missing.", xoBrandVars());
+    case "active_run_watchdog":
+      return tx("The active run has been silent. Recovery is observing without interrupting it.");
+    case "issue_graph_liveness":
+      return tx("{{brand}} could not find a clear next step for this open task. Choose whether to continue work, send it for review, mark it done, or record what is blocking it.", xoBrandVars());
+    case "missing_disposition":
+    default:
+      return tx("This task's run finished, but no next step was chosen. Choose what happens next — try the task again, mark it done, or send it for review.");
+  }
+}
 
 /** Shared shell for the retry-timing pill so every timing state reads as the same control. */
 const RETRY_PILL_CLASS =
@@ -222,16 +230,19 @@ const STATE_TONE: Record<RecoveryCardCardState, {
   },
 };
 
-const OUTCOME_LABEL: Record<IssueRecoveryActionOutcome, string> = {
-  restored: "restored",
-  handed_back: "handed back to original owner",
-  owner_completed: "completed by recovery owner",
-  delegated: "delegated to follow-up",
-  false_positive: "false positive",
-  blocked: "blocked",
-  escalated: "escalated",
-  cancelled: "cancelled",
-};
+function outcomeLabel(outcome: IssueRecoveryActionOutcome): string | undefined {
+  switch (outcome) {
+    case "restored": return tx("restored");
+    case "handed_back": return tx("handed back to original owner");
+    case "owner_completed": return tx("completed by recovery owner");
+    case "delegated": return tx("delegated to follow-up");
+    case "false_positive": return tx("false positive");
+    case "blocked": return tx("blocked");
+    case "escalated": return tx("escalated");
+    case "cancelled": return tx("cancelled");
+    default: return undefined;
+  }
+}
 
 function readEvidenceString(value: unknown): string | null {
   if (typeof value !== "string") return null;
@@ -492,10 +503,14 @@ function DivergenceDiagnosis({
         >
           <Lock className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
           <span>
-            Worktree claimed by{" "}
-            <code className="font-mono text-foreground/90">{contentionLabel(divergence.contention)}</code>{" "}
-            {divergence.contention.hasActiveRun ? "(active run)" : "(claim held)"} — the lossless repair
-            can&apos;t run while another workspace holds the live branch.
+            <XoTrans
+              i18nKey="Worktree claimed by <code>{{label}}</code> {{state}} — the lossless repair can't run while another workspace holds the live branch."
+              values={{
+                label: contentionLabel(divergence.contention),
+                state: divergence.contention.hasActiveRun ? tx("(active run)") : tx("(claim held)"),
+              }}
+              components={{ code: <code className="font-mono text-foreground/90" /> }}
+            />
           </span>
         </p>
       ) : null}
@@ -506,7 +521,7 @@ function DivergenceDiagnosis({
 function contentionLabel(contention: WorkspaceContention): string {
   return (
     contention.claimedByIssueIdentifier ??
-    (contention.claimedByIssueId ? `issue ${contention.claimedByIssueId.slice(0, 8)}` : "another task")
+    (contention.claimedByIssueId ? tx("issue {{id}}", { id: contention.claimedByIssueId.slice(0, 8) }) : tx("another task"))
   );
 }
 
@@ -562,10 +577,11 @@ function BreakGlassOverride({
             Break-glass reconciliation
           </div>
           <p className="text-xs leading-5 text-muted-foreground">
-            This overrides Paperclip&apos;s safety check and points the recorded workspace at the live
-            branch{" "}
-            <span className="font-medium text-foreground/80">without an ancestry proof</span>. Confirm
-            the divergence below and record why before continuing.
+            <XoTrans
+              i18nKey="This overrides {{brand}}'s safety check and points the recorded workspace at the live branch <strong>without an ancestry proof</strong>. Confirm the divergence below and record why before continuing."
+              values={xoBrandVars()}
+              components={{ strong: <span className="font-medium text-foreground/80" /> }}
+            />
           </p>
         </div>
         <dl
@@ -593,7 +609,10 @@ function BreakGlassOverride({
         </dl>
         <div className="space-y-1">
           <Label htmlFor="recovery-breakglass-reason" className="text-(length:--text-micro) text-muted-foreground">
-            Reason <span className="text-red-600 dark:text-red-400">(required — recorded in the audit log)</span>
+            <XoTrans
+              i18nKey="Reason <req>(required — recorded in the audit log)</req>"
+              components={{ req: <span className="text-red-600 dark:text-red-400" /> }}
+            />
           </Label>
           <Textarea
             id="recovery-breakglass-reason"
@@ -648,8 +667,10 @@ function RepairWorkspace({
   const dirtyCount = divergence.dirtyFileCount;
   const dirtyLabel =
     dirtyCount === null
-      ? "Uncommitted changes"
-      : `${dirtyCount} uncommitted ${dirtyCount === 1 ? "change" : "changes"}`;
+      ? tx("Uncommitted changes")
+      : dirtyCount === 1
+      ? tx("{{count}} uncommitted change", { count: dirtyCount })
+      : tx("{{count}} uncommitted changes", { count: dirtyCount });
   const trigger = (
     <Button
       type="button"
@@ -761,17 +782,17 @@ function readWakePolicySummary(action: IssueRecoveryAction): string | null {
   if (!policy) return null;
   const type = readEvidenceString(policy.type);
   if (!type) return null;
-  if (type === "wake_owner") return "An agent will be asked to choose the next step";
+  if (type === "wake_owner") return tx("An agent will be asked to choose the next step");
   if (type === "bounded_owner_disposition_repair") {
-    return "Paperclip is retrying the original owner";
+    return tx("{{brand}} is retrying the original owner", xoBrandVars());
   }
-  if (type === "bounded_recovery_owner") return "A recovery owner is repairing the next step";
-  if (type === "board_escalation") return "Board decision required";
-  if (type === "manual") return "Manual follow-up needed";
-  if (type === "manual_repair_required") return "Repair needed before retry";
+  if (type === "bounded_recovery_owner") return tx("A recovery owner is repairing the next step");
+  if (type === "board_escalation") return tx("Board decision required");
+  if (type === "manual") return tx("Manual follow-up needed");
+  if (type === "manual_repair_required") return tx("Repair needed before retry");
   if (type === "monitor") {
     const interval = readEvidenceString(policy.intervalLabel);
-    return interval ? `Check scheduled · ${interval}` : "Check scheduled";
+    return interval ? tx("Check scheduled · {{interval}}", { interval }) : tx("Check scheduled");
   }
   return type.replaceAll("_", " ");
 }
@@ -907,17 +928,17 @@ function lineageHeadline(lineage: RecoveryRetryLineage): string {
   // An attempt that came due and never ran leaves nobody working on this task, even though
   // attempts remain on paper. Say so before any lane wording that ends in "no action needed".
   if (lineage.retryExpired) {
-    return "This task's automatic retry came due and did not run, so nothing is moving it forward right now. Someone must retry it or record the next step. The task stays with its original owner.";
+    return tx("This task's automatic retry came due and did not run, so nothing is moving it forward right now. Someone must retry it or record the next step. The task stays with its original owner.");
   }
   if (lineage.lane === "source_owner") {
     return lineage.exhausted
-      ? "This task's last run stopped to wait, but nothing was waiting for it. The original owner has used every automatic repair attempt, so the next step needs a decision. The task stays with its owner."
-      : "This task's last run stopped to wait, but nothing was waiting for it. Paperclip is retrying the original owner to record a real next step. The task stays with its owner, and no action is needed yet.";
+      ? tx("This task's last run stopped to wait, but nothing was waiting for it. The original owner has used every automatic repair attempt, so the next step needs a decision. The task stays with its owner.")
+      : tx("This task's last run stopped to wait, but nothing was waiting for it. {{brand}} is retrying the original owner to record a real next step. The task stays with its owner, and no action is needed yet.", xoBrandVars());
   }
   if (lineage.lane === "recovery_owner") {
-    return "The original owner could not record a next step within its retry budget. A recovery owner is now repairing the path only — the task itself still belongs to its original owner.";
+    return tx("The original owner could not record a next step within its retry budget. A recovery owner is now repairing the path only — the task itself still belongs to its original owner.");
   }
-  return "Automatic recovery is exhausted, so the board must choose the next step. The task itself still belongs to its original owner.";
+  return tx("Automatic recovery is exhausted, so the board must choose the next step. The task itself still belongs to its original owner.");
 }
 
 /** Spent/remaining attempts as pips. The readable count lives beside it in text. */
@@ -1004,25 +1025,25 @@ export function IssueRecoveryActionCard({
 
   const headline = useMemo(() => {
     if (cardState === "resolved" && action.outcome) {
-      return `Recovery resolved as ${OUTCOME_LABEL[action.outcome] ?? action.outcome}.`;
+      return tx("Recovery resolved as {{outcome}}.", { outcome: outcomeLabel(action.outcome) ?? action.outcome });
     }
     if (
       (cardState === "needed" || cardState === "escalated") &&
       action.kind === "active_run_watchdog" &&
       action.ownerType === "board"
     ) {
-      return "This recovery needs a human decision. Review the recorded failure and choose the next step.";
+      return tx("This recovery needs a human decision. Review the recorded failure and choose the next step.");
     }
     if (lineage) return lineageHeadline(lineage);
-    return KIND_HEADLINE[action.kind] ?? KIND_HEADLINE.missing_disposition;
+    return kindHeadline(action.kind);
   }, [action.kind, action.outcome, action.ownerType, cardState, lineage]);
 
   // A lane with no path left must not keep advertising a retry that will never run — whether
   // the budget ran out or the scheduled attempt simply never fired.
   const wakeSummary = lineage?.retryExpired
-    ? "The scheduled retry did not run — a retry or a decision is needed"
+    ? tx("The scheduled retry did not run — a retry or a decision is needed")
     : lineage?.exhausted && lineage.lane !== "board"
-    ? "Automatic retries are finished — a decision is needed"
+    ? tx("Automatic retries are finished — a decision is needed")
     : readWakePolicySummary(action);
   const evidenceSummary = pickEvidenceSummary(action);
   const sourceRunId = readEvidenceRunId(action, "sourceRunId") ?? readEvidenceRunId(action, "latestRunId");
@@ -1051,13 +1072,16 @@ export function IssueRecoveryActionCard({
   })();
   const updatedAtLabel = formatTimeShort(action.updatedAt);
 
-  const ariaState = ({
-    needed: "needed",
-    in_progress: "in progress",
-    observe_only: "observing active run",
-    escalated: "escalated",
-    resolved: "resolved",
-  } satisfies Record<RecoveryCardCardState, string>)[cardState];
+  const ariaState =
+    cardState === "needed"
+      ? tx("needed")
+      : cardState === "in_progress"
+      ? tx("in progress")
+      : cardState === "observe_only"
+      ? tx("observing active run")
+      : cardState === "escalated"
+      ? tx("escalated")
+      : tx("resolved");
 
   const showResolveActions = onResolve !== undefined && cardState !== "resolved";
   const visibleResolveOptions = RESOLVE_OPTIONS.filter((option) => {
@@ -1098,7 +1122,7 @@ export function IssueRecoveryActionCard({
     divergence !== null &&
     divergence.cleanliness === "dirty";
   const repairDisabledReason = repairContention
-    ? `Held by ${contentionLabel(repairContention)} — re-issue on an isolated workspace instead.`
+    ? tx("Held by {{label}} — re-issue on an isolated workspace instead.", { label: contentionLabel(repairContention) })
     : null;
   // When contended, the re-issue is the recommended path, so it takes the primary emphasis and a
   // "Recommended" hint while the repair button is disabled.
@@ -1140,7 +1164,7 @@ export function IssueRecoveryActionCard({
             <span className={tone.labelClass}>{tone.label}</span>
             <span className="text-muted-foreground/60" aria-hidden>·</span>
             <code className="rounded bg-background/70 px-1.5 py-0.5 font-mono text-(length:--text-micro) tracking-normal text-muted-foreground">
-              {KIND_LABEL[action.kind] ?? action.kind}
+              {kindLabel(action.kind) ?? action.kind}
             </code>
             {updatedAtLabel ? (
               <>
@@ -1242,8 +1266,10 @@ export function IssueRecoveryActionCard({
             {lineage.lane !== "source_owner" && lineage.sourceMaxAttempts !== null ? (
               <MetadataRow label="Owner retries">
                 <span data-testid="recovery-source-attempts">
-                  The original owner used {lineage.sourceAttempt ?? lineage.sourceMaxAttempts} of{" "}
-                  {lineage.sourceMaxAttempts} automatic attempts.
+                  {tx("The original owner used {{used}} of {{max}} automatic attempts.", {
+                    used: lineage.sourceAttempt ?? lineage.sourceMaxAttempts,
+                    max: lineage.sourceMaxAttempts,
+                  })}
                 </span>
               </MetadataRow>
             ) : null}
@@ -1308,7 +1334,7 @@ export function IssueRecoveryActionCard({
             ) : null}
             {showTimeoutInline ? (
               <span className="rounded-md border border-border/50 bg-background/60 px-1.5 py-0.5 text-(length:--text-micro) text-muted-foreground">
-                Times out {formatTimeShort(action.timeoutAt) ?? "soon"}
+                {tx("Times out {{when}}", { when: formatTimeShort(action.timeoutAt) ?? tx("soon") })}
               </span>
             ) : null}
           </span>
@@ -1316,7 +1342,7 @@ export function IssueRecoveryActionCard({
         {cardState === "resolved" && action.outcome ? (
           <MetadataRow label="Resolution">
             <span className={cn("font-medium", tone.labelClass)}>
-              Resolved as {OUTCOME_LABEL[action.outcome]}
+              {tx("Resolved as {{outcome}}", { outcome: outcomeLabel(action.outcome) ?? "" })}
               {action.resolvedAt ? ` · ${formatTimeShort(action.resolvedAt) ?? ""}` : ""}
             </span>
           </MetadataRow>
@@ -1463,7 +1489,7 @@ export function IssueRecoveryActionCard({
                     })
                   }
                 >
-                  {reissuePending ? "Creating…" : "Create isolated re-issue"}
+                  {reissuePending ? tx("Creating…") : tx("Create isolated re-issue")}
                 </Button>
               </PopoverContent>
             </Popover>

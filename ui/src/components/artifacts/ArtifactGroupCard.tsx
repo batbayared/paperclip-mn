@@ -5,6 +5,7 @@ import { Link } from "@/lib/router";
 import { ArtifactPreview } from "@/components/artifacts/ArtifactCard";
 import { formatDate } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { tx } from "@/i18n/xo";
 
 interface ArtifactGroupCardProps {
   group: CompanyArtifactGroup;
@@ -21,7 +22,10 @@ interface ArtifactGroupCardProps {
 export function ArtifactGroupCard({ group, to }: ArtifactGroupCardProps) {
   const stacked = group.count > 1;
   const preview = group.previewArtifacts[0];
-  const countLabel = `${group.count} artifact${group.count === 1 ? "" : "s"}`;
+  const countLabel =
+    group.count === 1
+      ? tx("{{count}} artifact", { count: group.count })
+      : tx("{{count}} artifacts", { count: group.count });
 
   return (
     <div className="relative">

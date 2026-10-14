@@ -25,6 +25,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { tx } from "@/i18n/xo";
 
 const ARTIFACTS_PAGE_SIZE = 30;
 const SEARCH_DEBOUNCE_MS = 250;
@@ -58,7 +59,7 @@ function parseKind(value: string | null): ArtifactKindFilter {
 }
 
 export function artifactGroupByLabel(value: ArtifactGroupBy): string {
-  return ARTIFACT_GROUP_OPTIONS.find((option) => option.value === value)?.label ?? "None";
+  return ARTIFACT_GROUP_OPTIONS.find((option) => option.value === value)?.label ?? tx("None");
 }
 
 export function Artifacts() {
@@ -235,15 +236,15 @@ export function Artifacts() {
 
   const emptyMessage = showGroupCards
     ? searching
-      ? "No artifact stacks match this search."
-      : "No artifact stacks yet."
+      ? tx("No artifact stacks match this search.")
+      : tx("No artifact stacks yet.")
     : searching
-      ? "No artifacts match this search."
+      ? tx("No artifacts match this search.")
       : viewingSelectedStack
-        ? "No artifacts in this stack match the current filters."
+        ? tx("No artifacts in this stack match the current filters.")
         : kind === "all"
-          ? "No artifacts yet. Outputs attached to issues will appear here."
-          : "No artifacts of this type yet.";
+          ? tx("No artifacts yet. Outputs attached to issues will appear here.")
+          : tx("No artifacts of this type yet.");
 
   return (
     <div className="w-full max-w-6xl space-y-5">
@@ -276,7 +277,7 @@ export function Artifacts() {
                 type="button"
                 variant="outline"
                 size="icon"
-                aria-label={`Group artifacts (currently ${artifactGroupByLabel(groupBy)})`}
+                aria-label={tx("Group artifacts (currently {{group}})", { group: artifactGroupByLabel(groupBy) })}
                 title="Group artifacts"
                 data-testid="artifact-group-control"
                 data-group-by={groupBy}

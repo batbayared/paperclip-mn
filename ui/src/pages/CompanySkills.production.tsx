@@ -165,6 +165,16 @@ import {
 } from "lucide-react";
 import { GithubIcon } from "../components/icons/github-icon";
 import type { FolderListItem, FolderListResult } from "@paperclipai/shared";
+import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
+import {
+  xoBrandVars,
+  xoSkillDiscoverySortLabel,
+  xoSkillEditableReason,
+  xoSkillSourceFilterLabel,
+  xoSkillSourceLabel,
+  xoSkillVersionLabel,
+} from "@/xo/labels";
 
 type SkillTreeNode = {
   name: string;
@@ -258,22 +268,23 @@ function sourceMeta(sourceBadge: CompanySkillSourceBadge, sourceLabel: string | 
   const normalizedLabel = sourceLabel?.toLowerCase() ?? "";
   const isSkillsShManaged =
     normalizedLabel.includes("skills.sh") || normalizedLabel.includes("vercel-labs/skills");
+  const displayLabel = sourceLabel === null ? null : xoSkillSourceLabel(sourceLabel);
 
   switch (sourceBadge) {
     case "skills_sh":
-      return { icon: VercelMark, label: sourceLabel ?? "skills.sh", managedLabel: "skills.sh managed" };
+      return { icon: VercelMark, label: displayLabel ?? "skills.sh", managedLabel: tx("skills.sh managed") };
     case "github":
       return isSkillsShManaged
-        ? { icon: VercelMark, label: sourceLabel ?? "skills.sh", managedLabel: "skills.sh managed" }
-        : { icon: GithubIcon, label: sourceLabel ?? "GitHub", managedLabel: "GitHub managed" };
+        ? { icon: VercelMark, label: displayLabel ?? "skills.sh", managedLabel: tx("skills.sh managed") }
+        : { icon: GithubIcon, label: displayLabel ?? "GitHub", managedLabel: tx("GitHub managed") };
     case "url":
-      return { icon: Link2, label: sourceLabel ?? "URL", managedLabel: "URL managed" };
+      return { icon: Link2, label: displayLabel ?? "URL", managedLabel: tx("URL managed") };
     case "local":
-      return { icon: Folder, label: sourceLabel ?? "Folder", managedLabel: "Folder managed" };
+      return { icon: Folder, label: displayLabel ?? "Folder", managedLabel: tx("Folder managed") };
     case "paperclip":
-      return { icon: Paperclip, label: sourceLabel ?? "Paperclip", managedLabel: "Paperclip managed" };
+      return { icon: Paperclip, label: displayLabel ?? tx("{{brand}}", xoBrandVars()), managedLabel: tx("{{brand}} managed", xoBrandVars()) };
     default:
-      return { icon: Boxes, label: sourceLabel ?? "Catalog", managedLabel: "Catalog managed" };
+      return { icon: Boxes, label: displayLabel ?? "Catalog", managedLabel: tx("Catalog managed") };
   }
 }
 
@@ -290,13 +301,15 @@ function middleTruncate(value: string, maxLength = 72) {
 
 function formatProjectScanSummary(result: CompanySkillProjectScanResult) {
   const parts = [
-    `${result.discovered} found`,
-    `${result.imported.length} imported`,
-    `${result.updated.length} updated`,
+    tx("{{n}} found", { n: result.discovered }),
+    tx("{{n}} imported", { n: result.imported.length }),
+    tx("{{n}} updated", { n: result.updated.length }),
   ];
-  if (result.conflicts.length > 0) parts.push(`${result.conflicts.length} conflicts`);
-  if (result.skipped.length > 0) parts.push(`${result.skipped.length} skipped`);
-  return `${parts.join(", ")} across ${result.scannedWorkspaces} workspace${result.scannedWorkspaces === 1 ? "" : "s"}.`;
+  if (result.conflicts.length > 0) parts.push(tx("{{n}} conflicts", { n: result.conflicts.length }));
+  if (result.skipped.length > 0) parts.push(tx("{{n}} skipped", { n: result.skipped.length }));
+  return result.scannedWorkspaces === 1
+    ? tx("{{parts}} across {{n}} workspace.", { parts: parts.join(", "), n: result.scannedWorkspaces })
+    : tx("{{parts}} across {{n}} workspaces.", { parts: parts.join(", "), n: result.scannedWorkspaces });
 }
 
 function fileIcon(kind: CompanySkillFileInventoryEntry["kind"]) {
@@ -397,7 +410,7 @@ function SourceFilterMenu({
         <DropdownMenuRadioGroup value={value} onValueChange={(next) => onChange(next as SourceFilter)}>
           {filters.map((filter) => (
             <DropdownMenuRadioItem key={filter} value={filter}>
-              <span>{SOURCE_FILTER_LABELS[filter]}</span>
+              <span>{filter === "company" ? tx("Company") : xoSkillSourceFilterLabel(SOURCE_FILTER_LABELS[filter])}</span>
               <span className="ml-auto text-xs text-muted-foreground">{counts[filter] ?? 0}</span>
             </DropdownMenuRadioItem>
           ))}
@@ -502,7 +515,7 @@ function CompatChip({ compatibility }: { compatibility: CompanySkillCompatibilit
     unknown: {
       icon: HelpCircle,
       label: "Unknown format",
-      tooltip: "Paperclip could not validate this skill as Agent Skills markdown. Install at your own risk.",
+      tooltip: tx("{{brand}} could not validate this skill as Agent Skills markdown. Install at your own risk.", xoBrandVars()),
       className: "border-yellow-500/40 bg-yellow-500/10 text-yellow-800 dark:text-yellow-200",
     },
     invalid: {
@@ -631,7 +644,7 @@ function discoveryVersionLabel(skill: {
   sourceRef: string | null;
 }, required: boolean): string | null {
   if (skill.packageVersion) return `v${skill.packageVersion}`;
-  if (required) return "core";
+  if (required) return tx("core");
   if (skill.sourceRef) return shortRef(skill.sourceRef);
   return null;
 }
@@ -653,8 +666,10 @@ function categorySetKey(categories: string[]) {
 }
 
 function skillSettingsToastBody(skill: Pick<CompanySkillDetail, "categories" | "sharingScope">) {
-  const sharing = skill.sharingScope === "private" ? "Sharing: private" : "Sharing: company";
-  const categories = skill.categories.length ? `Categories: ${skill.categories.join(", ")}` : "Categories: none";
+  const sharing = skill.sharingScope === "private" ? tx("Sharing: private") : tx("Sharing: company");
+  const categories = skill.categories.length
+    ? tx("Categories: {{categories}}", { categories: skill.categories.join(", ") })
+    : tx("Categories: none");
   return `${sharing} | ${categories}`;
 }
 
@@ -680,7 +695,7 @@ function buildDiscoveryCards(
       catalogRef: catalogMatch ? catalogMatch.id : null,
       name: skill.name,
       slug: skill.slug,
-      author: skill.authorName ?? skill.sourceLabel ?? "you",
+      author: skill.authorName ?? (skill.sourceLabel != null ? xoSkillSourceLabel(skill.sourceLabel) : null) ?? "you",
       version: discoveryVersionLabel(skill, required),
       tagline: skill.tagline ?? null,
       description: skill.description ?? null,
@@ -1207,7 +1222,7 @@ export function DiscoveryGrid({
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm">
                 <span className="text-muted-foreground">Sort</span>
-                <span className="ml-1.5">{DISCOVERY_SORT_LABELS[sort]}</span>
+                <span className="ml-1.5">{xoSkillDiscoverySortLabel(DISCOVERY_SORT_LABELS[sort])}</span>
                 <ChevronDown className="ml-1 h-3.5 w-3.5" />
               </Button>
             </DropdownMenuTrigger>
@@ -1215,7 +1230,7 @@ export function DiscoveryGrid({
               <DropdownMenuRadioGroup value={sort} onValueChange={(value) => onSortChange(value as DiscoverySort)}>
                 {DISCOVERY_SORTS.map((option) => (
                   <DropdownMenuRadioItem key={option} value={option}>
-                    {DISCOVERY_SORT_LABELS[option]}
+                    {xoSkillDiscoverySortLabel(DISCOVERY_SORT_LABELS[option])}
                   </DropdownMenuRadioItem>
                 ))}
               </DropdownMenuRadioGroup>
@@ -1292,7 +1307,7 @@ export function DiscoveryGrid({
               <FolderChip
                 result={folderResult}
                 selection={folderSelection}
-                allLabel="All skills"
+                allLabel={tx("All skills")}
                 onClick={onOpenMobileFolders ?? (() => undefined)}
               />
             </div>
@@ -1490,7 +1505,7 @@ function NewSkillWizard({
   const [draft, setDraft] = useState<SkillCreateDraft>(initialDraft);
   const [slugDirty, setSlugDirty] = useState(initialDraft.slug.trim().length > 0);
   const categoryDraft = draft.categories.join(", ");
-  const steps = ["Basics", "Design", "Content", "Review"];
+  const steps = [tx("Basics"), tx("Design"), tx("Content"), tx("Review")];
 
   useEffect(() => {
     setStep(0);
@@ -1984,8 +1999,8 @@ function CatalogDetailPane({
           <span className="font-mono">{skill.contentHash.slice(0, 24)}…</span>
           <CopyText
             text={skill.contentHash}
-            copiedLabel="Copied hash"
-            ariaLabel="Copy content hash"
+            copiedLabel={tx("Copied hash")}
+            ariaLabel={tx("Copy content hash")}
             title="Copy content hash"
             className="inline-flex h-6 w-6 items-center justify-center rounded-sm border border-border text-muted-foreground hover:bg-accent hover:text-foreground"
           >
@@ -2088,15 +2103,15 @@ export function InstallPreviewDialog({
 
   if (!skill) return null;
 
-  let confirmLabel = "Install skill";
+  let confirmLabel = tx("Install skill");
   let confirmVariant: "default" | "destructive" = "default";
   if (defaultAction === "update") {
-    confirmLabel = "Install update";
+    confirmLabel = tx("Install update");
   } else if (defaultAction === "replace") {
-    confirmLabel = "Replace existing skill";
+    confirmLabel = tx("Replace existing skill");
     confirmVariant = "destructive";
   }
-  if (isPending) confirmLabel = "Installing…";
+  if (isPending) confirmLabel = tx("Installing…");
 
   return (
     <Dialog open={open} onOpenChange={(value) => (!isPending ? onOpenChange(value) : null)}>
@@ -2165,8 +2180,19 @@ export function InstallPreviewDialog({
 
           {conflict ? (
             <div className="rounded-md border border-amber-500/40 bg-amber-500/10 p-3 text-xs text-amber-800 dark:text-amber-200">
-              An existing skill with key <span className="font-mono">{conflict.key}</span> is installed (
-              {conflict.sourceLabel ?? conflict.sourceType}). Installing will {defaultAction === "update" ? "overwrite the catalog content" : "replace the existing skill"}.
+              {defaultAction === "update" ? (
+                <XoTrans
+                  i18nKey="An existing skill with key <code>{{key}}</code> is installed ({{source}}). Installing will overwrite the catalog content."
+                  values={{ key: conflict.key, source: (conflict.sourceLabel != null ? xoSkillSourceLabel(conflict.sourceLabel) : null) ?? conflict.sourceType }}
+                  components={{ code: <span className="font-mono" /> }}
+                />
+              ) : (
+                <XoTrans
+                  i18nKey="An existing skill with key <code>{{key}}</code> is installed ({{source}}). Installing will replace the existing skill."
+                  values={{ key: conflict.key, source: (conflict.sourceLabel != null ? xoSkillSourceLabel(conflict.sourceLabel) : null) ?? conflict.sourceType }}
+                  components={{ code: <span className="font-mono" /> }}
+                />
+              )}
             </div>
           ) : null}
 
@@ -2184,14 +2210,14 @@ export function InstallPreviewDialog({
                   setSelectedAgentIds(next);
                 }}
                 showSelectionPreview={false}
-                emptyMessage="No agents in this company support skills yet."
+                emptyMessage={tx("No agents in this company support skills yet.")}
                 isAgentDisabled={(agent) => {
                   const option = agent as AttachAgentOption;
                   return option.required || !option.supportsSkills;
                 }}
                 getDescription={(agent) => {
                   const option = agent as AttachAgentOption;
-                  return `${option.adapterType}${option.required ? " · required" : ""}${!option.supportsSkills ? " · skills not supported" : ""}`;
+                  return `${option.adapterType}${option.required ? ` · ${tx("required")}` : ""}${!option.supportsSkills ? ` · ${tx("skills not supported")}` : ""}`;
                 }}
               />
             </div>
@@ -2286,7 +2312,7 @@ function AttachAgentsPopover({
       selectedAgentIds={attachedIds}
       onSave={(nextIds) => onSubmit(Array.from(nextIds), draftVersionId)}
       pending={pending}
-      triggerLabel="Add to agent"
+      triggerLabel={tx("Add to agent")}
       triggerIcon={<Plus className="mr-1.5 h-3.5 w-3.5" />}
       triggerVariant="default"
       triggerSize="sm"
@@ -2308,20 +2334,20 @@ function AttachAgentsPopover({
             <option value="__latest__">Latest</option>
             {sortedVersions.map((version) => (
               <option key={version.id} value={version.id}>
-                v{version.revisionNumber}{version.label ? ` · ${version.label}` : ""}
+                v{version.revisionNumber}{version.label ? ` · ${xoSkillVersionLabel(version.label)}` : ""}
               </option>
             ))}
           </select>
         </div>
       ) : null}
-      emptyMessage={eligible.length === 0 ? "No agents in this company support skills yet." : "No agents yet."}
+      emptyMessage={eligible.length === 0 ? tx("No agents in this company support skills yet.") : tx("No agents yet.")}
       isAgentDisabled={(agent) => {
         const option = agent as AttachAgentOption;
         return option.required || !option.supportsSkills;
       }}
       getDescription={(agent) => {
         const option = agent as AttachAgentOption;
-        return `${option.adapterType}${option.required ? " · required" : ""}${!option.supportsSkills ? " · skills not supported" : ""}`;
+        return `${option.adapterType}${option.required ? ` · ${tx("required")}` : ""}${!option.supportsSkills ? ` · ${tx("skills not supported")}` : ""}`;
       }}
       renderNameSuffix={(agent) => (agent as AttachAgentOption).paused ? (
         <Badge variant="outline" className="[&>svg]:size-2.5 border-amber-500/30 bg-amber-500/10 px-1.5 text-(length:--text-nano) uppercase tracking-wide text-amber-500">
@@ -2463,7 +2489,13 @@ function SkillList({
     if (sourceFilter !== "all" && skills.length > 0) {
       return (
         <div className="px-4 py-6 text-sm text-muted-foreground">
-          No {SOURCE_FILTER_LABELS[sourceFilter].toLowerCase()} skills installed.{" "}
+          {sourceFilter === "company"
+            ? tx("No company skills installed.")
+            : sourceFilter === "bundled"
+              ? tx("No bundled skills installed.")
+              : sourceFilter === "optional"
+                ? tx("No optional skills installed.")
+                : tx("No external skills installed.")}{" "}
           <button type="button" className="text-foreground underline" onClick={onClearFilters}>
             Clear filter
           </button>
@@ -2564,8 +2596,8 @@ function currentVersionSelection(detail: CompanySkillDetail | null | undefined) 
 }
 
 function versionLabel(version: CompanySkillVersion | null | undefined) {
-  if (!version) return "Latest";
-  return `v${version.revisionNumber}${version.label ? ` · ${version.label}` : ""}`;
+  if (!version) return tx("Latest");
+  return `v${version.revisionNumber}${version.label ? ` · ${xoSkillVersionLabel(version.label)}` : ""}`;
 }
 
 export function getSkillVersionDiffSelection(versions: CompanySkillVersion[], targetVersionId?: string | null) {
@@ -2735,7 +2767,7 @@ function SkillLocationCard({
   onMove?: () => void;
 }) {
   const [copied, setCopied] = useState(false);
-  const canonical = folderPath && folderPath.length > 0 ? folderPath : "Unfiled";
+  const canonical = folderPath && folderPath.length > 0 ? folderPath : tx("Unfiled");
   return (
     <section>
       <div className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">Location</div>
@@ -3075,7 +3107,7 @@ export function SkillDetailPage({
                   variant="outline"
                   size="sm"
                   onClick={onFork}
-                  title={skill.editableReason ?? "Fork this skill to edit it."}
+                  title={skill.editableReason != null ? xoSkillEditableReason(skill.editableReason) : "Fork this skill to edit it."}
                 >
                   <GitFork className="mr-1.5 h-3.5 w-3.5" />
                   Fork
@@ -3220,8 +3252,10 @@ export function SkillDetailPage({
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-3">
           <p className="text-sm text-muted-foreground">
-            {attached.length} {attached.length === 1 ? "agent" : "agents"} attached
-            {selectedVersion ? ` · ${versionLabel(selectedVersion)}` : " · Latest"}
+            {attached.length === 1
+              ? tx("{{n}} agent attached", { n: attached.length })
+              : tx("{{n}} agents attached", { n: attached.length })}
+            {selectedVersion ? ` · ${versionLabel(selectedVersion)}` : ` · ${tx("Latest")}`}
           </p>
           <AttachAgentsPopover
             agents={attachAgents}
@@ -3314,7 +3348,11 @@ export function SkillDetailPage({
                 {/* GitHub-style "by" attribution sits directly under the title. */}
                 {detail.authorName ? (
                   <p className="mt-0.5 text-sm text-muted-foreground">
-                    by <span className="text-foreground">{detail.authorName}</span>
+                    <XoTrans
+                      i18nKey="by <author>{{author}}</author>"
+                      values={{ author: detail.authorName }}
+                      components={{ author: <span className="text-foreground" /> }}
+                    />
                   </p>
                 ) : null}
                 {subtitleText ? (
@@ -3460,7 +3498,7 @@ export function SkillDetailPage({
                   })}
                   {detail.usedByAgents.length > 3 ? (
                     <p className="px-1.5 pt-0.5 text-xs text-muted-foreground">
-                      and {detail.usedByAgents.length - 3} more
+                      {tx("and {{n}} more", { n: detail.usedByAgents.length - 3 })}
                     </p>
                   ) : null}
                 </div>
@@ -3748,7 +3786,7 @@ function SkillPane({
   const displaySourcePath = detail.sourcePath ? middleTruncate(detail.sourcePath) : null;
   const removeBlocked = usedBy.length > 0;
   const removeDisabledReason = removeBlocked
-    ? "Detach this skill from all agents before removing it."
+    ? tx("Detach this skill from all agents before removing it.")
     : null;
 
   return (
@@ -3790,7 +3828,7 @@ function SkillPane({
                 {editMode ? "Stop editing" : "Edit"}
               </button>
             ) : (
-              <div className="text-sm text-muted-foreground">{detail.editableReason}</div>
+              <div className="text-sm text-muted-foreground">{detail.editableReason && xoSkillEditableReason(detail.editableReason)}</div>
             )}
           </div>
         </div>
@@ -3811,8 +3849,8 @@ function SkillPane({
                     </span>
                     <CopyText
                       text={detail.sourcePath}
-                      copiedLabel="Copied path"
-                      ariaLabel="Copy source path"
+                      copiedLabel={tx("Copied path")}
+                      ariaLabel={tx("Copy source path")}
                       title="Copy source path"
                       className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-sm border border-border text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
                     >
@@ -4357,7 +4395,7 @@ export function CompanySkills() {
       setSource("");
     },
     onError: (error) => {
-      reportSkillError(error, "Skill import failed", "Failed to import skill source.", "Importing skills");
+      reportSkillError(error, tx("Skill import failed"), tx("Failed to import skill source."), tx("Importing skills"));
     },
   });
 
@@ -4368,11 +4406,11 @@ export function CompanySkills() {
     ),
     onMutate: (projectId) => {
       setScanStatusMessage(
-        projectId ? "Refreshing project skills..." : "Scanning project workspaces for skills...",
+        projectId ? tx("Refreshing project skills...") : tx("Scanning project workspaces for skills..."),
       );
     },
     onSuccess: async (result) => {
-      setScanStatusMessage("Refreshing skills list...");
+      setScanStatusMessage(tx("Refreshing skills list..."));
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: queryKeys.companySkills.list(selectedCompanyId!) }),
         queryClient.invalidateQueries({ queryKey: queryKeys.folders.list(selectedCompanyId!, "skill") }),
@@ -4400,7 +4438,7 @@ export function CompanySkills() {
     },
     onError: (error) => {
       setScanStatusMessage(null);
-      reportSkillError(error, "Project skill scan failed", "Failed to scan project workspaces.", "Scanning projects for skills");
+      reportSkillError(error, tx("Project skill scan failed"), tx("Failed to scan project workspaces."), tx("Scanning projects for skills"));
     },
   });
 
@@ -4414,13 +4452,13 @@ export function CompanySkills() {
       pushToast({
         tone: "success",
         title: skill.forkedFromSkillId ? "Skill fork created" : "Skill created",
-        body: `${skill.name} is now editable in the Paperclip workspace.`,
+        body: tx("{{name}} is now editable in the {{brand}} workspace.", { name: skill.name, ...xoBrandVars() }),
       });
     },
     onError: (error) => {
-      const message = error instanceof Error ? error.message : "Failed to create skill.";
+      const message = error instanceof Error ? error.message : tx("Failed to create skill.");
       setCreateError(message);
-      reportSkillError(error, "Skill creation failed", "Failed to create skill.", "Creating a skill");
+      reportSkillError(error, tx("Skill creation failed"), tx("Failed to create skill."), tx("Creating a skill"));
     },
   });
 
@@ -4456,7 +4494,7 @@ export function CompanySkills() {
 
   const toggleStar = useMutation({
     mutationFn: () => {
-      if (!activeDetail) throw new Error("Select a skill first.");
+      if (!activeDetail) throw new Error(tx("Select a skill first."));
       return activeDetail.starredByCurrentActor
         ? companySkillsApi.unstar(selectedCompanyId!, activeDetail.id)
         : companySkillsApi.star(selectedCompanyId!, activeDetail.id);
@@ -4517,11 +4555,11 @@ export function CompanySkills() {
       pushToast({
         tone: "success",
         title: "Skill updated",
-        body: skill.sourceRef ? `Pinned to ${shortRef(skill.sourceRef)}` : skill.name,
+        body: skill.sourceRef ? tx("Pinned to {{ref}}", { ref: shortRef(skill.sourceRef) }) : skill.name,
       });
     },
     onError: (error) => {
-      reportSkillError(error, "Update failed", "Failed to install skill update.", "Updating this skill");
+      reportSkillError(error, tx("Update failed"), tx("Failed to install skill update."), tx("Updating this skill"));
     },
   });
 
@@ -4697,11 +4735,11 @@ export function CompanySkills() {
       }
     },
     onError: (error) => {
-      const message = error instanceof Error ? error.message : "Failed to install catalog skill.";
+      const message = error instanceof Error ? error.message : tx("Failed to install catalog skill.");
       setInstallDialogState((current) => ({ ...current, error: message }));
       // Also surface explicit-policy / platform denials in the persistent banner
       // so the reason stays visible after the dialog closes.
-      policyDenial.capture(error, "Installing this skill");
+      policyDenial.capture(error, tx("Installing this skill"));
     },
   });
   const createFolder = useMutation({
@@ -4934,7 +4972,10 @@ export function CompanySkills() {
         tone: "success",
         title: ids.length === 1 ? "Skill moved" : "Skills moved",
         body: folderId
-          ? `Filed under ${skillFolderResult?.folders.find((folder) => folder.id === folderId)?.name ?? "folder"}.`
+          ? (() => {
+              const folderName = skillFolderResult?.folders.find((folder) => folder.id === folderId)?.name;
+              return folderName ? tx("Filed under {{folder}}.", { folder: folderName }) : tx("Filed under folder.");
+            })()
           : "Moved to Unfiled.",
       });
     } catch (moveError) {
@@ -5065,7 +5106,7 @@ export function CompanySkills() {
       });
     },
     onError: (error) => {
-      reportSkillError(error, "Remove failed", "Failed to remove skill.", "Removing this skill");
+      reportSkillError(error, tx("Remove failed"), tx("Failed to remove skill."), tx("Removing this skill"));
     },
   });
 
@@ -5143,10 +5184,10 @@ export function CompanySkills() {
     ? (catalogListQuery.data ?? []).find((entry) => entry.key === activeDetail.key)?.source ?? null
     : null;
   const studioBackHref = studioForkDetailQuery.data ? routeForSkill(studioForkDetailQuery.data) : "/skills";
-  const studioTitle = studioForkFromId ? "Fork skill" : "Create a new skill";
+  const studioTitle = studioForkFromId ? tx("Fork skill") : tx("Create a new skill");
   const studioDescription = studioForkFromId
-    ? "Review the fork metadata and create an editable company copy."
-    : "Create an editable company skill in the Paperclip workspace.";
+    ? tx("Review the fork metadata and create an editable company copy.")
+    : tx("Create an editable company skill in the {{brand}} workspace.", xoBrandVars());
   return (
     <>
       {policyDenial.denial ? (
@@ -5358,7 +5399,7 @@ export function CompanySkills() {
         onOpenChange={setMobileFoldersOpen}
         result={railSkillFolderResult}
         selection={folderSelection}
-        allLabel="All skills"
+        allLabel={tx("All skills")}
         itemLabelPlural="Skills"
         onSelect={setFolderSelection}
         onCreate={() => openCreateFolder()}
@@ -5479,8 +5520,13 @@ export function CompanySkills() {
               tone: "success",
               title: "Skill moved",
               body: folderId
-                ? `Moved "${card.name}" to ${skillFolderResult?.folders.find((folder) => folder.id === folderId)?.name ?? "folder"}.`
-                : `Moved "${card.name}" to Unfiled.`,
+                ? (() => {
+                    const folderName = skillFolderResult?.folders.find((folder) => folder.id === folderId)?.name;
+                    return folderName
+                      ? tx("Moved \"{{title}}\" to {{folder}}.", { title: card.name, folder: folderName })
+                      : tx("Moved \"{{title}}\" to folder.", { title: card.name });
+                  })()
+                : tx("Moved \"{{title}}\" to Unfiled.", { title: card.name }),
               action: {
                 label: "Undo",
                 onClick: () => moveSkillToFolder.mutate({ itemId: skillId, folderId: previousFolderId }),

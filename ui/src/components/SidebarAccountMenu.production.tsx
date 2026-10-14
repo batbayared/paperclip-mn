@@ -21,6 +21,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn, SIDEBAR_RAIL_HIDDEN_LABEL } from "../lib/utils";
 import { ThemeToggle } from "./ThemeToggle";
 import { XoLocaleMenuAction } from "@/xo/XoLocaleMenuAction";
+import { tx } from "@/i18n/xo";
 import { SidebarServerInfo } from "./SidebarServerInfo";
 
 const PROFILE_SETTINGS_PATH = "/company/settings/instance/profile";
@@ -122,9 +123,12 @@ export function SidebarAccountMenu({
 
   const signOutMutation = useSignOut({ onSignedOut: closeNavigationChrome });
 
-  const displayName = session?.user.name?.trim() || "Board";
+  const sessionName = session?.user.name?.trim();
+  // local_trusted горимд сервер «Board» нэр өгдөг — mn-д орчуулна, en-д хэвээр.
+  const displayName =
+    !sessionName || (session?.user.id === "local-board" && sessionName === "Board") ? tx("Board") : sessionName;
   const secondaryLabel =
-    session?.user.email?.trim() || (deploymentMode === "authenticated" ? "Signed in" : "Local workspace board");
+    session?.user.email?.trim() || (deploymentMode === "authenticated" ? tx("Signed in") : tx("Local workspace board"));
   const initials = deriveInitials(displayName);
   const profileHref = `/u/${deriveUserSlug(session?.user.name, session?.user.email, session?.user.id)}`;
 

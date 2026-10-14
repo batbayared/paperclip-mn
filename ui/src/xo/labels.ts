@@ -2,6 +2,7 @@
 // tx()-ийн аргумент бүр литерал байх ёстой — extract зөвхөн литералыг хураадаг.
 import { i18n } from "@/i18n";
 import { tx } from "@/i18n/xo";
+import { BRAND } from "@/xo/brand";
 import { issueFilterLabel } from "@/lib/issue-filters";
 
 export function xoLabel(english: string): string {
@@ -715,6 +716,11 @@ export function xoSkillPolicyDenialRemediation(code: string, fallback: string): 
 
 function xoIsMn(): boolean {
   return (i18n.resolvedLanguage ?? i18n.language ?? "").startsWith("mn");
+}
+
+/** Функц доторх брэндийг {{brand}} болгосон tx-д: en горимд BASE-ийн upstream нэр хэвээр. */
+export function xoBrandVars(): { brand: string } {
+  return { brand: xoIsMn() ? BRAND.name : "Paperclip" };
 }
 
 /** company-skills sourceLabel — зөвхөн серверийн тогтмол хоёр утга; бусад (owner/repo, зам) хэвээр. */

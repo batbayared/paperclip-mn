@@ -1,5 +1,31 @@
 # XO ахицын бүртгэл
 
+## Ү6 7.13 7.12-ийн үлдэгдэл (2026-10-14)
+
+Зорилго: 7.12-ийн «Үлдэгдэл» 3 зүйлийг хааж, хөтчөөр шинэ үлдэгдэл хайх.
+
+Төлөвлөгөө: docs/superpowers/plans/2026-10-14-xo-y6-7-13-leftovers.md. BASE 11b6344c0.
+
+ED шийдвэр (2026-10-14): *.production.tsx оруулна (өмнөх «хасах» шийдвэрийг цуцалсан). Activity-ийн дотоод action-д үйл үг нэмнэ (7.11-ийн шийдвэрийг цуцалсан). en горимд функц доторх брэнд BASE-ийн «Paperclip» хэвээр.
+
+| Хэсэг | Агуулга |
+|---|---|
+| en брэнд | labels.ts xoBrandVars(): mn → XO, en → Paperclip. ConnectionSetupFlow (14), IssueRunLedger (2), AuditTab (1), Agents.production, CompanySkills.production, IssueRecoveryActionCard, app-gallery-copy |
+| *.production.tsx | CompanySkills, AppConnectionSidebar, AppsSidebar, routine-sections/editable-sections, OrgChart, RoutineDetail, Routines, audit/AuditFeed, audit/CompanyActivity tiers-д (+9); SidebarAgents, SidebarAccountMenu, Agents, Costs, AgentDetail (.production) функц доторх мөр tx |
+| Activity | activity-format.ts XO_ACTIVITY_ROW_VERBS-д 312 action (нийт 581); en-д fallback хэвээр |
+| Хөтчийн олдвор | Artifacts, ArtifactCard, ArtifactGroupCard, apps/Browse, IssueRecoveryActionCard, FinanceTimelineCard, SidePanelFrame tiers-д (+7); recovery-lineage.ts, app-gallery-copy.ts (localizedAppDescription: mn-д манифестын тайлбарын загвар) гар tx; Inbox/IssuesList aria, AgentDetail «Adapter default», InstanceGeneralSettings dev зөвлөмж (XoTrans), Costs.tsx санхүүгийн хоосон мэдэгдэл |
+
+Түлхүүр: 6528 (+614).
+
+### Шалгалтын үр дүн
+
+- Gates (2026-10-14): xo:i18n:check OK keys=6528 (untranslated 0, orphan 0), xo:i18n:test 147, ui tsc 0 алдаа, vitest ui/src 625 файл / 6585 (CompanySettings.test нэг тест ачааллын үед унаж, дангаар давсан). xo:brand-scan OK 552 / 160 (566 / 161-ээс буурсан; ED-ийн зөвшөөрлөөр --update, labels.ts 4 → 5 нь xoBrandVars-ийн en «Paperclip» литерал).
+- Хөтчийн шалгалт (3110, mn): /apps, /artifacts, /activity, /activity/costs, /inbox дээр Латин үлдэгдэл бүтээгдэхүүний нэрээс өөр алга. en горимд /apps-ийн тайлбар эх англи хэвээр.
+
+### Tier-д ороогүй файлын тооллого (дараагийн шатны шийдвэрт)
+
+ui/src дотор T1-д ороогүй, англи мөртэй 312 файл, mn-д байхгүй ~4134 түлхүүр (2026-10-14, BASE 11b6344c0). Томоос нь: DesignGuide 319, Pipelines 178, apps/chat/ChatEndpointSetup 130, InviteUxLab 103, ChatEndpointDetail 94, RunnerInspector 93, TeamCatalog 92, AgentConfigForm 72, tools/ProfilesTab 69. ui/src/pages/apps/ (36 файл, Browse-оос бусад) ба pages/tools/* бүхэлдээ tier-гүй. 7.13 зөвхөн үндсэн хуудсанд хөтчөөр олдсоныг хаасан.
+
 ## Ү6 7.12 7.11-ийн үлдэгдэл (2026-10-14)
 
 Зорилго: 7.11-ийн үлдэгдлийг хаах: dev серверийн «RESTART REQUIRED» баннер, IssueRunLedger-ийн тоолуур ба run.status, local-board хэрэглэгчийн «Board» нэр, нэр томьёоны засвар. Серверийн код хөндөгдөөгүй. en гаралт 1252e0d74-тэй байт ижил.

@@ -20,6 +20,8 @@ import { useBreadcrumbs } from "../context/BreadcrumbContext";
 import { useToastActions } from "../context/ToastContext";
 import { queryKeys } from "../lib/queryKeys";
 import { copyTextToClipboard } from "../lib/clipboard";
+import { tx } from "@/i18n/xo";
+import { xoRoutineSectionLabel } from "@/xo/labels";
 import { buildMarkdownMentionOptions } from "../lib/company-members";
 import { ToggleSwitch } from "@/components/ui/toggle-switch";
 import { EmptyState } from "../components/EmptyState";
@@ -92,6 +94,13 @@ const SECTION_TITLES: Record<RoutineSectionKey, string> = {
   activity: "Activity",
   history: "History",
 };
+
+// XO: production-ийн «Triggers»/«History» гарчиг labels-ийн helper-т байхгүй тул литерал tx.
+function routineSectionTitle(section: RoutineSectionKey): string {
+  if (section === "triggers") return tx("Triggers");
+  if (section === "history") return tx("History");
+  return xoRoutineSectionLabel(SECTION_TITLES[section]);
+}
 
 function isRoutineSection(value: string | undefined | null): value is RoutineSectionKey {
   return value != null && ROUTINE_SECTION_KEYS.includes(value as RoutineSectionKey);
@@ -371,10 +380,24 @@ export function RoutineDetail() {
     async (label: string, value: string) => {
       try {
         await copyTextToClipboard(value);
-        pushToast({ title: `${label} copied`, tone: "success" });
-      } catch (copyError) {
         pushToast({
-          title: `Failed to copy ${label.toLowerCase()}`,
+          title:
+            label === "Webhook URL"
+              ? tx("Webhook URL copied")
+              : label === "Webhook secret"
+                ? tx("Webhook secret copied")
+                : `${label} copied`,
+          tone: "success",
+        });
+      } catch (copyError) {
+        const lowerLabel = label.toLowerCase();
+        pushToast({
+          title:
+            label === "Webhook URL"
+              ? tx("Failed to copy webhook url")
+              : label === "Webhook secret"
+                ? tx("Failed to copy webhook secret")
+                : `Failed to copy ${lowerLabel}`,
           body: copyError instanceof Error ? copyError.message : "Clipboard access was denied.",
           tone: "error",
         });
@@ -710,12 +733,12 @@ export function RoutineDetail() {
   const automationToggleDisabled = updateRoutineStatus.isPending || routine.status === "archived";
   const automationLabel =
     routine.status === "archived"
-      ? "Archived"
+      ? tx("Archived")
       : !routine.assigneeAgentId
-        ? "Draft"
+        ? tx("Draft")
         : automationEnabled
-          ? "Active"
-          : "Paused";
+          ? tx("Active")
+          : tx("Paused");
   const automationLabelClassName =
     routine.status === "archived"
       ? "text-muted-foreground"
@@ -879,7 +902,7 @@ export function RoutineDetail() {
               className={isEditableSection ? "mx-auto w-full max-w-3xl" : "w-full"}
             >
               <h2 id="routine-section-title" className="mb-4 text-lg font-semibold">
-                {SECTION_TITLES[section]}
+                {routineSectionTitle(section)}
               </h2>
 
               {section === "overview" && <OverviewSection />}

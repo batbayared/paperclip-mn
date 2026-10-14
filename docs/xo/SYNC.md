@@ -259,6 +259,31 @@ Gates (2026-10-14): xo:i18n:check OK 5894, xo:i18n:test 11 / 129, tsc 0, vitest 
 - company-members.ts-ийн «Board» шошго.
 - en-д ConnectionSetupFlow-ийн брэнд «XO» гэж гарна (en байт ижил зарчмаас ухамсартай гажсан).
 
+## Ү6 7.13-д хөндсөн upstream файлууд
+
+7.12-ийн үлдэгдлийг хаасан. BASE 11b6344c0. ED шийдвэр (2026-10-14): *.production.tsx оруулна; Activity-ийн дотоод action-д үйл үг; en-д функц доторх брэнд «Paperclip».
+
+| Файл | Өөрчлөлт |
+|---|---|
+| ui/src/features/connections/ConnectionSetupFlow.tsx, components/IssueRunLedger.tsx, pages/tools/AuditTab.tsx | {{brand}} tx-д xoBrandVars() |
+| ui/src/pages/CompanySkills.production.tsx, components/AppConnectionSidebar.production.tsx, components/AppsSidebar.production.tsx, components/routine-sections/editable-sections.production.tsx, pages/OrgChart.production.tsx, pages/RoutineDetail.production.tsx, pages/Routines.production.tsx, pages/audit/AuditFeed.production.tsx, pages/audit/CompanyActivity.production.tsx | T1; функц доторх мөр tx, модулийн Record → render үеийн функц |
+| ui/src/components/SidebarAgents.production.tsx, SidebarAccountMenu.production.tsx, pages/Agents.production.tsx, Costs.production.tsx, AgentDetail.production.tsx | функц доторх мөр tx |
+| ui/src/lib/activity-format.ts (+test) | XO_ACTIVITY_ROW_VERBS-д 312 action |
+| ui/src/pages/Artifacts.tsx, components/artifacts/ArtifactCard.tsx, ArtifactGroupCard.tsx, pages/apps/Browse.tsx, components/IssueRecoveryActionCard.tsx, FinanceTimelineCard.tsx, side-panel/SidePanelFrame.tsx | T1; prop/функц доторх мөр tx, XoTrans |
+| ui/src/lib/recovery-lineage.ts, lib/app-gallery-copy.ts | гар tx; localizedAppDescription (mn-д л) |
+| ui/src/pages/Inbox.tsx, components/IssuesList.tsx, pages/AgentDetail.tsx, pages/InstanceGeneralSettings.tsx, pages/Costs.tsx | aria/prop tx, XoTrans |
+
+XO-ийн өмч: ui/src/xo/labels.ts (xoBrandVars), scripts/xo-i18n/tiers.ts (+16 файл T1), ui/src/i18n/xo/* (keys=6528, +614).
+
+XO-ийн тестүүд: scripts/xo-i18n/tiers-y6-7-13.test.ts (шинэ), ui/src/xo/labels.test.ts (xoBrandVars).
+
+Gates (2026-10-14): xo:i18n:check OK 6528, xo:i18n:test 147, tsc 0; xo:brand-scan OK 552 / 160 (ED-ийн зөвшөөрлөөр --update; labels.ts 4 → 5 en «Paperclip» литерал, бусад файл буурсан).
+
+Үлдэгдэл (Ү6 7.13):
+- Tier-д ороогүй 312 файл (~4134 түлхүүр): PROGRESS.md-ийн 7.13 тооллого.
+- issue-monitor formatMonitorOffset-ийн «in 3m» / «3m ago» англиар.
+- Загвар, case-д ороогүй холбогчийн манифестын тайлбар англиар.
+
 ## Ү6 7.12-д хөндсөн upstream файлууд
 
 7.11-ийн үлдэгдлийг хаасан. BASE 1252e0d74. ED шийдвэр (2026-10-14): *.production.tsx хүрээнээс гадуур; нэр томьёог Claude засаж тайлагнана (PROGRESS.md-ийн 7.12 хүснэгт).

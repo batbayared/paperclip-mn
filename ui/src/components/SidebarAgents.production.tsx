@@ -57,6 +57,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { tx } from "@/i18n/xo";
 import type { Agent } from "@paperclipai/shared";
 
 /**
@@ -145,19 +146,23 @@ function SidebarAgentItem({
   const isPaused = agent.status === "paused";
   const isBudgetPaused = isPaused && agent.pauseReason === "budget";
   const hasInvalidOrgChain = agent.orgChainHealth?.status === "invalid_org_chain";
-  const pauseResumeLabel = isPaused ? "Resume agent" : "Pause agent";
+  const pauseResumeLabel = isPaused ? tx("Resume agent") : tx("Pause agent");
   const pauseResumeDisabled = disabled || agent.status === "pending_approval" || isBudgetPaused || (isPaused && hasInvalidOrgChain);
   const pauseResumeDisabledLabel = disabled
-    ? "Updating..."
+    ? tx("Updating...")
     : isBudgetPaused
-      ? "Budget paused"
+      ? tx("Budget paused")
       : isPaused && hasInvalidOrgChain
-        ? "Invalid org chain"
+        ? tx("Invalid org chain")
       : pauseResumeLabel;
   const showBuiltInLifecycle = builtInStatus === "needs_setup" || builtInStatus === "pending_approval";
   const trailingLabel = [
-    showBuiltInLifecycle ? `Built-in agent ${builtInStatus.replace(/_/g, " ")}` : null,
-    hasInvalidOrgChain ? "Invalid reporting chain" : null,
+    showBuiltInLifecycle
+      ? builtInStatus === "needs_setup"
+        ? tx("Built-in agent needs setup")
+        : tx("Built-in agent pending approval")
+      : null,
+    hasInvalidOrgChain ? tx("Invalid reporting chain") : null,
   ].filter(Boolean).join(", ") || undefined;
 
   // C11 (DECISION-SHEET.md): the row itself is a SidebarNavItem, so agent rows
@@ -634,17 +639,17 @@ export function SidebarAgents({ streamlined = false }: { streamlined?: boolean }
       label="Agents"
       collapsible={{ open, onOpenChange: setOpen }}
       headerAction={{
-        ariaLabel: "New agent",
+        ariaLabel: tx("New agent"),
         icon: Plus,
         onClick: openNewAgent,
       }}
       menu={{
-        ariaLabel: "Agents section actions",
+        ariaLabel: tx("Agents section actions"),
         actions: [
           { type: "item", label: "Browse agents", icon: Users, href: "/agents/all" },
           { type: "separator" },
         ],
-        radioLabel: "Agent sort",
+        radioLabel: tx("Agent sort"),
         radioChoices: AGENT_SORT_CHOICES,
         radioValue: sortMode,
         onRadioValueChange: persistSortMode,

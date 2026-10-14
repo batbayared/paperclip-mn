@@ -2,6 +2,7 @@ import { afterEach, beforeAll, describe, expect, it } from "vitest";
 import { i18n } from "@/i18n";
 import {
   xoActivityLabel,
+  xoBrandVars,
   xoColumnDescription,
   xoColumnLabel,
   xoCreateIssueLabels,
@@ -894,5 +895,13 @@ describe("Ү6 7.11 helper-ууд (mn)", () => {
     expect(xoAttentionTitle("Plan approval - {{x}} & <b>")).toBe("Төлөвлөгөөний баталгаажуулалт - {{x}} & <b>");
     expect(xoAttentionTitle("Confirmation requested")).toBe("Баталгаажуулалт хүссэн");
     expect(xoAttentionTitle("Custom title")).toBe("Custom title");
+  });
+});
+
+describe("xoBrandVars", () => {
+  it("en дээр BASE-ийн «Paperclip»-ийг буцааж, mn дээр XO брэнд өгнө", async () => {
+    expect(xoBrandVars()).toEqual({ brand: "Paperclip" });
+    await i18n.changeLanguage("mn");
+    expect(xoBrandVars()).toEqual({ brand: "XO" });
   });
 });

@@ -1,6 +1,7 @@
 import { AiConnectionCredentialStep } from "@/components/ai-connections/AiConnectionCredentialStep";
 import { tx } from "@/i18n/xo";
 import { XoTrans } from "@/xo/XoTrans";
+import { xoBrandVars } from "@/xo/labels";
 import { ConnectionChoiceList } from "./ConnectionChoiceList";
 import { useCallback, useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -702,7 +703,7 @@ export function ConnectionSetupFlow({
     const popup = oauthPopupRef.current;
     if (!popup || popup.closed) {
       setOAuthPhase("error");
-      setOAuthError(tx("{{brand}} couldn’t open the sign-in window. Open sign-in in a new tab to continue."));
+      setOAuthError(tx("{{brand}} couldn’t open the sign-in window. Open sign-in in a new tab to continue.", xoBrandVars()));
       onPhaseChange?.("needs_retry");
       return;
     }
@@ -742,7 +743,7 @@ export function ConnectionSetupFlow({
       if (target.kind === "reauthentication") {
         const destination = host === "dialog" ? oauthPopupRef.current : window;
         if (!destination || destination.closed || !start.handoff) {
-          throw new Error(tx("{{brand}} couldn’t preserve this sign-in while refreshing your account."));
+          throw new Error(tx("{{brand}} couldn’t preserve this sign-in while refreshing your account.", xoBrandVars()));
         }
         savePendingCloudHandoff(start.handoff.session, destination.sessionStorage);
         setOAuthPhase("starting");
@@ -754,7 +755,7 @@ export function ConnectionSetupFlow({
     } catch (error) {
       if (controller.signal.aborted) return;
       setOAuthPhase("error");
-      setOAuthError(error instanceof Error ? error.message : tx("{{brand}} couldn’t start secure sign-in. Try again."));
+      setOAuthError(error instanceof Error ? error.message : tx("{{brand}} couldn’t start secure sign-in. Try again.", xoBrandVars()));
       onPhaseChange?.("needs_retry");
     } finally {
       if (oauthHandoffAbortRef.current === controller) oauthHandoffAbortRef.current = null;
@@ -1028,7 +1029,7 @@ export function ConnectionSetupFlow({
     onSuccess: (status) => {
       if (!status.verificationUrl) {
         closeEnrollmentPopup();
-        setConnectorEnrollmentError(tx("{{brand}} Cloud did not return an enrollment link. Try again."));
+        setConnectorEnrollmentError(tx("{{brand}} Cloud did not return an enrollment link. Try again.", xoBrandVars()));
         return;
       }
       openConnectorEnrollment(status.verificationUrl);
@@ -1036,7 +1037,7 @@ export function ConnectionSetupFlow({
     onError: (error) => {
       closeEnrollmentPopup();
       setConnectorEnrollmentError(
-        error instanceof Error ? error.message : tx("{{brand}} couldn’t reach {{brand}} Cloud. Try again."),
+        error instanceof Error ? error.message : tx("{{brand}} couldn’t reach {{brand}} Cloud. Try again.", xoBrandVars()),
       );
     },
   });
@@ -1184,7 +1185,7 @@ export function ConnectionSetupFlow({
           ? tx("Your authorization expired or was revoked. Reconnect to continue.")
           : error instanceof Error
             ? error.message
-            : tx("{{brand}} couldn’t start secure sign-in. Try again."),
+            : tx("{{brand}} couldn’t start secure sign-in. Try again.", xoBrandVars()),
       );
     },
   });
@@ -1356,7 +1357,7 @@ export function ConnectionSetupFlow({
             ? tx("Your authorization expired or was revoked. Reconnect to continue.")
             : error instanceof Error
               ? error.message
-              : tx("{{brand}} couldn’t start secure sign-in. Try again."),
+              : tx("{{brand}} couldn’t start secure sign-in. Try again.", xoBrandVars()),
         );
         return;
       }
@@ -1521,7 +1522,7 @@ export function ConnectionSetupFlow({
     if (automaticOAuth && directOAuthRetryingRef.current) return;
     if (automaticOAuth && (applicationsQuery.isError || connectionsQuery.isError)) {
       setOAuthPhase("error");
-      setOAuthError(tx("{{brand}} couldn’t check for an existing connection. Try again."));
+      setOAuthError(tx("{{brand}} couldn’t check for an existing connection. Try again.", xoBrandVars()));
       setStep("key");
       return;
     }
@@ -1926,7 +1927,7 @@ export function ConnectionSetupFlow({
             ]);
             if (applicationsResult.isError || connectionsResult.isError) {
               setOAuthPhase("error");
-              setOAuthError(tx("{{brand}} couldn’t check for an existing connection. Try again."));
+              setOAuthError(tx("{{brand}} couldn’t check for an existing connection. Try again.", xoBrandVars()));
               return;
             }
             const refreshedResumeConnection = resumeConnectionId
@@ -2550,7 +2551,7 @@ export function OAuthConnectStateScreen({
           }
         : {
             title: `${serverName} couldn’t connect`,
-            body: error ?? tx("{{brand}} couldn’t start secure sign-in. Try again."),
+            body: error ?? tx("{{brand}} couldn’t start secure sign-in. Try again.", xoBrandVars()),
           };
 
   return (
@@ -3218,15 +3219,15 @@ function LinkConnectStep({
 function genericAuthModeHint(mode: GenericMcpAuthMode): string | undefined {
   switch (mode) {
     case "auto":
-      return tx("{{brand}} asks the server what it needs and walks you through it. Start here.");
+      return tx("{{brand}} asks the server what it needs and walks you through it. Start here.", xoBrandVars());
     case "none":
       return tx("The server is open to anyone with the address.");
     case "bearer":
-      return tx("{{brand}} sends your key as an Authorization header.");
+      return tx("{{brand}} sends your key as an Authorization header.", xoBrandVars());
     case "custom_headers":
-      return tx("For servers that name their own headers. Values are stored as {{brand}} secrets and can’t be read back.");
+      return tx("For servers that name their own headers. Values are stored as {{brand}} secrets and can’t be read back.", xoBrandVars());
     case "oauth":
-      return tx("You’ll sign in at the provider. Add a client ID and secret only if the provider requires you to register {{brand}} first.");
+      return tx("You’ll sign in at the provider. Add a client ID and secret only if the provider requires you to register {{brand}} first.", xoBrandVars());
     default:
       return GENERIC_AUTH_MODE_OPTIONS.find((option) => option.mode === mode)?.hint;
   }

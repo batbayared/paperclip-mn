@@ -248,4 +248,21 @@ export const XO_TRANSFORM_FILES: readonly string[] = [
   "ui/src/components/CommentAttributionChip.tsx",
   // Ү6 7.12 — 7.11-ийн үлдэгдэл: dev серверийн дахин эхлүүлэх баннер
   "ui/src/components/DevRestartBanner.tsx",
+  // Ү6 7.13 — Streamlined UI (*.production.tsx) ба хөтчийн шалгалтаар олдсон хуудсууд
+  "ui/src/pages/CompanySkills.production.tsx",
+  "ui/src/components/AppConnectionSidebar.production.tsx",
+  "ui/src/components/AppsSidebar.production.tsx",
+  "ui/src/components/routine-sections/editable-sections.production.tsx",
+  "ui/src/pages/OrgChart.production.tsx",
+  "ui/src/pages/RoutineDetail.production.tsx",
+  "ui/src/pages/Routines.production.tsx",
+  "ui/src/pages/audit/AuditFeed.production.tsx",
+  "ui/src/pages/audit/CompanyActivity.production.tsx",
+  "ui/src/pages/Artifacts.tsx",
+  "ui/src/components/artifacts/ArtifactCard.tsx",
+  "ui/src/components/artifacts/ArtifactGroupCard.tsx",
+  "ui/src/pages/apps/Browse.tsx",
+  "ui/src/components/IssueRecoveryActionCard.tsx",
+  "ui/src/components/FinanceTimelineCard.tsx",
+  "ui/src/components/side-panel/SidePanelFrame.tsx",
 ];

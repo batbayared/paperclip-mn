@@ -2408,7 +2408,7 @@ function StreamlinedInbox() {
     <div className="space-y-6">
       <InboxCollectionToolbar
         streamlined={streamlinedUiEnabled}
-        ariaLabel="Inbox controls"
+        ariaLabel={tx("Inbox controls")}
         context={(
           <Tabs value={tab} onValueChange={(value) => navigate(`/inbox/${value}`)}>
             <PageTabBar

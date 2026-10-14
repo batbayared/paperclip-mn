@@ -1,4 +1,5 @@
-import { xoRoleLabel } from "@/xo/labels";
+import { xoBrandVars, xoRoleLabel } from "@/xo/labels";
+import { tx } from "@/i18n/xo";
 import { useState, useEffect, useMemo, lazy, Suspense } from "react";
 import { Link, useNavigate, useLocation } from "@/lib/router";
 import { useQuery } from "@tanstack/react-query";
@@ -122,7 +123,7 @@ function getSandboxProviderLabel(
   const provider = typeof environment.config.provider === "string"
     ? environment.config.provider.trim()
     : "";
-  if (!provider) return "Sandbox";
+  if (!provider) return tx("Sandbox");
   return capabilities?.sandboxProviders?.[provider]?.displayName ?? provider;
 }
 
@@ -131,11 +132,11 @@ function describeEnvironment(
   capabilities?: EnvironmentCapabilities | null,
 ): EnvironmentDescriptor {
   const detail = isPlatformManagedEnvironment(environment)
-    ? "Managed by Paperclip"
+    ? tx("Managed by {{brand}}", xoBrandVars())
     : environment.driver === "sandbox"
-      ? `${getSandboxProviderLabel(environment, capabilities)} sandbox provider`
+      ? tx("{{provider}} sandbox provider", { provider: getSandboxProviderLabel(environment, capabilities) })
       : environment.driver === "local"
-        ? "Paperclip host"
+        ? tx("{{brand}} host", xoBrandVars())
         : formatEnvironmentDriver(environment.driver);
 
   return {

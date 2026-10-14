@@ -187,9 +187,26 @@ describe("XO activity row verbs", () => {
     expect(formatActivityVerb("issue.comment.created")).toBe("сэтгэгдэл бичлээ:");
   });
 
-  it("mn дээр ч дотоод action fallback-аар үлдэнэ", async () => {
+  it("mn дээр үл мэдэх action fallback-аар үлдэнэ", async () => {
     await i18n.changeLanguage("mn");
     expect(formatActivityVerb("test.event")).toBe("test event");
-    expect(formatActivityVerb("secret.value.read")).toBe("secret value read");
+  });
+
+  it("mn дээр дотоод action-ыг монгол үйл үгээр харуулна", async () => {
+    i18n.addResource("mn", "xo", "read a secret value", "нууц утгыг уншлаа");
+    i18n.addResource("mn", "xo", "downloaded a provider trace for", "provider trace татлаа:");
+    i18n.addResource("mn", "xo", "started a tool call", "хэрэгслийн дуудлага эхлүүллээ");
+    i18n.addResource("mn", "xo", "installed a plugin", "плагин суулгалаа");
+    await i18n.changeLanguage("mn");
+    expect(formatActivityVerb("secret.value.read")).toBe("нууц утгыг уншлаа");
+    expect(formatActivityVerb("provider_trace.downloaded")).toBe("provider trace татлаа:");
+    expect(formatActivityVerb("tool_gateway.call_started")).toBe("хэрэгслийн дуудлага эхлүүллээ");
+    expect(formatActivityVerb("plugin.installed")).toBe("плагин суулгалаа");
+    // Каталогт байгаа түлхүүрийг дахин ашигласан мөр.
+    expect(formatActivityVerb("issue.reviewers_updated")).toBe("хянагчдыг шинэчиллээ:");
+  });
+
+  it("en дээр дотоод action upstream fallback-аа хадгална", () => {
+    expect(formatActivityVerb("provider_trace.downloaded")).toBe("provider trace downloaded");
   });
 });

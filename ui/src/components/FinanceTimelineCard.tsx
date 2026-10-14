@@ -1,5 +1,6 @@
 import type { FinanceEvent } from "@paperclipai/shared";
 import { Badge } from "@/components/ui/badge";
+import { tx } from "@/i18n/xo";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   financeDirectionDisplayName,
@@ -16,7 +17,7 @@ interface FinanceTimelineCardProps {
 
 export function FinanceTimelineCard({
   rows,
-  emptyMessage = "No financial events in this period.",
+  emptyMessage = tx("No financial events in this period."),
 }: FinanceTimelineCardProps) {
   return (
     <Card>

@@ -1,4 +1,6 @@
+import { i18n } from "@/i18n";
 import { tx } from "@/i18n/xo";
+import { xoBrandVars } from "@/xo/labels";
 /**
  * Prosumer copy for the Apps surface (PAP-10856).
  *
@@ -165,4 +167,53 @@ export function credentialFieldLabel(
   if (fieldCount <= 1) return tx("Your {{app}} key", { app: appName });
   const cleaned = sanitizeProsumerCopy(rawLabel);
   return cleaned || tx("Your {{app}} key", { app: appName });
+}
+
+/**
+ * XO: mn горимд app definition-ий (packages/shared/src/app-definitions) англи
+ * тайлбарыг орчуулна. en горимд оролтыг өөрчлөлтгүй буцаана. Брэнд нэрийг
+ * \S+-ээр барьж {{brand}} болгоно; танигдаагүй текст хэвээр.
+ */
+export function localizedAppDescription(text: string): string {
+  if (!(i18n.resolvedLanguage ?? i18n.language ?? "").startsWith("mn")) return text;
+  let m = /^Connect (.+)'s provider-hosted MCP server\.$/.exec(text);
+  if (m) return tx("Connect {{name}}'s provider-hosted MCP server.", { name: m[1] });
+  m = /^Connect (.+) accounts for your agents\.$/.exec(text);
+  if (m) return tx("Connect {{name}} accounts for your agents.", { name: m[1] });
+  m = /^Let people start and continue \S+ work with an agent from (.+)\.$/.exec(text);
+  if (m) return tx("Let people start and continue {{brand}} work with an agent from {{name}}.", { ...xoBrandVars(), name: m[1] });
+  if (/^Message a \S+ agent from Apple Messages using Photon Cloud\. Pro supports DMs; dedicated lines also support groups\.$/.test(text)) {
+    return tx("Message a {{brand}} agent from Apple Messages using Photon Cloud. Pro supports DMs; dedicated lines also support groups.", xoBrandVars());
+  }
+  if (/^Give agents Slack tools or let people start and continue \S+ work from Slack\.$/.test(text)) {
+    return tx("Give agents Slack tools or let people start and continue {{brand}} work from Slack.", xoBrandVars());
+  }
+  if (/^Connect Composio so \S+ can discover and manage the toolkits in your project\.$/.test(text)) {
+    return tx("Connect Composio so {{brand}} can discover and manage the toolkits in your project.", xoBrandVars());
+  }
+  switch (text) {
+    case "Use Anthropic APIs with a restricted key.": return tx("Use Anthropic APIs with a restricted key.");
+    case "Search, read, create, and copy files in Google Drive.": return tx("Search, read, create, and copy files in Google Drive.");
+    case "Search contacts and directory profiles with the Google People API.": return tx("Search contacts and directory profiles with the Google People API.");
+    case "Search and read Google Chat conversations and send messages.": return tx("Search and read Google Chat conversations and send messages.");
+    case "Search and read Gmail messages and create drafts without enabling mail sending.": return tx("Search and read Gmail messages and create drafts without enabling mail sending.");
+    case "Search a store's products and policies, and manage shopping carts.": return tx("Search a store's products and policies, and manage shopping carts.");
+    case "Search Gmail, Drive, Calendar, and Chat through one read-only Google Workspace search tool.": return tx("Search Gmail, Drive, Calendar, and Chat through one read-only Google Workspace search tool.");
+    case "Read calendars and manage Google Calendar events.": return tx("Read calendars and manage Google Calendar events.");
+    case "Read and update pages in your Notion workspace.": return tx("Read and update pages in your Notion workspace.");
+    case "Read and update Google Slides presentations.": return tx("Read and update Google Slides presentations.");
+    case "Read and update Google Sheets spreadsheets.": return tx("Read and update Google Sheets spreadsheets.");
+    case "Read and update Google Docs documents.": return tx("Read and update Google Docs documents.");
+    case "Reach thousands of apps through your Zapier account.": return tx("Reach thousands of apps through your Zapier account.");
+    case "Look up current documentation for software libraries.": return tx("Look up current documentation for software libraries.");
+    case "Investigate errors, releases, and production issues.": return tx("Investigate errors, releases, and production issues.");
+    case "Inspect projects, deployments, and runtime logs.": return tx("Inspect projects, deployments, and runtime logs.");
+    case "Give agents repository tools or let people work with an agent from GitHub issues and pull requests.": return tx("Give agents repository tools or let people work with an agent from GitHub issues and pull requests.");
+    case "Give agents email inboxes and handle each conversation as a task.": return tx("Give agents email inboxes and handle each conversation as a task.");
+    case "Create, update, and read Linear issues.": return tx("Create, update, and read Linear issues.");
+    case "Connect an API using a key from your provider.": return tx("Connect an API using a key from your provider.");
+    case "Connect a provider using your own OAuth client.": return tx("Connect a provider using your own OAuth client.");
+    case "Analyze product usage, errors, feature flags, and experiments with PostHog's hosted MCP server.": return tx("Analyze product usage, errors, feature flags, and experiments with PostHog's hosted MCP server.");
+    default: return text;
+  }
 }

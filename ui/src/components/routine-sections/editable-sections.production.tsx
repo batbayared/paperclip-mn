@@ -37,6 +37,15 @@ import { EnvironmentVariablesEditor } from "../environment-variables-editor";
 import { createDefaultNewTrigger, useRoutineDetail } from "./context";
 import type { EnvBinding, RoutineDetail as RoutineDetailType } from "@paperclipai/shared";
 import { xoLocaleDateTime, xoZonedDateTime } from "@/xo/date-format";
+import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
+import {
+  xoFireDispositionLabel,
+  xoSigningModeDescription,
+  xoSigningModeLabel,
+  xoStatusLabel,
+  xoTriggerKindLabel,
+} from "@/xo/labels";
 
 const concurrencyPolicyOptions = [
   {
@@ -98,12 +107,13 @@ const activityGateScopeOptions = [
 
 const triggerKinds = ["schedule", "webhook"];
 const signingModes = ["bearer", "hmac_sha256", "github_hmac", "none"];
-const signingModeDescriptions: Record<string, string> = {
-  bearer: "Expect a shared bearer token in the Authorization header.",
-  hmac_sha256: "Expect an HMAC SHA-256 signature over the request using the shared secret.",
-  github_hmac: "Accept GitHub-style X-Hub-Signature-256 header (HMAC over raw body, no timestamp).",
-  none: "No authentication — the webhook URL itself acts as a shared secret.",
-};
+// XO: хэрэглэгчид харагдах литерал хаалт — i18next interpolation-оос гадуур хадгална.
+const PLACEHOLDER_TOKEN = "{{placeholder}}";
+const PLACEHOLDERS_TOKEN = "{{placeholders}}";
+
+function PlaceholdersCode() {
+  return <code className="font-mono">{PLACEHOLDERS_TOKEN}</code>;
+}
 const SIGNING_MODES_WITHOUT_REPLAY_WINDOW = new Set(["github_hmac", "none"]);
 
 export function OverviewSection({
@@ -161,9 +171,9 @@ export function OverviewSection({
             options={assigneeOptions}
             recentOptionIds={recentAssigneeIds}
             placeholder="Responsible"
-            noneLabel="No responsible"
-            searchPlaceholder="Search responsible..."
-            emptyMessage="No responsible found."
+            noneLabel={tx("No responsible")}
+            searchPlaceholder={tx("Search responsible...")}
+            emptyMessage={tx("No responsible found.")}
             onChange={(assigneeAgentId) =>
               setEditDraft((current) => ({ ...current, assigneeAgentId }))
             }
@@ -208,9 +218,9 @@ export function OverviewSection({
             options={projectOptions}
             recentOptionIds={recentProjectIds}
             placeholder="Project"
-            noneLabel="No project"
-            searchPlaceholder="Search projects..."
-            emptyMessage="No projects found."
+            noneLabel={tx("No project")}
+            searchPlaceholder={tx("Search projects...")}
+            emptyMessage={tx("No projects found.")}
             onChange={(projectId) => setEditDraft((current) => ({ ...current, projectId }))}
             onConfirm={() => descriptionEditorRef.current?.focus()}
             renderTriggerValue={(option) =>
@@ -325,26 +335,26 @@ export function OverviewSection({
         <SummaryCard
           icon={Clock3}
           label="Triggers"
-          value={activeTriggers === 0 ? "None" : `${activeTriggers} active`}
-          hint={nextFire ? `Next fire ${nextFire}` : "No schedule"}
+          value={activeTriggers === 0 ? tx("None") : tx("{{n}} active", { n: activeTriggers })}
+          hint={nextFire ? tx("Next fire {{time}}", { time: nextFire }) : tx("No schedule")}
           to={() => navigateToSection("triggers")}
-          ariaLabel={`${activeTriggers} triggers. Open triggers.`}
+          ariaLabel={tx("{{n}} triggers. Open triggers.", { n: activeTriggers })}
         />
         <SummaryCard
           icon={KeyRound}
           label="Secrets"
-          value={boundSecrets === 0 ? "None" : `${boundSecrets} bound`}
-          hint="Manage bound secrets"
+          value={boundSecrets === 0 ? tx("None") : tx("{{n}} bound", { n: boundSecrets })}
+          hint={tx("Manage bound secrets")}
           to={() => navigateToSection("secrets")}
-          ariaLabel={`${boundSecrets} secrets bound. Open secrets.`}
+          ariaLabel={tx("{{n}} secrets bound. Open secrets.", { n: boundSecrets })}
         />
         <SummaryCard
           icon={Play}
           label="Last run"
-          value={lastRun ? lastRun.status.replaceAll("_", " ") : "No runs"}
-          hint={lastRun ? timeAgo(lastRun.triggeredAt) : "Trigger a run"}
+          value={lastRun ? xoStatusLabel(lastRun.status, lastRun.status.replaceAll("_", " ")) : tx("No runs")}
+          hint={lastRun ? timeAgo(lastRun.triggeredAt) : tx("Trigger a run")}
           to={() => navigateToSection("runs")}
-          ariaLabel={lastRun ? `Last run ${lastRun.status}. Open runs.` : "No runs. Open runs."}
+          ariaLabel={lastRun ? tx("Last run {{status}}. Open runs.", { status: xoStatusLabel(lastRun.status, lastRun.status) }) : tx("No runs. Open runs.")}
         />
       </div>
 
@@ -479,7 +489,7 @@ export function TriggersSection() {
               <SelectContent>
                 {triggerKinds.map((kind) => (
                   <SelectItem key={kind} value={kind} disabled={kind === "webhook"}>
-                    {kind}
+                    {xoTriggerKindLabel(kind)}
                     {kind === "webhook" ? " — COMING SOON" : ""}
                   </SelectItem>
                 ))}
@@ -514,13 +524,13 @@ export function TriggersSection() {
                   <SelectContent>
                     {signingModes.map((mode) => (
                       <SelectItem key={mode} value={mode}>
-                        {mode}
+                        {xoSigningModeLabel(mode)}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
                 <p className="text-xs text-muted-foreground">
-                  {signingModeDescriptions[newTrigger.signingMode]}
+                  {xoSigningModeDescription(newTrigger.signingMode)}
                 </p>
               </div>
               {!SIGNING_MODES_WITHOUT_REPLAY_WINDOW.has(newTrigger.signingMode) && (
@@ -593,9 +603,10 @@ export function VariablesSection() {
     <div className="space-y-4">
       <div className="flex items-center gap-3 rounded-md border border-border bg-muted/20 px-4 py-3 text-xs">
         <span className="flex-1 text-muted-foreground">
-          Variables are auto-detected from <code className="font-mono">{"{{placeholders}}"}</code> in
-          the title &amp; instructions. The variable name is read-only — rename by editing the
-          placeholder.
+          <XoTrans
+            i18nKey="Variables are auto-detected from <code/> in the title & instructions. The variable name is read-only — rename by editing the placeholder."
+            components={{ code: <PlaceholdersCode /> }}
+          />
         </span>
         <Button variant="secondary" size="sm" onClick={() => navigateToSection("overview")}>
           <Edit3 className="mr-1.5 h-3.5 w-3.5" />
@@ -613,7 +624,9 @@ export function VariablesSection() {
       ) : (
         <EmptyState
           icon={Braces}
-          message="No variables yet. Add a {{placeholder}} in the title or instructions to create one."
+          message={tx("No variables yet. Add a {{token}} in the title or instructions to create one.", {
+            token: PLACEHOLDER_TOKEN,
+          })}
           action="Edit instructions"
           onAction={() => navigateToSection("overview")}
         />
@@ -644,8 +657,11 @@ export function SecretsSection() {
   return (
     <div className="space-y-4">
       <div className="rounded-md border border-border bg-muted/20 px-4 py-3 text-xs text-muted-foreground">
-        Routine secrets apply to every task this routine creates. They override matching keys in
-        project and agent env. <span className="font-mono">PAPERCLIP_*</span> names are reserved.
+        <XoTrans
+          i18nKey="Routine secrets apply to every task this routine creates. They override matching keys in project and agent env. <mono>{{prefix}}</mono> names are reserved."
+          values={{ prefix: "PAPERCLIP_*" }}
+          components={{ mono: <span className="font-mono" /> }}
+        />
       </div>
 
       {secretMessage ? (
@@ -706,7 +722,7 @@ export function DeliverySection() {
           Concurrency
         </p>
         <RadioCardGroup
-          ariaLabel="Concurrency policy"
+          ariaLabel={tx("Concurrency policy")}
           value={editDraft.concurrencyPolicy}
           onValueChange={(concurrencyPolicy) =>
             setEditDraft((current) => ({ ...current, concurrencyPolicy }))
@@ -719,7 +735,7 @@ export function DeliverySection() {
           Catch-up
         </p>
         <RadioCardGroup
-          ariaLabel="Catch-up policy"
+          ariaLabel={tx("Catch-up policy")}
           value={editDraft.catchUpPolicy}
           onValueChange={(catchUpPolicy) =>
             setEditDraft((current) => ({ ...current, catchUpPolicy }))
@@ -732,7 +748,7 @@ export function DeliverySection() {
           Advanced run policy
         </p>
         <RadioCardGroup
-          ariaLabel="Advanced run policy"
+          ariaLabel={tx("Advanced run policy")}
           value={editDraft.activityGatePolicy}
           onValueChange={(activityGatePolicy) =>
             setEditDraft((current) => ({ ...current, activityGatePolicy }))
@@ -749,7 +765,7 @@ export function DeliverySection() {
           <div className="space-y-2 rounded-lg border border-border p-3">
             <Label className="text-xs font-medium">Activity scope</Label>
             <RadioCardGroup
-              ariaLabel="Activity gate scope"
+              ariaLabel={tx("Activity gate scope")}
               value={editDraft.activityGateScope}
               onValueChange={(activityGateScope) =>
                 setEditDraft((current) => ({ ...current, activityGateScope }))
@@ -818,7 +834,7 @@ function NextFiresPreview({
                 <span className="tabular-nums">{formatFireTime(entry.at, preview.timeZone)}</span>
                 <ArrowRight className="h-3 w-3 shrink-0 text-muted-foreground/50" />
                 <span className={cn("font-medium", dispositionToneClass[entry.disposition])}>
-                  {entry.label}
+                  {xoFireDispositionLabel(entry.label)}
                 </span>
                 {entry.note ? (
                   <span className="truncate text-muted-foreground/60">({entry.note})</span>

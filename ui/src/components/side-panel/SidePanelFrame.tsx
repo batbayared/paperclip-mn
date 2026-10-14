@@ -3,6 +3,7 @@ import { Maximize2, Minimize2, PanelRightClose, PanelRightOpen, X } from "lucide
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { tx } from "@/i18n/xo";
 import type { SidePanelContentMode, SidePanelPresentation } from "./types";
 import { useScrollbarWhileScrolling } from "./use-scrollbar-while-scrolling";
 
@@ -33,7 +34,7 @@ export function SidePanelFrame({
   open = true,
   maximized = false,
   resizing = false,
-  label = "Side panel",
+  label = tx("Side panel"),
   headerSize = "default",
   className,
   bodyClassName,
@@ -108,7 +109,7 @@ export function SidePanelToggleButton({
   shortcut?: string;
   className?: string;
 }) {
-  const label = "Toggle side panel";
+  const label = tx("Toggle side panel");
   return (
     <Tooltip>
       <TooltipTrigger asChild>

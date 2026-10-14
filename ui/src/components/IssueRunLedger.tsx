@@ -8,7 +8,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@/lib/router";
 import { tx } from "@/i18n/xo";
 import { XoTrans } from "@/xo/XoTrans";
-import { xoStatusLabel } from "@/xo/labels";
+import { xoBrandVars, xoStatusLabel } from "@/xo/labels";
 import { accessApi, type CurrentBoardAccess } from "../api/access";
 import {
   activityApi,
@@ -141,7 +141,7 @@ const PENDING_LIVENESS_COPY = (): LivenessCopy => ({
 const RETRY_PENDING_LIVENESS_COPY = (): LivenessCopy => ({
   label: "Retry pending",
   tone: "border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-300",
-  description: tx("{{brand}} queued an automatic retry that has not started yet."),
+  description: tx("{{brand}} queued an automatic retry that has not started yet.", xoBrandVars()),
 });
 
 const MISSING_LIVENESS_COPY = (): LivenessCopy => ({
@@ -443,7 +443,7 @@ function watchdogDecisionErrorMessage(error: unknown) {
   }
   return error instanceof Error && error.message.trim().length > 0
     ? error.message
-    : tx("{{brand}} could not record the watchdog decision.");
+    : tx("{{brand}} could not record the watchdog decision.", xoBrandVars());
 }
 
 export function IssueRunLedger({

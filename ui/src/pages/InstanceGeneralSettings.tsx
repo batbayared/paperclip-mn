@@ -18,6 +18,7 @@ import { ToggleSwitch } from "@/components/ui/toggle-switch";
 import { cn } from "../lib/utils";
 import { useSignOut } from "@/hooks/useSignOut";
 import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
 
 const FEEDBACK_TERMS_URL = import.meta.env.VITE_FEEDBACK_TERMS_URL?.trim() || "https://paperclip.ing/tos";
 
@@ -378,11 +379,10 @@ export function InstanceGeneralSettings({ embedded = false }: { embedded?: boole
             })}
           </div>
           <p className="text-xs text-muted-foreground">
-            {tx("To retest the first-use prompt in local dev, remove the")}{" "}
-            <code>feedbackDataSharingPreference</code>{" "}{tx("key from the")}{" "}
-            <code>instance_settings.general</code>{" "}{tx("JSON row for this instance, or set it back to")}{" "}
-            <code>"prompt"</code>{tx(". Unset and")}{" "}<code>"prompt"</code>{" "}
-            {tx("both mean no default has been chosen yet.")}
+            <XoTrans
+              i18nKey='To retest the first-use prompt in local dev, remove the <code>feedbackDataSharingPreference</code> key from the <code>instance_settings.general</code> JSON row for this instance, or set it back to <code>"prompt"</code>. Unset and <code>"prompt"</code> both mean no default has been chosen yet.'
+              components={{ code: <code /> }}
+            />
           </p>
         </div>
       </section>

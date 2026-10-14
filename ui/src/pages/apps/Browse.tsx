@@ -24,7 +24,8 @@ import {
 } from "@paperclipai/shared";
 import { useNavigate } from "@/lib/router";
 import { useChatConnectorsEnabled } from "@/hooks/useChatConnectorsEnabled";
-import { appCopyFor } from "@/lib/app-gallery-copy";
+import { appCopyFor, localizedAppDescription } from "@/lib/app-gallery-copy";
+import { tx } from "@/i18n/xo";
 import { useCompany } from "@/context/CompanyContext";
 import { useBreadcrumbs } from "@/context/BreadcrumbContext";
 import { useToast } from "@/context/ToastContext";
@@ -403,7 +404,7 @@ export function Browse({ renderAccountDetails = (connection) => connection.conne
         description:
           !chatConnectorsEnabled && chatProviderForSlug(slug)
             ? appCopyFor(slug).tagline
-            : appDefinitionDescription(entry),
+            : localizedAppDescription(appDefinitionDescription(entry)),
         brandKey: slug,
         logoUrl: appDefinitionLogoUrl(entry),
         darkLogoUrl: appDefinitionDarkLogoUrl(entry),
@@ -544,7 +545,7 @@ export function Browse({ renderAccountDetails = (connection) => connection.conne
           key: `chat:${endpoint.provider}`,
           slug: endpoint.provider,
           name: names[endpoint.provider],
-          description: `Chat with agents through ${names[endpoint.provider]}.`,
+          description: tx("Chat with agents through {{name}}.", { name: names[endpoint.provider] }),
           brandKey: endpoint.provider,
           entry: null,
           applications: [],
@@ -672,7 +673,7 @@ export function Browse({ renderAccountDetails = (connection) => connection.conne
       ) : nothingMatches ? (
         <p className="flex items-center gap-2 rounded-xl border border-dashed border-border bg-card px-4 py-6 text-sm text-muted-foreground">
           <Link2 className="h-4 w-4" />
-          No connectors match “{query.trim()}”.
+          {tx("No connectors match “{{query}}”.", { query: query.trim() })}
         </p>
       ) : (
         <div className="space-y-3" role="list" aria-label="Connector list">
@@ -704,7 +705,9 @@ export function Browse({ renderAccountDetails = (connection) => connection.conne
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              Remove {connectionToRemove?.accountName ?? "this"} connection?
+              {connectionToRemove?.accountName != null
+                ? tx("Remove {{accountName}} connection?", { accountName: connectionToRemove.accountName })
+                : tx("Remove this connection?")}
             </AlertDialogTitle>
             <AlertDialogDescription>
               {connectionToRemove && connectionToRemove.childConnectionCount > 0
@@ -800,7 +803,7 @@ export function ConnectorCard({
           onClick={() => {
             if (action.href) onNavigate(action.href);
           }}
-          aria-label={`${action.label} ${row.name}`}
+          aria-label={tx("{{action}} {{name}}", { action: action.label, name: row.name })}
         >
           {action.label}
         </Button>

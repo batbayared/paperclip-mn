@@ -47,6 +47,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
+import { tx } from "@/i18n/xo";
 import type { RoutineListItem, RoutineVariable } from "@paperclipai/shared";
 import type { FolderListItem } from "@paperclipai/shared";
 import {
@@ -67,15 +68,22 @@ import {
 
 const concurrencyPolicies = ["coalesce_if_active", "always_enqueue", "skip_if_active"];
 const catchUpPolicies = ["skip_missed", "enqueue_missed_with_cap"];
-const concurrencyPolicyDescriptions: Record<string, string> = {
-  coalesce_if_active: "If a run is already active, keep just one follow-up run queued.",
-  always_enqueue: "Queue every trigger occurrence, even if the routine is already running.",
-  skip_if_active: "Drop new trigger occurrences while a run is still active.",
-};
-const catchUpPolicyDescriptions: Record<string, string> = {
-  skip_missed: "Ignore windows that were missed while the scheduler or routine was paused.",
-  enqueue_missed_with_cap: "Catch up missed schedule windows after recovery; sub-hourly schedules are combined into one catch-up run, slower schedules replay each missed window up to a cap.",
-};
+// XO: render үед дуудагдах helper (модулийн түвшинд tx дуудахгүй).
+function concurrencyPolicyDescription(policy: string): string | undefined {
+  switch (policy) {
+    case "coalesce_if_active": return tx("If a run is already active, keep just one follow-up run queued.");
+    case "always_enqueue": return tx("Queue every trigger occurrence, even if the routine is already running.");
+    case "skip_if_active": return tx("Drop new trigger occurrences while a run is still active.");
+    default: return undefined;
+  }
+}
+function catchUpPolicyDescription(policy: string): string | undefined {
+  switch (policy) {
+    case "skip_missed": return tx("Ignore windows that were missed while the scheduler or routine was paused.");
+    case "enqueue_missed_with_cap": return tx("Catch up missed schedule windows after recovery; sub-hourly schedules are combined into one catch-up run, slower schedules replay each missed window up to a cap.");
+    default: return undefined;
+  }
+}
 
 function autoResizeTextarea(element: HTMLTextAreaElement | null) {
   if (!element) return;
@@ -697,7 +705,7 @@ export function Routines() {
   const recentRunsIssueLinkState = useMemo(
     () =>
       createIssueDetailLocationState(
-        "Recent Runs",
+        tx("Recent Runs"),
         buildRoutinesTabHref("runs"),
         "issues",
       ),
@@ -846,10 +854,10 @@ export function Routines() {
                 <PopoverContent align="end" className="w-44 p-0">
                   <div className="p-2 space-y-0.5">
                     {([
-                      ["updated", "Updated"],
-                      ["created", "Created"],
-                      ["lastRun", "Last run"],
-                      ["title", "Title"],
+                      ["updated", tx("Updated")],
+                      ["created", tx("Created")],
+                      ["lastRun", tx("Last run")],
+                      ["title", tx("Title")],
                     ] as const).map(([field, label]) => (
                       <button
                         key={field}
@@ -887,10 +895,10 @@ export function Routines() {
                 <PopoverContent align="end" className="w-44 p-0">
                   <div className="p-2 space-y-0.5">
                     {([
-                      ["folder", "Folder"],
-                      ["project", "Project"],
-                      ["assignee", "Agent"],
-                      ["none", "None"],
+                      ["folder", tx("Folder")],
+                      ["project", tx("Project")],
+                      ["assignee", tx("Agent")],
+                      ["none", tx("None")],
                     ] as const).map(([value, label]) => (
                       <button
                         key={value}
@@ -926,7 +934,7 @@ export function Routines() {
               <FolderChip
                 result={railFolderResult}
                 selection={folderSelection}
-                allLabel="All routines"
+                allLabel={tx("All routines")}
                 onClick={() => setMobileFoldersOpen(true)}
               />
             </div>
@@ -1024,9 +1032,9 @@ export function Routines() {
                     options={assigneeOptions}
                     recentOptionIds={recentAssigneeIds}
                     placeholder="Responsible"
-                    noneLabel="No responsible"
-                    searchPlaceholder="Search responsible..."
-                    emptyMessage="No responsible found."
+                    noneLabel={tx("No responsible")}
+                    searchPlaceholder={tx("Search responsible...")}
+                    emptyMessage={tx("No responsible found.")}
                     onChange={(assigneeAgentId) => {
                       if (assigneeAgentId) trackRecentAssignee(assigneeAgentId);
                       setDraft((current) => ({ ...current, assigneeAgentId }));
@@ -1070,9 +1078,9 @@ export function Routines() {
                     options={projectOptions}
                     recentOptionIds={recentProjectIds}
                     placeholder="Project"
-                    noneLabel="No project"
-                    searchPlaceholder="Search projects..."
-                    emptyMessage="No projects found."
+                    noneLabel={tx("No project")}
+                    searchPlaceholder={tx("Search projects...")}
+                    emptyMessage={tx("No projects found.")}
                     onChange={(projectId) => {
                       if (projectId) trackRecentProject(projectId);
                       setDraft((current) => ({ ...current, projectId }));
@@ -1172,7 +1180,7 @@ export function Routines() {
                           ))}
                         </SelectContent>
                       </Select>
-                      <p className="text-xs text-muted-foreground">{concurrencyPolicyDescriptions[draft.concurrencyPolicy]}</p>
+                      <p className="text-xs text-muted-foreground">{concurrencyPolicyDescription(draft.concurrencyPolicy)}</p>
                     </div>
                     <div className="space-y-2">
                       <p className="text-xs font-medium uppercase tracking-(--tracking-caps) text-muted-foreground">Catch-up</p>
@@ -1189,7 +1197,7 @@ export function Routines() {
                           ))}
                         </SelectContent>
                       </Select>
-                      <p className="text-xs text-muted-foreground">{catchUpPolicyDescriptions[draft.catchUpPolicy]}</p>
+                      <p className="text-xs text-muted-foreground">{catchUpPolicyDescription(draft.catchUpPolicy)}</p>
                     </div>
                   </div>
                 </CollapsibleContent>
@@ -1236,7 +1244,7 @@ export function Routines() {
             <FolderRail
               result={railFolderResult}
               selection={folderSelection}
-              allLabel="All routines"
+              allLabel={tx("All routines")}
               itemLabelPlural="routines"
               loading={foldersLoading}
               onSelect={setFolderSelection}
@@ -1252,7 +1260,7 @@ export function Routines() {
           <div className="min-w-0 flex-1">
           {routineViewState.groupBy === "folder" && hasRoutineFolders ? (
             <div className="mb-3 flex flex-wrap items-center gap-2">
-              {folderSelection === "all" ? <FolderIconHeader label="All routines" count={sortedRoutines.length} /> : (
+              {folderSelection === "all" ? <FolderIconHeader label={tx("All routines")} count={sortedRoutines.length} /> : (
                 <div className="flex min-w-0 items-center gap-2 text-sm">
                   <FolderSwatch color={activeFolder?.color} />
                   <span className="truncate font-medium">{folderSelection === "unfiled" ? "Unfiled" : activeFolder?.name ?? "Folder"}</span>
@@ -1356,11 +1364,14 @@ export function Routines() {
                               currentFolderId={routine.folderId ?? null}
                               onMove={(folderId) => {
                                 const previousFolderId = routine.folderId ?? null;
+                                const folderName = routineFolders?.folders.find((folder) => folder.id === folderId)?.name;
                                 moveRoutineToFolder.mutate({ itemId: routine.id, folderId });
                                 pushToast({
                                   title: "Routine moved",
                                   body: folderId
-                                    ? `Moved "${routine.title}" to ${routineFolders?.folders.find((folder) => folder.id === folderId)?.name ?? "folder"}.`
+                                    ? folderName != null
+                                      ? tx("Moved \"{{title}}\" to {{folder}}.", { title: routine.title, folder: folderName })
+                                      : tx("Moved \"{{title}}\" to folder.", { title: routine.title })
                                     : `Moved "${routine.title}" to Unfiled.`,
                                   tone: "success",
                                   action: {
@@ -1412,7 +1423,7 @@ export function Routines() {
         onOpenChange={setMobileFoldersOpen}
         result={railFolderResult}
         selection={folderSelection}
-        allLabel="All routines"
+        allLabel={tx("All routines")}
         itemLabelPlural="Routines"
         onSelect={setFolderSelection}
         onCreate={() => openCreateFolder()}

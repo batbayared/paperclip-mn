@@ -25,6 +25,7 @@ import { agentsApi } from "@/api/agents";
 import { AgentSelect } from "@/components/AgentMultiSelect";
 import { ToolsPageHeader, LoadingState, ErrorState, RelativeTime } from "./shared";
 import { tx } from "@/i18n/xo";
+import { xoBrandVars } from "@/xo/labels";
 import { XoTrans } from "@/xo/XoTrans";
 
 const PAGE_SIZE = 50;
@@ -158,7 +159,7 @@ function plainReason(event: ToolGatewayActivityEvent): string {
     case "failed":
       return tx("The app was allowed to run it, but returned an error.");
     default:
-      return tx("Recorded by {{brand}}.");
+      return tx("Recorded by {{brand}}.", xoBrandVars());
   }
 }
 
