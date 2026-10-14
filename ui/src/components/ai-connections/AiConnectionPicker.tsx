@@ -2,6 +2,7 @@ import { AppLogo } from "@/pages/apps/AppLogo";
 import { ConnectionChoiceList } from "@/features/connections/ConnectionChoiceList";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { tx } from "@/i18n/xo";
 import {
   AI_PROVIDERS,
   aiConnectionProblem,
@@ -107,9 +108,9 @@ export function AiConnectionPicker({
             disabled={readOnly}
             selectedId={value?.mode === "responsible_user" ? "responsible_user" : value?.connectionId}
             choices={[
-              { id: "responsible_user", name: "Responsible user’s connection", description: <>
-                <span className="block">For you: {personalDefault?.name ?? "Not connected"}</span>
-                <span className="block">Other users’ tasks use their own {AI_PROVIDERS[requirement.provider].name} connection.</span>
+              { id: "responsible_user", name: tx("Responsible user’s connection"), description: <>
+                <span className="block">{tx("For you: {{name}}", { name: personalDefault?.name ?? tx("Not connected") })}</span>
+                <span className="block">{tx("Other users’ tasks use their own {{provider}} connection.", { provider: AI_PROVIDERS[requirement.provider].name })}</span>
               </> },
               ...compatible.filter((connection) => connection.ownership === "shared").map((connection) => ({
                 id: connection.id, name: connection.name,

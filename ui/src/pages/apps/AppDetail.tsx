@@ -29,6 +29,7 @@ import { installStateFrom, type InstallState } from "@/lib/tool-installs";
 import { navigateTopLevel } from "@/lib/browserNavigation";
 import { prepareOAuthNavigation, savePendingCloudHandoff } from "@/lib/oauthHandoff";
 import { Button } from "@/components/ui/button";
+import { tx } from "@/i18n/xo";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
@@ -173,13 +174,13 @@ export function AppDetail({ renderActions, onReconnect }: {
     )
     : grantsQuery.data?.capabilities.canConfigure === true;
   const reconnectUnavailableMessage = grantsQuery.isLoading
-    ? "Checking who can reconnect this identity…"
+    ? tx("Checking who can reconnect this identity…")
     : grantsQuery.isError
-      ? "We couldn't verify who can reconnect this identity. Reload the page to try again."
+      ? tx("We couldn't verify who can reconnect this identity. Reload the page to try again.")
       : managedIdentityGrant?.kind === "user"
         && managedPersonalUserId !== grantsQuery.data?.currentUserId
-        ? "The person this connection belongs to must reconnect it."
-        : "You don't have permission to reconnect this identity.";
+        ? tx("The person this connection belongs to must reconnect it.")
+        : tx("You don't have permission to reconnect this identity.");
   const logoEntry = useMemo(
     () => galleryEntryFor((galleryQuery.data?.apps ?? []) as AppGalleryDisplayEntry[], connection, application),
     [galleryQuery.data, connection, application],
@@ -194,10 +195,10 @@ export function AppDetail({ renderActions, onReconnect }: {
   const owner = connection ? connectionOwnerProfile(connection, userProfileById) : null;
   const baseAppName = connection
     ? logoEntry ? appDefinitionName(logoEntry) : humanizeConnectionDisplayName(connection)
-    : "App";
+    : tx("App");
   const appName = connection
     ? connectionDisplayNameForOwner(connection, baseAppName, owner)
-    : "App";
+    : tx("App");
   const successNoticeShownFor = useRef<string | null>(null);
 
   useEffect(() => {
@@ -333,7 +334,7 @@ export function AppDetail({ renderActions, onReconnect }: {
   const startPersonalAuth = useMutation({
     mutationFn: () => {
       const subjectUserId = grantsQuery.data?.currentUserId;
-      if (!subjectUserId) throw new Error("Sign in again to connect your own account.");
+      if (!subjectUserId) throw new Error(tx("Sign in again to connect your own account."));
       return toolsApi.startPersonalAuthorization(selectedCompanyId!, connectionId, {
         subjectUserId,
         returnTo: appTabHref(connectionId, "permissions"),
@@ -377,12 +378,14 @@ export function AppDetail({ renderActions, onReconnect }: {
         title: "Audience saved",
         body: (grant.members?.length ?? 0) === 0
           ? "Every organization member can use this identity."
-          : `${grant.members?.length} ${grant.members?.length === 1 ? "member" : "members"} can use this identity.`,
+          : grant.members?.length === 1
+            ? tx("{{n}} member can use this identity.", { n: grant.members?.length })
+            : tx("{{n}} members can use this identity.", { n: grant.members?.length }),
         tone: "success",
       });
     },
     onError: (error) =>
-      setAudienceError(error instanceof Error ? error.message : "We couldn't save that audience."),
+      setAudienceError(error instanceof Error ? error.message : tx("We couldn't save that audience.")),
   });
 
   const refreshTools = useMutation({
@@ -396,7 +399,9 @@ export function AppDetail({ renderActions, onReconnect }: {
       pushToast({
         title: `Found ${result.discoveredCount} ${result.discoveredCount === 1 ? "action" : "actions"}`,
         body: result.quarantinedCount > 0
-          ? `${result.quarantinedCount} new ${result.quarantinedCount === 1 ? "action needs" : "actions need"} your OK.`
+          ? result.quarantinedCount === 1
+            ? tx("{{n}} new action needs your OK.", { n: result.quarantinedCount })
+            : tx("{{n}} new actions need your OK.", { n: result.quarantinedCount })
           : undefined,
         tone: "success",
       });
@@ -629,7 +634,7 @@ export function AppDetail({ renderActions, onReconnect }: {
                 refreshPending={refreshTools.isPending}
                 permissionChangeWarning={
                   connection.credentialPolicy === "per_agent" && managedIdentityGrant?.providerTenant?.github
-                    ? "Shell Git and gh use this account for the run and are not constrained by per-tool Ask-first controls."
+                    ? tx("Shell Git and gh use this account for the run and are not constrained by per-tool Ask-first controls.")
                     : undefined
                 }
                 onSaveAccess={(next) => apply({ access: connection.connectionPurpose === "ai" ? next : accessIncludingInstalls(next, install) })}

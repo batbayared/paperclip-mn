@@ -1,5 +1,36 @@
 # XO ахицын бүртгэл
 
+## Ү6 7.14 Tier-гүй үлдэгдэл, 1-р шат: apps, tools, холболт (2026-10-14)
+
+Зорилго: 7.13-ын тооллогоор tier-гүй үлдсэн файлуудаас apps, tools, холболтын хэсгийг орчуулах.
+
+Төлөвлөгөө: docs/superpowers/plans/2026-10-14-xo-y6-7-14-apps-tools.md. BASE 732c337e9.
+
+ED шийдвэр (2026-10-14): хөгжүүлэгчийн туршилтын 11 хуудсыг (DesignGuide, *UxLab, TaskChatLab, fixtures/, connect-flow-preview-main) хасна. Үлдсэнийг хоёр шатанд: 7.14 = pages/apps, pages/tools, components/chat, components/ai-connections, features/connections; 7.15 = бусад pages, components, adapters (~2000 түлхүүр).
+
+| Хэсэг | Агуулга |
+|---|---|
+| Хүрээ | tiers.ts «// Ү6 7.14» блокт 62 файл; scripts/xo-i18n/tiers-y6-7-14.test.ts |
+| Каталог | merge t1–t9 (алгассан түлхүүр 0). en шинэ түлхүүр identity, 32 _one/_other plural нь эх англи утгатай |
+| Нэр томьёо | identity → «таниулбар» (Identifier → «Таних тэмдэг» хэвээр). Давхцсан 11 түлхүүрийн сонголт: Gateway created «Гарц үүслээ», Token issued «Токен олголоо», Token revoked «Токеныг хүчингүй болголоо», Profile updated «Профайлыг шинэчиллээ», Organization default «Байгууллагын анхдагч», Client snippets «Клиентийн жишээ код» г.м. |
+| keep-en (+18) | {{durationMs}}ms, {{latencyMs}}ms, agentmail.to, Application / Client ID, Application ID, Authorization, Authorization header, Bot User OAuth Token, Directory / Tenant ID, Endpoint URL, Events API, Header, ID: {{id}}, Interactivity, p{{priority}}, Project ID, Server ID, Signing Secret |
+| Helper засвар | gateway-helpers.ts (scope, owner, tools тоо, attention), ai-connections/model.ts (аргын шошго, төлөв, binding асуудал; aiConnectionStatusLabel), app-tabs.ts (табын шошго tx, баримтын гарчиг «Permissions» засагдсан) |
+| Брэнд | Түлхүүрт «Paperclip» литералтай 3 мөрийн mn утгад {{brand}} биш «XO» (parity.test) |
+
+Түлхүүр: 8141 (+1613).
+
+### Шалгалтын үр дүн
+
+- Gates (2026-10-14): xo:i18n:check OK keys=8141 (untranslated 0), xo:i18n:test 209, ui tsc 0 алдаа, xo:brand-scan OK (baseline 552 / 160, одоо 522). vitest ui/src 6584 / 6585: CompanyEnvironments.test.tsx (хөндөөгүй файл) ачааллын үед нэг удаа унаж, дангаар 32 / 32 хоёр удаа давсан.
+- Хөтчийн шалгалт (3110, mn): /YB/apps, /apps/chat, gateways, review, tools/profiles, tools/gateways, advanced/paste, smoke-lab, app-ийн эрхийн хуудасны гарчиг. Латин үсгээр зөвхөн бүтээгдэхүүний нэр үлдсэн. en горимд gateways, advanced/paste англи хэвээр.
+
+### 7.15-д үлдсэн
+
+- Бусад pages, components, adapters (~2000 түлхүүр).
+- Хадгалагддаг анхдагч нэр («My … account», «Unnamed attachment») англиар.
+- TEAMS_*_COMMAND_DESCRIPTION тогтмолууд англиар.
+- AI_PROVIDERS-ийн бүтээгдэхүүний subscription нэр англиар.
+
 ## Ү6 7.13 7.12-ийн үлдэгдэл (2026-10-14)
 
 Зорилго: 7.12-ийн «Үлдэгдэл» 3 зүйлийг хааж, хөтчөөр шинэ үлдэгдэл хайх.

@@ -177,8 +177,8 @@ export function EmailEndpointSetup() {
     addressMode === "existing" ? inboxId : `${username}@${domain}`;
   const labels =
     step < 3
-      ? ["Access", "API key", "Connected"]
-      : ["Agent", "Email address", "Review"];
+      ? [tx("Access"), tx("API key"), tx("Connected")]
+      : [tx("Agent"), tx("Email address"), tx("Review")];
   const current = step < 3 ? step : Math.min(step - 3, 2);
   const error = connect.error ?? setup.error ?? inspected.error ?? agents.error;
   const trustNotice = chosen && (
@@ -196,7 +196,7 @@ export function EmailEndpointSetup() {
           ? scoped
             ? "Low-trust review configured"
             : "Low trust needs a work boundary"
-          : `${chosen.name} is not a low-trust agent`}
+          : tx("{{name}} is not a low-trust agent", { name: chosen.name })}
       </p>
       <p className="text-sm text-muted-foreground">
         {lowTrust
@@ -346,8 +346,8 @@ export function EmailEndpointSetup() {
             <SearchableSelect
               value={agentId}
               placeholder="Choose an agent"
-              searchPlaceholder="Search all agents…"
-              emptyMessage="No agents found."
+              searchPlaceholder={tx("Search all agents…")}
+              emptyMessage={tx("No agents found.")}
               groups={[
                 {
                   id: "agents",
@@ -401,7 +401,7 @@ export function EmailEndpointSetup() {
               Choose {chosen?.name}’s email address
             </h2>
             <RadioCardGroup
-              ariaLabel="Email address source"
+              ariaLabel={tx("Email address source")}
               value={addressMode}
               onValueChange={setAddressMode}
               options={[
@@ -516,8 +516,10 @@ export function EmailEndpointSetup() {
             </h2>
             <p className="text-lg font-semibold">{address}</p>
             <p className="text-sm">
-              Assigned to {chosen?.name} ·{" "}
-              {mode === "websocket" ? "Live connection" : "Signed webhook"}
+              {tx("Assigned to {{name}} · {{mode}}", {
+                name: chosen?.name,
+                mode: mode === "websocket" ? tx("Live connection") : tx("Signed webhook"),
+              })}
             </p>
             <p className="text-sm text-muted-foreground">
               New conversations create tasks. Replies stay in the same task.

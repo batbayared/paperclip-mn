@@ -6,6 +6,7 @@ import { ToggleSwitch } from "@/components/ui/toggle-switch";
 import { useToast } from "@/context/ToastContext";
 import { cn } from "@/lib/utils";
 import { copyTextToClipboard } from "@/lib/clipboard";
+import { tx } from "@/i18n/xo";
 import {
   activeTokenCount,
   allowedToolsLabel,
@@ -75,7 +76,9 @@ export function OverviewPanel({
           {profile ? ` · ${allowedToolsLabel(profile)}` : ""}
         </StatCard>
         <StatCard label="Tokens">
-          {active} active{expiring > 0 ? ` · ${expiring} expiring` : ""}
+          {expiring > 0
+            ? tx("{{active}} active · {{expiring}} expiring", { active, expiring })
+            : tx("{{n}} active", { n: active })}
         </StatCard>
         <StatCard label="Health">
           {needsAttention.length === 0 ? "All green" : `${needsAttention.length} needs attention`}
@@ -92,8 +95,8 @@ export function OverviewPanel({
           </div>
         </div>
         <div className="mt-3 flex flex-wrap gap-2">
-          <Chip>Scope · {formatScope(gateway, projectNames, agentNames)}</Chip>
-          <Chip>Profile · {profile?.name ?? "Unavailable"}</Chip>
+          <Chip>{tx("Scope · {{scope}}", { scope: formatScope(gateway, projectNames, agentNames) })}</Chip>
+          <Chip>{tx("Profile · {{name}}", { name: profile?.name ?? tx("Unavailable") })}</Chip>
           <Chip>{active} active {active === 1 ? "token" : "tokens"}</Chip>
         </div>
       </section>
@@ -116,7 +119,7 @@ export function OverviewPanel({
       <section className="rounded-lg border border-border bg-muted/30 p-4">
         <div className="flex items-center justify-between gap-2">
           <h3 className="text-sm font-semibold text-foreground">How clients connect</h3>
-          <Button variant="outline" size="sm" onClick={() => void copy(snippet, "Client config")}>
+          <Button variant="outline" size="sm" onClick={() => void copy(snippet, tx("Client config"))}>
             <Copy className="mr-1 h-3.5 w-3.5" />
             Copy
           </Button>

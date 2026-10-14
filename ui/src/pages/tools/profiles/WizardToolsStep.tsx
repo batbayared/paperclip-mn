@@ -21,7 +21,7 @@ import {
   toggleApp,
   toggleTool,
   toolCapability,
-  CAPABILITY_LABEL,
+  capabilityLabel,
   type AdvancedRule,
   type AdvancedRuleKind,
   type AppGroup,
@@ -29,6 +29,7 @@ import {
   type WizardSelections,
 } from "./profile-model";
 import { LoadingState } from "../shared";
+import { tx } from "@/i18n/xo";
 
 type NewToolsAction = "deny" | "allow";
 
@@ -120,7 +121,7 @@ export function WizardToolsStep(props: WizardToolsStepProps) {
                   : "border-border text-muted-foreground hover:bg-accent",
               )}
             >
-              {CAPABILITY_LABEL[cap]}
+              {capabilityLabel(cap)}
             </button>
           ))}
         </div>
@@ -208,7 +209,7 @@ function AppRow({
             <span className="text-xs text-muted-foreground">
               {state === "indeterminate"
                 ? appSelectionLabel(group, selection)
-                : "includes tools " + group.name + " adds later"}
+                : tx("includes tools {{name}} adds later", { name: group.name })}
             </span>
           </span>
         </button>
@@ -232,7 +233,7 @@ function AppRow({
                   <span className="flex flex-wrap items-center gap-2">
                     <code className="font-mono text-xs text-foreground">{tool.toolName}</code>
                     <Badge variant={CAPABILITY_VARIANT[cap]} className="text-(length:--text-nano)">
-                      {CAPABILITY_LABEL[cap]}
+                      {capabilityLabel(cap)}
                     </Badge>
                   </span>
                   {tool.title || tool.description ? (
@@ -259,13 +260,13 @@ function NewToolsRadio({
     {
       value: "deny",
       label: "Stay blocked until someone allows them",
-      hint: "New tools an app adds later won't be usable until you review them.",
+      hint: tx("New tools an app adds later won't be usable until you review them."),
       recommended: true,
     },
     {
       value: "allow",
       label: "Allowed automatically",
-      hint: "Any tool an app adds later becomes usable right away.",
+      hint: tx("Any tool an app adds later becomes usable right away."),
     },
   ];
   return (
@@ -301,12 +302,6 @@ function NewToolsRadio({
   );
 }
 
-const RULE_KIND_OPTIONS: Array<{ value: AdvancedRuleKind; label: string }> = [
-  { value: "tool_name", label: "Tool name pattern" },
-  { value: "risk_level", label: "Risk level" },
-  { value: "catalog_entry", label: "By tool ID" },
-];
-
 function createAdvancedRuleId() {
   const randomUuid = globalThis.crypto?.randomUUID?.();
   if (randomUuid) return randomUuid;
@@ -314,10 +309,17 @@ function createAdvancedRuleId() {
 }
 
 function ruleSummary(rule: AdvancedRule): string {
-  const verb = rule.effect === "include" ? "Allow" : "Block";
-  if (rule.kind === "tool_name") return `${verb} tools matching ${rule.value}`;
-  if (rule.kind === "risk_level") return `${verb} ${rule.riskLevel ?? rule.value} tools`;
-  return `${verb} tool ${rule.value}`;
+  const allow = rule.effect === "include";
+  if (rule.kind === "tool_name") {
+    return allow
+      ? tx("Allow tools matching {{value}}", { value: rule.value })
+      : tx("Block tools matching {{value}}", { value: rule.value });
+  }
+  if (rule.kind === "risk_level") {
+    const level = rule.riskLevel ?? rule.value;
+    return allow ? tx("Allow {{level}} tools", { level }) : tx("Block {{level}} tools", { level });
+  }
+  return allow ? tx("Allow tool {{value}}", { value: rule.value }) : tx("Block tool {{value}}", { value: rule.value });
 }
 
 function AdvancedRules({
@@ -331,6 +333,11 @@ function AdvancedRules({
   const [kind, setKind] = useState<AdvancedRuleKind>("tool_name");
   const [value, setValue] = useState("");
   const [effect, setEffect] = useState<"include" | "exclude">("include");
+  const ruleKindOptions: Array<{ value: AdvancedRuleKind; label: string }> = [
+    { value: "tool_name", label: "Tool name pattern" },
+    { value: "risk_level", label: "Risk level" },
+    { value: "catalog_entry", label: "By tool ID" },
+  ];
 
   const addRule = () => {
     const trimmed = value.trim();
@@ -394,7 +401,7 @@ function AdvancedRules({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {RULE_KIND_OPTIONS.map((opt) => (
+              {ruleKindOptions.map((opt) => (
                 <SelectItem key={opt.value} value={opt.value}>
                   {opt.label}
                 </SelectItem>

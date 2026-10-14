@@ -1,6 +1,7 @@
 /** Redacted presentation contracts shared with the production API. */
 import type { AiProvider, AiAuthMethod, AiManagedConnectionSummary, AiConnectionBinding } from "@paperclipai/shared";
 export type { AiProvider, AiAuthMethod, AiConnectionBinding } from "@paperclipai/shared";
+import { tx } from "@/i18n/xo";
 export type AiConnectionStatus = AiManagedConnectionSummary["status"];
 
 export const AI_PROVIDERS: Record<
@@ -42,8 +43,8 @@ export const AI_CONNECTION_STATUS: Record<AiConnectionStatus, string> = {
 
 export function aiMethodLabel(provider: AiProvider, method: AiAuthMethod) {
   return method === "subscription"
-    ? (AI_PROVIDERS[provider].subscriptionName ?? "Subscription unavailable")
-    : "API key";
+    ? (AI_PROVIDERS[provider].subscriptionName ?? tx("Subscription unavailable"))
+    : tx("API key");
 }
 
 export function matchesAiRequirement(
@@ -72,14 +73,27 @@ export function personalAiDefault(
   );
 }
 
+function aiConnectionStatusLabel(status: AiConnectionStatus): string {
+  switch (status) {
+    case "connected":
+      return tx("Connected");
+    case "needs_attention":
+      return tx("Needs attention");
+    case "expired":
+      return tx("Expired");
+    case "revoked":
+      return tx("Revoked");
+  }
+}
+
 export function aiConnectionProblem(connection?: AiConnectionSummary) {
   if (!connection)
-    return "No connection selected. Connect an account to continue.";
+    return tx("No connection selected. Connect an account to continue.");
   return (
     connection.unavailableReason ??
     (connection.status === "connected"
       ? null
-      : `${AI_CONNECTION_STATUS[connection.status]}. Reconnect this account to continue.`)
+      : tx("{{status}}. Reconnect this account to continue.", { status: aiConnectionStatusLabel(connection.status) }))
   );
 }
 
@@ -94,7 +108,7 @@ export function bindingProblem(
     binding.provider !== requirement.provider ||
     (binding.mode !== "responsible_user" && requirement.method !== undefined && binding.method !== requirement.method)
   )
-    return "Choose a connection compatible with this provider and sign-in method.";
+    return tx("Choose a connection compatible with this provider and sign-in method.");
   if (binding.mode === "responsible_user")
     return aiConnectionProblem(
       personalAiDefault(connections, requirement, userId),
@@ -107,14 +121,14 @@ export function bindingProblem(
       matchesAiRequirement(item, requirement),
   );
   if (!connection)
-    return "This connection is no longer available for this agent. Choose another connection.";
+    return tx("This connection is no longer available for this agent. Choose another connection.");
   if (binding.mode === "shared" && connection.ownership !== "shared")
-    return "Choose a company-shared connection.";
+    return tx("Choose a company-shared connection.");
   if (
     binding.mode === "delegated" &&
     (connection.ownership !== "personal" ||
       connection.ownerUserId !== userId)
   )
-    return "This credential is not shared with you. Choose a connection you can use.";
+    return tx("This credential is not shared with you. Choose a connection you can use.");
   return aiConnectionProblem(connection);
 }

@@ -8,6 +8,7 @@ import { useBreadcrumbs } from "@/context/BreadcrumbContext";
 import { queryKeys } from "@/lib/queryKeys";
 import { toolsApi } from "@/api/tools";
 import { Button } from "@/components/ui/button";
+import { tx } from "@/i18n/xo";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AppLogo } from "./AppLogo";
 import {
@@ -75,7 +76,7 @@ export function AppNotConnected() {
     enabled: !!previousConnection && !!activeTab,
   });
 
-  const appName = application?.name ?? "App";
+  const appName = application?.name ?? tx("App");
   useEffect(() => {
     if (!activeTab) return;
     setBreadcrumbs([
@@ -151,13 +152,13 @@ export function AppNotConnected() {
       )
       : grantsQuery.data?.capabilities.canConfigure === true);
   const reconnectUnavailableMessage = grantsQuery.isLoading
-    ? "Checking who can reconnect this identity…"
+    ? tx("Checking who can reconnect this identity…")
     : grantsQuery.isError
-      ? "We couldn't verify who can reconnect this identity. Reload the page to try again."
+      ? tx("We couldn't verify who can reconnect this identity. Reload the page to try again.")
       : previousConnection?.credentialPolicy === "per_user"
         && retainedPersonalUserId !== grantsQuery.data?.currentUserId
-        ? "The person this connection belongs to must reconnect it."
-        : "You don't have permission to reconnect this identity.";
+        ? tx("The person this connection belongs to must reconnect it.")
+        : tx("You don't have permission to reconnect this identity.");
   const connectHref = newConnectionHref({
     applicationId,
     appName: application.name,
@@ -253,9 +254,9 @@ function ConnectionCallout({
         <p className="mt-0.5 text-sm text-muted-foreground">
           {previousConnection
             ? previousConnection.authKind === "oauth"
-              ? `Sign in to ${applicationName} again to restore access.`
-              : `Add a working ${applicationName} key to restore access.`
-            : `Connect ${applicationName} so agents can use it.`}
+              ? tx("Sign in to {{applicationName}} again to restore access.", { applicationName })
+              : tx("Add a working {{applicationName}} key to restore access.", { applicationName })
+            : tx("Connect {{applicationName}} so agents can use it.", { applicationName })}
         </p>
         {previousConnection && !canReconnect ? (
           <p className="mt-1 text-sm text-muted-foreground">{reconnectUnavailableMessage}</p>

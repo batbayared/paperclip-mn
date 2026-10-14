@@ -31,6 +31,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
 import { timeAgo } from "@/lib/timeAgo";
 import { AppLogo } from "./AppLogo";
 import { ConnectionProvenanceChip } from "./ComposioProvenanceChip";
@@ -415,12 +417,12 @@ export function Connections() {
                   const hint =
                     status.tone === "attention"
                       ? connection?.authKind === "oauth"
-                        ? "Reconnect required — sign in again to restore access."
-                        : "The key stopped working — reconnect to fix."
+                        ? tx("Reconnect required — sign in again to restore access.")
+                        : tx("The key stopped working — reconnect to fix.")
                       : status.tone === "paused"
-                        ? "Paused — agents can’t use it right now."
+                        ? tx("Paused — agents can’t use it right now.")
                         : status.tone === "not_connected"
-                          ? "Connect it so agents can use it."
+                          ? tx("Connect it so agents can use it.")
                           : row.displayName !== application.name
                             ? application.name
                             : null;
@@ -428,10 +430,10 @@ export function Connections() {
                     ? `/apps/${connection.id}/permissions`
                     : `/apps/app/${application.id}/permissions`;
                   const actionLabel = !connection
-                    ? "Connect"
+                    ? tx("Connect")
                     : status.tone === "attention"
-                      ? "Reconnect"
-                      : "Permissions";
+                      ? tx("Reconnect")
+                      : tx("Permissions");
                   return (
                     <tr
                       key={connection?.id ?? application.id}
@@ -546,11 +548,15 @@ export function Connections() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              Delete {connectionToDelete?.appName ?? "this"} connection?
+              {connectionToDelete?.appName
+                ? tx("Delete {{appName}} connection?", { appName: connectionToDelete.appName })
+                : tx("Delete this connection?")}
             </AlertDialogTitle>
             <AlertDialogDescription>
               {connectionToDelete && connectionToDelete.childConnectionCount > 0
-                ? `This also removes ${connectionToDelete.childConnectionCount} connected ${connectionToDelete.childConnectionCount === 1 ? "service" : "services"} and takes agent access away immediately. The Composio key and child session credentials are deleted.`
+                ? connectionToDelete.childConnectionCount === 1
+                  ? tx("This also removes {{n}} connected service and takes agent access away immediately. The Composio key and child session credentials are deleted.", { n: connectionToDelete.childConnectionCount })
+                  : tx("This also removes {{n}} connected services and takes agent access away immediately. The Composio key and child session credentials are deleted.", { n: connectionToDelete.childConnectionCount })
                 : connectionToDelete && connectionToDelete.remainingConnectionCount > 0
                 ? `This connection's saved credentials are deleted and agents lose access through it immediately. Agents can still use ${connectionToDelete.appName} through ${connectionToDelete.remainingConnectionCount} other active ${connectionToDelete.remainingConnectionCount === 1 ? "connection" : "connections"}.`
                 : "The saved credentials are deleted and agents lose access immediately. Connecting it again later needs a new sign-in or key."}
@@ -670,8 +676,9 @@ function enabledActionCount(profile: ToolProfileWithDetails): number {
 
 function floatSummary(rows: AppRow[]): string {
   const names = rows.map((row) => humanizeConnectionDisplayName(row.application.name));
-  if (names.length <= 2) return names.join(" and ");
-  return `${names.slice(0, 2).join(", ")} and ${names.length - 2} more`;
+  if (names.length < 2) return names.join("");
+  if (names.length === 2) return tx("{{a}} and {{b}}", { a: names[0], b: names[1] });
+  return tx("{{a}}, {{b}} and {{n}} more", { a: names[0], b: names[1], n: names.length - 2 });
 }
 
 function EmptyConnections({ onBrowse }: { onBrowse: () => void }) {
@@ -690,8 +697,10 @@ function EmptyConnections({ onBrowse }: { onBrowse: () => void }) {
         </div>
         <p className="mt-4 text-sm font-medium text-foreground">No connections yet.</p>
         <p className="mt-1 text-sm text-muted-foreground">
-          Add one from <span className="font-medium text-foreground">Apps</span> to give your agents
-          the tools they need.
+          <XoTrans
+            i18nKey="Add one from <b>Apps</b> to give your agents the tools they need."
+            components={{ b: <span className="font-medium text-foreground" /> }}
+          />
         </p>
         <Button className="mt-6" onClick={onBrowse}>
           Browse apps

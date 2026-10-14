@@ -16,6 +16,8 @@ import { useToast } from "@/context/ToastContext";
 import { queryKeys } from "@/lib/queryKeys";
 import { copyTextToClipboard } from "@/lib/clipboard";
 import { ErrorState, LoadingState, RelativeTime, ToolsPageHeader } from "./shared";
+import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
 
 type CreateGatewayDraft = {
   name: string;
@@ -48,8 +50,8 @@ function shortId(value: string | null | undefined) {
   return value.length > 12 ? `${value.slice(0, 8)}...` : value;
 }
 
-function pluralize(count: number, singular: string, plural = `${singular}s`) {
-  return `${count} ${count === 1 ? singular : plural}`;
+function allowedToolsLabel(n: number) {
+  return n === 1 ? tx("{{n}} tool allowed", { n }) : tx("{{n}} tools allowed", { n });
 }
 
 function dateValue(value: Date | string | null | undefined) {
@@ -67,12 +69,12 @@ function latestTokenActivity(gateway: ToolMcpGatewayWithTokens) {
 }
 
 function formatOwner(gateway: ToolMcpGatewayWithTokens, agentNames: Map<string, string>) {
-  if (gateway.agentId) return agentNames.get(gateway.agentId) ?? `Agent ${shortId(gateway.agentId)}`;
+  if (gateway.agentId) return agentNames.get(gateway.agentId) ?? tx("Agent {{name}}", { name: shortId(gateway.agentId) });
   if (gateway.createdByAgentId) {
-    return agentNames.get(gateway.createdByAgentId) ?? `Agent ${shortId(gateway.createdByAgentId)}`;
+    return agentNames.get(gateway.createdByAgentId) ?? tx("Agent {{name}}", { name: shortId(gateway.createdByAgentId) });
   }
-  if (gateway.createdByUserId) return `Board user ${shortId(gateway.createdByUserId)}`;
-  return "Board";
+  if (gateway.createdByUserId) return tx("Board user {{id}}", { id: shortId(gateway.createdByUserId) });
+  return tx("Board");
 }
 
 function formatScope(
@@ -82,26 +84,26 @@ function formatScope(
 ) {
   if (gateway.contextScopeType !== "none" && gateway.contextScopeId) {
     if (gateway.contextScopeType === "project") {
-      return `Project ${projectNames.get(gateway.contextScopeId) ?? shortId(gateway.contextScopeId)}`;
+      return tx("Project {{name}}", { name: projectNames.get(gateway.contextScopeId) ?? shortId(gateway.contextScopeId) });
     }
     if (gateway.contextScopeType === "agent") {
-      return `Agent ${agentNames.get(gateway.contextScopeId) ?? shortId(gateway.contextScopeId)}`;
+      return tx("Agent {{name}}", { name: agentNames.get(gateway.contextScopeId) ?? shortId(gateway.contextScopeId) });
     }
     return `${gateway.contextScopeType} ${shortId(gateway.contextScopeId)}`;
   }
-  if (gateway.projectId) return `Project ${projectNames.get(gateway.projectId) ?? shortId(gateway.projectId)}`;
-  if (gateway.issueId) return `Issue ${shortId(gateway.issueId)}`;
-  if (gateway.agentId) return `Agent ${agentNames.get(gateway.agentId) ?? shortId(gateway.agentId)}`;
-  return "Company";
+  if (gateway.projectId) return tx("Project {{name}}", { name: projectNames.get(gateway.projectId) ?? shortId(gateway.projectId) });
+  if (gateway.issueId) return tx("Issue {{id}}", { id: shortId(gateway.issueId) });
+  if (gateway.agentId) return tx("Agent {{name}}", { name: agentNames.get(gateway.agentId) ?? shortId(gateway.agentId) });
+  return tx("Company");
 }
 
 function formatAllowedTools(profile: ToolProfileWithDetails | undefined) {
-  if (!profile) return "Profile unavailable";
+  if (!profile) return tx("Profile unavailable");
   const allowed = profile.summary.allowedToolCount;
   if (profile.summary.accessMode === "all_except") {
-    return `${pluralize(Math.max(profile.summary.totalToolCount - profile.summary.excludedToolCount, 0), "tool")} allowed`;
+    return allowedToolsLabel(Math.max(profile.summary.totalToolCount - profile.summary.excludedToolCount, 0));
   }
-  return allowed === 0 ? "No tools allowed" : `${pluralize(allowed, "tool")} allowed`;
+  return allowed === 0 ? tx("No tools allowed") : allowedToolsLabel(allowed);
 }
 
 function formatSnippetConfig(config: Record<string, unknown>) {
@@ -194,7 +196,7 @@ export function GatewaysTab({ companyId }: { companyId: string }) {
       setCreatedTokens((current) => ({ ...current, [token.gatewayId]: token }));
       setIssuingGatewayId(null);
       setTokenDrafts((current) => ({ ...current, [token.gatewayId]: defaultTokenDraft() }));
-      pushToast({ title: "Token issued", body: `${token.name} was created. Copy it now; it will not be shown again.`, tone: "success" });
+      pushToast({ title: "Token issued", body: tx("{{name}} was created. Copy it now; it will not be shown again.", { name: token.name }), tone: "success" });
       await invalidateGateways();
     },
     onError: (error) => {
@@ -363,7 +365,7 @@ export function GatewaysTab({ companyId }: { companyId: string }) {
                     ) : null}
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    <Button type="button" variant="outline" size="sm" onClick={() => void copyText(endpoint, "Gateway endpoint")}>
+                    <Button type="button" variant="outline" size="sm" onClick={() => void copyText(endpoint, tx("Gateway endpoint"))}>
                       <Copy className="mr-1.5 h-3.5 w-3.5" />
                       Copy endpoint
                     </Button>
@@ -390,7 +392,9 @@ export function GatewaysTab({ companyId }: { companyId: string }) {
                   <div>
                     <dt className="text-xs font-medium text-muted-foreground">Allowed tools</dt>
                     <dd className="mt-0.5 text-foreground">
-                      {profile ? `${formatAllowedTools(profile)} via ${profile.name}` : `Profile ${shortId(gateway.profileId)}`}
+                      {profile
+                        ? tx("{{tools}} via {{profile}}", { tools: formatAllowedTools(profile), profile: profile.name })
+                        : tx("Profile {{id}}", { id: shortId(gateway.profileId) })}
                     </dd>
                   </div>
                   <div>
@@ -509,7 +513,7 @@ export function GatewaysTab({ companyId }: { companyId: string }) {
                   <div className="space-y-2 rounded-md border border-border bg-muted/40 p-3 text-sm">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <div className="font-medium text-foreground">New token for {createdToken.name}</div>
-                      <Button type="button" variant="outline" size="sm" onClick={() => void copyText(createdToken.token, "Gateway bearer token")}>
+                      <Button type="button" variant="outline" size="sm" onClick={() => void copyText(createdToken.token, tx("Gateway bearer token"))}>
                         <Copy className="mr-1.5 h-3.5 w-3.5" />
                         Copy token
                       </Button>
@@ -546,11 +550,11 @@ export function GatewaysTab({ companyId }: { companyId: string }) {
                                   <span className="text-xs text-muted-foreground">
                                     {token.revokedAt ? (
                                       <>
-                                        revoked <RelativeTime value={token.revokedAt} />
+                                        <XoTrans i18nKey="revoked <when></when>" components={{ when: <RelativeTime value={token.revokedAt} /> }} />
                                       </>
                                     ) : token.expiresAt ? (
                                       <>
-                                        expires <RelativeTime value={token.expiresAt} />
+                                        <XoTrans i18nKey="expires <when></when>" components={{ when: <RelativeTime value={token.expiresAt} /> }} />
                                       </>
                                     ) : (
                                       "no expiry"
@@ -563,7 +567,7 @@ export function GatewaysTab({ companyId }: { companyId: string }) {
                                       size="sm"
                                       className="h-7 px-2 text-xs text-destructive hover:text-destructive"
                                       onClick={() => setConfirmingRevokeTokenId(token.id)}
-                                      aria-label={`Revoke ${token.name}`}
+                                      aria-label={tx("Revoke {{name}}", { name: token.name })}
                                     >
                                       <RotateCcw className="mr-1 h-3.5 w-3.5" />
                                       Revoke
@@ -624,7 +628,7 @@ export function GatewaysTab({ companyId }: { companyId: string }) {
                                 className="h-7 px-2"
                                 onClick={(event) => {
                                   event.preventDefault();
-                                  void copyText(formatSnippetConfig(snippet.config), `${snippet.label} snippet`);
+                                  void copyText(formatSnippetConfig(snippet.config), tx("{{label}} snippet", { label: snippet.label }));
                                 }}
                               >
                                 <Copy className="mr-1 h-3.5 w-3.5" />

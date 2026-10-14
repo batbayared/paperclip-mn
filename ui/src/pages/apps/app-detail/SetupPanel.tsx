@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { ToggleSwitch } from "@/components/ui/toggle-switch";
 import { appDefinitionSlug } from "../app-definition-display";
 import type { AppDetailSectionProps } from "./types";
+import { tx } from "@/i18n/xo";
 import { googleSheetsConfigWithAllowlist, parseGoogleSheetIds } from "../google-sheets";
 
 export function SetupPanel({
@@ -40,7 +41,7 @@ export function SetupPanel({
       <SetupLinkSection title="Agents" summary={agentsSummary} onClick={onOpenPermissions} />
       <SetupLinkSection
         title="Actions"
-        summary={permissionsLoading ? "Loading permissions…" : permissionsSummary ?? "Manage permissions"}
+        summary={permissionsLoading ? tx("Loading permissions…") : permissionsSummary ?? tx("Manage permissions")}
         onClick={onOpenPermissions}
       />
       {appDefinitionSlug(galleryEntry) === "google-sheets" && (
@@ -108,16 +109,16 @@ function PostHogConfigurationSection({ connection }: { connection: ToolConnectio
   const config = raw && typeof raw === "object" && !Array.isArray(raw)
     ? raw as Record<string, unknown>
     : {};
-  const method = connection.config?.connectionMethodKey === "mcp-oauth" ? "PostHog sign-in" : "Personal API key";
-  const features = typeof config.features === "string" ? config.features : "None";
-  const tools = typeof config.tools === "string" && config.tools ? config.tools : "None";
+  const method = connection.config?.connectionMethodKey === "mcp-oauth" ? tx("PostHog sign-in") : tx("Personal API key");
+  const features = typeof config.features === "string" ? config.features : tx("None");
+  const tools = typeof config.tools === "string" && config.tools ? config.tools : tx("None");
   const rows = [
-    ["Connection method", method],
-    ["Project pin", typeof config.projectId === "string" ? config.projectId : "Use active project"],
-    ["Read-only mode", config.readOnly === true ? "On" : "Off"],
-    ["Feature groups", features],
-    ["Individual tools", tools],
-    ["Response mode", typeof config.mode === "string" ? config.mode : "tools"],
+    [tx("Connection method"), method],
+    [tx("Project pin"), typeof config.projectId === "string" ? config.projectId : tx("Use active project")],
+    [tx("Read-only mode"), config.readOnly === true ? tx("On") : tx("Off")],
+    [tx("Feature groups"), features],
+    [tx("Individual tools"), tools],
+    [tx("Response mode"), typeof config.mode === "string" ? config.mode : "tools"],
   ];
   return (
     <section>
@@ -225,11 +226,11 @@ function GoogleSheetsAllowlistSection({
           onClick={() => {
             const parsed = parseGoogleSheetIds(draft);
             if (parsed.ids.length === 0) {
-              setError("Paste a Google Sheets link.");
+              setError(tx("Paste a Google Sheets link."));
               return;
             }
             if (parsed.invalidCount > 0) {
-              setError("That doesn't look like a Google Sheets link.");
+              setError(tx("That doesn't look like a Google Sheets link."));
               return;
             }
             saveIds(Array.from(new Set([...ids, ...parsed.ids])));

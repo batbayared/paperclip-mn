@@ -10,6 +10,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { timeAgo } from "@/lib/timeAgo";
 import { appTabHref } from "../app-tabs";
+import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
 import type { ActivityPanelProps } from "./types";
 
 export function ActivityPanel(props: ActivityPanelProps) {
@@ -95,13 +97,18 @@ function RecentActivity({
                 <span className="block truncate text-xs text-muted-foreground">
                   {row.issue ? (
                     <>
-                      while working on{" "}
-                      <Link
-                        to={`/issues/${row.issue.identifier}`}
-                        className="font-medium text-muted-foreground hover:text-foreground hover:underline"
-                      >
-                        {row.issue.identifier}
-                      </Link>
+                      <XoTrans
+                        i18nKey="while working on <issue>{{identifier}}</issue>"
+                        values={{ identifier: row.issue.identifier }}
+                        components={{
+                          issue: (
+                            <Link
+                              to={`/issues/${row.issue.identifier}`}
+                              className="font-medium text-muted-foreground hover:text-foreground hover:underline"
+                            />
+                          ),
+                        }}
+                      />
                       {" · "}
                     </>
                   ) : null}
@@ -151,9 +158,9 @@ export function resolveActorLabel(
   if (actorId) {
     const label = userLabelById?.get(actorId);
     if (label) return label;
-    if (actorId === "local-board") return "Board";
+    if (actorId === "local-board") return tx("Board");
   }
-  return "Someone";
+  return tx("Someone");
 }
 
 export function humanizeEvent(
@@ -166,32 +173,32 @@ export function humanizeEvent(
   // For Test-tab calls, surface "<User> tested as <Agent>" so prosumer test runs are
   // distinguishable from real heartbeat agent activity in the audit trail (PAP-11415).
   const who = testRunnerLabel
-    ? `${testRunnerLabel} tested as ${agentName ?? "an agent"}`
-    : agentName ?? "An agent";
+    ? tx("{{runner}} tested as {{agent}}", { runner: testRunnerLabel, agent: agentName ?? tx("an agent") })
+    : agentName ?? tx("An agent");
   // The raw gateway tool name is prefixed (e.g. `mcp.app-gallery-link-…:kv-set`);
   // humanize it to "Kv Set" to match the cross-app Activity view (PAP-11105).
-  const action = event.toolName ? humanizeConnectionDisplayName(event.toolName) : "an action";
+  const action = event.toolName ? humanizeConnectionDisplayName(event.toolName) : tx("an action");
   switch (event.eventType) {
     case "call_completed":
       return {
         primary: event.outcome === "success"
-          ? `${who} used ${action}`
-          : `${who} ran ${action}, but it didn't finish`,
+          ? tx("{{who}} used {{action}}", { who, action })
+          : tx("{{who}} ran {{action}}, but it didn't finish", { who, action }),
       };
     case "call_failed":
-      return { primary: `${action} didn't work for ${lower(who)}` };
+      return { primary: tx("{{action}} didn't work for {{who}}", { action, who: lower(who) }) };
     case "call_denied":
       return {
         primary: testRunnerLabel
-          ? `${who} - ${action} is turned off`
-          : `Blocked ${action} - it isn't turned on`,
+          ? tx("{{who}} - {{action}} is turned off", { who, action })
+          : tx("Blocked {{action}} - it isn't turned on", { action }),
       };
     case "approval_requested":
-      return { primary: `${who} asked before running ${action}` };
+      return { primary: tx("{{who}} asked before running {{action}}", { who, action }) };
     case "approval_resolved":
       return { primary: humanizeApprovalResolved(action, actionRequest) };
     default:
-      return { primary: `${who} used ${action}` };
+      return { primary: tx("{{who}} used {{action}}", { who, action }) };
   }
 }
 
@@ -199,10 +206,10 @@ function humanizeApprovalResolved(
   action: string,
   actionRequest?: ActivityPanelProps["actionRequests"][string],
 ): string {
-  const resolver = actionRequest?.resolverDisplayName ?? "Someone";
-  if (actionRequest?.status === "approved") return `${resolver} approved ${action}`;
-  if (actionRequest?.status === "rejected") return `${resolver} said no to ${action}`;
-  return `${resolver} reviewed ${action}`;
+  const resolver = actionRequest?.resolverDisplayName ?? tx("Someone");
+  if (actionRequest?.status === "approved") return tx("{{resolver}} approved {{action}}", { resolver, action });
+  if (actionRequest?.status === "rejected") return tx("{{resolver}} said no to {{action}}", { resolver, action });
+  return tx("{{resolver}} reviewed {{action}}", { resolver, action });
 }
 
 /** Humanize a connection lifecycle event into a prosumer sentence (PAP-11284). */
@@ -211,26 +218,28 @@ function humanizeLifecycleEvent(
   appName: string,
   agentName: string | null,
 ): string {
-  const who = event.actorDisplayName ?? agentName ?? "Someone";
+  const who = event.actorDisplayName ?? agentName ?? tx("Someone");
   switch (event.type) {
     case "app_connected":
-      return `${who} connected ${appName}`;
+      return tx("{{who}} connected {{app}}", { who, app: appName });
     case "app_paused":
-      return `${who} paused this app`;
+      return tx("{{who}} paused this app", { who });
     case "app_resumed":
-      return `${who} resumed this app`;
+      return tx("{{who}} resumed this app", { who });
     case "reconnected":
-      return `${who} reconnected ${appName}`;
+      return tx("{{who}} reconnected {{app}}", { who, app: appName });
     case "disconnected":
-      return `${who} disconnected ${appName}`;
+      return tx("{{who}} disconnected {{app}}", { who, app: appName });
     case "allowlist_changed":
       return humanizeAllowlistChange(who, event.details);
     case "actions_quarantined": {
       const count = numberFrom(event.details?.count);
-      return `${count} new ${count === 1 ? "action" : "actions"} need review`;
+      return count === 1
+        ? tx("{{n}} new action need review", { n: count })
+        : tx("{{n}} new actions need review", { n: count });
     }
     default:
-      return `${who} updated this app`;
+      return tx("{{who}} updated this app", { who });
   }
 }
 
@@ -238,19 +247,23 @@ function humanizeAllowlistChange(who: string, details: Record<string, unknown> |
   const added = numberFrom(details?.added);
   const removed = numberFrom(details?.removed);
   if (added > 0 && removed === 0) {
-    return `${who} added ${added} ${added === 1 ? "sheet" : "sheets"} to the allowlist`;
+    return added === 1
+      ? tx("{{who}} added {{added}} sheet to the allowlist", { who, added })
+      : tx("{{who}} added {{added}} sheets to the allowlist", { who, added });
   }
   if (removed > 0 && added === 0) {
-    return `${who} removed ${removed} ${removed === 1 ? "sheet" : "sheets"} from the allowlist`;
+    return removed === 1
+      ? tx("{{who}} removed {{removed}} sheet from the allowlist", { who, removed })
+      : tx("{{who}} removed {{removed}} sheets from the allowlist", { who, removed });
   }
   if (added > 0 && removed > 0) {
-    return `${who} updated the allowlist (added ${added}, removed ${removed})`;
+    return tx("{{who}} updated the allowlist (added {{added}}, removed {{removed}})", { who, added, removed });
   }
-  return `${who} updated the allowlist`;
+  return tx("{{who}} updated the allowlist", { who });
 }
 
 function lifecycleLinkLabel(event: ToolConnectionLifecycleEvent): string {
-  return event.type === "actions_quarantined" ? "Review permissions" : "View permissions";
+  return event.type === "actions_quarantined" ? tx("Review permissions") : tx("View permissions");
 }
 
 function numberFrom(value: unknown): number {
@@ -259,7 +272,7 @@ function numberFrom(value: unknown): number {
 }
 
 function lower(who: string): string {
-  return who === "An agent" ? "an agent" : who;
+  return who === tx("An agent") ? tx("an agent") : who;
 }
 
 function dotColor(event: ToolCallEvent): string {

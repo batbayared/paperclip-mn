@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StatusBadge } from "@/components/StatusBadge";
 import { queryKeys } from "@/lib/queryKeys";
+import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
 import { ErrorState, RelativeTime } from "@/pages/tools/shared";
 
 const PAGE_SIZE = 25;
@@ -65,9 +67,9 @@ function Fact({ label, value, mono = false }: { label: string; value: string; mo
 function ActivityRow({ event }: { event: ToolGatewayActivityEvent }) {
   const [open, setOpen] = useState(false);
   const outcome = OUTCOME_META[event.normalizedOutcome] ?? OUTCOME_META.unknown;
-  const actor = event.agentDisplayName ?? "Client";
-  const app = event.appDisplayName ?? event.connectionDisplayName ?? event.applicationDisplayName ?? "App";
-  const tool = event.toolDisplayName ?? event.invocation?.toolName ?? "Tool call";
+  const actor = event.agentDisplayName ?? tx("Client");
+  const app = event.appDisplayName ?? event.connectionDisplayName ?? event.applicationDisplayName ?? tx("App");
+  const tool = event.toolDisplayName ?? event.invocation?.toolName ?? tx("Tool call");
   const rawTool = event.invocation?.toolName ?? detailString(event.details, "tool") ?? detailString(event.details, "toolName");
   const reason = detailString(event.details, "reasonCode");
   const argumentsText = formatSummary(
@@ -93,7 +95,11 @@ function ActivityRow({ event }: { event: ToolGatewayActivityEvent }) {
         )}
         <span className="min-w-0 flex-1">
           <span className="block text-foreground">
-            <span className="font-medium">{actor}</span> used <span className="font-medium">{tool}</span> in {app}
+            <XoTrans
+              i18nKey="<b>{{actor}}</b> used <b>{{tool}}</b> in {{app}}"
+              values={{ actor, tool, app }}
+              components={{ b: <span className="font-medium" /> }}
+            />
           </span>
         </span>
         <span className="flex shrink-0 items-center gap-2 whitespace-nowrap">

@@ -9,6 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { tx } from "@/i18n/xo";
 
 export type ProfileActionDialogKind = "archive" | "delete" | "restore";
 
@@ -36,13 +37,13 @@ export function ProfileActionDialog({
     archive: {
       title: "Archive profile",
       body: `This profile stops applying to ${profile.summary.appliesToAgentCount} ${profile.summary.appliesToAgentCount === 1 ? "agent" : "agents"}. You can restore it later.`,
-      confirm: "Archive",
+      confirm: tx("Archive"),
       action: onArchive,
     },
     restore: {
       title: "Restore profile",
       body: "This profile will be active again and can be assigned to agents.",
-      confirm: "Restore",
+      confirm: tx("Restore"),
       action: onRestore,
     },
     delete: {
@@ -50,7 +51,7 @@ export function ProfileActionDialog({
       body: defaultDeleteBlocked
         ? "This profile is the organization default. Reassign the organization default to another profile before deleting it."
         : `This permanently deletes the profile and removes ${profile.summary.assignmentCount} ${profile.summary.assignmentCount === 1 ? "assignment" : "assignments"}.`,
-      confirm: "Delete",
+      confirm: tx("Delete"),
       action: onDelete,
     },
   }[kind];

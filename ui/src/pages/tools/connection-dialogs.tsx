@@ -38,6 +38,9 @@ import {
   CapabilityBadges,
   QuarantineBadge,
 } from "./shared";
+import { tx } from "@/i18n/xo";
+import { xoBrandVars } from "@/xo/labels";
+import { XoTrans } from "@/xo/XoTrans";
 
 export const TRANSPORT_LABEL: Record<string, string> = {
   mcp_remote: "remote http",
@@ -430,7 +433,7 @@ export function AddConnectionDialog({
                             type="button"
                             className="ml-auto text-muted-foreground hover:text-destructive"
                             onClick={() => setCreds((cs) => cs.filter((_, idx) => idx !== i))}
-                            aria-label={`Remove credential reference for ${secretName(c.secretId)}`}
+                            aria-label={tx("Remove credential reference for {{name}}", { name: secretName(c.secretId) })}
                           >
                             <Trash2 className="h-3.5 w-3.5" />
                           </button>
@@ -474,8 +477,11 @@ export function AddConnectionDialog({
                       </p>
                     ) : null}
                     <p className="text-xs text-muted-foreground">
-                      Free-text secrets are not accepted — pick a vault entry; Paperclip stores only the
-                      <span className="font-mono"> vault://</span> reference and resolves it at gateway use time.
+                      <XoTrans
+                        i18nKey="Free-text secrets are not accepted — pick a vault entry; {{brand}} stores only the<mono> vault://</mono> reference and resolves it at gateway use time."
+                        values={xoBrandVars()}
+                        components={{ mono: <span className="font-mono" /> }}
+                      />
                     </p>
                   </>
                 ) : null}

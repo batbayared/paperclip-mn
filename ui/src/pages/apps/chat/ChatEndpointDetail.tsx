@@ -40,13 +40,27 @@ import { formatDateTime } from "@/lib/utils";
 import { queryKeys } from "@/lib/queryKeys";
 import { copyTextToClipboard } from "@/lib/clipboard";
 import { Link, Navigate, useNavigate, useParams } from "@/lib/router";
+import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
+import { xoBrandVars } from "@/xo/labels";
 
 const tabs = ["settings", "access", "conversations", "activity"] as const;
 type ChatTab = (typeof tabs)[number];
-const tabItems = tabs.map((value) => ({
-  value,
-  label: value[0].toUpperCase() + value.slice(1),
-}));
+function chatTabLabel(value: ChatTab): string {
+  switch (value) {
+    case "settings":
+      return tx("Settings");
+    case "access":
+      return tx("Access");
+    case "conversations":
+      return tx("Conversations");
+    case "activity":
+      return tx("Activity");
+  }
+}
+function chatTabItems() {
+  return tabs.map((value) => ({ value, label: chatTabLabel(value) }));
+}
 const providerNames: Record<ChatProvider, string> = {
   agentmail: "AgentMail",
   slack: "Slack",
@@ -57,54 +71,86 @@ const providerNames: Record<ChatProvider, string> = {
   "imessage-photon": "iMessage Photon",
 };
 
-const providerLifecycleGuidance: Record<
-  ChatProvider,
-  { reconnect: string; remove: string }
-> = {
-  agentmail: { reconnect: "Reconnect the same email inbox.", remove: "Disconnect email and retain task history." },
-  slack: {
-    reconnect:
-      "Reconnect verifies or replaces credentials for this same Slack app. It does not reinstall the app or change its workspace or channel membership.",
-    remove:
-      "Paperclip archives the endpoint, stops new ingress, and retires its saved Slack credentials. It does not uninstall the Slack app: the app remains installed, and its bot remains in channels, until you remove them in Slack.",
-  },
-  github: {
-    reconnect:
-      "Reconnect verifies this same App and installation, then updates its webhook URL, secret, and secure delivery settings. It does not reinstall the App or change repository access.",
-    remove:
-      "Paperclip archives the endpoint, stops new ingress, and retires its saved App key and webhook secret. It does not uninstall the GitHub App: the App, its installations, and its webhook settings remain until you remove or update them on GitHub.",
-  },
-  discord: {
-    reconnect:
-      "Reconnect verifies this same Discord application and server installation. It does not add or remove the bot from the server.",
-    remove:
-      "Paperclip archives the endpoint, stops its Paperclip Gateway connection, and retires its saved bot token. It does not uninstall the bot: the bot remains in the Discord server, and the application remains in the Developer Portal, until you remove them there.",
-  },
-  "microsoft-teams": {
-    reconnect:
-      "Reconnect verifies this same Microsoft app, tenant, and bot identity. It does not upload or reinstall the Teams app.",
-    remove:
-      "Paperclip archives the endpoint, stops new ingress, and retires its saved client secret. It does not uninstall the Teams app: the Entra app registration, Azure Bot, custom Teams app, and Teams installations remain until you remove them in Microsoft.",
-  },
-  "imessage-photon": {
-    reconnect: "Reconnect verifies the same Photon project and line allocation, then recovers eligible missed messages.",
-    remove: "Disconnect archives this channel and removes its saved secret. Your Photon project, number, subscription, and Messages history remain in Photon.",
-  },
-  telegram: {
-    reconnect:
-      "Reconnect verifies this same BotFather bot and automatically refreshes its Paperclip webhook and command menu.",
-    remove:
-      "Paperclip archives the endpoint and queues durable removal of its Telegram webhook and command menu. After Telegram confirms that cleanup, Paperclip retires the saved token. The BotFather bot and its chat memberships remain until you remove them in Telegram.",
-  },
-};
+function providerLifecycleGuidance(
+  provider: ChatProvider,
+): { reconnect: string; remove: string } {
+  const brand = xoBrandVars();
+  switch (provider) {
+    case "agentmail":
+      return { reconnect: tx("Reconnect the same email inbox."), remove: tx("Disconnect email and retain task history.") };
+    case "slack":
+      return {
+        reconnect: tx(
+          "Reconnect verifies or replaces credentials for this same Slack app. It does not reinstall the app or change its workspace or channel membership.",
+        ),
+        remove: tx(
+          "{{brand}} archives the endpoint, stops new ingress, and retires its saved Slack credentials. It does not uninstall the Slack app: the app remains installed, and its bot remains in channels, until you remove them in Slack.",
+          brand,
+        ),
+      };
+    case "github":
+      return {
+        reconnect: tx(
+          "Reconnect verifies this same App and installation, then updates its webhook URL, secret, and secure delivery settings. It does not reinstall the App or change repository access.",
+        ),
+        remove: tx(
+          "{{brand}} archives the endpoint, stops new ingress, and retires its saved App key and webhook secret. It does not uninstall the GitHub App: the App, its installations, and its webhook settings remain until you remove or update them on GitHub.",
+          brand,
+        ),
+      };
+    case "discord":
+      return {
+        reconnect: tx(
+          "Reconnect verifies this same Discord application and server installation. It does not add or remove the bot from the server.",
+        ),
+        remove: tx(
+          "{{brand}} archives the endpoint, stops its {{brand}} Gateway connection, and retires its saved bot token. It does not uninstall the bot: the bot remains in the Discord server, and the application remains in the Developer Portal, until you remove them there.",
+          brand,
+        ),
+      };
+    case "microsoft-teams":
+      return {
+        reconnect: tx(
+          "Reconnect verifies this same Microsoft app, tenant, and bot identity. It does not upload or reinstall the Teams app.",
+        ),
+        remove: tx(
+          "{{brand}} archives the endpoint, stops new ingress, and retires its saved client secret. It does not uninstall the Teams app: the Entra app registration, Azure Bot, custom Teams app, and Teams installations remain until you remove them in Microsoft.",
+          brand,
+        ),
+      };
+    case "imessage-photon":
+      return {
+        reconnect: tx("Reconnect verifies the same Photon project and line allocation, then recovers eligible missed messages."),
+        remove: tx("Disconnect archives this channel and removes its saved secret. Your Photon project, number, subscription, and Messages history remain in Photon."),
+      };
+    case "telegram":
+      return {
+        reconnect: tx(
+          "Reconnect verifies this same BotFather bot and automatically refreshes its Paperclip webhook and command menu.",
+          brand,
+        ),
+        remove: tx(
+          "Paperclip archives the endpoint and queues durable removal of its Telegram webhook and command menu. After Telegram confirms that cleanup, Paperclip retires the saved token. The BotFather bot and its chat memberships remain until you remove them in Telegram.",
+          brand,
+        ),
+      };
+  }
+}
 
-const activityKindLabels: Record<ChatActivityItem["kind"], string> = {
-  delivery: "Inbound delivery",
-  publication: "Outbound publication",
-  action: "Provider action",
-  health: "Connection health",
-  repair: "Connection repair",
-};
+function activityKindLabel(kind: ChatActivityItem["kind"]): string {
+  switch (kind) {
+    case "delivery":
+      return tx("Inbound delivery");
+    case "publication":
+      return tx("Outbound publication");
+    case "action":
+      return tx("Provider action");
+    case "health":
+      return tx("Connection health");
+    case "repair":
+      return tx("Connection repair");
+  }
+}
 
 const replayableFailureStates = new Set(["failed"]);
 // Provider callbacks do not necessarily emit a Board activity event. Refresh
@@ -155,12 +201,12 @@ export function activityResolutionActions(item: ChatActivityItem) {
 export function activityResolutionDescription(item: ChatActivityItem): string {
   const phase = item.fileTransfer?.phase;
   if (phase === "file_info_unknown")
-    return "The file upload was confirmed, but its Teams notification was not. Check Teams first. Retrying sends only that notification, not the file bytes, and may create a duplicate card.";
+    return tx("The file upload was confirmed, but its Teams notification was not. Check Teams first. Retrying sends only that notification, not the file bytes, and may create a duplicate card.");
   if (phase === "consent_unknown")
-    return "The consent card may have reached Teams. File delivery is not confirmed. Cancelling here does not remove any card already sent.";
+    return tx("The consent card may have reached Teams. File delivery is not confirmed. Cancelling here does not remove any card already sent.");
   if (phase)
-    return "The file may already exist in OneDrive. Cancelling stops this Paperclip transfer; it does not delete remote bytes. Uploads cannot be marked delivered or retried from this uncertain state.";
-  return "Paperclip lost confirmation after sending. Check the provider conversation first. Retrying can create a duplicate message.";
+    return tx("The file may already exist in OneDrive. Cancelling stops this {{brand}} transfer; it does not delete remote bytes. Uploads cannot be marked delivered or retried from this uncertain state.", xoBrandVars());
+  return tx("{{brand}} lost confirmation after sending. Check the provider conversation first. Retrying can create a duplicate message.", xoBrandVars());
 }
 
 export function isResolutionEligible(item: ChatActivityItem): boolean {
@@ -182,7 +228,7 @@ export function isIndividuallyToggleableResource(
 }
 
 function activityDetailLabel(item: ChatActivityItem): string {
-  return replayableFailureStates.has(item.status) ? "Reason" : "Details";
+  return replayableFailureStates.has(item.status) ? tx("Reason") : tx("Details");
 }
 
 export function connectionHealthPresentation(
@@ -190,12 +236,12 @@ export function connectionHealthPresentation(
 ) {
   // Health events outlive pause/removal. They are history, not lifecycle state.
   const lifecycleMessages = {
-    draft: "Connection setup is incomplete.",
-    verifying: "Connection verification is in progress.",
-    paused: "Connection is paused. Resume it to receive new messages.",
-    attention: "Connection needs attention.",
-    revoked: "Connection access is revoked. Reconnect to verify access.",
-    archived: "Connection has been removed from Paperclip.",
+    draft: tx("Connection setup is incomplete."),
+    verifying: tx("Connection verification is in progress."),
+    paused: tx("Connection is paused. Resume it to receive new messages."),
+    attention: tx("Connection needs attention."),
+    revoked: tx("Connection access is revoked. Reconnect to verify access."),
+    archived: tx("Connection has been removed from {{brand}}.", xoBrandVars()),
   };
   const lifecycleMessage =
     endpoint.status === "active" ? null : lifecycleMessages[endpoint.status];
@@ -204,8 +250,8 @@ export function connectionHealthPresentation(
     previousHealth: lifecycleMessage ? (endpoint.healthMessage ?? null) : null,
     error: endpoint.lastError ?? null,
     errorLabel: ["active", "attention", "revoked"].includes(endpoint.status)
-      ? "Reason"
-      : "Last reported error",
+      ? tx("Reason")
+      : tx("Last reported error"),
   };
 }
 
@@ -240,8 +286,8 @@ export function ChatEndpointDetail() {
       },
       {
         label:
-          tabItems.find((item) => item.value === activeTab)?.label ??
-          "Settings",
+          chatTabItems().find((item) => item.value === activeTab)?.label ??
+          tx("Settings"),
       },
     ]);
     return () => setBreadcrumbs([]);
@@ -286,8 +332,8 @@ export function ChatEndpointDetail() {
             <div className="mt-2 flex flex-wrap items-center gap-2 text-sm">
               <span>{endpoint.botExternalId}</span>
               <Button variant="ghost" size="sm" aria-label="Copy dedicated number" onClick={async () => {
-                try { await copyTextToClipboard(endpoint.botExternalId!); setCopyStatus("Number copied"); }
-                catch { setCopyStatus("Could not copy the number. Select and copy it manually."); }
+                try { await copyTextToClipboard(endpoint.botExternalId!); setCopyStatus(tx("Number copied")); }
+                catch { setCopyStatus(tx("Could not copy the number. Select and copy it manually.")); }
               }}><Copy className="size-4" />Copy number</Button>
               <span role="status" className="text-muted-foreground">{copyStatus}</span>
             </div>
@@ -314,7 +360,7 @@ export function ChatEndpointDetail() {
         onValueChange={(next) => navigate(`/apps/chat/${endpoint.id}/${next}`)}
       >
         <PageTabBar
-          items={tabItems}
+          items={chatTabItems()}
           value={activeTab}
           onValueChange={(next) =>
             navigate(`/apps/chat/${endpoint.id}/${next}`)
@@ -399,12 +445,17 @@ function Settings({
           <div className="rounded-lg border border-border p-3 text-sm">
             <code>{endpoint.setup.command}</code>
             <p className="mt-2 text-muted-foreground">
-              Start work with{" "}
-              <code>{endpoint.setup.command} investigate this</code>. In a
-              direct message, use <code>{endpoint.setup.command} status</code>,{" "}
-              <code>{endpoint.setup.command} new</code>, or{" "}
-              <code>{endpoint.setup.command} close</code>. Slack&apos;s bare{" "}
-              <code>/status</code> command is not a Paperclip control.
+              <XoTrans
+                i18nKey="Start work with <investigate/>. In a direct message, use <status/>, <new/>, or <close/>. Slack's bare <code>/status</code> command is not a {{brand}} control."
+                values={xoBrandVars()}
+                components={{
+                  investigate: <code>{`${endpoint.setup.command} investigate this`}</code>,
+                  status: <code>{`${endpoint.setup.command} status`}</code>,
+                  new: <code>{`${endpoint.setup.command} new`}</code>,
+                  close: <code>{`${endpoint.setup.command} close`}</code>,
+                  code: <code />,
+                }}
+              />
             </p>
           </div>
         </div>
@@ -457,7 +508,7 @@ function Settings({
                   {resource.participants?.length ? <p className="mt-1 break-words text-xs text-muted-foreground">Participants: {resource.participants.join(", ")}</p> : null}
                 </div>
                 <ToggleSwitch
-                  aria-label={`Enable ${resource.label}`}
+                  aria-label={tx("Enable {{label}}", { label: resource.label })}
                   checked={resource.enabled}
                   disabled={
                     endpoint.photonAllocation === "shared" ||
@@ -650,7 +701,7 @@ function Access({
                   <p className="text-sm font-medium">{link.externalLabel}</p>
                   <p className="text-xs text-muted-foreground">
                     {link.paperclipUserLabel
-                      ? `Linked to ${link.paperclipUserLabel}`
+                      ? tx("Linked to {{user}}", { user: link.paperclipUserLabel })
                       : (link.externalDetail ?? "Not linked")}
                   </p>
                 </div>
@@ -776,7 +827,7 @@ function Activity({
         queryKey: queryKeys.chatEndpoints.activity(endpointId),
       });
       pushToast({
-        title: `${item.kind === "publication" ? "Publication" : "Delivery"} queued for replay`,
+        title: item.kind === "publication" ? tx("Publication queued for replay") : tx("Delivery queued for replay"),
         tone: "success",
       });
     },
@@ -879,9 +930,9 @@ function Activity({
   const lifecycleAction = lifecycle.variables;
   const callbackSurfaceRows = endpoint.setup?.callbackSurfaces
     ? ([
-        ["Events API", endpoint.setup.callbackSurfaces.events],
-        ["Interactivity", endpoint.setup.callbackSurfaces.interactivity],
-        ["Slash command", endpoint.setup.callbackSurfaces.slashCommands],
+        [tx("Events API"), endpoint.setup.callbackSurfaces.events],
+        [tx("Interactivity"), endpoint.setup.callbackSurfaces.interactivity],
+        [tx("Slash command"), endpoint.setup.callbackSurfaces.slashCommands],
       ] as const)
     : [];
   return (
@@ -1017,7 +1068,7 @@ function Activity({
           </div>
           {status !== "draft" && status !== "verifying" && (
             <p className="text-xs text-muted-foreground">
-              {providerLifecycleGuidance[endpoint.provider].reconnect}
+              {providerLifecycleGuidance(endpoint.provider).reconnect}
             </p>
           )}
         </div>
@@ -1057,7 +1108,7 @@ function Activity({
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="text-xs font-medium text-muted-foreground">
-                      {activityKindLabels[item.kind]}
+                      {activityKindLabel(item.kind)}
                     </span>
                     <StatusBadge status={item.status} />
                     <time
@@ -1088,7 +1139,7 @@ function Activity({
                   <Button
                     size="sm"
                     variant="outline"
-                    aria-label={`Replay failed ${item.kind}`}
+                    aria-label={tx("Replay failed {{kind}}", { kind: item.kind })}
                     disabled={replay.isPending}
                     onClick={() => replay.mutate(item)}
                   >
@@ -1214,10 +1265,8 @@ function Activity({
           <AlertDialogHeader>
             <AlertDialogTitle>Remove this connection?</AlertDialogTitle>
             <AlertDialogDescription>
-              {endpoint.assignedAgentName} will stop receiving new work from
-              {` ${providerNames[endpoint.provider]}`}. Existing Paperclip tasks
-              remain available.{" "}
-              {providerLifecycleGuidance[endpoint.provider].remove}
+              {tx("{{agent}} will stop receiving new work from {{provider}}. Existing {{brand}} tasks remain available.", { agent: endpoint.assignedAgentName, provider: providerNames[endpoint.provider], ...xoBrandVars() })}{" "}
+              {providerLifecycleGuidance(endpoint.provider).remove}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

@@ -14,6 +14,7 @@ import { AiConnectionCredentialStep } from "@/components/ai-connections/AiConnec
 import { AI_PROVIDERS } from "@/components/ai-connections/model";
 import { AppLogo } from "@/pages/apps/AppLogo";
 import { Button } from "@/components/ui/button";
+import { tx } from "@/i18n/xo";
 import {
   Dialog,
   DialogContent,
@@ -305,8 +306,9 @@ export function ConnectionIntentInteractionBody({
         onComplete={(result) => { void finishNewConnection(result); }}
         onCancel={() => { closeSetup(); returnFocusToCard(); }}
       /> : <p role="status" className="text-sm text-muted-foreground">
-        {repair.connection.ownership === "personal" ? `${repair.connection.ownerName ?? "The account owner"} must reconnect ${repair.connection.name}.` : `The account owner must reconnect ${repair.connection.name}.`}
-        {" "}You can continue here once it is restored.
+        {repair.connection.ownership === "personal"
+          ? tx("{{owner}} must reconnect {{name}}. You can continue here once it is restored.", { owner: repair.connection.ownerName ?? tx("The account owner"), name: repair.connection.name })
+          : tx("The account owner must reconnect {{name}}. You can continue here once it is restored.", { name: repair.connection.name })}
       </p>
     : setupQuery.data?.aiConnection && setupQuery.data.aiConnection.mode !== "responsible_user"
       ? <p role="status" className="text-sm text-muted-foreground">The selected account is no longer available to you. Ask its owner to restore access, or choose an available AI connection in the agent’s settings.</p>

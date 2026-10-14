@@ -7,6 +7,7 @@ import { useCompany } from "@/context/CompanyContext";
 import { useBreadcrumbs } from "@/context/BreadcrumbContext";
 import { useToast } from "@/context/ToastContext";
 import { queryKeys } from "@/lib/queryKeys";
+import { tx } from "@/i18n/xo";
 import { toolsApi } from "@/api/tools";
 import { agentsApi } from "@/api/agents";
 import { projectsApi } from "@/api/projects";
@@ -202,7 +203,7 @@ export function GatewayDetail() {
               )}
               aria-current={isActive ? "page" : undefined}
             >
-              {item.label}
+              {gatewayTabLabel(item.key, item.label)}
             </Link>
           );
         })}
@@ -250,4 +251,15 @@ export function GatewayDetail() {
       />
     </div>
   );
+}
+
+function gatewayTabLabel(key: GatewayTabKey, english: string): string {
+  switch (key) {
+    case "overview": return tx("Overview");
+    case "apps": return tx("Apps & tools");
+    case "tokens": return tx("Tokens");
+    case "activity": return tx("Activity");
+    case "advanced": return tx("Advanced");
+    default: return english;
+  }
 }

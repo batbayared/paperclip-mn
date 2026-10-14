@@ -26,9 +26,10 @@ import { useToast } from "@/context/ToastContext";
 import { EffectiveAgentPanel } from "../ProfilesTab";
 import { ErrorState, LoadingState, RelativeTime, ToolsPageHeader } from "../shared";
 import { ProfileActionDialog, type ProfileActionDialogKind } from "./ProfileActionDialog";
-import { TEMPLATES, type TemplateKey } from "./profile-model";
+import { TEMPLATES, templateDescription, templateTitle, type TemplateKey } from "./profile-model";
 import { useProfilesData } from "./useProfilesData";
-import { allowsLabel, assignedLabel, isDraft, STATUS_LABEL } from "./profile-summary";
+import { allowsLabel, assignedLabel, isDraft, statusLabel } from "./profile-summary";
+import { tx } from "@/i18n/xo";
 
 /** The wizard route for a fresh profile, optionally seeded with a template. */
 function newProfileHref(template?: TemplateKey): string {
@@ -81,7 +82,7 @@ export function ProfilesIndex({
 
   const duplicate = useMutation({
     mutationFn: (profile: ToolProfileWithDetails) =>
-      toolsApi.duplicateProfile(profile.id, { name: `${profile.name} (copy)` }),
+      toolsApi.duplicateProfile(profile.id, { name: tx("{{name}} (copy)", { name: profile.name }) }),
     onSuccess: () => {
       pushToast({ title: "Profile duplicated", body: "The copy is not assigned to anyone yet.", tone: "success" });
       invalidate();
@@ -270,7 +271,7 @@ export function ProfilesIndex({
                     </td>
                     <td className="px-3 py-1.5">
                       <span className="inline-flex items-center gap-2">
-                        <Badge variant={statusVariant(profile.status)}>{STATUS_LABEL[profile.status]}</Badge>
+                        <Badge variant={statusVariant(profile.status)}>{statusLabel(profile.status)}</Badge>
                         {draft ? (
                           <button
                             type="button"
@@ -390,8 +391,8 @@ function EmptyTemplatePicker({ onPick }: { onPick: (key: TemplateKey) => void })
               "hover:border-primary hover:bg-primary/5",
             )}
           >
-            <span className="text-sm font-medium text-foreground">{template.title}</span>
-            <span className="text-xs text-muted-foreground">{template.description}</span>
+            <span className="text-sm font-medium text-foreground">{templateTitle(template.key)}</span>
+            <span className="text-xs text-muted-foreground">{templateDescription(template.key)}</span>
           </button>
         ))}
       </div>

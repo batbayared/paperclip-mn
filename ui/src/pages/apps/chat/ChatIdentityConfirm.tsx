@@ -6,6 +6,8 @@ import { authApi } from "@/api/auth";
 import { Button } from "@/components/ui/button";
 import { queryKeys } from "@/lib/queryKeys";
 import { Link, useSearchParams } from "@/lib/router";
+import { tx } from "@/i18n/xo";
+import { xoBrandVars } from "@/xo/labels";
 
 const providerNames: Record<ChatProvider, string> = {
   slack: "Slack",
@@ -115,9 +117,10 @@ export function ChatIdentityConfirm() {
         </div>
       </dl>
       <p className="text-sm text-muted-foreground">
-        Confirm only if this is your {providerNames[identity.provider]}{" "}
-        identity. Paperclip will check your current organization membership on
-        every action.
+        {tx("Confirm only if this is your {{provider}} identity. {{brand}} will check your current organization membership on every action.", {
+          provider: providerNames[identity.provider],
+          ...xoBrandVars(),
+        })}
       </p>
       {confirm.isError && (
         <p className="text-sm text-destructive">

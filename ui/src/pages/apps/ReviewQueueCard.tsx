@@ -12,6 +12,7 @@ import { IssueThreadInteractionCard } from "@/components/IssueThreadInteractionC
 import { toolsApi } from "@/api/tools";
 import { Button } from "@/components/ui/button";
 import { MarkdownBody } from "@/components/MarkdownBody";
+import { tx } from "@/i18n/xo";
 
 /**
  * "Ask first" review queue (M1b float / M9 card, PAP-10859).
@@ -27,7 +28,7 @@ import { MarkdownBody } from "@/components/MarkdownBody";
 export function ReviewQueueCard({
   connectionId,
   emptyState = "hidden",
-  heading = "Waiting for your OK",
+  heading = tx("Waiting for your OK"),
   plain = false,
 }: {
   connectionId?: string;
@@ -111,7 +112,7 @@ function ReviewRow({
     mutationFn: () => toolsApi.approveActionRequest(companyId, item.request.id),
     onMutate: () => setResolving("allow"),
     onSuccess: () => {
-      pushToast({ title: "Allowed once", body: `${actionLabel(item)} can run this time.`, tone: "success" });
+      pushToast({ title: "Allowed once", body: tx("{{action}} can run this time.", { action: actionLabel(item) }), tone: "success" });
       invalidate();
     },
     onError: (error) => {
@@ -129,7 +130,7 @@ function ReviewRow({
     onSuccess: () => {
       pushToast({
         title: "Always allowed",
-        body: `${actionLabel(item)} won’t ask again.`,
+        body: tx("{{action}} won’t ask again.", { action: actionLabel(item) }),
         tone: "success",
       });
       invalidate();
@@ -146,7 +147,7 @@ function ReviewRow({
     mutationFn: () => toolsApi.declineActionRequest(companyId, item.request.id),
     onMutate: () => setResolving("decline"),
     onSuccess: () => {
-      pushToast({ title: "Declined", body: `${actionLabel(item)} won’t run.`, tone: "info" });
+      pushToast({ title: "Declined", body: tx("{{action}} won’t run.", { action: actionLabel(item) }), tone: "info" });
       invalidate();
     },
     onError: (error) => {
@@ -213,7 +214,7 @@ function ReviewRow({
 }
 
 function actionLabel(item: ToolActionRequestListItem): string {
-  if (!item.toolTitle && !item.toolName) return "This action";
+  if (!item.toolTitle && !item.toolName) return tx("This action");
   return humanizeConnectionDisplayName(item.toolName ?? "", { title: item.toolTitle });
 }
 

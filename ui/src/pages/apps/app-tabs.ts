@@ -1,4 +1,5 @@
 import { Blocks, Inbox, ShieldCheck } from "lucide-react";
+import { tx } from "@/i18n/xo";
 
 export const APP_TABS = [
   { key: "permissions", label: "Permissions", icon: ShieldCheck },
@@ -42,5 +43,12 @@ export function isAppTabKey(value: string | undefined): value is AppTabKey {
 }
 
 export function appTabLabel(tabKey: AppTabKey): string {
-  return APP_TABS.find((tab) => tab.key === tabKey)?.label ?? "Permissions";
+  switch (tabKey) {
+    case "services":
+      return tx("Services");
+    case "review":
+      return tx("Review");
+    default:
+      return tx("Permissions");
+  }
 }

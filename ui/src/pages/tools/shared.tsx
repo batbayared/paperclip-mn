@@ -21,7 +21,20 @@ export function RiskBadge({ risk }: { risk: ToolRiskLevel | null | undefined }) 
       : risk === "medium"
         ? "secondary"
         : "outline";
-  return <Badge variant={variant}>{risk}</Badge>;
+  return <Badge variant={variant}>{riskLabel(risk)}</Badge>;
+}
+
+export function riskLabel(risk: string): string {
+  switch (risk) {
+    case "low": return tx("low");
+    case "medium": return tx("medium");
+    case "high": return tx("high");
+    case "critical": return tx("critical");
+    case "read": return tx("read");
+    case "write": return tx("write");
+    case "destructive": return tx("destructive");
+    default: return risk;
+  }
 }
 
 /** Read/Write/Destructive capability chips. */
@@ -85,25 +98,25 @@ function decisionToStatusKey(decision: string): { key: string; label: string } {
   switch (decision) {
     case "allow":
     case "allowed":
-      return { key: "allowed", label: "allowed" };
+      return { key: "allowed", label: tx("allowed") };
     case "deny":
     case "denied":
-      return { key: "denied", label: "denied" };
+      return { key: "denied", label: tx("denied") };
     case "block":
-      return { key: "block", label: "block" };
+      return { key: "block", label: tx("block") };
     case "require_approval":
     case "requires_approval":
-      return { key: "require-approval", label: "require approval" };
+      return { key: "require-approval", label: tx("require approval") };
     case "redact":
     case "redacted":
-      return { key: "redacted", label: "redacted" };
+      return { key: "redacted", label: tx("redacted") };
     case "rate_limited":
-      return { key: "rate-limit", label: "rate limited" };
+      return { key: "rate-limit", label: tx("rate limited") };
     case "defer":
     case "deferred":
-      return { key: "deferred", label: "deferred" };
+      return { key: "deferred", label: tx("deferred") };
     case "hidden":
-      return { key: "hidden", label: "hidden" };
+      return { key: "hidden", label: tx("hidden") };
     default:
       return { key: decision, label: decision };
   }
@@ -162,11 +175,11 @@ export function ToolsPageHeader({
   );
 }
 
-export function LoadingState({ label = "Loading…" }: { label?: string }) {
+export function LoadingState({ label }: { label?: string }) {
   return (
     <div className="flex items-center gap-2 py-10 text-sm text-muted-foreground">
       <span className="h-4 w-4 animate-spin rounded-full border-2 border-muted-foreground/30 border-t-muted-foreground" />
-      {label}
+      {label ?? tx("Loading…")}
     </div>
   );
 }
@@ -176,17 +189,17 @@ export function ErrorState({ error, onRetry }: { error: unknown; onRetry?: () =>
   let message: string;
   if (error instanceof ApiError) {
     if (error.status === 403) {
-      message = "You do not have permission to view this. Tools & Access requires board/admin access.";
+      message = tx("You do not have permission to view this. Tools & Access requires board/admin access.");
     } else if (error.status === 404 || /route not found/i.test(error.originalMessage)) {
       // Snapshot-skew window: the route exists in this build but not on the live server snapshot yet.
-      message = "Tools & Access isn't available on this server yet — try refreshing after the next deployment.";
+      message = tx("Tools & Access isn't available on this server yet — try refreshing after the next deployment.");
     } else {
       message = error.message;
     }
   } else if (error instanceof Error) {
     message = error.message;
   } else {
-    message = "Something went wrong.";
+    message = tx("Something went wrong.");
   }
   return (
     <Card className="border-destructive/40">

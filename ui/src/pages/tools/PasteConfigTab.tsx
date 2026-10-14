@@ -23,7 +23,10 @@ import {
 } from "@/features/connections/ConnectionSetupFlow";
 import { endpointHost } from "@/pages/apps/generic-mcp-connect";
 import { McpConfigHelpDialog } from "./McpConfigHelpDialog";
-import { ErrorState } from "./shared";
+import { ErrorState, riskLabel } from "./shared";
+import { tx } from "@/i18n/xo";
+import { xoBrandVars } from "@/xo/labels";
+import { XoTrans } from "@/xo/XoTrans";
 
 const SAMPLE_CONFIG = `{
   "mcpServers": {
@@ -37,15 +40,17 @@ const SAMPLE_CONFIG = `{
 /** Turn an env/header key (e.g. `GITHUB_TOKEN`) into a friendly field label. */
 function humanizeKey(raw: string): string {
   const cleaned = raw.replace(/[_-]+/g, " ").trim().toLowerCase();
-  if (!cleaned) return "Key";
+  if (!cleaned) return tx("Key");
   return cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
 }
 
 function draftSummary(draft: McpJsonImportDraft): string {
   const keyCount = draft.credentialFields.length || draft.credentialRefs.length;
-  const where = draft.transport === "local_stdio" ? "Runs in your workspace" : "Connects over the web";
-  if (keyCount === 0) return `${where}  ·  no keys needed`;
-  return `${where}  ·  needs ${keyCount} ${keyCount === 1 ? "key" : "keys"}`;
+  const where = draft.transport === "local_stdio" ? tx("Runs in your workspace") : tx("Connects over the web");
+  if (keyCount === 0) return tx("{{where}}  ·  no keys needed", { where });
+  return keyCount === 1
+    ? tx("{{where}}  ·  needs {{n}} key", { where, n: keyCount })
+    : tx("{{where}}  ·  needs {{n}} keys", { where, n: keyCount });
 }
 
 /**
@@ -137,7 +142,7 @@ export function PasteConfigTab({ companyId }: { companyId: string }) {
       navigateTopLevel(target.url);
     } catch (error) {
       setOAuthPhase("error");
-      setOAuthError(error instanceof Error ? error.message : "Paperclip couldn’t start secure sign-in. Try again.");
+      setOAuthError(error instanceof Error ? error.message : tx("{{brand}} couldn’t start secure sign-in. Try again.", xoBrandVars()));
     }
   };
 
@@ -149,7 +154,7 @@ export function PasteConfigTab({ companyId }: { companyId: string }) {
       setOAuthError(
         error instanceof Error
           ? error.message
-          : "Paperclip couldn’t start secure sign-in. Try again.",
+          : tx("{{brand}} couldn’t start secure sign-in. Try again.", xoBrandVars()),
       );
     },
   });
@@ -157,7 +162,7 @@ export function PasteConfigTab({ companyId }: { companyId: string }) {
   const connectMutation = useMutation({
     mutationFn: (draft: McpJsonImportDraft) => {
       const url = draftConnectUrl(draft);
-      if (!url) throw new Error("Only remote HTTP drafts can be checked and activated from pasted config.");
+      if (!url) throw new Error(tx("Only remote HTTP drafts can be checked and activated from pasted config."));
       return toolsApi.connectApp(companyId, {
         link: url,
         name: connectionNames[draft.name]?.trim() || draft.name,
@@ -173,7 +178,7 @@ export function PasteConfigTab({ companyId }: { companyId: string }) {
         if (result.auth.manualClientRequired) {
           setOAuthPhase("error");
           setOAuthError(
-            "This server requires OAuth client details from its provider settings. Continue in setup to add them.",
+            tx("This server requires OAuth client details from its provider settings. Continue in setup to add them."),
           );
           return;
         }
@@ -207,7 +212,7 @@ export function PasteConfigTab({ companyId }: { companyId: string }) {
         access: "all_agents",
       });
     },
-    onSuccess: () => setActivatedName(connectResult?.application.name ?? "Imported app"),
+    onSuccess: () => setActivatedName(connectResult?.application.name ?? tx("Imported app")),
   });
 
   const drafts = preview?.drafts ?? [];
@@ -220,7 +225,7 @@ export function PasteConfigTab({ companyId }: { companyId: string }) {
       JSON.parse(trimmed);
       return null;
     } catch {
-      return "That doesn't look like valid JSON yet — paste the whole snippet, including the outer braces.";
+      return tx("That doesn't look like valid JSON yet — paste the whole snippet, including the outer braces.");
     }
   }, [draftText]);
 
@@ -260,11 +265,10 @@ export function PasteConfigTab({ companyId }: { companyId: string }) {
         <McpConfigHelpDialog />
       </div>
       <p className="text-xs text-muted-foreground">
-        Just a URL?{" "}
-        <Link to="/apps" className="text-primary hover:underline">
-          Browse planned app connections
-        </Link>{" "}
-        instead.
+        <XoTrans
+          i18nKey="Just a URL? <apps>Browse planned app connections</apps> instead."
+          components={{ apps: <Link to="/apps" className="text-primary hover:underline" /> }}
+        />
       </p>
 
       <div className="space-y-2">
@@ -561,7 +565,7 @@ function ActionGroup({
               <div className="min-w-0 flex-1">
                 <div className="truncate text-sm font-medium text-foreground">{action.title || action.toolName}</div>
                 <div className="truncate text-xs text-muted-foreground">
-                  {askFirstLevels.includes(action.riskLevel) ? "Ask first when enabled" : action.riskLevel}
+                  {askFirstLevels.includes(action.riskLevel) ? "Ask first when enabled" : riskLabel(action.riskLevel)}
                 </div>
               </div>
               <ToggleSwitch checked={on} onCheckedChange={(next) => onToggle(action.catalogEntryId, next)} />

@@ -49,6 +49,9 @@ import {
 import { cn, relativeTime } from "@/lib/utils";
 import { appTabHref } from "../app-tabs";
 import { formatActionPermissionSummary } from "./action-permission-summary";
+import { tx } from "@/i18n/xo";
+import { xoBrandVars } from "@/xo/labels";
+import { XoTrans } from "@/xo/XoTrans";
 
 // ---------------------------------------------------------------------------
 // Small format helpers
@@ -164,7 +167,7 @@ export function ActionTestDialog({
           <p className="py-6 text-sm text-muted-foreground">No agents are available to test as.</p>
         ) : accessQuery.isError && !accessQuery.data ? (
           <TestLoadError
-            message={`We couldn't load ${selectedAgentBase?.name ?? "this agent"}'s permissions.`}
+            message={tx("We couldn't load {{name}}'s permissions.", { name: selectedAgentBase?.name ?? tx("this agent") })}
             onRetry={() => { void accessQuery.refetch(); }}
           />
         ) : !selectedAgent ? (
@@ -360,11 +363,11 @@ export function TestPanel({
       <div className="py-6 text-center">
         <p className="text-sm font-medium text-foreground">No agents to test as</p>
         <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">
-          Only agents you can assign tasks to can preview {appName}. Give an agent access in{" "}
-          <Link className="font-medium text-primary hover:underline" to={appTabHref(connectionId, "permissions")}>
-            Permissions
-          </Link>{" "}
-          to test it here.
+          <XoTrans
+            i18nKey="Only agents you can assign tasks to can preview {{appName}}. Give an agent access in <permissions>Permissions</permissions> to test it here."
+            values={{ appName }}
+            components={{ permissions: <Link className="font-medium text-primary hover:underline" to={appTabHref(connectionId, "permissions")} /> }}
+          />
         </p>
       </div>
     );
@@ -373,7 +376,7 @@ export function TestPanel({
   if (testAgentAccessQuery.isError && !testAgentAccessQuery.data) {
     return (
       <TestLoadError
-        message={`We couldn't load ${selectedAgentBase?.name ?? "this agent"}'s permissions.`}
+        message={tx("We couldn't load {{name}}'s permissions.", { name: selectedAgentBase?.name ?? tx("this agent") })}
         onRetry={() => { void testAgentAccessQuery.refetch(); }}
       />
     );
@@ -425,7 +428,7 @@ export function TestPanel({
               onChange={(event) => setQuery(event.target.value)}
             />
           </div>
-          <FilterChip label={`All ${active.length + quarantinedActions.length}`} active={kindFilter === "all"} onClick={() => setKindFilter("all")} />
+          <FilterChip label={tx("All {{n}}", { n: active.length + quarantinedActions.length })} active={kindFilter === "all"} onClick={() => setKindFilter("all")} />
           <FilterChip label={`Read ${readActions.length}`} active={kindFilter === "read"} onClick={() => setKindFilter("read")} />
           <FilterChip label={`Write ${writeActions.length}`} active={kindFilter === "write"} onClick={() => setKindFilter("write")} />
         </div>
@@ -440,7 +443,7 @@ export function TestPanel({
         <div className="space-y-6">
           {visibleRead.length > 0 && selectedAgent && (
             <ActionGroup
-              heading={`Read (${visibleRead.length})`}
+              heading={tx("Read ({{length}})", { length: visibleRead.length })}
               entries={visibleRead}
               decisionFor={decisionFor}
               agent={selectedAgent}
@@ -449,7 +452,7 @@ export function TestPanel({
           )}
           {visibleWrite.length > 0 && selectedAgent && (
             <ActionGroup
-              heading={`Write (${visibleWrite.length})`}
+              heading={tx("Write ({{length}})", { length: visibleWrite.length })}
               entries={visibleWrite}
               decisionFor={decisionFor}
               agent={selectedAgent}
@@ -458,8 +461,8 @@ export function TestPanel({
           )}
           {visibleQuarantined.length > 0 && selectedAgent && (
             <ActionGroup
-              heading={`New (${visibleQuarantined.length})`}
-              subheading="New actions wait, switched off, until you turn them on."
+              heading={tx("New ({{length}})", { length: visibleQuarantined.length })}
+              subheading={tx("New actions wait, switched off, until you turn them on.")}
               entries={visibleQuarantined}
               decisionFor={() => "off" as const}
               agent={selectedAgent}
@@ -641,13 +644,26 @@ function AgentPicker({
         <div className="border-t border-border p-3">
           <p className="text-xs font-semibold text-foreground">What the badges mean</p>
           <ul className="mt-1.5 space-y-1 text-xs text-muted-foreground">
-            <li><span className="font-medium text-foreground">Allowed</span> — runs immediately when you press Run.</li>
-            <li><span className="font-medium text-foreground">Ask first</span> — Run is parked in Review for your OK.</li>
             <li>
-              <span className="font-medium text-foreground">Off</span> — won't run. Change it in{" "}
-              <Link className="text-primary hover:underline" to={appTabHref(connectionId, "permissions")}>
-                Permissions
-              </Link>.
+              <XoTrans
+                i18nKey="<b>Allowed</b> — runs immediately when you press Run."
+                components={{ b: <span className="font-medium text-foreground" /> }}
+              />
+            </li>
+            <li>
+              <XoTrans
+                i18nKey="<b>Ask first</b> — Run is parked in Review for your OK."
+                components={{ b: <span className="font-medium text-foreground" /> }}
+              />
+            </li>
+            <li>
+              <XoTrans
+                i18nKey="<b>Off</b> — won't run. Change it in <permissions>Permissions</permissions>."
+                components={{
+                  b: <span className="font-medium text-foreground" />,
+                  permissions: <Link className="text-primary hover:underline" to={appTabHref(connectionId, "permissions")} />,
+                }}
+              />
             </li>
           </ul>
           <p className="mt-2 text-(length:--text-micro) text-muted-foreground">
@@ -834,9 +850,9 @@ function splitRequiredOptional(schema: JsonSchemaNode): JsonSchemaNode {
 }
 
 const GUT_CHECK: Record<ToolConnectionTestDecision, (app: string, agent: string) => string> = {
-  allowed: (app, agent) => `This runs a real call against ${app} as ${agent}.`,
-  ask_first: () => `Waiting for your OK before this call leaves Paperclip.`,
-  off: (_app, agent) => `No call will be made — this action is off for ${agent}.`,
+  allowed: (app, agent) => tx("This runs a real call against {{app}} as {{agent}}.", { app, agent }),
+  ask_first: () => tx("Waiting for your OK before this call leaves {{brand}}.", xoBrandVars()),
+  off: (_app, agent) => tx("No call will be made — this action is off for {{agent}}.", { agent }),
 };
 
 function ActionTester({
@@ -960,7 +976,7 @@ function ActionTester({
           onChange={setValues}
           errors={errors}
           disabled={running}
-          advancedLabel="More options"
+          advancedLabel={tx("More options")}
         />
       ) : (
         <p className="text-xs text-muted-foreground">This action takes no inputs.</p>
@@ -991,7 +1007,8 @@ function ActionTester({
 
       {run.isError && !running && (
         <div className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
-          Couldn't reach {agent.name}. {run.error instanceof Error ? run.error.message : "Please try again."}
+          {tx("Couldn't reach {{name}}.", { name: agent.name })}{" "}
+          {run.error instanceof Error ? run.error.message : tx("Please try again.")}
         </div>
       )}
 
@@ -1019,7 +1036,11 @@ function RunningCard({
   elapsedMs: number;
   onCancel: () => void;
 }) {
-  const verb = entry.isReadOnly ? "Reading from" : entry.isWrite ? "Writing to" : "Calling";
+  const sentence = entry.isReadOnly
+    ? tx("Reading from {{appName}} as {{agentName}}.", { appName, agentName })
+    : entry.isWrite
+      ? tx("Writing to {{appName}} as {{agentName}}.", { appName, agentName })
+      : tx("Calling {{appName}} as {{agentName}}.", { appName, agentName });
   return (
     <div className="rounded-md border border-border bg-muted/30 p-4">
       <div className="flex items-center gap-2">
@@ -1027,10 +1048,12 @@ function RunningCard({
         <span className="text-sm font-medium text-foreground">Running…</span>
       </div>
       <p className="mt-1 text-xs text-muted-foreground">
-        {verb} {appName} as {agentName}.
+        {sentence}
       </p>
       <div className="mt-3 flex items-center justify-between">
-        <span className="text-xs text-muted-foreground">Started {seconds(elapsedMs)} ago · Press cancel to stop</span>
+        <span className="text-xs text-muted-foreground">
+          {tx("Started {{elapsed}} ago · Press cancel to stop", { elapsed: seconds(elapsedMs) })}
+        </span>
         <Button onClick={onCancel} size="sm" variant="outline">
           Cancel
         </Button>
@@ -1092,7 +1115,7 @@ function mcpToolError(value: unknown): { message: string; reasonCode: string | n
   const message =
     (typeof envelope.content === "string" && envelope.content.trim() !== "" && envelope.content)
     || (typeof envelope.error === "string" && envelope.error.trim() !== "" && envelope.error)
-    || "The app returned an error result.";
+    || tx("The app returned an error result.");
   return { message, reasonCode: "tool_error" };
 }
 
@@ -1130,11 +1153,19 @@ function writeVerb(entry: ToolCatalogEntry): string | null {
 
 function successHeadline(value: unknown, entry: ToolCatalogEntry, appName: string): string {
   const verb = writeVerb(entry);
-  if (!entry.isReadOnly && verb) return `Worked. Row ${verb}.`;
+  if (!entry.isReadOnly && verb) {
+    if (verb === "added") return tx("Worked. Row added.");
+    if (verb === "updated") return tx("Worked. Row updated.");
+    return tx("Worked. Row removed.");
+  }
   const rows = asRows(value);
-  if (rows) return `Worked. ${rows.length} ${rows.length === 1 ? "row" : "rows"} came back.`;
-  if (isEmptyResult(value)) return "Worked. No data to show.";
-  return `Worked. ${appName} sent back the result.`;
+  if (rows) {
+    return rows.length === 1
+      ? tx("Worked. {{n}} row came back.", { n: rows.length })
+      : tx("Worked. {{n}} rows came back.", { n: rows.length });
+  }
+  if (isEmptyResult(value)) return tx("Worked. No data to show.");
+  return tx("Worked. {{appName}} sent back the result.", { appName });
 }
 
 function AllowedResult({
@@ -1172,13 +1203,12 @@ function AllowedResult({
       <RawResponseDisclosure value={value} />
 
       <p className="mt-3 text-xs text-muted-foreground">
-        This call is in the{" "}
-        <Link className="text-primary hover:underline" to="/activity?mode=agents&action=tool_">
-          Audit log
-        </Link>
-        .
+        <XoTrans
+          i18nKey="This call is in the <audit>Audit log</audit>."
+          components={{ audit: <Link className="text-primary hover:underline" to="/activity?mode=agents&action=tool_" /> }}
+        />
       </p>
-      <p className="mt-1 text-xs text-muted-foreground">Last run finished in {seconds(outcome.durationMs)}.</p>
+      <p className="mt-1 text-xs text-muted-foreground">{tx("Last run finished in {{duration}}.", { duration: seconds(outcome.durationMs) })}</p>
     </div>
   );
 }
@@ -1210,7 +1240,7 @@ function PrettyPreview({ value }: { value: unknown }) {
           </tbody>
         </table>
         {rows.length > shown.length && (
-          <p className="px-2.5 py-1.5 text-(length:--text-micro) text-muted-foreground">… {rows.length - shown.length} more rows</p>
+          <p className="px-2.5 py-1.5 text-(length:--text-micro) text-muted-foreground">{tx("… {{n}} more rows", { n: rows.length - shown.length })}</p>
         )}
       </div>
     );
@@ -1303,11 +1333,10 @@ function ErrorResult({
       </div>
       <p className="mt-3 text-xs text-muted-foreground">Adjust the input above and try again.</p>
       <p className="mt-1 text-xs text-muted-foreground">
-        Also visible in the{" "}
-        <Link className="text-primary hover:underline" to="/activity?mode=agents&action=tool_">
-          Audit log
-        </Link>
-        .
+        <XoTrans
+          i18nKey="Also visible in the <audit>Audit log</audit>."
+          components={{ audit: <Link className="text-primary hover:underline" to="/activity?mode=agents&action=tool_" /> }}
+        />
       </p>
     </div>
   );
@@ -1403,14 +1432,14 @@ function AskFirstResult({
   const where = formatWhere(status?.parameters);
   const statusLabel =
     phase === "running"
-      ? "Approved · running"
+      ? tx("Approved · running")
       : phase === "denied"
-        ? "Denied — see Review for why"
+        ? tx("Denied — see Review for why")
         : phase === "cancelled"
-          ? "Cancelled"
+          ? tx("Cancelled")
           : phase === "expired"
-            ? "Expired — send it again"
-            : `Waiting · ${relTime(requestedAt)}`;
+            ? tx("Expired — send it again")
+            : tx("Waiting · {{time}}", { time: relTime(requestedAt) });
   const settled = phase === "denied" || phase === "cancelled" || phase === "expired";
 
   return (
@@ -1443,11 +1472,10 @@ function AskFirstResult({
 
       {!settled && (
         <p className="mt-3 text-sm text-foreground">
-          Approve it in the{" "}
-          <Link className="font-medium text-primary hover:underline" to={appTabHref(connectionId, "review")}>
-            Review tab
-          </Link>{" "}
-          to finish the test. You can also cancel the request.
+          <XoTrans
+            i18nKey="Approve it in the <review>Review tab</review> to finish the test. You can also cancel the request."
+            components={{ review: <Link className="font-medium text-primary hover:underline" to={appTabHref(connectionId, "review")} /> }}
+          />
         </p>
       )}
 
@@ -1490,8 +1518,8 @@ function OffExplanation({
   const others = allAgents.filter((a) => a.id !== agent.id);
 
   const whyBody = entry.status === "quarantined"
-    ? "This action is new and hasn't been turned on yet."
-    : `${agent.name}'s access profile sets this action to Off.`;
+    ? tx("This action is new and hasn't been turned on yet.")
+    : tx("{{name}}'s access profile sets this action to Off.", { name: agent.name });
 
   // "Last changed by {Actor} · {relativeTime}" — only the access config carries
   // this; a quarantined action has never been configured, so there's nothing to
@@ -1499,7 +1527,9 @@ function OffExplanation({
   const { lastChangedAt, lastChangedByName } = agent.effectiveAccess;
   const auditHint =
     entry.status !== "quarantined" && lastChangedAt
-      ? `Last changed${lastChangedByName ? ` by ${lastChangedByName}` : ""} · ${relTime(new Date(lastChangedAt))}`
+      ? lastChangedByName
+        ? tx("Last changed by {{name}} · {{time}}", { name: lastChangedByName, time: relTime(new Date(lastChangedAt)) })
+        : tx("Last changed · {{time}}", { time: relTime(new Date(lastChangedAt)) })
       : null;
 
   return (
@@ -1511,11 +1541,11 @@ function OffExplanation({
             <p className="font-medium text-foreground">{title} is off for {agent.name}.</p>
             <p className="mt-0.5">It won't run here, and it won't run from a task either.</p>
             <p className="mt-2">
-              Want to test it? Turn it on for {agent.name} in{" "}
-              <Link className="font-medium text-primary hover:underline" to={appTabHref(connectionId, "permissions")}>
-                Permissions
-              </Link>{" "}
-              — set it to Allowed or Ask first.
+              <XoTrans
+                i18nKey="Want to test it? Turn it on for {{name}} in <permissions>Permissions</permissions> — set it to Allowed or Ask first."
+                values={{ name: agent.name }}
+                components={{ permissions: <Link className="font-medium text-primary hover:underline" to={appTabHref(connectionId, "permissions")} /> }}
+              />
             </p>
           </div>
         </div>
@@ -1572,25 +1602,25 @@ export function errorHints(message: string, reasonCode: string | null | undefine
   const haystack = `${reasonCode ?? ""} ${message}`.toUpperCase();
   if (haystack.includes("NOT_FOUND")) {
     return [
-      "Double-check the ID or name you entered — pick it from a dropdown if one is offered.",
-      "Make sure this agent has access to that resource in the connected account.",
+      tx("Double-check the ID or name you entered — pick it from a dropdown if one is offered."),
+      tx("Make sure this agent has access to that resource in the connected account."),
     ];
   }
   if (haystack.includes("PERMISSION") || haystack.includes("FORBIDDEN") || haystack.includes("UNAUTHORIZED")) {
     return [
-      "The connected account may not have permission for this action.",
-      "Reconnect the app from Setup if its access was recently changed.",
+      tx("The connected account may not have permission for this action."),
+      tx("Reconnect the app from Setup if its access was recently changed."),
     ];
   }
   if (haystack.includes("INVALID_ARGUMENT") || haystack.includes("INVALID") || haystack.includes("BAD_REQUEST")) {
     return [
-      "Check the field formats above — a value may be the wrong type or shape.",
-      "Open “More options” to confirm any advanced fields are filled in correctly.",
+      tx("Check the field formats above — a value may be the wrong type or shape."),
+      tx("Open “More options” to confirm any advanced fields are filled in correctly."),
     ];
   }
   if (haystack.includes("RATE_LIMIT") || haystack.includes("RESOURCE_EXHAUSTED") || haystack.includes("429")) {
-    return ["The app is rate-limiting calls right now — wait a moment and run it again."];
+    return [tx("The app is rate-limiting calls right now — wait a moment and run it again.")];
   }
   // Locked generic fallback (copy-spec decision #2).
-  return ["Check the inputs above and try again."];
+  return [tx("Check the inputs above and try again.")];
 }

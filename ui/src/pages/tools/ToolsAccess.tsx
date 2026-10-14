@@ -15,6 +15,18 @@ import {
   isAdvancedSetupTab,
   type ToolTabKey,
 } from "./tool-tabs";
+import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
+
+// tool-tabs.ts-ийн модулийн түвшний label-ийг render үед орчуулна (en: яг тэр англи утга).
+function toolTabLabel(tab: ToolTabKey): string {
+  switch (tab) {
+    case "paste-config": return tx("Paste a config");
+    case "gateways": return tx("Gateways");
+    case "profiles": return tx("Profiles");
+    case "smoke-lab": return tx("Smoke Lab");
+  }
+}
 
 function renderTab(tab: ToolTabKey, companyId: string) {
   switch (tab) {
@@ -36,7 +48,7 @@ export function ToolsAccess() {
   const params = useParams<{ tab?: string }>();
   const activeTab = (TOOL_TABS.find((t) => t.key === params.tab)?.key ?? "paste-config") as ToolTabKey;
   const advanced = isAdvancedSetupTab(activeTab);
-  const tabLabel = TOOL_TABS.find((t) => t.key === activeTab)?.label;
+  const tabLabel = TOOL_TABS.some((t) => t.key === activeTab) ? toolTabLabel(activeTab) : undefined;
 
   useEffect(() => {
     setBreadcrumbs([
@@ -92,12 +104,10 @@ export function ToolsAccess() {
             </span>
           </div>
           <p className="mt-1 text-sm text-muted-foreground">
-            For tools that aren't in the gallery. You'll need details from the tool's documentation.
-            Most people never need this — if the app you want is in the gallery,{" "}
-            <Link to="/apps" className="font-medium text-primary hover:underline">
-              connect it there instead
-            </Link>
-            .
+            <XoTrans
+              i18nKey="For tools that aren't in the gallery. You'll need details from the tool's documentation. Most people never need this — if the app you want is in the gallery, <apps>connect it there instead</apps>."
+              components={{ apps: <Link to="/apps" className="font-medium text-primary hover:underline" /> }}
+            />
           </p>
         </header>
 
@@ -113,7 +123,7 @@ export function ToolsAccess() {
                   : "border-transparent text-muted-foreground hover:text-foreground",
               )}
             >
-              {tab.label}
+              {toolTabLabel(tab.key)}
             </Link>
           ))}
         </nav>
@@ -122,10 +132,10 @@ export function ToolsAccess() {
 
         <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <Wrench className="h-3.5 w-3.5" />
-          Looking for the developer surface?{" "}
-          <Link to={advancedTabHref("profiles")} className="font-medium text-primary hover:underline">
-            Open developer tools
-          </Link>
+          <XoTrans
+            i18nKey="Looking for the developer surface? <dev>Open developer tools</dev>"
+            components={{ dev: <Link to={advancedTabHref("profiles")} className="font-medium text-primary hover:underline" /> }}
+          />
         </p>
       </div>
     );

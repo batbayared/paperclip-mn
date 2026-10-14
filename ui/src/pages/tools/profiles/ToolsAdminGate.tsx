@@ -5,6 +5,7 @@ import { Link } from "@/lib/router";
 import { accessApi } from "@/api/access";
 import { queryKeys } from "@/lib/queryKeys";
 import { useCompany } from "@/context/CompanyContext";
+import { XoTrans } from "@/xo/XoTrans";
 
 /**
  * Best-effort admin gate for the access-profiles surface, mirroring
@@ -40,12 +41,10 @@ export function ToolsAdminGate({ children }: { children: ReactNode }) {
             <h1 className="text-lg font-semibold">Access profiles are for administrators</h1>
           </div>
           <p className="text-sm text-muted-foreground">
-            Access profiles decide which tools your agents can use. Ask an administrator to set these up, or
-            head back to{" "}
-            <Link to="/apps" className="font-medium text-primary hover:underline">
-              your apps
-            </Link>
-            .
+            <XoTrans
+              i18nKey="Access profiles decide which tools your agents can use. Ask an administrator to set these up, or head back to <apps>your apps</apps>."
+              components={{ apps: <Link to="/apps" className="font-medium text-primary hover:underline" /> }}
+            />
           </p>
         </div>
       </div>

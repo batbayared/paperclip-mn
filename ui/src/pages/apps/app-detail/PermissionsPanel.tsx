@@ -14,6 +14,7 @@ import { type InstallState } from "@/lib/tool-installs";
 import { QuarantinedActionsReview } from "./SetupPanel";
 import { ActionTestDialog } from "./TestPanel";
 import type { AccessDraft, AppDetailSectionProps } from "./types";
+import { tx } from "@/i18n/xo";
 
 type ActionPermission = "off" | "ask" | "allowed";
 type ActionKindFilter = "all" | "read" | "write";
@@ -129,7 +130,7 @@ function AgentAccessSection({
       {canManage ? (
         <div className="space-y-3">
           <RadioCardGroup
-            ariaLabel="Which agents can use this connection"
+            ariaLabel={tx("Which agents can use this connection")}
             value={access.mode}
             disabled={disabled}
             className="sm:grid-cols-2"
@@ -163,11 +164,13 @@ function AgentAccessSection({
               selectedAgentIds={access.agentIds}
               disabled={disabled}
               triggerLabel={access.agentIds.size === 0
-                ? "Choose agents"
-                : `${access.agentIds.size} ${access.agentIds.size === 1 ? "agent" : "agents"} selected`}
-              emptyMessage="You cannot edit any agents yet."
+                ? tx("Choose agents")
+                : access.agentIds.size === 1
+                  ? tx("{{n}} agent selected", { n: access.agentIds.size })
+                  : tx("{{n}} agents selected", { n: access.agentIds.size })}
+              emptyMessage={tx("You cannot edit any agents yet.")}
               isAgentDisabled={(agent) => requiredAgentIds.has(agent.id)}
-              getDescription={(agent) => requiredAgentIds.has(agent.id) ? "Required by this connection's install setting" : agent.title}
+              getDescription={(agent) => requiredAgentIds.has(agent.id) ? tx("Required by this connection's install setting") : agent.title}
               onChange={(agentIds) => onSave({
                 mode: "specific",
                 agentIds: new Set([...agentIds, ...requiredAgentIds]),
@@ -293,7 +296,7 @@ function ActionsSection({
               onChange={(event) => setQuery(event.target.value)}
             />
           </div>
-          <FilterChip label={`All ${readOnly.length + canChange.length}`} active={kindFilter === "all"} onClick={() => setKindFilter("all")} />
+          <FilterChip label={tx("All {{n}}", { n: readOnly.length + canChange.length })} active={kindFilter === "all"} onClick={() => setKindFilter("all")} />
           <FilterChip label={`Read ${readOnly.length}`} active={kindFilter === "read"} onClick={() => setKindFilter("read")} />
           <FilterChip label={`Write ${canChange.length}`} active={kindFilter === "write"} onClick={() => setKindFilter("write")} />
         </div>

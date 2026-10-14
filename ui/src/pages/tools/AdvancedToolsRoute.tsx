@@ -5,6 +5,7 @@ import { accessApi } from "@/api/access";
 import { queryKeys } from "@/lib/queryKeys";
 import { useCompany } from "@/context/CompanyContext";
 import { ToolsAccess } from "./ToolsAccess";
+import { XoTrans } from "@/xo/XoTrans";
 
 /**
  * Admin gate for the Advanced door (PAP-10862, plan D8). The developer surface
@@ -41,12 +42,10 @@ export function AdvancedToolsRoute() {
             <h1 className="text-lg font-semibold">Advanced setup is for administrators</h1>
           </div>
           <p className="text-sm text-muted-foreground">
-            This area lets administrators wire up tools that aren't in the gallery. Ask an administrator if you
-            need a new app connected, or head back to{" "}
-            <Link to="/apps" className="font-medium text-primary hover:underline">
-              your apps
-            </Link>
-            .
+            <XoTrans
+              i18nKey="This area lets administrators wire up tools that aren't in the gallery. Ask an administrator if you need a new app connected, or head back to <apps>your apps</apps>."
+              components={{ apps: <Link to="/apps" className="font-medium text-primary hover:underline" /> }}
+            />
           </p>
         </div>
       </div>

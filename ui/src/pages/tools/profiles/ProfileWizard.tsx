@@ -20,6 +20,8 @@ import {
   parseEntries,
   templateSelections,
   TEMPLATES,
+  templateDescription,
+  templateTitle,
   type AdvancedRule,
   type TemplateKey,
   type WizardSelections,
@@ -27,6 +29,8 @@ import {
 import { useProfilesData } from "./useProfilesData";
 import { WizardToolsStep } from "./WizardToolsStep";
 import { readWizardMeta, resumeStep, withWizardMeta, type WizardStep } from "./wizard-draft";
+import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
 
 function slugifyProfileKey(name: string): string {
   return name
@@ -37,11 +41,18 @@ function slugifyProfileKey(name: string): string {
     .slice(0, 160);
 }
 
-const STEP_LABELS: Array<{ step: WizardStep; label: string }> = [
-  { step: 1, label: "Name" },
-  { step: 2, label: "Choose tools" },
-  { step: 3, label: "Assign" },
-];
+const STEPS: WizardStep[] = [1, 2, 3];
+
+function stepLabel(step: WizardStep): string {
+  switch (step) {
+    case 1:
+      return tx("Name");
+    case 2:
+      return tx("Choose tools");
+    default:
+      return tx("Assign");
+  }
+}
 
 export function ProfileWizard({
   companyId,
@@ -153,7 +164,7 @@ export function ProfileWizard({
       if (!draftId) {
         const created = await toolsApi.createProfile(companyId, {
           profileKey: profileKey || slugifyProfileKey(name) || "profile",
-          name: name.trim() || "Untitled profile",
+          name: name.trim() || tx("Untitled profile"),
           description: description.trim() || null,
           status: "draft",
           defaultAction: newToolsAction,
@@ -164,7 +175,7 @@ export function ProfileWizard({
       }
       const updated = await toolsApi.updateProfile(draftId, {
         profileKey: profileKey || undefined,
-        name: name.trim() || "Untitled profile",
+        name: name.trim() || tx("Untitled profile"),
         description: description.trim() || null,
         defaultAction: newToolsAction,
         entries,
@@ -287,8 +298,11 @@ export function ProfileWizard({
           <div className="flex items-center gap-3 text-sm text-muted-foreground">
             {step >= 2 ? (
               <span>
-                Allows <span className="font-medium text-foreground">{live.allowed}</span> of {live.total}{" "}
-                tools
+                <XoTrans
+                  i18nKey="Allows <b>{{allowed}}</b> of {{total}} tools"
+                  values={{ allowed: live.allowed, total: live.total }}
+                  components={{ b: <span className="font-medium text-foreground" /> }}
+                />
               </span>
             ) : null}
             {draftId ? (
@@ -393,8 +407,14 @@ async function reconcileBindings(
     } catch (error) {
       const rollbacks = await Promise.allSettled(completed.reverse().map((done) => done.rollback()));
       const rollbackFailures = rollbacks.filter((result) => result.status === "rejected").length;
-      const suffix = rollbackFailures > 0 ? `; ${rollbackFailures} rollback operation(s) also failed` : "";
-      throw new Error(`Could not update assignment ${operation.key}${suffix}`, { cause: error });
+      const message =
+        rollbackFailures > 0
+          ? tx("Could not update assignment {{key}}; {{n}} rollback operation(s) also failed", {
+              key: operation.key,
+              n: rollbackFailures,
+            })
+          : tx("Could not update assignment {{key}}", { key: operation.key });
+      throw new Error(message, { cause: error });
     }
   }
 }
@@ -402,7 +422,7 @@ async function reconcileBindings(
 function Stepper({ current }: { current: WizardStep }) {
   return (
     <ol className="flex items-center gap-2 text-sm">
-      {STEP_LABELS.map(({ step, label }, idx) => {
+      {STEPS.map((step, idx) => {
         const done = current > step;
         const active = current === step;
         return (
@@ -418,9 +438,9 @@ function Stepper({ current }: { current: WizardStep }) {
               {done ? <Check className="h-3.5 w-3.5" /> : step}
             </span>
             <span className={cn("font-medium", active ? "text-foreground" : "text-muted-foreground")}>
-              {label}
+              {stepLabel(step)}
             </span>
-            {idx < STEP_LABELS.length - 1 ? <span className="mx-1 text-muted-foreground">→</span> : null}
+            {idx < STEPS.length - 1 ? <span className="mx-1 text-muted-foreground">→</span> : null}
           </li>
         );
       })}
@@ -471,8 +491,8 @@ export function StepName({
                   : "border-border hover:border-primary/40 hover:bg-accent/40",
               )}
             >
-              <span className="text-sm font-medium text-foreground">{t.title}</span>
-              <span className="text-xs text-muted-foreground">{t.description}</span>
+              <span className="text-sm font-medium text-foreground">{templateTitle(t.key)}</span>
+              <span className="text-xs text-muted-foreground">{templateDescription(t.key)}</span>
             </button>
           ))}
         </div>
@@ -613,7 +633,7 @@ export function StepAssign({
           <span className="text-sm font-medium text-foreground">Make this the organization default</span>
           <span className="text-xs text-muted-foreground">
             Every agent without its own profile uses this one.
-            {defaultProfileName ? ` Replaces “${defaultProfileName}”.` : ""}
+            {defaultProfileName ? " " + tx("Replaces “{{name}}”.", { name: defaultProfileName }) : ""}
           </span>
         </span>
       </label>
@@ -631,8 +651,8 @@ export function StepAssign({
           getDescription={(agent) => {
             const context = contextByAgent.get(agent.id) ?? [];
             const bits = [...context];
-            if (defaultProfileName) bits.push("organization default");
-            return bits.length > 0 ? `already has: ${bits.join(" · ")}` : "no profiles yet";
+            if (defaultProfileName) bits.push(tx("organization default"));
+            return bits.length > 0 ? tx("already has: {{list}}", { list: bits.join(" · ") }) : tx("no profiles yet");
           }}
         />
         <p className="text-xs text-muted-foreground">

@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useBreadcrumbs } from "@/context/BreadcrumbContext";
 import { useCompany } from "@/context/CompanyContext";
+import { tx } from "@/i18n/xo";
 import { ReviewQueueCard } from "./ReviewQueueCard";
 
 /**
@@ -38,7 +39,7 @@ export function AppsReview() {
         </p>
       </header>
 
-      <ReviewQueueCard emptyState="reassure" heading="Waiting for your OK" />
+      <ReviewQueueCard emptyState="reassure" heading={tx("Waiting for your OK")} />
     </div>
   );
 }

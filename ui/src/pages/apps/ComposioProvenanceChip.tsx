@@ -1,6 +1,7 @@
 import { Blocks } from "lucide-react";
 import { Link } from "@/lib/router";
 import { cn } from "@/lib/utils";
+import { tx } from "@/i18n/xo";
 import { appTabHref } from "./app-tabs";
 import { composioChildParentConnectionId, composioChildToolkitSlug } from "./composio-services";
 
@@ -33,7 +34,7 @@ export function ConnectionProvenanceChip({
     return (
       <span
         className={chipClass}
-        title={connectorUid ? `Credentials managed by Vercel Connect (${connectorUid})` : "Credentials managed by Vercel Connect"}
+        title={connectorUid ? tx("Credentials managed by Vercel Connect ({{connectorUid}})", { connectorUid }) : tx("Credentials managed by Vercel Connect")}
       >
         <Blocks className="h-3 w-3" />
         via Vercel Connect
@@ -54,14 +55,14 @@ export function ConnectionProvenanceChip({
   // Without a parent id there is nowhere to send the reader, so the chip stays a
   // label rather than becoming a dead link.
   if (!parentConnectionId) {
-    return <span className={chipClass} title={`Brokered by Composio (${toolkitSlug})`}>{label}</span>;
+    return <span className={chipClass} title={tx("Brokered by Composio ({{toolkitSlug}})", { toolkitSlug })}>{label}</span>;
   }
 
   return (
     <Link
       to={appTabHref(parentConnectionId, "services")}
       className={cn(chipClass, "transition-colors hover:bg-accent hover:text-accent-foreground")}
-      title={`Brokered by Composio (${toolkitSlug}) — open the Composio Services tab`}
+      title={tx("Brokered by Composio ({{toolkitSlug}}) — open the Composio Services tab", { toolkitSlug })}
       onClick={(event) => event.stopPropagation()}
     >
       {label}

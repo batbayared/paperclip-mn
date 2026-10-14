@@ -31,6 +31,14 @@ import { queryKeys } from "@/lib/queryKeys";
 import { copyTextToClipboard } from "@/lib/clipboard";
 import { isAgentStatusInvokable } from "@paperclipai/shared";
 import { sanitizedSetupErrorMessage } from "./chat-setup-error";
+import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
+import { xoBrandVars } from "@/xo/labels";
+
+// Teams app manifest content copied into Developer Portal: keep it untranslated.
+const TEAMS_STATUS_COMMAND_DESCRIPTION = "Show the active Paperclip task status";
+const TEAMS_NEW_COMMAND_DESCRIPTION = "Start a new Paperclip task in this chat";
+const TEAMS_CLOSE_COMMAND_DESCRIPTION = "Close the active chat conversation";
 import {
   createGitHubPrivateKeyReadGuard,
   readGitHubPrivateKeyFile,
@@ -103,7 +111,7 @@ export function isChatEndpointRepairing(
 function SetupRail({ step }: { step: number }) {
   return (
     <ol className="space-y-2 text-sm" aria-label="Connection setup progress">
-      {["Choose agent", "Connect provider", "Try it"].map((label, index) => (
+      {[tx("Choose agent"), tx("Connect provider"), tx("Try it")].map((label, index) => (
         <li key={label} className="flex items-center gap-2">
           <span
             className={`flex h-6 w-6 items-center justify-center rounded-full border ${index < step ? "border-primary bg-primary text-primary-foreground" : index === step ? "border-foreground text-foreground" : "border-border text-muted-foreground"}`}
@@ -371,7 +379,7 @@ function ChatSdkEndpointSetup() {
         <div>
           <h1 className="text-xl font-bold">Choose how to connect</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            What should this {providerNames[provider]} connection do?
+            {tx("What should this {{provider}} connection do?", { provider: providerNames[provider] })}
           </p>
         </div>
         <div className="grid gap-3">
@@ -384,8 +392,7 @@ function ChatSdkEndpointSetup() {
               Chat with an agent
             </span>
             <span className="mt-1 block text-sm text-muted-foreground">
-              People in {providerNames[provider]} can start and continue
-              Paperclip tasks.
+              {tx("People in {{provider}} can start and continue {{brand}} tasks.", { provider: providerNames[provider], ...xoBrandVars() })}
             </span>
           </button>
           <button
@@ -397,8 +404,7 @@ function ChatSdkEndpointSetup() {
               Use this connection as an agent tool
             </span>
             <span className="mt-1 block text-sm text-muted-foreground">
-              Let agents use {providerNames[provider]} actions and data while
-              they work.
+              {tx("Let agents use {{provider}} actions and data while they work.", { provider: providerNames[provider] })}
             </span>
           </button>
         </div>
@@ -438,7 +444,7 @@ function ChatSdkEndpointSetup() {
               value={agentId}
               onChange={setAgentId}
               placeholder="Choose an active agent"
-              emptyMessage="No active agents are available."
+              emptyMessage={tx("No active agents are available.")}
             />
             <div className="flex justify-end">
               <Button
@@ -612,7 +618,7 @@ function ProviderConnectStep({
       setPrivateKeyFileError(
         error instanceof Error
           ? error.message
-          : "Paperclip couldn't read that file. Choose the .pem file again or paste the private key.",
+          : tx("{{brand}} couldn't read that file. Choose the .pem file again or paste the private key.", xoBrandVars()),
       );
     } finally {
       if (privateKeyReadGuard.isCurrent(readRevision)) {
@@ -724,15 +730,15 @@ settings:
               commands: [
                 {
                   title: "/status",
-                  description: "Show the active Paperclip task status",
+                  description: TEAMS_STATUS_COMMAND_DESCRIPTION,
                 },
                 {
                   title: "/new",
-                  description: "Start a new Paperclip task in this chat",
+                  description: TEAMS_NEW_COMMAND_DESCRIPTION,
                 },
                 {
                   title: "/close",
-                  description: "Close the active chat conversation",
+                  description: TEAMS_CLOSE_COMMAND_DESCRIPTION,
                 },
               ],
             },
@@ -798,9 +804,9 @@ settings:
         >
           Open Discord Developer Portal <ExternalLink />
         </Button>
-        {field("applicationId", "Application ID", "text")}
-        {field("guildId", "Server ID", "text")}
-        {field("botToken", "Bot token")}
+        {field("applicationId", tx("Application ID"), "text")}
+        {field("guildId", tx("Server ID"), "text")}
+        {field("botToken", tx("Bot token"))}
         {installUrl && (
           <Button asChild variant="outline">
             <a href={installUrl} target="_blank" rel="noreferrer">
@@ -855,9 +861,11 @@ settings:
         <p className="rounded-md border border-border bg-muted/40 p-3 text-sm text-muted-foreground">
           Paperclip works with Telegram&apos;s default bot privacy mode and
           registers its command menu automatically. In a group, ordinary
-          mentions are not delivered to bots: start or continue work with{" "}
-          <code>/task@bot_username &lt;request&gt;</code>, or reply directly to
-          a message from the bot.
+          mentions are not delivered to bots:{" "}
+          <XoTrans
+            i18nKey="start or continue work with <cmd/>, or reply directly to a message from the bot."
+            components={{ cmd: <code>/task@bot_username &lt;request&gt;</code> }}
+          />
         </p>
         <Button
           variant="outline"
@@ -865,7 +873,7 @@ settings:
         >
           Open BotFather <ExternalLink />
         </Button>
-        {field("botToken", "Bot token")}
+        {field("botToken", tx("Bot token"))}
         {!endpoint.setup?.webhookUrl && (
           <p className="text-sm text-destructive">
             Configure a public HTTPS URL for this Paperclip instance before
@@ -960,12 +968,12 @@ settings:
           </Button>
         </div>
         {endpointValue(
-          "Paperclip messaging endpoint",
+          tx("{{brand}} messaging endpoint", xoBrandVars()),
           endpoint.setup?.messagingEndpoint,
         )}
-        {field("clientId", "Application / Client ID", "text")}
-        {field("tenantId", "Directory / Tenant ID", "text")}
-        {field("clientSecret", "Client secret value")}
+        {field("clientId", tx("Application / Client ID"), "text")}
+        {field("tenantId", tx("Directory / Tenant ID"), "text")}
+        {field("clientSecret", tx("Client secret value"))}
         <section className="space-y-3 rounded-lg border border-border p-4">
           <div>
             <h2 className="text-sm font-semibold">
@@ -978,51 +986,29 @@ settings:
           </div>
           <ol className="list-decimal space-y-3 pl-5 text-sm">
             <li>
-              <strong>Microsoft Entra admin center · App registrations</strong>:
-              select <strong>New registration</strong>, choose{" "}
-              <strong>
-                Accounts in this organizational directory only (Single tenant)
-              </strong>
-              , then select <strong>Register</strong>. Copy{" "}
-              <strong>Application (client) ID</strong> and{" "}
-              <strong>Directory (tenant) ID</strong>. Under{" "}
-              <strong>Certificates &amp; secrets · Client secrets</strong>,
-              select <strong>New client secret</strong> and copy its{" "}
-              <strong>Value</strong>, not its Secret ID.
+              <XoTrans
+                i18nKey="<strong>Microsoft Entra admin center · App registrations</strong>: select <strong>New registration</strong>, choose <strong>Accounts in this organizational directory only (Single tenant)</strong>, then select <strong>Register</strong>. Copy <strong>Application (client) ID</strong> and <strong>Directory (tenant) ID</strong>. Under <strong>Certificates &amp; secrets · Client secrets</strong>, select <strong>New client secret</strong> and copy its <strong>Value</strong>, not its Secret ID."
+                components={{ strong: <strong /> }}
+              />
             </li>
             <li>
-              <strong>Azure · Create Azure Bot</strong>: set{" "}
-              <strong>Microsoft App ID</strong> to{" "}
-              <strong>Single Tenant</strong>, set <strong>Creation type</strong>{" "}
-              to <strong>Use existing app registration</strong>, and enter the
-              Application ID and Tenant ID above. After creation, open{" "}
-              <strong>Settings · Configuration</strong> and paste the Paperclip{" "}
-              <strong>Messaging endpoint</strong>; then open{" "}
-              <strong>Settings · Channels</strong> and enable{" "}
-              <strong>Microsoft Teams</strong>.
+              <XoTrans
+                i18nKey="<strong>Azure · Create Azure Bot</strong>: set <strong>Microsoft App ID</strong> to <strong>Single Tenant</strong>, set <strong>Creation type</strong> to <strong>Use existing app registration</strong>, and enter the Application ID and Tenant ID above. After creation, open <strong>Settings · Configuration</strong> and paste the {{brand}} <strong>Messaging endpoint</strong>; then open <strong>Settings · Channels</strong> and enable <strong>Microsoft Teams</strong>."
+                values={xoBrandVars()}
+                components={{ strong: <strong /> }}
+              />
             </li>
             <li>
-              <strong>Teams Developer Portal · Apps</strong>: select{" "}
-              <strong>New app</strong>. Under{" "}
-              <strong>Configure · App features · Bot</strong>, add an existing
-              bot using the same Application ID; enable{" "}
-              <strong>Personal</strong>, <strong>Team</strong>, and{" "}
-              <strong>Group chat</strong> scopes plus file support. Under{" "}
-              <strong>Configure · Permissions</strong>, add the two RSC{" "}
-              <strong>Application</strong> permissions shown below. Complete the
-              required app details and icons, explain that the app can receive
-              every message in an installed team or group chat, then download
-              the app package.
+              <XoTrans
+                i18nKey="<strong>Teams Developer Portal · Apps</strong>: select <strong>New app</strong>. Under <strong>Configure · App features · Bot</strong>, add an existing bot using the same Application ID; enable <strong>Personal</strong>, <strong>Team</strong>, and <strong>Group chat</strong> scopes plus file support. Under <strong>Configure · Permissions</strong>, add the two RSC <strong>Application</strong> permissions shown below. Complete the required app details and icons, explain that the app can receive every message in an installed team or group chat, then download the app package."
+                components={{ strong: <strong /> }}
+              />
             </li>
             <li>
-              <strong>Microsoft Teams · Apps · Manage your apps</strong>: select{" "}
-              <strong>Upload an app · Upload a custom app</strong>, choose the
-              downloaded package, and install it in each intended personal chat,
-              group chat, or team. One team install covers its standard
-              channels. Private and shared channels require a separate app
-              installation and are not supported by this release. If upload is
-              unavailable, a Teams administrator must enable or approve custom
-              apps.
+              <XoTrans
+                i18nKey="<strong>Microsoft Teams · Apps · Manage your apps</strong>: select <strong>Upload an app · Upload a custom app</strong>, choose the downloaded package, and install it in each intended personal chat, group chat, or team. One team install covers its standard channels. Private and shared channels require a separate app installation and are not supported by this release. If upload is unavailable, a Teams administrator must enable or approve custom apps."
+                components={{ strong: <strong /> }}
+              />
             </li>
           </ol>
         </section>
@@ -1059,11 +1045,11 @@ settings:
           the manifest with your app icons.
         </p>
         <p className="text-sm text-muted-foreground">
-          Paperclip does not use Teams single sign-on in this release. The
-          copied <code>webApplicationInfo</code> entry only associates the RSC
-          permissions with the same Entra Application ID. Its nonempty resource
-          is an RSC placeholder; you do not need to register an Entra
-          Application ID URI or add delegated Microsoft Graph permissions.
+          <XoTrans
+            i18nKey="{{brand}} does not use Teams single sign-on in this release. The copied <code>webApplicationInfo</code> entry only associates the RSC permissions with the same Entra Application ID. Its nonempty resource is an RSC placeholder; you do not need to register an Entra Application ID URI or add delegated Microsoft Graph permissions."
+            values={xoBrandVars()}
+            components={{ code: <code /> }}
+          />
         </p>
         <p className="text-sm text-muted-foreground">
           The two application RSC permissions let the bot receive every message,
@@ -1073,11 +1059,10 @@ settings:
           description shown to installers.
         </p>
         <p className="text-sm text-muted-foreground">
-          This release supports personal chats, group chats, and standard team
-          channels—not private channels. <code>supportsFiles: true</code>{" "}
-          enables native file receipt and consent-based sending in personal
-          chats; channel and group-chat files need a separate Microsoft Graph
-          connection and are not ingested here.
+          <XoTrans
+            i18nKey="This release supports personal chats, group chats, and standard team channels—not private channels. <code/> enables native file receipt and consent-based sending in personal chats; channel and group-chat files need a separate Microsoft Graph connection and are not ingested here."
+            components={{ code: <code>supportsFiles: true</code> }}
+          />
         </p>
         {!endpoint.setup?.messagingEndpoint && (
           <p className="text-sm text-destructive">
@@ -1128,37 +1113,37 @@ settings:
               Paperclip homepage URL below, and leave user authorization off.
             </li>
             <li>
-              Keep <strong>Webhooks · Active</strong> on. Enter the Paperclip
-              webhook URL and the Paperclip-generated webhook secret below, and
-              keep <strong>Enable SSL verification</strong> selected.
+              <XoTrans
+                i18nKey="Keep <strong>Webhooks · Active</strong> on. Enter the {{brand}} webhook URL and the {{brand}}-generated webhook secret below, and keep <strong>Enable SSL verification</strong> selected."
+                values={xoBrandVars()}
+                components={{ strong: <strong /> }}
+              />
             </li>
             <li>
-              Under Repository permissions, set <strong>Issues</strong> and{" "}
-              <strong>Pull requests</strong> to{" "}
-              <strong>Read &amp; write</strong>. Leave every other permission at
-              its default; Metadata remains read-only.
+              <XoTrans
+                i18nKey="Under Repository permissions, set <strong>Issues</strong> and <strong>Pull requests</strong> to <strong>Read &amp; write</strong>. Leave every other permission at its default; Metadata remains read-only."
+                components={{ strong: <strong /> }}
+              />
             </li>
             <li>
-              Subscribe to <strong>Issue comment</strong> (
-              <code>issue_comment</code>),{" "}
-              <strong>Pull request review comment</strong> (
-              <code>pull_request_review_comment</code>). GitHub sends{" "}
-              <code>installation</code> and{" "}
-              <code>installation_repositories</code> to every GitHub App
-              automatically; they are not selectable here.
+              <XoTrans
+                i18nKey="Subscribe to <strong>Issue comment</strong> (<code>issue_comment</code>), <strong>Pull request review comment</strong> (<code>pull_request_review_comment</code>). GitHub sends <code>installation</code> and <code>installation_repositories</code> to every GitHub App automatically; they are not selectable here."
+                components={{ strong: <strong />, code: <code /> }}
+              />
             </li>
             <li>
-              Choose <strong>Only on this account</strong>, create the App, copy
-              its App ID, generate one private key, then install it on the
-              selected repositories.
+              <XoTrans
+                i18nKey="Choose <strong>Only on this account</strong>, create the App, copy its App ID, generate one private key, then install it on the selected repositories."
+                components={{ strong: <strong /> }}
+              />
             </li>
           </ol>
         )}
         {endpointValue(
-          "Paperclip homepage URL",
+          tx("{{brand}} homepage URL", xoBrandVars()),
           publicOrigin(endpoint.setup?.webhookUrl),
         )}
-        {endpointValue("Paperclip webhook URL", endpoint.setup?.webhookUrl)}
+        {endpointValue(tx("{{brand}} webhook URL", xoBrandVars()), endpoint.setup?.webhookUrl)}
         <Button
           variant="outline"
           onClick={() =>
@@ -1353,25 +1338,31 @@ settings:
             connected.
           </p>
         </div>
-        {endpointValue("Paperclip webhook URL", endpoint.setup?.webhookUrl)}
-        {endpointValue("Slack command", slackCommand)}
+        {endpointValue(tx("{{brand}} webhook URL", xoBrandVars()), endpoint.setup?.webhookUrl)}
+        {endpointValue(tx("Slack command"), slackCommand)}
         <div className="rounded-lg border border-border p-3 text-sm">
           <p className="font-medium">Use the registered command</p>
           <p className="mt-1 text-muted-foreground">
-            Start work with <code>{slackCommand} investigate this</code>. In a
-            direct message, use <code>{slackCommand} status</code>,{" "}
-            <code>{slackCommand} new</code>, or{" "}
-            <code>{slackCommand} close</code>. Slack&apos;s bare{" "}
-            <code>/status</code> command is not a Paperclip control.
+            <XoTrans
+              i18nKey="Start work with <investigate/>. In a direct message, use <status/>, <new/>, or <close/>. Slack's bare <code>/status</code> command is not a {{brand}} control."
+              values={xoBrandVars()}
+              components={{
+                investigate: <code>{`${slackCommand} investigate this`}</code>,
+                status: <code>{`${slackCommand} status`}</code>,
+                new: <code>{`${slackCommand} new`}</code>,
+                close: <code>{`${slackCommand} close`}</code>,
+                code: <code />,
+              }}
+            />
           </p>
         </div>
         <ol className="list-decimal space-y-2 pl-5 text-sm">
           <li>
-            Return to <strong>App Manifest</strong> in Slack and click{" "}
-            <strong>Save Changes</strong>. The copied manifest already contains
-            the event, interaction, and slash-command URLs. Slack verifies the
-            Events URL when you save; Paperclip records Interactivity and slash
-            command health only after each signed callback is observed.
+            <XoTrans
+              i18nKey="Return to <strong>App Manifest</strong> in Slack and click <strong>Save Changes</strong>. The copied manifest already contains the event, interaction, and slash-command URLs. Slack verifies the Events URL when you save; Paperclip records Interactivity and slash command health only after each signed callback is observed."
+              values={xoBrandVars()}
+              components={{ strong: <strong /> }}
+            />
           </li>
         </ol>
         <div className="flex flex-wrap gap-2">
@@ -1400,15 +1391,22 @@ settings:
       </div>
       <ol className="list-decimal space-y-2 pl-5 text-sm">
         <li>
-          Copy the manifest, then create a Slack app{" "}
-          <strong>From an app manifest</strong> in the target workspace.
+          <XoTrans
+            i18nKey="Copy the manifest, then create a Slack app <strong>From an app manifest</strong> in the target workspace."
+            components={{ strong: <strong /> }}
+          />
         </li>
         <li>
-          Open <strong>OAuth &amp; Permissions</strong>, install the app to the
-          workspace, and copy its Bot User OAuth Token.
+          <XoTrans
+            i18nKey="Open <strong>OAuth &amp; Permissions</strong>, install the app to the workspace, and copy its Bot User OAuth Token."
+            components={{ strong: <strong /> }}
+          />
         </li>
         <li>
-          Open <strong>Basic Information</strong> and copy its Signing Secret.
+          <XoTrans
+            i18nKey="Open <strong>Basic Information</strong> and copy its Signing Secret."
+            components={{ strong: <strong /> }}
+          />
         </li>
       </ol>
       <div className="space-y-2 rounded-lg border border-border p-3 text-sm">
@@ -1452,8 +1450,8 @@ settings:
           Open Slack app settings <ExternalLink />
         </Button>
       </div>
-      {field("botToken", "Bot User OAuth Token")}
-      {field("signingSecret", "Signing Secret")}
+      {field("botToken", tx("Bot User OAuth Token"))}
+      {field("signingSecret", tx("Signing Secret"))}
       {!endpoint.setup?.webhookUrl && (
         <p className="text-sm text-destructive">
           Configure a public HTTPS URL for this Paperclip instance before
@@ -1515,13 +1513,13 @@ function TryStep({
     (identity) => identity.status !== "linked",
   );
   const freshConversationInstruction =
-    provider === "imessage-photon" ? "send a fresh message to your Photon number" : provider === "telegram"
-      ? "start a fresh conversation with /new and send the test message again"
+    provider === "imessage-photon" ? tx("send a fresh message to your Photon number") : provider === "telegram"
+      ? tx("start a fresh conversation with /new and send the test message again")
       : provider === "github"
-        ? "start a new issue or pull request conversation and mention the agent again"
+        ? tx("start a new issue or pull request conversation and mention the agent again")
         : provider === "microsoft-teams"
-          ? "start a new channel post and mention the agent again"
-          : "send a new root mention to the agent";
+          ? tx("start a new channel post and mention the agent again")
+          : tx("send a new root mention to the agent");
   const identityGuidance = provider === "imessage-photon" && principalsQuery.isSuccess && (identities.length === 0 || unlinkedIdentities.length > 0)
     ? { tone: "info" as const, title: "Link your Messages identity", body: "Send one message to discover your phone number or Apple account address, then link that exact identity in Access. Send a fresh request after linking; earlier messages do not start work." }
     : principalsQuery.isError
@@ -1540,7 +1538,7 @@ function TryStep({
               body:
                 provider === "telegram"
                   ? "Tap Start in Telegram to discover your account; the welcome does not start an agent run. Link the account privately in Access, then return and send the test message."
-                  : `Your first ${providerNames[provider]} message discovers the external account, but isolated guest work is off, so it cannot safely start ${agentName}. Send it once, link that account privately in Access, then ${freshConversationInstruction}.`,
+                  : tx("Your first {{provider}} message discovers the external account, but isolated guest work is off, so it cannot safely start {{agentName}}. Send it once, link that account privately in Access, then {{freshConversationInstruction}}.", { provider: providerNames[provider], agentName, freshConversationInstruction }),
             }
           : {
               tone: "info" as const,
@@ -1573,38 +1571,38 @@ function TryStep({
     : (botLabel ?? agentName);
   const instructions =
     provider === "imessage-photon" ? [
-      photonAllocation === "shared" ? "In your Photon project, enroll your sender in Users and find its assigned number in Get started. Send a fresh message to that number from Apple Messages." : `Open Apple Messages and send a fresh message to ${botUsername ?? botLabel ?? "the dedicated number"}.`,
-      "Link the discovered sender to a Paperclip person in Access, then send a fresh request.",
-      "Wait for the agent’s actual reply. Setup completes after that reply is delivered.",
-      ...(photonAllocation === "shared" ? ["This Pro-compatible channel supports DMs only. Group messages cannot start work."] : ["For a group: add the number in Messages, send a message, enable the discovered group in Settings, then send a fresh request."]),
+      photonAllocation === "shared" ? tx("In your Photon project, enroll your sender in Users and find its assigned number in Get started. Send a fresh message to that number from Apple Messages.") : tx("Open Apple Messages and send a fresh message to {{target}}.", { target: botUsername ?? botLabel ?? tx("the dedicated number") }),
+      tx("Link the discovered sender to a {{brand}} person in Access, then send a fresh request.", xoBrandVars()),
+      tx("Wait for the agent’s actual reply. Setup completes after that reply is delivered."),
+      ...(photonAllocation === "shared" ? [tx("This Pro-compatible channel supports DMs only. Group messages cannot start work.")] : [tx("For a group: add the number in Messages, send a message, enable the discovered group in Settings, then send a fresh request.")]),
     ] : provider === "discord"
       ? [
-          "Open a text channel where the bot is installed.",
-          `Mention ${botMention} in a new root message.`,
-          `Reply once inside ${agentName}'s new Discord thread.`,
+          tx("Open a text channel where the bot is installed."),
+          tx("Mention {{botMention}} in a new root message.", { botMention }),
+          tx("Reply once inside {{agentName}}'s new Discord thread.", { agentName }),
         ]
       : provider === "telegram"
         ? [
-            "Open the bot's private chat.",
-            "Tap Start.",
-            "Send “Help me test this”.",
+            tx("Open the bot's private chat."),
+            tx("Tap Start."),
+            tx("Send “Help me test this”."),
           ]
         : provider === "github"
           ? [
-              "Open an installed issue or pull request.",
-              `Mention ${botMention} in a comment.`,
-              "Add another comment to continue the same task.",
+              tx("Open an installed issue or pull request."),
+              tx("Mention {{botMention}} in a comment.", { botMention }),
+              tx("Add another comment to continue the same task."),
             ]
           : provider === "microsoft-teams"
             ? [
-                "Open an installed channel and start a new post.",
-                `Mention ${botMention} in the post.`,
-                "Reply once beneath the post.",
+                tx("Open an installed channel and start a new post."),
+                tx("Mention {{botMention}} in the post.", { botMention }),
+                tx("Reply once beneath the post."),
               ]
             : [
-                "Open a channel and invite the bot if needed.",
-                `Mention ${botMention} in a new channel message.`,
-                `Reply once in ${agentName}'s thread.`,
+                tx("Open a channel and invite the bot if needed."),
+                tx("Mention {{botMention}} in a new channel message.", { botMention }),
+                tx("Reply once in {{agentName}}'s thread.", { agentName }),
               ];
   return (
     <div className="space-y-5">
@@ -1643,7 +1641,7 @@ function TryStep({
           </Button>
         </div>
       ) : null}
-      {provider === "imessage-photon" && botUsername && <div className="space-y-2"><Button variant="outline" onClick={() => { void copyTextToClipboard(botUsername).then(() => { setNumberCopied(true); setCopyError(null); }, () => setCopyError("Could not copy the number. Select it in the instructions below.")); }}>{numberCopied ? "Number copied" : `Copy ${botUsername}`}</Button>{copyError && <p role="alert" className="text-sm text-destructive">{copyError}</p>}</div>}
+      {provider === "imessage-photon" && botUsername && <div className="space-y-2"><Button variant="outline" onClick={() => { void copyTextToClipboard(botUsername).then(() => { setNumberCopied(true); setCopyError(null); }, () => setCopyError(tx("Could not copy the number. Select it in the instructions below."))); }}>{numberCopied ? tx("Number copied") : tx("Copy {{botUsername}}", { botUsername })}</Button>{copyError && <p role="alert" className="text-sm text-destructive">{copyError}</p>}</div>}
       <ol className="list-decimal space-y-2 pl-5 text-sm">
         {instructions.map((item) => (
           <li key={item}>{item}</li>

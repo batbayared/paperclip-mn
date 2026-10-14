@@ -1,6 +1,7 @@
 import type { ToolProfileWithDetails } from "@paperclipai/shared";
 import { Link } from "@/lib/router";
 import { cn } from "@/lib/utils";
+import { tx } from "@/i18n/xo";
 import { allowedToolsLabel, type GatewayAppRow, gatewayAppDisplayName } from "../gateway-helpers";
 
 /**
@@ -18,9 +19,14 @@ export function AppsToolsPanel({
   return (
     <div className="space-y-4">
       <p className="text-sm text-muted-foreground">
-        These apps go through this gateway. The bound profile
-        {profile ? ` (${profile.name})` : ""} decides which tools are allowed
-        {profile ? ` — ${allowedToolsLabel(profile)}.` : "."} Change the profile under Advanced.
+        {profile
+          ? tx(
+              "These apps go through this gateway. The bound profile ({{name}}) decides which tools are allowed — {{tools}}. Change the profile under Advanced.",
+              { name: profile.name, tools: allowedToolsLabel(profile) },
+            )
+          : tx(
+              "These apps go through this gateway. The bound profile decides which tools are allowed. Change the profile under Advanced.",
+            )}
       </p>
 
       {apps.length === 0 ? (

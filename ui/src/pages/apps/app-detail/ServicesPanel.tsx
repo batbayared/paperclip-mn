@@ -20,6 +20,7 @@ import { resolveAuthorizationTarget } from "@/lib/authorizationUrl";
 import { cn } from "@/lib/utils";
 import { AppLogo } from "../AppLogo";
 import { appTabHref } from "../app-tabs";
+import { tx } from "@/i18n/xo";
 import {
   composioServiceIsSettling,
   composioServiceRows,
@@ -343,32 +344,40 @@ export function ServiceRow({
  */
 function serviceDetailLine(row: ComposioServiceRow): string {
   const toolCount = row.toolCount !== null
-    ? `${row.toolCount} ${row.toolCount === 1 ? "action" : "actions"}`
+    ? row.toolCount === 1
+      ? tx("{{n}} action", { n: row.toolCount })
+      : tx("{{n}} actions", { n: row.toolCount })
     : null;
   if (row.state === "pending") {
-    return "Waiting for Composio to confirm the connection.";
+    return tx("Waiting for Composio to confirm the connection.");
   }
   if (row.state === "attention") {
     return row.connectedAccountStatus
-      ? `Composio reports this connection as ${row.connectedAccountStatus.toLowerCase()}. Reconnect to fix it.`
-      : "This connection is no longer usable. Reconnect to fix it.";
+      ? tx("Composio reports this connection as {{status}}. Reconnect to fix it.", { status: row.connectedAccountStatus.toLowerCase() })
+      : tx("This connection is no longer usable. Reconnect to fix it.");
   }
   if (row.state === "connected") {
-    return [toolCount, "available to agents you install it for"].filter(Boolean).join(" · ");
+    return [toolCount, tx("available to agents you install it for")].filter(Boolean).join(" · ");
   }
   return [
     row.description,
     toolCount,
-    row.noAuth ? "No sign-in needed" : null,
-  ].filter(Boolean).join(" · ") || "Not connected";
+    row.noAuth ? tx("No sign-in needed") : null,
+  ].filter(Boolean).join(" · ") || tx("Not connected");
 }
 
-const STATE_LABEL: Record<ComposioServiceState, string> = {
-  not_connected: "Not connected",
-  pending: "Pending",
-  connected: "Connected",
-  attention: "Needs attention",
-};
+function stateLabel(state: ComposioServiceState): string {
+  switch (state) {
+    case "not_connected":
+      return tx("Not connected");
+    case "pending":
+      return tx("Pending");
+    case "connected":
+      return tx("Connected");
+    case "attention":
+      return tx("Needs attention");
+  }
+}
 
 /**
  * Row state, in the same visual language as the connection status badge in the
@@ -391,7 +400,7 @@ function ServiceStateBadge({ state }: { state: ComposioServiceState }) {
       {state === "connected" && <Check className="h-3 w-3" />}
       {state === "pending" && <Loader2 className="h-3 w-3 animate-spin" />}
       {state === "attention" && <AlertTriangle className="h-3 w-3" />}
-      {STATE_LABEL[state]}
+      {stateLabel(state)}
     </span>
   );
 }

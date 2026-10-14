@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { tx } from "@/i18n/xo";
+import { xoBrandVars } from "@/xo/labels";
 import { navigateTopLevel } from "@/lib/browserNavigation";
 import {
   clearPendingCloudHandoff,
@@ -64,7 +66,7 @@ export function PaperclipCloudOAuthHandoffPage() {
     const handoff = readPendingCloudHandoff();
     if (!handoff) {
       setPhase("error");
-      setError("This sign-in expired. Return to Paperclip and start the connection again.");
+      setError(tx("This sign-in expired. Return to {{brand}} and start the connection again.", xoBrandVars()));
       return;
     }
     setPhase("loading");
@@ -73,14 +75,14 @@ export function PaperclipCloudOAuthHandoffPage() {
       const target = await prepareOAuthNavigation({ authorizationUrl: "", handoff });
       if (target.kind === "reauthentication") {
         setPhase("error");
-        setError("Paperclip couldn’t refresh this sign-in. Try again to continue.");
+        setError(tx("{{brand}} couldn’t refresh this sign-in. Try again to continue.", xoBrandVars()));
         return;
       }
       clearPendingCloudHandoff();
       navigateTopLevel(target.url);
     } catch (caught) {
       setPhase("error");
-      setError(caught instanceof Error ? caught.message : "Paperclip couldn’t prepare secure sign-in.");
+      setError(caught instanceof Error ? caught.message : tx("{{brand}} couldn’t prepare secure sign-in.", xoBrandVars()));
     }
   }, []);
 

@@ -24,6 +24,7 @@ import { prepareOAuthNavigation, savePendingCloudHandoff } from "@/lib/oauthHand
 import { cn } from "@/lib/utils";
 import { Link } from "@/lib/router";
 import type { AppDetailSectionProps } from "./types";
+import { tx } from "@/i18n/xo";
 import { RevokeGrantDialog } from "./IdentitiesSection";
 
 export function AdvancedPanel({
@@ -35,7 +36,7 @@ export function AdvancedPanel({
   onRemove,
   onReplaced,
   canReplaceCredential = true,
-  credentialUnavailableMessage = "You don't have permission to replace this identity's credential.",
+  credentialUnavailableMessage = tx("You don't have permission to replace this identity's credential."),
   appToggleDisabled,
   onToggleApp,
   identityGrant = null,
@@ -197,7 +198,7 @@ export function ReconnectCard({
     onSuccess: () => {
       pushToast({
         title: "Vercel credential verified",
-        body: `${humanizeConnectionDisplayName(connection)} is back online.`,
+        body: tx("{{name}} is back online.", { name: humanizeConnectionDisplayName(connection) }),
         tone: "success",
       });
       onReconnected();
@@ -314,7 +315,7 @@ function ReconnectForm({
       if (healthy) {
         pushToast({
           title: "Reconnected",
-          body: `${humanizeConnectionDisplayName(connection)} is back online.`,
+          body: tx("{{name}} is back online.", { name: humanizeConnectionDisplayName(connection) }),
           tone: "success",
         });
         onReconnected();
@@ -432,7 +433,7 @@ export function DangerZone({
   onRemove,
   onReplaced,
   canReplaceCredential = true,
-  credentialUnavailableMessage = "You don't have permission to replace this identity's credential.",
+  credentialUnavailableMessage = tx("You don't have permission to replace this identity's credential."),
   toggleDisabled = false,
   onToggleConnection,
   identityGrant = null,
@@ -614,12 +615,12 @@ export function connectionAddress(connection: ToolConnection): string {
   const config = connection.config ?? connection.transportConfig ?? {};
   const value = config.url ?? config.endpoint ?? config.remoteUrl;
   if (typeof value === "string" && value.trim().length > 0) return redactUrlSecrets(value);
-  if (connection.transport === "local_stdio") return "Local command";
-  return "Not set";
+  if (connection.transport === "local_stdio") return tx("Local command");
+  return tx("Not set");
 }
 
 export function connectionTransportLabel(transport: ToolConnection["transport"]): string {
-  if (transport === "mcp_remote") return "Remote HTTP";
-  if (transport === "local_stdio") return "Local command";
-  return "Unknown";
+  if (transport === "mcp_remote") return tx("Remote HTTP");
+  if (transport === "local_stdio") return tx("Local command");
+  return tx("Unknown");
 }

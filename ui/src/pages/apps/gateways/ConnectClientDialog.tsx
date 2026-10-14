@@ -17,6 +17,9 @@ import type {
   ToolMcpGatewayWithTokens,
 } from "@paperclipai/shared";
 import { toolsApi } from "@/api/tools";
+import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
+import { xoBrandVars } from "@/xo/labels";
 import { SearchableSelect, type SearchableSelectGroup } from "@/components/SearchableSelect";
 import { Button } from "@/components/ui/button";
 import {
@@ -180,7 +183,7 @@ export function ConnectClientDialog({
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            Client snippets
+            {tx("Client snippets")}
             <Tooltip>
               <TooltipTrigger asChild>
                 <button type="button" aria-label="About client snippets" className="text-muted-foreground hover:text-foreground">
@@ -188,8 +191,10 @@ export function ConnectClientDialog({
                 </button>
               </TooltipTrigger>
               <TooltipContent className="max-w-xs text-xs">
-                Give this MCP gateway configuration to your tool. It does not give it access to Paperclip or
-                skills; it only gateways calls between the client and the tools exposed here.
+                {tx(
+                  "Give this MCP gateway configuration to your tool. It does not give it access to {{brand}} or skills; it only gateways calls between the client and the tools exposed here.",
+                  xoBrandVars(),
+                )}
               </TooltipContent>
             </Tooltip>
           </DialogTitle>
@@ -206,11 +211,11 @@ export function ConnectClientDialog({
               groups={tokenGroups}
               onValueChange={setSelectedTokenId}
               placeholder="Issue a token"
-              searchPlaceholder="Search tokens…"
-              emptyMessage="No copyable tokens."
+              searchPlaceholder={tx("Search tokens…")}
+              emptyMessage={tx("No copyable tokens.")}
               contentWidth="auto"
               triggerClassName="h-8 w-auto max-w-xs rounded-full px-3"
-              renderValue={(option) => option ? `${option.label} · ${maskedTokenLabel(option.token)}` : "Issue a token"}
+              renderValue={(option) => option ? `${option.label} · ${maskedTokenLabel(option.token)}` : tx("Issue a token")}
               renderOption={(option) => (
                 <span className="flex min-w-0 flex-col">
                   <span className="truncate">{option.label}</span>
@@ -241,7 +246,7 @@ export function ConnectClientDialog({
               type="button"
               variant="ghost"
               size="sm"
-              onClick={() => void copyText(`Authorization: Bearer ${selectedToken.token}`, "Authorization header")}
+              onClick={() => void copyText(`Authorization: Bearer ${selectedToken.token}`, tx("Authorization header"))}
             >
               <Copy className="mr-1 h-3.5 w-3.5" />
               Copy header
@@ -251,9 +256,10 @@ export function ConnectClientDialog({
 
         {!selectedToken ? (
           <p className="text-xs text-muted-foreground">
-            Issue a token before copying a snippet; the full <code>Authorization: Bearer …</code> header is
-            required. Existing token secrets cannot be retrieved again, so only tokens issued in this page
-            session can fill a snippet.
+            <XoTrans
+              i18nKey="Issue a token before copying a snippet; the full <code>Authorization: Bearer …</code> header is required. Existing token secrets cannot be retrieved again, so only tokens issued in this page session can fill a snippet."
+              components={{ code: <code /> }}
+            />
           </p>
         ) : null}
 
@@ -302,7 +308,7 @@ export function ConnectClientDialog({
                     <code className="min-w-0 flex-1 truncate rounded-md bg-muted px-3 py-2 font-mono text-xs text-muted-foreground">
                       {endpoint}
                     </code>
-                    <Button variant="outline" size="sm" onClick={() => void copyText(endpoint, "Endpoint URL")}>
+                    <Button variant="outline" size="sm" onClick={() => void copyText(endpoint, tx("Endpoint URL"))}>
                       <Copy className="mr-1 h-3.5 w-3.5" />
                       Copy
                     </Button>
@@ -323,7 +329,7 @@ export function ConnectClientDialog({
                     variant="outline"
                     size="sm"
                     disabled={!copyConfigText}
-                    onClick={() => copyConfigText && void copyText(copyConfigText, `${activeSnippet.label} config`)}
+                    onClick={() => copyConfigText && void copyText(copyConfigText, tx("{{label}} config", { label: activeSnippet.label }))}
                   >
                     <Copy className="mr-1 h-3.5 w-3.5" />
                     Copy

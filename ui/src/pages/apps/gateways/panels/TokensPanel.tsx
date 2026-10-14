@@ -18,6 +18,8 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/context/ToastContext";
 import { copyTextToClipboard } from "@/lib/clipboard";
 import { cn } from "@/lib/utils";
+import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
 import { RelativeTime } from "@/pages/tools/shared";
 import { gatewaysQueryKey } from "../NewGatewayDialog";
 import {
@@ -43,6 +45,21 @@ const STATUS_CLASS: Record<TokenStatus, string> = {
   revoked: "border-foreground bg-foreground text-background",
 };
 
+function tokenStatusLabel(status: TokenStatus): string {
+  switch (status) {
+    case "active":
+      return tx("Active");
+    case "expiring":
+      return tx("Expiring");
+    case "expired":
+      return tx("Expired");
+    case "revoked":
+      return tx("Revoked");
+    default:
+      return TOKEN_STATUS_LABEL[status];
+  }
+}
+
 function StatusBadge({ status }: { status: TokenStatus }) {
   return (
     <span
@@ -51,7 +68,7 @@ function StatusBadge({ status }: { status: TokenStatus }) {
         STATUS_CLASS[status],
       )}
     >
-      {TOKEN_STATUS_LABEL[status]}
+      {tokenStatusLabel(status)}
     </span>
   );
 }
@@ -400,8 +417,11 @@ export function TokensPanel({
             <div>
               <h3 className="text-sm font-semibold text-foreground">Revoke this token?</h3>
               <p className="mt-1 text-sm text-muted-foreground">
-                Any client using <span className="font-medium text-foreground">{confirmToken.name}</span> goes
-                silent immediately. This can’t be undone. Type the token name to confirm.
+                <XoTrans
+                  i18nKey="Any client using <name>{{name}}</name> goes silent immediately. This can’t be undone. Type the token name to confirm."
+                  values={{ name: confirmToken.name }}
+                  components={{ name: <span className="font-medium text-foreground" /> }}
+                />
               </p>
             </div>
             <Input

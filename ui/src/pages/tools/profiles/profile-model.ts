@@ -5,6 +5,7 @@ import type {
   ToolRiskLevel,
 } from "@paperclipai/shared";
 import type { ToolProfileEntryInput } from "@/api/tools";
+import { tx } from "@/i18n/xo";
 
 /**
  * Pure domain model for the prosumer access-profile wizard (PAP-10997).
@@ -35,6 +36,20 @@ export const CAPABILITY_LABEL: Record<ToolCapability, string> = {
   write: "Makes changes",
   destructive: "Destructive",
 };
+
+/** Display label for a capability; CAPABILITY_LABEL stays the English source map. */
+export function capabilityLabel(cap: ToolCapability): string {
+  switch (cap) {
+    case "read":
+      return tx("Read-only");
+    case "write":
+      return tx("Makes changes");
+    case "destructive":
+      return tx("Destructive");
+    default:
+      return CAPABILITY_LABEL[cap] ?? cap;
+  }
+}
 
 // --- App grouping ----------------------------------------------------------
 
@@ -131,16 +146,16 @@ export function appCheckState(group: AppGroup, selection: AppSelection | undefin
 export function appSelectionLabel(group: AppGroup, selection: AppSelection | undefined): string {
   const total = group.tools.length;
   const state = appCheckState(group, selection);
-  if (state === "unchecked") return "None selected";
+  if (state === "unchecked") return tx("None selected");
   if (selection?.kind === "all" || (selection?.kind === "all_except" && selection.excluded.length === 0)) {
-    return `All ${group.name} tools (${total})`;
+    return tx("All {{name}} tools ({{total}})", { name: group.name, total });
   }
   if (selection?.kind === "all_except") {
     const n = selection.excluded.length;
-    return `All ${group.name} except ${n}`;
+    return tx("All {{name}} except {{n}}", { name: group.name, n });
   }
   const n = selectedToolIds(group, selection).size;
-  return `${n} of ${total} ${group.name} tools`;
+  return tx("{{n}} of {{total}} {{name}} tools", { n, total, name: group.name });
 }
 
 // --- Checkbox reducers -----------------------------------------------------
@@ -374,6 +389,42 @@ export const TEMPLATES: TemplateDef[] = [
   { key: "scratch", title: "Start from scratch", description: "An empty profile you build up tool by tool." },
   { key: "copy", title: "Copy an existing profile", description: "Start from a profile you already have." },
 ];
+
+/** Display title for a template; TEMPLATES stays the English source list. */
+export function templateTitle(key: TemplateKey): string {
+  switch (key) {
+    case "read_only":
+      return tx("Read-only");
+    case "everyday":
+      return tx("Everyday work");
+    case "full_access":
+      return tx("Full access");
+    case "scratch":
+      return tx("Start from scratch");
+    case "copy":
+      return tx("Copy an existing profile");
+    default:
+      return key;
+  }
+}
+
+/** Display description for a template. */
+export function templateDescription(key: TemplateKey): string {
+  switch (key) {
+    case "read_only":
+      return tx("See and fetch, but never change anything.");
+    case "everyday":
+      return tx("Read and make routine changes — no destructive tools.");
+    case "full_access":
+      return tx("Everything every connected app offers.");
+    case "scratch":
+      return tx("An empty profile you build up tool by tool.");
+    case "copy":
+      return tx("Start from a profile you already have.");
+    default:
+      return key;
+  }
+}
 
 function capabilityPredicate(key: TemplateKey): (tool: ToolCatalogEntry) => boolean {
   if (key === "read_only") return (t) => toolCapability(t) === "read";

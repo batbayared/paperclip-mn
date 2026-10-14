@@ -18,6 +18,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/context/ToastContext";
 import { Link } from "@/lib/router";
 import { queryKeys } from "@/lib/queryKeys";
+import { tx } from "@/i18n/xo";
 import { useChatConnectorsEnabled } from "@/hooks/useChatConnectorsEnabled";
 import { issuesApi } from "@/api/issues";
 import {
@@ -107,6 +108,43 @@ const filePhaseLabels: Record<ChatFileTransferPhase, string> = {
   cancelled: "Cancelled; remote bytes may remain",
   conflict: "File delivery needs review",
 };
+
+function filePhaseLabel(phase: ChatFileTransferPhase): string {
+  switch (phase) {
+    case "consent_pending":
+      return tx("Consent card queued");
+    case "consent_sending":
+      return tx("Sending consent card");
+    case "consent_unknown":
+      return tx("Consent card delivery not confirmed");
+    case "awaiting_consent":
+      return tx("Awaiting consent");
+    case "upload_pending":
+      return tx("Upload queued");
+    case "uploading":
+      return tx("Uploading file");
+    case "upload_unknown":
+      return tx("File upload not confirmed");
+    case "file_info_pending":
+      return tx("File notification queued");
+    case "file_info_sending":
+      return tx("Sending file notification");
+    case "file_info_unknown":
+      return tx("File notification not confirmed");
+    case "delivered":
+      return tx("Delivered");
+    case "declined":
+      return tx("Declined");
+    case "expired":
+      return tx("Consent expired");
+    case "cancelled":
+      return tx("Cancelled; remote bytes may remain");
+    case "conflict":
+      return tx("File delivery needs review");
+    default:
+      return filePhaseLabels[phase];
+  }
+}
 
 export function useIssueChatBinding(companyId: string, issueId: string) {
   const { enabled } = useChatConnectorsEnabled();
@@ -214,7 +252,7 @@ function ConnectedTaskComposer({
       setStorageError(null);
     } catch {
       setStorageError(
-        "Saved delivery identity could not be read. Check Activity and restore browser storage before starting another send.",
+        tx("Saved delivery identity could not be read. Check Activity and restore browser storage before starting another send."),
       );
       setComposing(true);
     }
@@ -349,7 +387,7 @@ function ConnectedTaskComposer({
           writeBoardSendDraft(storageKey, saved);
         } catch {
           setStorageError(
-            "The rejected send could not be saved. Restore browser storage, then retry this same request to recover its receipt.",
+            tx("The rejected send could not be saved. Restore browser storage, then retry this same request to recover its receipt."),
           );
           return;
         }
@@ -368,7 +406,7 @@ function ConnectedTaskComposer({
         title: "Couldn't confirm channel delivery",
         body:
           error instanceof Error
-            ? `${error.message} Your draft is kept; retrying here reuses the same request identity.`
+            ? tx("{{message}} Your draft is kept; retrying here reuses the same request identity.", { message: error.message })
             : "Your draft is kept; retrying here reuses the same request identity.",
         tone: "error",
       });
@@ -403,7 +441,9 @@ function ConnectedTaskComposer({
     } catch (error) {
       if (mounted.current) {
         setUploadError(
-          `${error instanceof Error ? error.message : "Upload could not be confirmed."} No channel message was sent. Check task files before retrying the upload.`,
+          tx("{{message}} No channel message was sent. Check task files before retrying the upload.", {
+            message: error instanceof Error ? error.message : tx("Upload could not be confirmed."),
+          }),
         );
       }
     } finally {
@@ -449,7 +489,7 @@ function ConnectedTaskComposer({
             ?.name ??
           taskAttachments.find((attachment) => attachment.id === id)
             ?.originalFilename ??
-          "Selected task file (details unavailable)",
+          tx("Selected task file (details unavailable)"),
       }))
     : taskAttachments.filter(
         (attachment) =>
@@ -491,7 +531,7 @@ function ConnectedTaskComposer({
           <Radio className="h-4 w-4 shrink-0 text-muted-foreground" />
           <div className="min-w-0 flex-1">
             <p className="font-medium">
-              Connected to {providerNames[binding.provider]}
+              {tx("Connected to {{provider}}", { provider: providerNames[binding.provider] })}
             </p>
             <p className="truncate text-xs text-muted-foreground">
               {binding.externalLabel} · Agent assignment is fixed for this
@@ -503,7 +543,7 @@ function ConnectedTaskComposer({
           {binding.externalUrl && (
             <Button asChild size="sm" variant="outline">
               <a href={binding.externalUrl} target="_blank" rel="noreferrer">
-                Open {providerNames[binding.provider]} <ExternalLink />
+                {tx("Open {{provider}}", { provider: providerNames[binding.provider] })} <ExternalLink />
               </a>
             </Button>
           )}
@@ -621,7 +661,7 @@ function ConnectedTaskComposer({
               <div className="space-y-2">
                 {visibleAttachments.map((attachment) => {
                   const label =
-                    attachment.originalFilename ?? "Unnamed attachment";
+                    attachment.originalFilename ?? tx("Unnamed attachment");
                   return (
                     <label
                       className="flex items-center gap-2 text-xs"
@@ -674,7 +714,7 @@ function ConnectedTaskComposer({
                     clearBoardSendDraft(storageKey);
                   } catch {
                     setStorageError(
-                      "Saved rejection could not be cleared. Restore browser storage before editing this send.",
+                      tx("Saved rejection could not be cleared. Restore browser storage before editing this send."),
                     );
                     return;
                   }
@@ -742,16 +782,16 @@ function ConnectedTaskComposer({
                   batch.cancelled !== undefined &&
                   batch.awaitingConsent !== undefined
                     ? [
-                        `${batch.published} published`,
+                        tx("{{n}} published", { n: batch.published }),
                         ...(batch.awaitingConsent
-                          ? [`${batch.awaitingConsent} awaiting consent`]
+                          ? [tx("{{n}} awaiting consent", { n: batch.awaitingConsent })]
                           : []),
                         ...(batch.declined
-                          ? [`${batch.declined} declined`]
+                          ? [tx("{{n}} declined", { n: batch.declined })]
                           : []),
-                        ...(batch.expired ? [`${batch.expired} expired`] : []),
+                        ...(batch.expired ? [tx("{{n}} expired", { n: batch.expired })] : []),
                         ...(batch.cancelled
-                          ? [`${batch.cancelled} cancelled`]
+                          ? [tx("{{n}} cancelled", { n: batch.cancelled })]
                           : []),
                       ].join(" · ")
                     : `${batch.published} of ${batch.total} parts published.`}
@@ -767,7 +807,7 @@ function ConnectedTaskComposer({
                     .map((part) => (
                       <li key={part.id}>
                         {part.fileTransfer!.filename} —{" "}
-                        {filePhaseLabels[part.fileTransfer!.phase]}
+                        {filePhaseLabel(part.fileTransfer!.phase)}
                       </li>
                     ))}
                 </ul>
@@ -800,7 +840,7 @@ function ConnectedTaskComposer({
                         clearBoardSendDraft(storageKey);
                       } catch {
                         setStorageError(
-                          "Saved delivery identity could not be cleared. Restore browser storage before starting another send.",
+                          tx("Saved delivery identity could not be cleared. Restore browser storage before starting another send."),
                         );
                         return;
                       }
@@ -863,7 +903,7 @@ function ConnectedTaskComposer({
                   writeBoardSendDraft(storageKey, input);
                 } catch {
                   setStorageError(
-                    "Browser storage could not preserve this delivery identity. No update was sent. Restore browser storage, then reload to try again.",
+                    tx("Browser storage could not preserve this delivery identity. No update was sent. Restore browser storage, then reload to try again."),
                   );
                   return;
                 }

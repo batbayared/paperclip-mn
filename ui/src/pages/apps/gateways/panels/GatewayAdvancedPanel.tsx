@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/context/ToastContext";
 import { copyTextToClipboard } from "@/lib/clipboard";
 import { gatewaysQueryKey } from "../NewGatewayDialog";
+import { tx } from "@/i18n/xo";
 
 /**
  * Advanced tab — raw protocol/transport details, config JSON and the archive
@@ -86,7 +87,7 @@ export function GatewayAdvancedPanel({
           <code className="min-w-0 flex-1 truncate rounded-md bg-muted px-3 py-2 font-mono text-xs text-muted-foreground">
             {endpoint}
           </code>
-          <Button variant="outline" size="sm" onClick={() => void copy(endpoint, "Endpoint URL")}>
+          <Button variant="outline" size="sm" onClick={() => void copy(endpoint, tx("Endpoint URL"))}>
             <Copy className="mr-1 h-3.5 w-3.5" />
             Copy
           </Button>
@@ -96,7 +97,7 @@ export function GatewayAdvancedPanel({
       <section className="space-y-2">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-semibold text-foreground">Raw configuration</h3>
-          <Button variant="outline" size="sm" onClick={() => void copy(rawConfig, "Gateway config JSON")}>
+          <Button variant="outline" size="sm" onClick={() => void copy(rawConfig, tx("Gateway config JSON"))}>
             <Copy className="mr-1 h-3.5 w-3.5" />
             Copy JSON
           </Button>

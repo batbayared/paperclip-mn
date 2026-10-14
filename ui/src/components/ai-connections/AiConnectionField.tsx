@@ -12,6 +12,7 @@ import { AiConnectionPicker } from "./AiConnectionPicker";
 import { AiConnectionLegacyNotice } from "./AiConnectionManagement";
 import { AiConnectionCredentialStep } from "./AiConnectionCredentialStep";
 import { Button } from "@/components/ui/button";
+import { tx } from "@/i18n/xo";
 import {
   Dialog,
   DialogContent,
@@ -124,7 +125,7 @@ export function AiConnectionField({
           </DialogHeader>
           <p className="text-sm">
             {pendingAdoption?.mode === "responsible_user"
-              ? `Responsible user’s default. For you: ${accounts.data?.connections.find((account) => account.isDefault && account.provider === provider)?.name ?? "Not connected"}. Other users use their own default.`
+              ? tx("Responsible user’s default. For you: {{name}}. Other users use their own default.", { name: accounts.data?.connections.find((account) => account.isDefault && account.provider === provider)?.name ?? tx("Not connected") })
               : accounts.data?.connections.find(
                   (account) => account.id === pendingAdoption?.connectionId,
                 )?.name}

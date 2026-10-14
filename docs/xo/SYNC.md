@@ -259,6 +259,28 @@ Gates (2026-10-14): xo:i18n:check OK 5894, xo:i18n:test 11 / 129, tsc 0, vitest 
 - company-members.ts-ийн «Board» шошго.
 - en-д ConnectionSetupFlow-ийн брэнд «XO» гэж гарна (en байт ижил зарчмаас ухамсартай гажсан).
 
+## Ү6 7.14-д хөндсөн upstream файлууд
+
+Tier-гүй үлдэгдлийн 1-р шат. BASE 732c337e9. ED шийдвэр (2026-10-14): хөгжүүлэгчийн туршилтын хуудсыг хасна; хоёр шатанд (7.14 apps/tools/холболт, 7.15 бусад).
+
+| Файл | Өөрчлөлт |
+|---|---|
+| ui/src/pages/apps/chat/{ChatEndpointSetup, ChatEndpointDetail, EmailEndpointSetup, PhotonConnectStep, ChatIdentityConfirm}.tsx | T1; функц доторх мөр tx, XoTrans; модулийн түвшний мөр → функц |
+| ui/src/pages/apps/{AppDetail, AppNotConnected, AppsReview, ComposioProvenanceChip, Connections, PaperclipCloudOAuthHandoff, ReviewQueueCard}.tsx, app-detail/* (8) | T1; tx, XoTrans, _one/_other plural |
+| ui/src/pages/apps/gateways/** (11), components/ai-connections/* (5 .tsx), components/chat/ExternallyConnectedTaskBanner.tsx, features/connections/ConnectionIntentInteractionBody.tsx | T1; tx, XoTrans |
+| ui/src/pages/tools/*.tsx (9), tools/profiles/* (8) | T1; tx, XoTrans |
+| ui/src/pages/apps/gateways/gateway-helpers.ts, components/ai-connections/model.ts, pages/apps/app-tabs.ts | гар tx; aiConnectionStatusLabel (model.ts) |
+
+XO-ийн өмч: scripts/xo-i18n/tiers.ts (+62 файл T1), ui/src/i18n/xo/* (keys=8141, +1613; keep-en +18).
+
+XO-ийн тестүүд: scripts/xo-i18n/tiers-y6-7-14.test.ts (шинэ).
+
+Gates (2026-10-14): xo:i18n:check OK 8141, xo:i18n:test 209, tsc 0; xo:brand-scan OK (baseline 552 / 160 хэвээр).
+
+Үлдэгдэл (Ү6 7.14):
+- 7.15: бусад pages, components, adapters (~2000 түлхүүр).
+- Хадгалагддаг анхдагч нэр («My … account», «Unnamed attachment»), TEAMS_*_COMMAND_DESCRIPTION, AI_PROVIDERS subscription нэр англиар.
+
 ## Ү6 7.13-д хөндсөн upstream файлууд
 
 7.12-ийн үлдэгдлийг хаасан. BASE 11b6344c0. ED шийдвэр (2026-10-14): *.production.tsx оруулна; Activity-ийн дотоод action-д үйл үг; en-д функц доторх брэнд «Paperclip».

@@ -12,8 +12,27 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { copyTextToClipboard } from "@/lib/clipboard";
 import { MCP_CONFIG_HELP_INSTRUCTIONS, MCP_CONFIG_HELP_PROMPT } from "@paperclipai/shared";
+import { tx } from "@/i18n/xo";
+import { xoBrandVars } from "@/xo/labels";
 
 const COPIED_RESET_MS = 2_000;
+
+// Хэрэглэгчид харагдах алхмуудыг render үед орчуулна; агентад очих prompt (MCP_CONFIG_HELP_PROMPT) англиар үлдэнэ.
+function helpInstructionLabel(instruction: string): string {
+  switch (instruction) {
+    case MCP_CONFIG_HELP_INSTRUCTIONS[0]:
+      return tx("Copy this prompt and send it to an agent or assistant that can look up the server's documentation.");
+    case MCP_CONFIG_HELP_INSTRUCTIONS[1]:
+      return tx("Paste only the JSON block it replies with back into the box on this page.");
+    case MCP_CONFIG_HELP_INSTRUCTIONS[2]:
+      return tx(
+        "{{brand}} reads the header names from that JSON and asks you for the values, then stores them as {{brand}} secrets — so the config you paste should contain placeholders, not live credentials.",
+        xoBrandVars(),
+      );
+    default:
+      return instruction;
+  }
+}
 
 /**
  * Compact question-mark help beside the Paste-a-config copy (PAP-17087, plan 3A).
@@ -73,7 +92,7 @@ export function McpConfigHelpDialog() {
 
         <ol className="list-decimal space-y-1.5 pl-5 text-sm text-muted-foreground">
           {MCP_CONFIG_HELP_INSTRUCTIONS.map((instruction) => (
-            <li key={instruction}>{instruction}</li>
+            <li key={instruction}>{helpInstructionLabel(instruction)}</li>
           ))}
         </ol>
 

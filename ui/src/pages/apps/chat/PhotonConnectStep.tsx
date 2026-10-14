@@ -8,6 +8,7 @@ import {
   type ChatEndpointSetupAction,
 } from "@/api/chatEndpoints";
 import { sanitizedSetupErrorMessage } from "./chat-setup-error";
+import { tx } from "@/i18n/xo";
 
 export function PhotonConnectStep({
   endpoint,
@@ -73,9 +74,9 @@ export function PhotonConnectStep({
       </div>
       {repairing && (
         <p className="text-sm text-muted-foreground">
-          Reconnect keeps this project and{" "}
-          {endpoint.photonAllocation === "shared" ? "shared DM allocation" : endpoint.botExternalId ?? "dedicated number"}. Leave the secret blank
-          to reuse the saved connection.
+          {tx("Reconnect keeps this project and {{target}}. Leave the secret blank to reuse the saved connection.", {
+            target: endpoint.photonAllocation === "shared" ? tx("shared DM allocation") : endpoint.botExternalId ?? tx("dedicated number"),
+          })}
         </p>
       )}
       <label className="grid gap-2 text-sm font-medium">
@@ -120,7 +121,9 @@ export function PhotonConnectStep({
       {inspection.data && (
         <fieldset className="space-y-3">
           <legend className="text-sm font-medium">
-            {inspection.data.allocation === "shared" ? "Shared DMs" : "Dedicated numbers"} in {inspection.data.projectName}
+            {inspection.data.allocation === "shared"
+              ? tx("Shared DMs in {{project}}", { project: inspection.data.projectName })
+              : tx("Dedicated numbers in {{project}}", { project: inspection.data.projectName })}
           </legend>
           {!inspection.data.eligible && (
             <p role="alert" className="text-sm text-destructive">

@@ -7,6 +7,7 @@ import { useCompany } from "@/context/CompanyContext";
 import { useBreadcrumbs } from "@/context/BreadcrumbContext";
 import { useToast } from "@/context/ToastContext";
 import { queryKeys } from "@/lib/queryKeys";
+import { tx } from "@/i18n/xo";
 import { toolsApi } from "@/api/tools";
 import { agentsApi } from "@/api/agents";
 import { projectsApi } from "@/api/projects";
@@ -180,7 +181,7 @@ export function GatewaysList() {
                 gateway,
                 profile,
                 scope: formatScope(gateway, projectNames, agentNames),
-                appsLabel: `${apps.length} ${apps.length === 1 ? "app" : "apps"}${
+                appsLabel: `${apps.length === 1 ? tx("{{n}} app", { n: apps.length }) : tx("{{n}} apps", { n: apps.length })}${
                   profile ? ` · ${allowedToolsLabel(profile)}` : ""
                 }`,
                 active: activeTokenCount(gateway),
@@ -195,12 +196,16 @@ export function GatewaysList() {
                 disabled={toggleMutation.isPending}
                 onClick={(event) => event.stopPropagation()}
                 onCheckedChange={() => toggleMutation.mutate({ gateway })}
-                aria-label={`Turn ${gateway.name} ${isGatewayOn(gateway) ? "off" : "on"}`}
+                aria-label={
+                  isGatewayOn(gateway)
+                    ? tx("Turn {{name}} off", { name: gateway.name })
+                    : tx("Turn {{name}} on", { name: gateway.name })
+                }
               />
             );
             const empty = (
               <div className="px-4 py-8 text-center text-sm text-muted-foreground">
-                No gateways match “{search.trim()}”.
+                {tx("No gateways match “{{query}}”.", { query: search.trim() })}
               </div>
             );
             return (
@@ -232,7 +237,7 @@ export function GatewaysList() {
                           <td className="whitespace-nowrap px-4 py-3 text-muted-foreground">{scope}</td>
                           <td className="whitespace-nowrap px-4 py-3 text-muted-foreground">{appsLabel}</td>
                           <td className="whitespace-nowrap px-4 py-3 text-muted-foreground">
-                            {active} active{expiring > 0 ? ` · ${expiring} expiring` : ""}
+                            {tokenCountsLabel(active, expiring)}
                           </td>
                           <td className="whitespace-nowrap px-4 py-3 text-muted-foreground">
                             {lastUsed ? <RelativeTime value={lastUsed} /> : "—"}
@@ -271,7 +276,7 @@ export function GatewaysList() {
                         <MobileField label="Apps" value={appsLabel} />
                         <MobileField
                           label="Tokens"
-                          value={`${active} active${expiring > 0 ? ` · ${expiring} expiring` : ""}`}
+                          value={tokenCountsLabel(active, expiring)}
                         />
                         <MobileField
                           label="Last used"
@@ -309,6 +314,12 @@ export function GatewaysList() {
 }
 
 /** One label:value pair inside a mobile stacked card. */
+function tokenCountsLabel(active: number, expiring: number): string {
+  return expiring > 0
+    ? tx("{{active}} active · {{expiring}} expiring", { active, expiring })
+    : tx("{{n}} active", { n: active });
+}
+
 function MobileField({ label, value }: { label: string; value: ReactNode }) {
   return (
     <div className="min-w-0">

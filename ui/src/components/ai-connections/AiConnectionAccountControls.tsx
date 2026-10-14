@@ -4,6 +4,7 @@ import type { ConnectionGrant } from "@paperclipai/shared";
 import { RevokeGrantDialog } from "@/pages/apps/app-detail/IdentitiesSection";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { tx } from "@/i18n/xo";
 import { AI_PROVIDERS, aiMethodLabel, type AiConnectionSummary } from "./model";
 
 /** AI-only account controls; identity, access and navigation belong to AppDetail. */
@@ -36,7 +37,7 @@ export function AiConnectionAccountControls({
             <Star aria-hidden className={cn("size-5 shrink-0", activeDefault ? "fill-current text-(--status-task-icon-done)" : "text-muted-foreground")} />
             <div>
               <h3 className="text-sm font-semibold">Personal default</h3>
-              <p className="text-xs text-muted-foreground">For your {AI_PROVIDERS[account.provider].name} tasks</p>
+              <p className="text-xs text-muted-foreground">{tx("For your {{provider}} tasks", { provider: AI_PROVIDERS[account.provider].name })}</p>
             </div>
           </div>
           {account.isDefault ? (
@@ -63,7 +64,7 @@ export function AiConnectionAccountControls({
       </div>
       {revoking && <RevokeGrantDialog grant={grant} providerName={account.name} pending={revokePending} credentialPolicy={account.ownership === "shared" ? "shared" : "per_user"} isOwnIdentity={account.ownerUserId === currentUserId}
         description="New runs using this account will be blocked. Existing runs may retain credentials already issued to them. No other account will be selected automatically."
-        onCancel={() => setRevoking(false)} onConfirm={async () => { setRevokePending(true); setRevokeError(undefined); try { await onRevoke(); setRevoking(false); } catch (error) { setRevokeError(error instanceof Error ? error.message : "Could not revoke this account. Retry."); } finally { setRevokePending(false); } }}>{revokeError && <p role="alert" className="text-sm text-destructive">{revokeError}</p>}{revocationDetails}</RevokeGrantDialog>}
+        onCancel={() => setRevoking(false)} onConfirm={async () => { setRevokePending(true); setRevokeError(undefined); try { await onRevoke(); setRevoking(false); } catch (error) { setRevokeError(error instanceof Error ? error.message : tx("Could not revoke this account. Retry.")); } finally { setRevokePending(false); } }}>{revokeError && <p role="alert" className="text-sm text-destructive">{revokeError}</p>}{revocationDetails}</RevokeGrantDialog>}
     </section>
   );
 }

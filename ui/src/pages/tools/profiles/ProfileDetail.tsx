@@ -30,7 +30,8 @@ import {
 import { useToast } from "@/context/ToastContext";
 import { ErrorState, LoadingState, RelativeTime, ToolsPageHeader } from "../shared";
 import { ProfileActionDialog, type ProfileActionDialogKind } from "./ProfileActionDialog";
-import { allowsLabel, STATUS_LABEL } from "./profile-summary";
+import { allowsLabel, statusLabel } from "./profile-summary";
+import { tx } from "@/i18n/xo";
 import { useProfilesData } from "./useProfilesData";
 
 type DialogKind = "edit" | "duplicate" | "archive" | "delete" | "restore" | null;
@@ -41,6 +42,8 @@ interface AllowRow {
   tool: string;
   capabilities: string;
   source: string;
+  /** True when a rule (whole app / risk level) added the tool, not a direct pick. */
+  ruleBased: boolean;
   autoAddedAt: Date | string | null;
   degraded: boolean;
   connectionId: string | null;
@@ -207,7 +210,7 @@ export function ProfileDetail({
       />
 
       <div className="flex flex-wrap items-center gap-3 text-sm">
-        <Badge variant={archived ? "outline" : "default"}>{STATUS_LABEL[profile.status]}</Badge>
+        <Badge variant={archived ? "outline" : "default"}>{statusLabel(profile.status)}</Badge>
         <span className="text-muted-foreground">Updated <RelativeTime value={profile.updatedAt} /></span>
         <span className="text-muted-foreground">{allowsLabel(profile.summary)}</span>
       </div>
@@ -405,7 +408,10 @@ function NewToolsReviewDialog({
                     <p className="mt-1 text-sm text-muted-foreground">{tool.description}</p>
                   ) : null}
                   <p className="mt-1 text-xs text-muted-foreground">
-                    {tool.applicationName ?? tool.connectionName ?? "App tool"} · added {formatShortDate(tool.addedAt)}
+                    {tx("{{app}} · added {{date}}", {
+                      app: tool.applicationName ?? tool.connectionName ?? tx("App tool"),
+                      date: formatShortDate(tool.addedAt),
+                    })}
                   </p>
                 </div>
                 <div className="flex items-center gap-2 sm:justify-end">
@@ -482,7 +488,7 @@ function AllowList({ rows, total }: { rows: AllowRow[]; total: number }) {
               </td>
               <td className="px-3 py-2 text-muted-foreground">{row.capabilities}</td>
               <td className="px-3 py-2">
-                {row.source.startsWith("added by rule") ? (
+                {row.ruleBased ? (
                   <span className="rounded bg-amber-100 px-1.5 py-0.5 text-xs text-amber-950">{row.source}</span>
                 ) : (
                   <span className="text-muted-foreground">{row.source}</span>
@@ -537,7 +543,7 @@ function Assignments({
         <div key={binding.id} className="flex items-center justify-between gap-3 px-3 py-2.5">
           <div className="flex min-w-0 items-center gap-3">
             <span className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-xs font-semibold text-muted-foreground">
-              {binding.targetType === "company" ? "Or" : binding.targetType.slice(0, 2).toUpperCase()}
+              {targetInitials(binding.targetType)}
             </span>
             <div className="min-w-0">
               <p className="truncate text-sm font-medium text-foreground">{assignmentLabel(binding, companyId, maps)}</p>
@@ -621,7 +627,7 @@ function ProfileDialogs({
   const [name, setName] = useState(profile.name);
   const [description, setDescription] = useState(profile.description ?? "");
   const [profileKey, setProfileKey] = useState(profile.profileKey);
-  const [copyName, setCopyName] = useState(`${profile.name} copy`);
+  const [copyName, setCopyName] = useState(() => tx("{{name}} copy", { name: profile.name }));
   const [copyAssignments, setCopyAssignments] = useState(false);
   const [advancedOpen, setAdvancedOpen] = useState(false);
 
@@ -761,7 +767,7 @@ function buildAllowRows(
     .filter((tool) => includeAllExcept || included.some((entry) => entryMatchesTool(entry, tool)))
     .map((tool) => {
       const match = includeAllExcept ? null : included.find((entry) => entryMatchesTool(entry, tool)) ?? null;
-      const app = appNames.get(tool.applicationId ?? "") ?? connectionNames.get(tool.connectionId) ?? "Unknown app";
+      const app = appNames.get(tool.applicationId ?? "") ?? connectionNames.get(tool.connectionId) ?? tx("Unknown app");
       const connection = connections.find((item) => item.id === tool.connectionId);
       return {
         id: tool.id,
@@ -769,6 +775,7 @@ function buildAllowRows(
         tool: tool.title || tool.toolName,
         capabilities: capabilityLabel(tool),
         source: sourceLabel(match, app),
+        ruleBased: isRuleEntry(match),
         autoAddedAt: profile.defaultAction === "allow" && isRecentTool(tool) ? (tool.addedAt ?? tool.firstSeenAt) : null,
         degraded: Boolean(connection && (connection.status !== "active" || connection.healthStatus === "error")),
         connectionId: tool.connectionId,
@@ -793,32 +800,48 @@ function entryMatchesTool(entry: ToolProfileEntry, tool: ToolCatalogEntry): bool
   }
 }
 
+function isRuleEntry(entry: ToolProfileEntry | null): boolean {
+  if (!entry) return false;
+  if (entry.selectorType === "application" || entry.selectorType === "connection") return true;
+  return entry.selectorType === "risk_level" && Boolean(entry.riskLevel);
+}
+
 function sourceLabel(entry: ToolProfileEntry | null, app: string): string {
-  if (!entry) return "added directly";
-  if (entry.selectorType === "application" || entry.selectorType === "connection") return `added by rule: all ${app}`;
-  if (entry.selectorType === "risk_level" && entry.riskLevel) return `added by rule: ${entry.riskLevel} tools`;
-  return "added directly";
+  if (!entry) return tx("added directly");
+  if (entry.selectorType === "application" || entry.selectorType === "connection") {
+    return tx("added by rule: all {{app}}", { app });
+  }
+  if (entry.selectorType === "risk_level" && entry.riskLevel) {
+    return tx("added by rule: {{level}} tools", { level: entry.riskLevel });
+  }
+  return tx("added directly");
 }
 
 function capabilityLabel(tool: ToolCatalogEntry): string {
-  if (tool.isDestructive) return "Destructive";
-  if (tool.isWrite) return "Write";
-  return "Read";
+  if (tool.isDestructive) return tx("Destructive");
+  if (tool.isWrite) return tx("Write");
+  return tx("Read");
 }
 
 function capabilityText(tool: ToolProfileNewToolReviewItem): string {
-  if (tool.riskLevel === "destructive") return "Destructive";
-  if (tool.riskLevel === "write") return "Write";
-  if (tool.riskLevel === "read") return "Read";
+  if (tool.riskLevel === "destructive") return tx("Destructive");
+  if (tool.riskLevel === "write") return tx("Write");
+  if (tool.riskLevel === "read") return tx("Read");
   return tool.capability;
 }
 
 function newToolsAppLabel(tools: ToolProfileNewToolReviewItem[]): string {
   const names = [...new Set(tools.map((tool) => tool.applicationName ?? tool.connectionName).filter(Boolean))] as string[];
-  if (names.length === 0) return "An app";
-  if (names.length === 1) return names[0] ?? "An app";
-  if (names.length === 2) return `${names[0]} and ${names[1]}`;
-  return `${names[0]} and ${names.length - 1} more apps`;
+  if (names.length === 0) return tx("An app");
+  if (names.length === 1) return names[0] ?? tx("An app");
+  if (names.length === 2) return tx("{{a}} and {{b}}", { a: names[0], b: names[1] });
+  return tx("{{a}} and {{n}} more apps", { a: names[0], n: names.length - 1 });
+}
+
+/** Two-letter avatar code for an assignment target (technical code, kept Latin). */
+function targetInitials(type: ToolProfileBinding["targetType"]): string {
+  if (type === "company") return "Or";
+  return type.slice(0, 2).toUpperCase();
 }
 
 function isRecentTool(tool: ToolCatalogEntry): boolean {
@@ -834,18 +857,18 @@ function assignmentLabel(
   companyId: string,
   maps: ReturnType<typeof useProfilesData>["maps"],
 ): string {
-  if (binding.targetType === "company") return "Organization default";
-  if (binding.targetType === "agent") return maps.agentsById.get(binding.targetId) ?? "Unknown agent";
-  if (binding.targetType === "project") return maps.projectsById.get(binding.targetId) ?? "Unknown project";
-  if (binding.targetType === "routine") return maps.routinesById.get(binding.targetId) ?? "Unknown routine";
-  if (binding.targetId === companyId) return "Organization";
+  if (binding.targetType === "company") return tx("Organization default");
+  if (binding.targetType === "agent") return maps.agentsById.get(binding.targetId) ?? tx("Unknown agent");
+  if (binding.targetType === "project") return maps.projectsById.get(binding.targetId) ?? tx("Unknown project");
+  if (binding.targetType === "routine") return maps.routinesById.get(binding.targetId) ?? tx("Unknown routine");
+  if (binding.targetId === companyId) return tx("Organization");
   return binding.targetId;
 }
 
 function assignmentTypeLabel(type: ToolProfileBinding["targetType"]): string {
-  if (type === "company") return "Organization default";
-  if (type === "agent") return "Agent";
-  if (type === "project") return "Project";
-  if (type === "routine") return "Routine";
-  return "Scoped assignment";
+  if (type === "company") return tx("Organization default");
+  if (type === "agent") return tx("Agent");
+  if (type === "project") return tx("Project");
+  if (type === "routine") return tx("Routine");
+  return tx("Scoped assignment");
 }

@@ -33,6 +33,8 @@ import {
   type CellStatus,
 } from "./smoke-lab-matrix";
 import { xoLocaleDateTime } from "@/xo/date-format";
+import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
 
 // Public, non-secret fixture credentials for the fake OAuth provider. Kept in
 // sync with SMOKE_LAB_DEMO_EMAIL / SMOKE_LAB_DEMO_PASSWORD in
@@ -58,6 +60,66 @@ function CellGlyph({ status }: { status: CellStatus }) {
   if (status === "fail") return <X className="mx-auto h-4 w-4 text-destructive" aria-label="fail" />;
   if (status === "skipped") return <Minus className="mx-auto h-4 w-4 text-amber-500" aria-label="skipped" />;
   return <span className="mx-auto block h-1.5 w-1.5 rounded-full bg-muted-foreground/30" aria-label="not run" />;
+}
+
+// smoke-lab-matrix.ts-ийн модулийн түвшний label-уудыг render үед орчуулна (en: яг тэр англи утга).
+function pathTitle(path: string, fallback: string): string {
+  switch (path) {
+    case "P1": return tx("Remote HTTP · OAuth");
+    case "P2": return tx("Remote HTTP · API key");
+    case "P3": return tx("Local stdio (template)");
+    case "P4": return tx("Plugin integration");
+    case "P5": return tx("Paste-a-config import");
+    case "P6": return tx("Token broker / gateway");
+    case "P7": return tx("Governance surfaces");
+    default: return fallback;
+  }
+}
+
+function pathDetail(path: string, fallback: string): string {
+  switch (path) {
+    case "P1": return tx("HTTP MCP fixture behind the fake OAuth provider");
+    case "P2": return tx("HTTP MCP fixture with a static bearer key");
+    case "P3": return tx("stdio fixture via the runtime supervisor");
+    case "P4": return tx("plugin-provided catalog entry + install flow");
+    case "P5": return tx("prosumer import via Advanced setup");
+    case "P6": return tx("run-scoped connection token, TTL + scope checks");
+    case "P7": return tx("profiles, ask-first rules, quarantine");
+    default: return fallback;
+  }
+}
+
+function stageLabel(key: string, fallback: string): string {
+  switch (key) {
+    case "connect": return tx("Connect");
+    case "discover": return tx("Discover catalog");
+    case "read": return tx("Allowed read");
+    case "write": return tx("Ask-first write");
+    case "deny": return tx("Denied call");
+    case "quarantine": return tx("Schema-change quarantine");
+    case "revoke": return tx("Revoke");
+    case "audit": return tx("Audit evidence");
+    default: return fallback;
+  }
+}
+
+function healthLabel(health: string): string {
+  switch (health) {
+    case "unknown": return tx("no runs yet");
+    case "green": return tx("green");
+    case "amber": return tx("amber");
+    case "red": return tx("red");
+    default: return health;
+  }
+}
+
+function serviceStatusLabel(status: string): string {
+  switch (status) {
+    case "running": return tx("running");
+    case "stopped": return tx("stopped");
+    case "error": return tx("error");
+    default: return status;
+  }
 }
 
 const HEALTH_STYLES: Record<string, string> = {
@@ -177,9 +239,10 @@ export function SmokeLabTab({ companyId }: { companyId: string }) {
           <h2 className="text-base font-semibold">Smoke Lab is turned off</h2>
         </div>
         <p className="mt-1.5 max-w-xl text-sm text-muted-foreground">
-          The Smoke Lab is an experimental developer surface for exercising the integration paths
-          against deterministic local fixtures. Turn on <code className="rounded bg-muted px-1 py-0.5 text-xs">Smoke Lab</code>{" "}
-          under Settings → Experimental to enable it.
+          <XoTrans
+            i18nKey="The Smoke Lab is an experimental developer surface for exercising the integration paths against deterministic local fixtures. Turn on <code>Smoke Lab</code> under Settings → Experimental to enable it."
+            components={{ code: <code className="rounded bg-muted px-1 py-0.5 text-xs" /> }}
+          />
         </p>
       </div>
     );
@@ -210,19 +273,19 @@ export function SmokeLabTab({ companyId }: { companyId: string }) {
           </a>
         </div>
         <p className="mt-1.5 max-w-3xl text-sm text-muted-foreground">
-          Exercise every integration path (P1–P7) end-to-end against deterministic local fixtures —
-          a fake OAuth provider and loopback MCP servers. Nothing here touches a real vendor or a
-          real credential. Start the services, install the fixture apps, then drive the governed
-          lifecycle from a browser smoke run. New here? Follow the{" "}
-          <a
-            href="https://github.com/paperclipai/paperclip/blob/master/doc/connections/SMOKE-LAB-TUTORIAL.md"
-            target="_blank"
-            rel="noreferrer"
-            className="font-medium text-primary hover:underline"
-          >
-            hands-on tutorial
-          </a>
-          .
+          <XoTrans
+            i18nKey="Exercise every integration path (P1–P7) end-to-end against deterministic local fixtures — a fake OAuth provider and loopback MCP servers. Nothing here touches a real vendor or a real credential. Start the services, install the fixture apps, then drive the governed lifecycle from a browser smoke run. New here? Follow the <tutorial>hands-on tutorial</tutorial>."
+            components={{
+              tutorial: (
+                <a
+                  href="https://github.com/paperclipai/paperclip/blob/master/doc/connections/SMOKE-LAB-TUTORIAL.md"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="font-medium text-primary hover:underline"
+                />
+              ),
+            }}
+          />
         </p>
       </header>
 
@@ -294,7 +357,7 @@ export function SmokeLabTab({ companyId }: { companyId: string }) {
                       serviceTone(service.status) === "muted" && "text-muted-foreground",
                     )}
                   >
-                    {service.status}
+                    {serviceStatusLabel(service.status)}
                   </span>
                 </span>
               </div>
@@ -345,7 +408,7 @@ export function SmokeLabTab({ companyId }: { companyId: string }) {
                 <th className="sticky left-0 z-10 bg-muted/40 px-3 py-2 text-left font-semibold text-foreground">Path</th>
                 {LIFECYCLE_STAGES.map((stage) => (
                   <th key={stage.key} className="px-2 py-2 text-center font-medium text-muted-foreground">
-                    {stage.label}
+                    {stageLabel(stage.key, stage.label)}
                   </th>
                 ))}
               </tr>
@@ -355,9 +418,9 @@ export function SmokeLabTab({ companyId }: { companyId: string }) {
                 <tr key={path} className="border-b border-border last:border-0">
                   <th scope="row" className="sticky left-0 z-10 bg-card px-3 py-2 text-left">
                     <span className="font-mono font-semibold text-foreground">{path}</span>
-                    <span className="ml-2 text-foreground">{SMOKE_PATH_LABELS[path].title}</span>
+                    <span className="ml-2 text-foreground">{pathTitle(path, SMOKE_PATH_LABELS[path].title)}</span>
                     <span className="block text-(length:--text-micro) font-normal text-muted-foreground">
-                      {SMOKE_PATH_LABELS[path].detail}
+                      {pathDetail(path, SMOKE_PATH_LABELS[path].detail)}
                     </span>
                   </th>
                   {LIFECYCLE_STAGES.map((stage) => {
@@ -387,8 +450,8 @@ export function SmokeLabTab({ companyId }: { companyId: string }) {
             <h2 className="text-sm font-semibold text-foreground">Runs</h2>
             <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
               <span className={cn("h-2 w-2 rounded-full", HEALTH_STYLES[health])} />
-              {health === "unknown" ? "no runs yet" : health}
-              {failing.length > 0 && ` · failing: ${failing.join(", ")}`}
+              {healthLabel(health)}
+              {failing.length > 0 && ` · ${tx("failing: {{paths}}", { paths: failing.join(", ") })}`}
             </span>
           </div>
           <Button size="sm" onClick={() => runSmokeMutation.mutate()} disabled={anyMutating}>
@@ -439,7 +502,10 @@ export function SmokeLabTab({ companyId }: { companyId: string }) {
               <div className="flex flex-col">
                 <div className="flex items-center justify-between gap-2 border-b border-border px-4 py-2.5">
                   <span className="text-xs text-muted-foreground">
-                    Started {formatTime(activeRun.startedAt)} · finished {formatTime(activeRun.finishedAt)}
+                    {tx("Started {{started}} · finished {{finished}}", {
+                      started: formatTime(activeRun.startedAt),
+                      finished: formatTime(activeRun.finishedAt),
+                    })}
                   </span>
                   <StatusBadge status={activeRun.status} />
                 </div>

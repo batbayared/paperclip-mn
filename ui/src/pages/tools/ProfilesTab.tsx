@@ -57,7 +57,10 @@ import {
   RelativeTime,
   RiskBadge,
   ToolsPageHeader,
+  riskLabel,
 } from "./shared";
+import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
 
 const SELECTOR_TYPES: Array<{ value: ToolProfileEntrySelectorType; label: string }> = [
   { value: "tool_name", label: "Tool name" },
@@ -84,6 +87,58 @@ function slugifyProfileKey(name: string) {
     .replace(/[^a-z0-9._:-]+/g, "-")
     .replace(/^-+|-+$/g, "")
     .slice(0, 160);
+}
+
+function profileStatusLabel(status: ToolProfileStatus): string {
+  switch (status) {
+    case "active":
+      return tx("active");
+    case "disabled":
+      return tx("disabled");
+    case "archived":
+      return tx("archived");
+    default:
+      return status;
+  }
+}
+
+function defaultActionLabel(action: ToolProfileDefaultAction): string {
+  switch (action) {
+    case "allow":
+      return tx("allow");
+    case "deny":
+      return tx("deny");
+    default:
+      return action;
+  }
+}
+
+function effectLabel(effect: ToolProfileEntryEffect): string {
+  switch (effect) {
+    case "include":
+      return tx("include");
+    case "exclude":
+      return tx("exclude");
+    default:
+      return effect;
+  }
+}
+
+function targetTypeLabel(targetType: ToolProfileBindingTargetType): string {
+  switch (targetType) {
+    case "company":
+      return tx("company");
+    case "agent":
+      return tx("agent");
+    case "project":
+      return tx("project");
+    case "routine":
+      return tx("routine");
+    case "issue":
+      return tx("issue");
+    default:
+      return targetType;
+  }
 }
 
 function statusVariant(status: ToolProfileStatus): "default" | "secondary" | "outline" | "destructive" {
@@ -139,11 +194,11 @@ function entryLabel(
   applicationsById: Map<string, string>,
   connectionsById: Map<string, string>,
 ) {
-  if (entry.selectorType === "application") return applicationsById.get(entry.applicationId ?? "") ?? entry.applicationId ?? "application";
-  if (entry.selectorType === "connection") return connectionsById.get(entry.connectionId ?? "") ?? entry.connectionId ?? "connection";
-  if (entry.selectorType === "catalog_entry") return entry.catalogEntryId ?? "catalog entry";
-  if (entry.selectorType === "risk_level") return entry.riskLevel ?? "risk level";
-  return entry.toolName ?? "tool";
+  if (entry.selectorType === "application") return applicationsById.get(entry.applicationId ?? "") ?? entry.applicationId ?? tx("application");
+  if (entry.selectorType === "connection") return connectionsById.get(entry.connectionId ?? "") ?? entry.connectionId ?? tx("connection");
+  if (entry.selectorType === "catalog_entry") return entry.catalogEntryId ?? tx("catalog entry");
+  if (entry.selectorType === "risk_level") return entry.riskLevel ?? tx("risk level");
+  return entry.toolName ?? tx("tool");
 }
 
 function bindingLabel(
@@ -156,7 +211,7 @@ function bindingLabel(
     routinesById: Map<string, string>;
   },
 ) {
-  if (targetType === "company") return targetId === labels.companyId ? "Company" : targetId;
+  if (targetType === "company") return targetId === labels.companyId ? tx("Company") : targetId;
   if (targetType === "agent") return labels.agentsById.get(targetId) ?? targetId;
   if (targetType === "project") return labels.projectsById.get(targetId) ?? targetId;
   if (targetType === "routine") return labels.routinesById.get(targetId) ?? targetId;
@@ -165,10 +220,14 @@ function bindingLabel(
 
 /** Short, human subtitle for the master rail: prefers the agent count the spec calls for. */
 function bindingsSubtitle(bindings: ToolProfileBinding[]): string {
-  if (bindings.length === 0) return "unbound";
+  if (bindings.length === 0) return tx("unbound");
   const agents = bindings.filter((b) => b.targetType === "agent").length;
-  if (agents === bindings.length) return `bound to ${agents} agent${agents === 1 ? "" : "s"}`;
-  return `${bindings.length} binding${bindings.length === 1 ? "" : "s"}`;
+  if (agents === bindings.length) {
+    return agents === 1 ? tx("bound to {{n}} agent", { n: agents }) : tx("bound to {{n}} agents", { n: agents });
+  }
+  return bindings.length === 1
+    ? tx("{{n}} binding", { n: bindings.length })
+    : tx("{{n}} bindings", { n: bindings.length });
 }
 
 // --- Allow-list resolution ------------------------------------------------
@@ -228,6 +287,11 @@ function entrySpecificity(entry: ToolProfileEntry): number {
   return 1; // risk_level
 }
 
+/** Technical selector label shown in the Source column (e.g. "app:Slack") — kept untranslated. */
+function patternLabel(prefix: string, value: string): string {
+  return `${prefix}:${value}`;
+}
+
 function sourceFromEntry(
   entry: ToolProfileEntry,
   applicationsById: Map<string, string>,
@@ -240,12 +304,12 @@ function sourceFromEntry(
       : { kind: "explicit" };
   }
   if (entry.selectorType === "application") {
-    return { kind: "pattern", label: `app:${applicationsById.get(entry.applicationId ?? "") ?? entry.applicationId ?? "?"}` };
+    return { kind: "pattern", label: patternLabel("app", applicationsById.get(entry.applicationId ?? "") ?? entry.applicationId ?? "?") };
   }
   if (entry.selectorType === "connection") {
-    return { kind: "pattern", label: `conn:${connectionsById.get(entry.connectionId ?? "") ?? entry.connectionId ?? "?"}` };
+    return { kind: "pattern", label: patternLabel("conn", connectionsById.get(entry.connectionId ?? "") ?? entry.connectionId ?? "?") };
   }
-  return { kind: "pattern", label: `risk:${entry.riskLevel ?? "?"}` };
+  return { kind: "pattern", label: patternLabel("risk", entry.riskLevel ?? "?") };
 }
 
 export function resolveAllowList(
@@ -460,7 +524,7 @@ function EntryFields({
             <SelectContent>
               {RISK_LEVELS.map((risk) => (
                 <SelectItem key={risk} value={risk}>
-                  {risk}
+                  {riskLabel(risk)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -567,10 +631,10 @@ function AllowList({ rows, catalogLoading }: { rows: AllowListRow[]; catalogLoad
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h4 className="text-sm font-semibold text-foreground">Allow list</h4>
         <p className="text-xs text-muted-foreground">
-          {rows.length} tool{rows.length === 1 ? "" : "s"}
-          {explicitCount > 0 ? ` · ${explicitCount} explicit` : ""}
-          {patternCount > 0 ? ` · ${patternCount} via pattern` : ""}
-          {defaultCount > 0 ? ` · ${defaultCount} via default` : ""}
+          {rows.length === 1 ? tx("{{n}} tool", { n: rows.length }) : tx("{{n}} tools", { n: rows.length })}
+          {explicitCount > 0 ? ` · ${tx("{{n}} explicit", { n: explicitCount })}` : ""}
+          {patternCount > 0 ? ` · ${tx("{{n}} via pattern", { n: patternCount })}` : ""}
+          {defaultCount > 0 ? ` · ${tx("{{n}} via default", { n: defaultCount })}` : ""}
         </p>
       </div>
       {rows.length === 0 ? (
@@ -628,8 +692,10 @@ function AllowList({ rows, catalogLoading }: { rows: AllowListRow[]; catalogLoad
       {patternCount > 0 ? (
         <p className="flex items-start gap-1.5 text-xs text-muted-foreground">
           <AlertTriangle className="mt-0.5 h-3 w-3 shrink-0 text-amber-500" />
-          Tools marked <span className="font-medium">pattern</span> were pulled in by a wildcard, application,
-          connection, or risk selector rather than named explicitly — review them when the catalog changes.
+          <XoTrans
+            i18nKey="Tools marked <em>pattern</em> were pulled in by a wildcard, application, connection, or risk selector rather than named explicitly — review them when the catalog changes."
+            components={{ em: <span className="font-medium" /> }}
+          />
         </p>
       ) : null}
     </div>
@@ -958,12 +1024,13 @@ export function ProfilesTab({ companyId }: { companyId: string }) {
                           <span className="truncate font-medium text-foreground">{profile.name}</span>
                           {profile.status !== "active" ? (
                             <Badge variant={statusVariant(profile.status)} className="text-(length:--text-nano)">
-                              {profile.status}
+                              {profileStatusLabel(profile.status)}
                             </Badge>
                           ) : null}
                         </span>
                         <span className="text-xs text-muted-foreground">
-                          {toolCount} tool{toolCount === 1 ? "" : "s"} · {bindingsSubtitle(profile.bindings)}
+                          {toolCount === 1 ? tx("{{n}} tool", { n: toolCount }) : tx("{{n}} tools", { n: toolCount })} ·{" "}
+                          {bindingsSubtitle(profile.bindings)}
                         </span>
                       </button>
                     </li>
@@ -1256,6 +1323,7 @@ function ProfileDetail({
   );
   const includeCount = profile.entries.filter((e) => e.effect === "include").length;
   const excludeCount = profile.entries.filter((e) => e.effect === "exclude").length;
+  const defaultActionText = defaultActionLabel(profile.defaultAction);
 
   return (
     <Card>
@@ -1267,9 +1335,9 @@ function ProfileDetail({
             <div className="flex flex-wrap items-center gap-2">
               <span className="font-medium text-foreground">{profile.name}</span>
               <Badge variant="outline">{profile.profileKey}</Badge>
-              <Badge variant={statusVariant(profile.status)}>{profile.status}</Badge>
+              <Badge variant={statusVariant(profile.status)}>{profileStatusLabel(profile.status)}</Badge>
               <Badge variant={profile.defaultAction === "allow" ? "secondary" : "outline"}>
-                default {profile.defaultAction}
+                default {defaultActionText}
               </Badge>
             </div>
             {profile.description ? (
@@ -1303,7 +1371,7 @@ function ProfileDetail({
               <span className="text-sm text-muted-foreground">No targets bound.</span>
             ) : profile.bindings.map((binding) => (
               <span key={binding.id} className="inline-flex items-center gap-1.5 rounded-md border border-border px-2 py-1 text-xs">
-                <Badge variant="outline">{binding.targetType}</Badge>
+                <Badge variant="outline">{targetTypeLabel(binding.targetType)}</Badge>
                 <span>{bindingLabel(binding.targetType, binding.targetId, { companyId, ...maps })}</span>
                 <span className="text-muted-foreground">p{binding.priority}</span>
                 <button
@@ -1324,14 +1392,17 @@ function ProfileDetail({
           <h4 className="text-sm font-semibold text-foreground">Effective scope</h4>
           <div className="flex flex-wrap gap-2 text-xs">
             <span className="rounded-md border border-border px-2 py-1 text-muted-foreground">
-              Default <span className="font-medium text-foreground">{profile.defaultAction}</span>
+              Default <span className="font-medium text-foreground">{defaultActionText}</span>
             </span>
             <span className="rounded-md border border-border px-2 py-1 text-muted-foreground">
               <span className="font-medium text-foreground">{rows.length}</span> tools allowed
             </span>
             <span className="rounded-md border border-border px-2 py-1 text-muted-foreground">
-              <span className="font-medium text-foreground">{includeCount}</span> include /{" "}
-              <span className="font-medium text-foreground">{excludeCount}</span> exclude
+              <XoTrans
+                i18nKey="<num>{{includeCount}}</num> include / <num>{{excludeCount}}</num> exclude"
+                values={{ includeCount, excludeCount }}
+                components={{ num: <span className="font-medium text-foreground" /> }}
+              />
             </span>
           </div>
         </div>
@@ -1344,7 +1415,7 @@ function ProfileDetail({
               <span className="text-sm text-muted-foreground">No selectors.</span>
             ) : profile.entries.map((entry) => (
               <span key={entry.id} className="inline-flex items-center gap-1.5 rounded-md border border-border px-2 py-1 text-xs">
-                <Badge variant={entry.effect === "include" ? "secondary" : "destructive"}>{entry.effect}</Badge>
+                <Badge variant={entry.effect === "include" ? "secondary" : "destructive"}>{effectLabel(entry.effect)}</Badge>
                 <span className="font-mono">{entry.selectorType}</span>
                 {entry.selectorType === "risk_level" ? <RiskBadge risk={entry.riskLevel} /> : (
                   <span className="max-w-64 truncate">{entryLabel(entry, maps.applicationsById, maps.connectionsById)}</span>

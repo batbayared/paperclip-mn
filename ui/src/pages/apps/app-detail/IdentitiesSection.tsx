@@ -34,6 +34,8 @@ import {
 import { Link } from "@/lib/router";
 import { brandBanner, brandChipBadge } from "@/lib/status-colors";
 import { agentUrl, cn } from "@/lib/utils";
+import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
 import {
   audienceUserIds,
   grantAccountLabel,
@@ -301,13 +303,15 @@ function GitHubConnectionSummary({
       ? github.installationUrl
       : null;
   const repositoryWarning = github.repositorySelection === "all"
-    ? "All current and future repositories"
+    ? tx("All current and future repositories")
     : github.repositorySelection === "mixed"
-      ? "Mixed access; scope varies by installation"
+      ? tx("Mixed access; scope varies by installation")
       : null;
   const repositorySummary = github.repositorySelection === "none"
-    ? "No repositories selected"
-    : `${github.repositoryCount} selected ${github.repositoryCount === 1 ? "repository" : "repositories"}`;
+    ? tx("No repositories selected")
+    : github.repositoryCount === 1
+      ? tx("{{n}} selected repository", { n: github.repositoryCount })
+      : tx("{{n}} selected repositories", { n: github.repositoryCount });
   return (
     <div className="divide-y divide-border border-y border-border">
       <div className="py-3">
@@ -371,7 +375,10 @@ function GitHubConnectionSummary({
           <p className="text-sm text-muted-foreground">Refresh access to load the current repository list.</p>
         )}
         {configurationUrl ? <p className="text-xs text-muted-foreground">
-          Missing an organization or repository? <a href={configurationUrl} target="_blank" rel="noreferrer" className="text-foreground hover:underline">Configure access on GitHub</a>, then refresh this list.
+          <XoTrans
+            i18nKey="Missing an organization or repository? <anchor>Configure access on GitHub</anchor>, then refresh this list."
+            components={{ anchor: <a href={configurationUrl} target="_blank" rel="noreferrer" className="text-foreground hover:underline" /> }}
+          />
         </p> : null}
       </div>
     </div>
@@ -404,7 +411,7 @@ function HumanAccessCards({
   return (
     <div className="space-y-3">
       <RadioCardGroup
-        ariaLabel="Which humans can use this credential"
+        ariaLabel={tx("Which humans can use this credential")}
         value={personal ? "personal" : restricted ? "selected" : "company"}
         className="sm:grid-cols-2"
         onValueChange={(next) => {
@@ -545,8 +552,10 @@ export function AudienceDialog({
               selectedUserIds={selected}
               onChange={setSelected}
               triggerLabel={selected.size === 0
-                ? "Choose people"
-                : `${selected.size} ${selected.size === 1 ? "person" : "people"} selected`}
+                ? tx("Choose people")
+                : selected.size === 1
+                  ? tx("{{n}} person selected", { n: selected.size })
+                  : tx("{{n}} people selected", { n: selected.size })}
             />
           ) : null}
 
@@ -609,16 +618,16 @@ export function RevokeGrantDialog({
   const personal = grant.kind === "user";
   const title = personal
     ? isOwnIdentity
-      ? `Revoke your ${providerName} identity?`
-      : `Revoke this ${providerName} identity?`
-    : "Revoke the organization identity?";
+      ? tx("Revoke your {{providerName}} identity?", { providerName })
+      : tx("Revoke this {{providerName}} identity?", { providerName })
+    : tx("Revoke the organization identity?");
   const body = personal
     ? isOwnIdentity
-      ? "Agents will stop acting as you. Work that needs this identity can ask you to connect again."
-      : "Agents will stop acting as this person. They can connect again themselves; no one else can do it for them."
+      ? tx("Agents will stop acting as you. Work that needs this identity can ask you to connect again.")
+      : tx("Agents will stop acting as this person. They can connect again themselves; no one else can do it for them.")
     : credentialPolicy === "per_user"
-      ? "Installed agents lose this shared identity immediately."
-      : "Eligible members and installed agents will lose this shared identity immediately.";
+      ? tx("Installed agents lose this shared identity immediately.")
+      : tx("Eligible members and installed agents will lose this shared identity immediately.");
 
   return (
     <AlertDialog open onOpenChange={(open) => { if (!open) onCancel(); }}>
