@@ -19,7 +19,7 @@ describe("Ү6 7.10 админгүй эхний тохиргооны дэлгэц
       "Finish setting up this {{brand}}",
       "Run this command on the host that runs {{brand}} to print a one-time first-admin invite URL:",
       "Sign in / Create account",
-      "Wrong account? <link>Switch account</link>.",
+      "Wrong account? <anchor>Switch account</anchor>.",
     ]) {
       expect(extracted).toContain(key);
     }

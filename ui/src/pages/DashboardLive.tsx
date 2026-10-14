@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { ArrowLeft, RadioTower } from "lucide-react";
 import { Link } from "@/lib/router";
+import { tx } from "@/i18n/xo";
 import { ActiveAgentsPanel } from "../components/ActiveAgentsPanel";
 import { EmptyState } from "../components/EmptyState";
 import { useBreadcrumbs } from "../context/BreadcrumbContext";
@@ -53,7 +54,7 @@ export function DashboardLive() {
         minRunCount={DASHBOARD_LIVE_RUN_LIMIT}
         fetchLimit={DASHBOARD_LIVE_RUN_LIMIT}
         cardLimit={DASHBOARD_LIVE_RUN_LIMIT}
-        emptyMessage="No active or recent agent runs."
+        emptyMessage={tx("No active or recent agent runs.")}
         queryScope="dashboard-live"
         showMoreLink={false}
       />

@@ -38,6 +38,7 @@ import { MarkdownBody } from "./MarkdownBody";
 import { Badge } from "@/components/ui/badge";
 import { tx } from "@/i18n/xo";
 import {
+  xoRoutineChangeSummary,
   xoRoutineDirtyFieldLabel,
   xoRoutineHistoryFieldLabel,
   xoRoutineHistoryValueLabel,
@@ -481,7 +482,7 @@ function RevisionList({
             </div>
             <div className="text-xs text-muted-foreground truncate">
               {relativeTime(revision.createdAt)} • {getActorLabel(revision)}
-              {revision.changeSummary ? ` • ${revision.changeSummary}` : ""}
+              {revision.changeSummary ? ` • ${xoRoutineChangeSummary(revision.changeSummary)}` : ""}
             </div>
           </button>
         );
@@ -587,7 +588,7 @@ function RevisionPreview({
             <p className="text-sm font-medium">rev {revision.revisionNumber}</p>
             <p className="text-xs text-muted-foreground truncate">
               {tx("Saved {{time}} by {{actor}}", { time: relativeTime(revision.createdAt), actor: getActorLabel(revision) })}
-              {revision.changeSummary ? ` · ${revision.changeSummary}` : ""}
+              {revision.changeSummary ? ` · ${xoRoutineChangeSummary(revision.changeSummary)}` : ""}
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -933,7 +934,7 @@ function RevisionPicker({
         {revisions.map((revision) => (
           <option key={revision.id} value={revision.id}>
             rev {revision.revisionNumber} — {relativeTime(revision.createdAt)}
-            {revision.changeSummary ? ` • ${revision.changeSummary}` : ""}
+            {revision.changeSummary ? ` • ${xoRoutineChangeSummary(revision.changeSummary)}` : ""}
           </option>
         ))}
       </select>

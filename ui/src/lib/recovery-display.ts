@@ -5,6 +5,7 @@ import {
   type RecoveryLivenessContext,
   type RecoveryRetryLineage,
 } from "./recovery-lineage";
+import { tx } from "@/i18n/xo";
 
 export type RecoveryDisplayState =
   | "needed"
@@ -107,7 +108,7 @@ export function recoveryChipLabel(
   lineage?: RecoveryRetryLineage | null,
 ): string {
   if (kind === "workspace_validation" && state === "needed") {
-    return "Workspace recovery needed";
+    return tx("Workspace recovery needed");
   }
   if (
     state === "in_progress" &&
@@ -115,7 +116,19 @@ export function recoveryChipLabel(
     lineage.maxAttempts !== null &&
     lineage.attempt > 0
   ) {
-    return `Recovery in progress · ${Math.min(lineage.attempt, lineage.maxAttempts)}/${lineage.maxAttempts}`;
+    return tx("Recovery in progress · {{attempt}}/{{max}}", {
+      attempt: Math.min(lineage.attempt, lineage.maxAttempts),
+      max: lineage.maxAttempts,
+    });
   }
-  return RECOVERY_CHIP_DEFAULT_TONE[state].label;
+  switch (state) {
+    case "needed":
+      return tx("Recovery needed");
+    case "in_progress":
+      return tx("Recovery in progress");
+    case "observe_only":
+      return tx("Observing active run");
+    case "escalated":
+      return tx("Recovery escalated");
+  }
 }

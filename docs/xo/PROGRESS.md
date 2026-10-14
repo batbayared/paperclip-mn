@@ -1,5 +1,41 @@
 # XO ахицын бүртгэл
 
+## Ү6 7.11 Үлдэгдэл (2026-10-14)
+
+Зорилго: 7.10-ын «Үлдэгдэл»-ийг хаах: серверийн changeSummary / editableReason / «Plan approval - {title}»-ийг labels.ts helper-ээр буулгах, Activity бүртгэлийн хэрэглэгчид харагдах action-ууд, хянах самбар, ConnectionSetupFlow, туршилтын тохиргооны карт, аудит хуудсууд, recovery шошго. Серверийн код хөндөгдөөгүй. en гаралт d36e28452-тэй байт ижил (брэндийн гажилтыг доор бичсэн).
+
+Төлөвлөгөө: docs/superpowers/plans/2026-10-14-xo-y6-7-11-leftovers.md. BASE d36e28452.
+
+ED шийдвэр (2026-10-14): Х1 Activity-д зөвхөн хэрэглэгчид харагдах action-ыг орчуулна, дотоод action (test.*, auth.*, runner.*, provider_trace.*, native.*, tool_gateway.* г.м.) англи fallback-аар үлдэнэ. Х2 серверийн changeSummary, editableReason, «Plan approval - {title}» → labels.ts helper (xoRoutineChangeSummary, xoSkillEditableReason, xoAttentionTitle), танигдаагүй утга англиар. Х3 брэнд baseline-д labels.ts 3 → 4 (серверийн «Bundled Paperclip skills are read-only.» мөртэй харьцуулах литерал, ED зөвшөөрсөн). Өмнөх шийдвэр хэвээр: *.production.tsx хүрээнээс гадуур, техникийн утга латинаар, Board «Удирдах зөвлөл», stage «үе шат».
+
+| Task | Агуулга |
+|---|---|
+| 1 | labels.ts-ийн 3 helper, дуудагч 7 файл |
+| 2 | activity-format.ts: XO_ACTIVITY_ROW_VERBS (176 action, xoActivityRowVerb guard-аар en-д fallback), ActivityRow-ийн System / Board / Unknown actor |
+| 3 | ActiveAgentsPanel, ActivityCharts, SmokeLabDashboardCard, DashboardLive |
+| 4 | InstanceExperimentalSettings (31 footnote / aria-label), IssuePlanDecompositionsSection, ConnectionSetupFlow, pipeline-item-detail (actor brand) |
+| 5 | tiers.ts «// Ү6 7.11» блок (+6 файл), tiers-y6-7-11.test.ts, y6-7-11-keys.test.ts, каталог |
+| 7 | AuditFeed, AuditTab, IssueRunLedger, CommentAttributionChip (tiers +4), environment.lease_* үйл үг |
+| 8 | recovery-display.ts-ийн recoveryChipLabel (6 шошго); BootstrapPendingPage-ийн <link> tag-ийг <anchor> болгосон |
+
+Түлхүүр: 5894 (7.10-ын төгсгөл 5240, +654). keep-en.json +4 (Client ID, Client secret, Vercel Connect, Zapier MCP URL).
+
+### Шалгалтын үр дүн
+
+- Gates (2026-10-14): xo:i18n:check OK keys=5894, xo:i18n:test 11 файл / 129, ui tsc 0 алдаа, vitest ui/src 625 файл / 6582 тест, xo:brand-scan OK 566 / 161.
+- Хөтчийн шалгалт (3110, mn): хянах самбар («АГЕНТУУД», «Бүх ажиллагааг харах», Амжилттай / Амжилтгүй / Бусад), туршилтын тохиргоо, чадварын read-only tooltip («XO-ийн багцад орсон чадварууд зөвхөн уншигдана.»), тогтмол ажлын түүх («Идэвхжүүлэгч үүсгэсэн: хуваарь»), Ирсэн хайрцгийн recovery шошго, /YB/activity аудит (шүүлтүүр, «CSV экспортлох», «орчны түрээсийг суллалаа», «Удирдах зөвлөл-ийн нэрийн өмнөөс») Монголоор. en-д нэг удаа харьцуулав: аудит хуудас англиар, кирилл зөвхөн өгөгдөлд.
+- Хөтчийн шалгалтын явцад нэмэгдсэн хүрээ: аудит хуудсууд (Task 7), recovery шошго ба BootstrapPendingPage anchor (Task 8).
+
+### Хязгаарлалт ба үлдэгдэл
+
+- *.production.tsx англиар.
+- Хөгжүүлэлтийн «RESTART REQUIRED» баннер англиар.
+- Activity-ийн дотоод action-ууд англи fallback; аудит мөрөнд action id (issue.successful_run_handoff_escalated) ба entity төрөл (environment_lease) техникийн утгаараа харагдана.
+- IssueRunLedger: «+{n} more», «{n} older items not shown», statusLabel(run.status) англиар.
+- company-members.ts-ийн «Board» шошго AuditFeed-ээс бусад газар англиар гарч магадгүй; хажуу цэсний хэрэглэгчийн нэр «Board» (өгөгдөл).
+- en гаралтад брэнд солигдсон: ConnectionSetupFlow-ийн {{brand}} мөрүүд en-д «XO» гэж гарна; pipeline-item-detail ба InstanceExperimentalSettings-ийн 2 aria-label locale guard-аар en-д «Paperclip» хэвээр.
+- Хянах нэр томьёо: «Интеграцийн шалгалт», «Товлосон heartbeat», «хариуцагч оноолоо:», «Idempotent баталгаа», «GitHub-ийг дараах байдлаар холбох», «орчны түрээс», decision.expired, budget.soft_threshold_crossed.
+
 ## Ү6 7.10 Үлдэгдэл (2026-10-14)
 
 Зорилго: 7.8 ба 7.9-ийн «Үлдэгдэл»-ийг хаах: серверээс ирэх шошгыг клиент талд labels.ts helper-ээр орчуулах, routines / skills / secrets / pipeline / workspace хуудсын англи үлдэгдэл, «Updated <time>» маягийн холимог өгүүлбэр, InlineEntitySelector-ийн текст. Серверийн код хөндөгдөөгүй. en гаралт c76922936-тэй байт ижил (брэндийн baseline-ийн өөрчлөлтийг доор бичсэн).
@@ -13,7 +49,7 @@ ED шийдвэр (2026-10-14): Х1 серверийн шошгыг клиент
 | Task | Commit |
 |---|---|
 | 0 BootstrapPendingPage (эхний админы дэлгэц) | c76922936 |
-| 1–10 labels.ts helper, tiers +10 файл, 13 файлын «Updated <time>», каталог, тест, SYNC.md ба бүртгэл | commit хийгээгүй |
+| 1–10 labels.ts helper, tiers +10 файл, 13 файлын «Updated <time>», каталог, тест, SYNC.md ба бүртгэл | d36e28452 |
 
 Түлхүүр: 5240 (7.9-ын төгсгөл 4706, 7.10-д +534). Нэгтгэсэн түлхүүр: t1 22, t3 179, t4 123, t5 24, t6 68, t7 14, t8 24, t11 54, t12 1.
 

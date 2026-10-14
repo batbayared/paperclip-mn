@@ -6,6 +6,7 @@ import { queryKeys } from "@/lib/queryKeys";
 import { useSmokeLabEnabled } from "@/hooks/useSmokeLabEnabled";
 import { advancedTabHref } from "@/pages/tools/tool-tabs";
 import { cn } from "@/lib/utils";
+import { tx } from "@/i18n/xo";
 import { xoLocaleDateTime } from "@/xo/date-format";
 import { failingPaths, runHealth, type SmokeHealth } from "@/pages/tools/smoke-lab-matrix";
 
@@ -22,6 +23,16 @@ const HEALTH_LABEL: Record<SmokeHealth, string> = {
   red: "Failing paths",
   unknown: "No runs yet",
 };
+
+function healthLabel(health: SmokeHealth): string {
+  switch (health) {
+    case "green": return tx("All paths passing");
+    case "amber": return tx("Needs a run");
+    case "red": return tx("Failing paths");
+    case "unknown": return tx("No runs yet");
+    default: return HEALTH_LABEL[health];
+  }
+}
 
 function formatTime(value: string | Date | null | undefined): string {
   if (!value) return "—";
@@ -73,14 +84,16 @@ export function SmokeLabDashboardCard({ companyId }: { companyId: string }) {
         <div className="min-w-0">
           <div className="flex items-center gap-2">
             <span className={cn("h-2.5 w-2.5 shrink-0 rounded-full", HEALTH_DOT[health])} />
-            <p className="truncate text-sm font-semibold text-foreground">Integration smoke</p>
+            <p className="truncate text-sm font-semibold text-foreground">{tx("Integration smoke")}</p>
           </div>
           <p className="mt-0.5 truncate text-xs text-muted-foreground">
-            {HEALTH_LABEL[health]}
+            {healthLabel(health)}
             {failing.length > 0 && `: ${failing.join(", ")}`}
           </p>
           <p className="mt-0.5 truncate text-(length:--text-micro) text-muted-foreground/80">
-            {latestRun ? `Last run ${formatTime(latestRun.startedAt)}` : "Run one from the Smoke Lab tab"}
+            {latestRun
+              ? tx("Last run {{time}}", { time: formatTime(latestRun.startedAt) })
+              : tx("Run one from the Smoke Lab tab")}
           </p>
         </div>
       </div>

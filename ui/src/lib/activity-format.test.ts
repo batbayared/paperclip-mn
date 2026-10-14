@@ -1,5 +1,6 @@
 import type { Agent } from "@paperclipai/shared";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
+import { i18n } from "@/i18n";
 import { formatActivityVerb, formatIssueActivityAction } from "./activity-format";
 
 describe("activity formatting", () => {
@@ -153,5 +154,42 @@ describe("activity formatting", () => {
     expect(formatIssueActivityAction("issue.successful_run_handoff_escalated")).toBe(
       "Run finished without a next step - recovery escalated",
     );
+  });
+});
+
+describe("XO activity row verbs", () => {
+  afterEach(async () => {
+    await i18n.changeLanguage("en");
+  });
+
+  it("en дээр нэмэлт action-ууд upstream fallback-аа байт ижил буцаана", () => {
+    expect(formatActivityVerb("routine.created")).toBe("routine created");
+    expect(formatActivityVerb("company.skill_forked")).toBe("company skill forked");
+    expect(formatActivityVerb("secret.proposal.approved")).toBe("secret proposal approved");
+    expect(formatActivityVerb("agent.deleted")).toBe("agent deleted");
+    expect(formatActivityVerb("issue.checkout")).toBe("issue checkout");
+    expect(formatActivityVerb("instance.settings.general_updated")).toBe("instance settings general updated");
+  });
+
+  it("mn дээр хэрэглэгчид харагдах action-ыг монгол үйл үгээр харуулна", async () => {
+    // Шинэ түлхүүрүүд каталогт Wave 2-т нэмэгдэнэ; scratch-ийн mn утгыг энд шууд ачаална.
+    i18n.addResource("mn", "xo", "created routine", "тогтмол ажил үүсгэлээ");
+    i18n.addResource("mn", "xo", "rotated secret", "нууц утгыг сэлгэлээ");
+    i18n.addResource("mn", "xo", "created folder", "хавтас үүсгэлээ");
+    await i18n.changeLanguage("mn");
+    expect(formatActivityVerb("routine.created")).toBe("тогтмол ажил үүсгэлээ");
+    expect(formatActivityVerb("secret.rotated")).toBe("нууц утгыг сэлгэлээ");
+    expect(formatActivityVerb("folder.created")).toBe("хавтас үүсгэлээ");
+    expect(formatActivityVerb("environment.lease_released")).toBe("орчны түрээсийг суллалаа");
+    // Каталогт байгаа түлхүүрийг дахин ашигласан мөрүүд.
+    expect(formatActivityVerb("agent.deleted")).toBe("устгалаа:");
+    expect(formatActivityVerb("issue.checkout")).toBe("хариуцан авлаа:");
+    expect(formatActivityVerb("issue.comment.created")).toBe("сэтгэгдэл бичлээ:");
+  });
+
+  it("mn дээр ч дотоод action fallback-аар үлдэнэ", async () => {
+    await i18n.changeLanguage("mn");
+    expect(formatActivityVerb("test.event")).toBe("test event");
+    expect(formatActivityVerb("secret.value.read")).toBe("secret value read");
   });
 });

@@ -2,6 +2,7 @@ import { UserCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "../lib/utils";
+import { tx } from "@/i18n/xo";
 
 /**
  * "for {user}" chip on an agent comment posted to a task the agent does not own
@@ -22,9 +23,9 @@ import { cn } from "../lib/utils";
  * driving Radix's portal open.
  */
 export function commentAttributionTooltip(agentName: string, userName: string): string {
-  return (
-    `${agentName} posted this on behalf of ${userName}. ${agentName} is not assigned to ` +
-    `this task — its authority to write here comes from ${userName}, and never exceeds it.`
+  return tx(
+    "{{agent}} posted this on behalf of {{user}}. {{agent}} is not assigned to this task — its authority to write here comes from {{user}}, and never exceeds it.",
+    { agent: agentName, user: userName },
   );
 }
 
@@ -41,7 +42,7 @@ export function CommentAttributionChip({
 }) {
   const user = userName?.trim();
   if (!user) return null;
-  const agent = agentName?.trim() || "This agent";
+  const agent = agentName?.trim() || tx("This agent");
 
   return (
     <Tooltip>

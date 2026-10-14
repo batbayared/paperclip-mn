@@ -1,7 +1,7 @@
 import { type ReactNode } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Loader2, Sun } from "lucide-react";
-import { xoLabel } from "@/xo/labels";
+import { xoAttentionTitle, xoLabel } from "@/xo/labels";
 import type { Agent, AttentionItem } from "@paperclipai/shared";
 import { decisionQueuesApi } from "../api/decisionQueues";
 import { useToastActions } from "../context/ToastContext";
@@ -78,7 +78,7 @@ export function AgingItemRow({
     mutationFn: () => decisionQueuesApi.setKeep(companyId, item.sourceKind, item.subject.id, true),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.attention(companyId) });
-      pushToast({ title: "Kept on desk", body: item.subject.title ?? undefined, tone: "success" });
+      pushToast({ title: "Kept on desk", body: item.subject.title != null ? xoAttentionTitle(item.subject.title) : undefined, tone: "success" });
     },
     onError: (error) =>
       pushToast({

@@ -26,36 +26,75 @@ import { agentsApi } from "@/api/agents";
 import { accessApi } from "@/api/access";
 import { ApiError } from "@/api/client";
 import { useToastActions } from "@/context/ToastContext";
+import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
 
 const PAGE_SIZE = 50;
 const ALL = "__all";
 
 /** Action-domain prefixes offered in the filter (server does a prefix match). */
-const ACTION_DOMAINS: { value: string; label: string }[] = [
-  { value: ALL, label: "All actions" },
-  { value: "issue.", label: "Tasks" },
-  { value: "agent.", label: "Agents" },
-  { value: "heartbeat.", label: "Runs" },
-  { value: "approval.", label: "Approvals" },
-  { value: "project.", label: "Projects" },
-  { value: "goal.", label: "Goals" },
-  { value: "tool_", label: "Apps & tools" },
-  { value: "cost.", label: "Costs" },
-  { value: "company.", label: "Organization" },
+const ACTION_DOMAINS: string[] = [
+  ALL,
+  "issue.",
+  "agent.",
+  "heartbeat.",
+  "approval.",
+  "project.",
+  "goal.",
+  "tool_",
+  "cost.",
+  "company.",
 ];
 
+function actionDomainLabel(value: string): string {
+  switch (value) {
+    case ALL: return tx("All actions");
+    case "issue.": return tx("Tasks");
+    case "agent.": return tx("Agents");
+    case "heartbeat.": return tx("Runs");
+    case "approval.": return tx("Approvals");
+    case "project.": return tx("Projects");
+    case "goal.": return tx("Goals");
+    case "tool_": return tx("Apps & tools");
+    case "cost.": return tx("Costs");
+    case "company.": return tx("Organization");
+    default: return value;
+  }
+}
+
 /** Entity types offered in the filter (server does an exact match). */
-const ENTITY_TYPES: { value: string; label: string }[] = [
-  { value: ALL, label: "All entities" },
-  { value: "issue", label: "Task" },
-  { value: "agent", label: "Agent" },
-  { value: "heartbeat_run", label: "Run" },
-  { value: "routine", label: "Routine" },
-  { value: "project", label: "Project" },
-  { value: "goal", label: "Goal" },
-  { value: "company", label: "Organization" },
-  { value: "tool_connection", label: "Connection" },
+const ENTITY_TYPES: string[] = [
+  ALL,
+  "issue",
+  "agent",
+  "heartbeat_run",
+  "routine",
+  "project",
+  "goal",
+  "company",
+  "tool_connection",
 ];
+
+function entityTypeLabel(value: string): string {
+  switch (value) {
+    case ALL: return tx("All entities");
+    case "issue": return tx("Task");
+    case "agent": return tx("Agent");
+    case "heartbeat_run": return tx("Run");
+    case "routine": return tx("Routine");
+    case "project": return tx("Project");
+    case "goal": return tx("Goal");
+    case "company": return tx("Organization");
+    case "tool_connection": return tx("Connection");
+    default: return value;
+  }
+}
+
+/** The local board principal falls back to the English "Board" label. */
+function userProfileLabel(userId: string, profile: CompanyUserProfile | null | undefined): string | undefined {
+  if (userId === "local-board" && (!profile || profile.label === "Board")) return tx("Board");
+  return profile?.label;
+}
 
 /**
  * Which actors the feed covers. `all` is the shared company activity view
@@ -133,7 +172,7 @@ function AuditActor({
     const profile = userProfileMap.get(record.actorId);
     return (
       <Identity
-        name={profile?.label ?? "User"}
+        name={userProfileLabel(record.actorId, profile) ?? tx("User")}
         avatarUrl={profile?.image ?? null}
         size="sm"
         className="font-medium text-foreground"
@@ -144,12 +183,12 @@ function AuditActor({
   // deleted or authorization-filtered agents that are absent from the directory.
   const label =
     record.actorType === "plugin"
-      ? "Plugin"
+      ? tx("Plugin")
       : record.actorType === "agent"
-        ? "Agent"
+        ? tx("Agent")
         : record.actorType === "user"
-          ? "User"
-          : "System";
+          ? tx("User")
+          : tx("System");
   return <Identity name={label} size="sm" className="font-medium text-foreground" />;
 }
 
@@ -206,7 +245,9 @@ function AuditRow({
     record.responsibleUserId
       && !(record.actorType === "user" && record.actorId === record.responsibleUserId),
   );
-  const responsibleLabel = responsible?.label ?? (record.responsibleUserId ? "a user" : null);
+  const responsibleLabel = record.responsibleUserId
+    ? userProfileLabel(record.responsibleUserId, responsible) ?? tx("a user")
+    : null;
   const excerpt = record.entity.comment?.excerpt?.trim();
   // Show the document key only when it isn't already the linked entity node.
   const documentKey = record.entity.issue && record.entity.document ? record.entity.document.key : null;
@@ -268,11 +309,12 @@ function AuditUpsell() {
         <div>
           <p className="text-sm font-medium text-foreground">Agent audit is a Paperclip Enterprise view</p>
           <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">
-            The agent audit log gives you a searchable, exportable record of everything your agents
-            did — every comment, task change, approval, and run — with the responsible person for
-            each action. Ask an administrator to grant you the{" "}
-            <span className="font-mono text-(length:--text-micro)">audit:view_agent_actions</span>{" "}
-            permission to view it.
+            <XoTrans
+              i18nKey="The agent audit log gives you a searchable, exportable record of everything your agents did — every comment, task change, approval, and run — with the responsible person for each action. Ask an administrator to grant you the <permission/> permission to view it."
+              components={{
+                permission: <span className="font-mono text-(length:--text-micro)">audit:view_agent_actions</span>,
+              }}
+            />
           </p>
         </div>
       </CardContent>
@@ -530,10 +572,10 @@ export function AuditFeed({
       {hasLockedScope ? (
         <div className="border-y border-border px-1 py-2 text-xs text-muted-foreground">
           {lockedRunId
-            ? `Scoped to run ${lockedRunId.slice(0, 8)}`
+            ? tx("Scoped to run {{id}}", { id: lockedRunId.slice(0, 8) })
             : lockedAgentId
               ? "Scoped to one agent"
-              : `Scoped to ${lockedEntity?.label ?? lockedEntity?.type ?? "entity"}`}
+              : tx("Scoped to {{name}}", { name: lockedEntity?.label ?? lockedEntity?.type ?? tx("entity") })}
         </div>
       ) : null}
 
@@ -583,8 +625,8 @@ export function AuditFeed({
             </SelectTrigger>
             <SelectContent>
               {ACTION_DOMAINS.map((d) => (
-                <SelectItem key={d.value} value={d.value}>
-                  {d.label}
+                <SelectItem key={d} value={d}>
+                  {actionDomainLabel(d)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -599,8 +641,8 @@ export function AuditFeed({
               </SelectTrigger>
               <SelectContent>
                 {ENTITY_TYPES.map((e) => (
-                  <SelectItem key={e.value} value={e.value}>
-                    {e.label}
+                  <SelectItem key={e} value={e}>
+                    {entityTypeLabel(e)}
                   </SelectItem>
                 ))}
               </SelectContent>

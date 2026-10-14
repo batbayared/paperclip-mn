@@ -219,6 +219,46 @@ XO-ийн өмч: ui/src/xo/date-format.ts (mnZoned, богино огнооны
 - 7.3-ын үлдэгдлээс хэвээр: d.label === "Intent" харьцуулалт, dev-only T2 файлууд ба LegacyIssuesList.
 - Browser шалгалт (7.4 дараах, tier-т ороогүй өмнөх файл): агентын хуудасны зүүн навигаци («Overview», «Instructions», «Runs», «Permissions / Trust» г.м.) ба «Overview» гарчиг; Audit хэсгийн Runs хуудас бүхэлдээ англи.
 
+## Ү6 7.11-д хөндсөн upstream файлууд
+
+7.10-ын «Үлдэгдэл»-ийг хаасан. Тэмдэглэгээ 7.5-ын хүснэгттэй ижил. BASE d36e28452. ED шийдвэр (2026-10-14): Х1 Activity-д зөвхөн хэрэглэгчид харагдах action орчуулна, дотоод action англи fallback; Х2 серверийн changeSummary / editableReason / «Plan approval - {title}» → labels.ts helper; Х3 брэнд baseline-д labels.ts 3 → 4 (ED зөвшөөрсөн).
+
+| Файл | Өөрчлөлт |
+|---|---|
+| ui/src/features/connections/ConnectionSetupFlow.tsx | T1; connectionStepLabel(), genericAuthModeHint() switch, XoTrans, {{brand}}; «Install Paperclip» түлхүүр GitHub-ийн алдаатай тааруулахаар литерал хэвээр |
+| ui/src/components/IssuePlanDecompositionsSection.tsx | T1 |
+| ui/src/components/ActiveAgentsPanel.tsx | T1; title / emptyMessage анхдагч утга render үед tx |
+| ui/src/components/ActivityCharts.tsx | T1; priorityLabel() |
+| ui/src/components/SmokeLabDashboardCard.tsx | T1; healthLabel() |
+| ui/src/components/ActivityRow.tsx | T1; System / Board / Unknown actor tx |
+| ui/src/pages/audit/AuditFeed.tsx | T1; actionDomainLabel, entityTypeLabel, userProfileLabel |
+| ui/src/pages/tools/AuditTab.tsx | T1; outcomeLabel, windowLabel, XoTrans 4 өгүүлбэр |
+| ui/src/components/IssueRunLedger.tsx | T1; модулийн хүснэгтийг render-үеийн функц болгосон; сервер рүү илгээх reason ба throw Error англиар |
+| ui/src/components/CommentAttributionChip.tsx | T1 |
+| ui/src/lib/activity-format.ts | XO_ACTIVITY_ROW_VERBS (176 action), xoActivityRowVerb guard (en-д fallback) |
+| ui/src/lib/recovery-display.ts | recoveryChipLabel tx (6 шошго) |
+| ui/src/lib/pipeline-item-detail.ts | system actor mn-д BRAND.name, en-д «Paperclip» |
+| ui/src/pages/InstanceExperimentalSettings.tsx | footnote / aria-label гар tx (31); брэндтэй 2 aria-label locale guard |
+| ui/src/pages/DashboardLive.tsx | emptyMessage tx |
+| ui/src/components/BootstrapPendingPage.tsx | <link> tag → <anchor> (react-i18next-д link нь void элемент) |
+| RoutineHistoryTab, CompanySkills, SkillStudio, AttentionQueueRow, DecisionShelf, WhatNeedsMe, DecisionQueuePage | серверийн шошгыг labels.ts helper-ээр буулгасан |
+
+Хөндөгдөөгүй: серверийн код, *.production.tsx.
+
+XO-ийн өмч: ui/src/xo/labels.ts (xoRoutineChangeSummary, xoSkillEditableReason, xoAttentionTitle), scripts/xo-i18n/tiers.ts (+10 файл T1), scripts/xo-brand/baseline.json (labels.ts 3 → 4; скан 566 / 161), ui/src/i18n/xo/* (keys=5894, +654; keep-en.json +4).
+
+XO-ийн тестүүд: scripts/xo-i18n/tiers-y6-7-11.test.ts (шинэ), ui/src/i18n/xo/y6-7-11-keys.test.ts (шинэ), ui/src/xo/labels.test.ts, ui/src/lib/activity-format.test.ts, scripts/xo-i18n/tiers-y6-7-10.test.ts (anchor түлхүүр).
+
+Gates (2026-10-14): xo:i18n:check OK 5894, xo:i18n:test 11 / 129, tsc 0, vitest ui/src 625 файл / 6582 тест, xo:brand-scan OK.
+
+Үлдэгдэл (Ү6 7.11):
+- *.production.tsx англиар.
+- Хөгжүүлэлтийн «RESTART REQUIRED» баннер англиар.
+- Activity-ийн дотоод action англи fallback.
+- IssueRunLedger: «+{n} more», «{n} older items not shown», run.status англиар.
+- company-members.ts-ийн «Board» шошго.
+- en-д ConnectionSetupFlow-ийн брэнд «XO» гэж гарна (en байт ижил зарчмаас ухамсартай гажсан).
+
 ## Lockfile" хэсгийн дүрмээр зохицуулагдана.
 
 ## Ү3-А-д хөндсөн upstream файлууд

@@ -827,3 +827,54 @@ export function xoRoutineHistoryValueLabel(value: string): string {
     default: return value;
   }
 }
+
+const ROUTINE_TRIGGER_SUMMARY_RE = /^(Created|Updated|Deleted) (\S+) trigger$/;
+const ROUTINE_RESTORED_SUMMARY_RE = /^Restored from revision (\d+)$/;
+
+/** routines.ts revision changeSummary — серверийн тогтмол утгууд; хэрэглэгчийн бичсэн тайлбар хэвээр. */
+export function xoRoutineChangeSummary(summary: string): string {
+  if (!xoIsMn()) return summary;
+  switch (summary) {
+    case "Created routine": return tx("Created routine");
+    case "Updated routine": return tx("Updated routine");
+    case "Rotated webhook trigger secret": return tx("Rotated webhook trigger secret");
+  }
+  const trigger = ROUTINE_TRIGGER_SUMMARY_RE.exec(summary);
+  if (trigger) {
+    const kind = xoTriggerKindLabel(trigger[2]);
+    switch (trigger[1]) {
+      case "Created": return tx("Created {{kind}} trigger", { kind });
+      case "Updated": return tx("Updated {{kind}} trigger", { kind });
+      case "Deleted": return tx("Deleted {{kind}} trigger", { kind });
+    }
+  }
+  const restored = ROUTINE_RESTORED_SUMMARY_RE.exec(summary);
+  if (restored) return tx("Restored from revision {{number}}", { number: restored[1] });
+  return summary;
+}
+
+/** company-skills.ts editableReason — серверийн тогтмол утгууд. */
+export function xoSkillEditableReason(reason: string): string {
+  if (!xoIsMn()) return reason;
+  switch (reason) {
+    case "Bundled Paperclip skills are read-only.": return tx("Bundled {{brand}} skills are read-only.");
+    case "Skills.sh-managed skills are read-only.": return tx("Skills.sh-managed skills are read-only.");
+    case "Remote GitHub skills are read-only. Fork or import locally to edit them.":
+      return tx("Remote GitHub skills are read-only. Fork or import locally to edit them.");
+    case "URL-based skills are read-only. Save them locally to edit them.":
+      return tx("URL-based skills are read-only. Save them locally to edit them.");
+    case "This skill source is read-only.": return tx("This skill source is read-only.");
+    default: return reason;
+  }
+}
+
+const ATTENTION_PLAN_APPROVAL_PREFIX = "Plan approval - ";
+
+/** attention.ts subject.title — «Plan approval - <issue title>» угтвар ба interactionLabel; issue-ийн гарчиг хэвээр. */
+export function xoAttentionTitle(title: string): string {
+  if (!xoIsMn()) return title;
+  if (title.startsWith(ATTENTION_PLAN_APPROVAL_PREFIX)) {
+    return tx("Plan approval - {{title}}", { title: title.slice(ATTENTION_PLAN_APPROVAL_PREFIX.length) });
+  }
+  return xoAttentionInteractionLabel(title);
+}

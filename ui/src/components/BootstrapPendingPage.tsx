@@ -155,8 +155,8 @@ export function BootstrapPendingPage({
       </div>
       <p className="mt-3 text-xs text-muted-foreground">
         <XoTrans
-          i18nKey="Wrong account? <link>Switch account</link>."
-          components={{ link: <Link to="/auth?next=/" className="underline underline-offset-2" /> }}
+          i18nKey="Wrong account? <anchor>Switch account</anchor>."
+          components={{ anchor: <Link to="/auth?next=/" className="underline underline-offset-2" /> }}
         />
       </p>
       {claimError && (

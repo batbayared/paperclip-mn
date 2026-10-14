@@ -9,6 +9,8 @@ import type {
 } from "../api/pipelines";
 import { assigneeValueFromSelection } from "./assignees";
 import { tx } from "@/i18n/xo";
+import { BRAND } from "@/xo/brand";
+import { resolveLocale } from "@/xo/locale";
 
 export const INTERNAL_FIELD_KEYS = new Set([
   "nextSuggestedStageId",
@@ -292,7 +294,8 @@ function readDecision(payload: Record<string, unknown>) {
 function actorName(event: PipelineCaseEvent) {
   if (event.actorAgent?.name) return event.actorAgent.name;
   if (event.actorType === "user") return tx("Board");
-  if (event.actorType === "system") return "Paperclip";
+  // XO: mn-д брэнд XO; en гаралт upstream-тэй ижил үлдэнэ.
+  if (event.actorType === "system") return resolveLocale() === "mn" ? BRAND.name : "Paperclip";
   return null;
 }
 

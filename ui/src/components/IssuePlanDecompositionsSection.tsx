@@ -58,12 +58,12 @@ export function IssuePlanDecompositionsSection({
           const requested = record.requestedChildCount ?? 0;
           const created = record.childIssueIds?.length ?? 0;
           const ownerName = record.ownerAgentId
-            ? agentMap?.get(record.ownerAgentId)?.name ?? "agent"
+            ? agentMap?.get(record.ownerAgentId)?.name ?? tx("agent")
             : null;
           const revisionLabel =
             record.acceptedPlanRevisionNumber != null
-              ? `revision ${record.acceptedPlanRevisionNumber}`
-              : `revision ${record.acceptedPlanRevisionId.slice(0, 8)}`;
+              ? tx("revision {{n}}", { n: record.acceptedPlanRevisionNumber })
+              : tx("revision {{id}}", { id: record.acceptedPlanRevisionId.slice(0, 8) });
           const completedAt =
             record.completedAt && typeof record.completedAt === "string"
               ? record.completedAt

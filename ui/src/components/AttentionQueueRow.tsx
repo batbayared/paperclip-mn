@@ -53,7 +53,7 @@ import { StalledReviewActions } from "./StalledReviewActions";
 import { readIssueReviewPolicyMetadata } from "../lib/review-policy";
 import { xoLocaleDateTime } from "@/xo/date-format";
 import { tx } from "@/i18n/xo";
-import { xoAttentionInteractionLabel, xoAttentionSourceLabel, xoAttentionWhyNow, xoSnoozePresetLabel } from "@/xo/labels";
+import { xoAttentionSourceLabel, xoAttentionTitle, xoAttentionWhyNow, xoSnoozePresetLabel } from "@/xo/labels";
 
 const HOUR_MS = 60 * 60 * 1000;
 const DAY_MS = 24 * HOUR_MS;
@@ -354,7 +354,7 @@ export const AttentionQueueRow = memo(function AttentionQueueRow({
           : {})}
       >
         <span className="line-clamp-2 text-sm font-medium text-foreground" title={item.subject.title ?? undefined}>
-          {item.subject.title != null ? xoAttentionInteractionLabel(item.subject.title) : xoAttentionSourceLabel(meta.label)}
+          {item.subject.title != null ? xoAttentionTitle(item.subject.title) : xoAttentionSourceLabel(meta.label)}
         </span>
         <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{detailLine}</p>
       </div>

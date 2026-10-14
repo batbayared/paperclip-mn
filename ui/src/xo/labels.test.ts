@@ -54,6 +54,9 @@ import {
   xoRoutineRunSourceLabel,
   xoRoutineTriggerLabel,
   xoRoutineHistoryValueLabel,
+  xoRoutineChangeSummary,
+  xoSkillEditableReason,
+  xoAttentionTitle,
 } from "./labels";
 
 afterEach(async () => {
@@ -799,5 +802,97 @@ describe("Ү6 7.10 helper-ууд (mn)", () => {
     expect(xoRoutineHistoryValueLabel("coalesce_if_active")).toBe("Идэвхтэй бол нэгтгэх");
     expect(xoRoutineHistoryValueLabel("skip missed")).toBe("Алдсаныг алгасах");
     expect(xoRoutineHistoryValueLabel("something")).toBe("something");
+  });
+});
+
+const Y6_7_11_MN: Record<string, string> = {
+  "Created routine": "Тогтмол ажил үүсгэсэн",
+  "Updated routine": "Тогтмол ажлыг шинэчилсэн",
+  "Rotated webhook trigger secret": "Вэбхүүк идэвхжүүлэгчийн нууц утгыг сэлгэсэн",
+  "Created {{kind}} trigger": "Идэвхжүүлэгч үүсгэсэн: {{kind}}",
+  "Updated {{kind}} trigger": "Идэвхжүүлэгчийг шинэчилсэн: {{kind}}",
+  "Deleted {{kind}} trigger": "Идэвхжүүлэгчийг устгасан: {{kind}}",
+  "Restored from revision {{number}}": "{{number}} дугаар хувилбараас сэргээсэн",
+  "Bundled {{brand}} skills are read-only.": "{{brand}}-ийн багцад орсон чадварууд зөвхөн уншигдана.",
+  "Skills.sh-managed skills are read-only.": "Skills.sh-ийн удирддаг чадварууд зөвхөн уншигдана.",
+  "Remote GitHub skills are read-only. Fork or import locally to edit them.":
+    "Алсын GitHub чадварууд зөвхөн уншигдана. Засварлахын тулд салаалах эсвэл локалд импортлоно уу.",
+  "URL-based skills are read-only. Save them locally to edit them.":
+    "URL-д суурилсан чадварууд зөвхөн уншигдана. Засварлахын тулд локалд хадгална уу.",
+  "This skill source is read-only.": "Энэ чадварын эх сурвалж зөвхөн уншигдана.",
+  "Plan approval - {{title}}": "Төлөвлөгөөний баталгаажуулалт - {{title}}",
+  schedule: "хуваарь",
+  webhook: "вэбхүүк",
+  "Confirmation requested": "Баталгаажуулалт хүссэн",
+};
+
+const ROUTINE_CHANGE_SUMMARIES = [
+  "Created routine",
+  "Updated routine",
+  "Rotated webhook trigger secret",
+  "Created schedule trigger",
+  "Updated webhook trigger",
+  "Deleted api trigger",
+  "Restored from revision 3",
+];
+
+const SKILL_EDITABLE_REASONS = [
+  "Bundled Paperclip skills are read-only.",
+  "Skills.sh-managed skills are read-only.",
+  "Remote GitHub skills are read-only. Fork or import locally to edit them.",
+  "URL-based skills are read-only. Save them locally to edit them.",
+  "This skill source is read-only.",
+];
+
+describe("Ү6 7.11 helper-ууд (en)", () => {
+  it("en дээр серверийн утгыг өөрчлөлтгүй буцаана", async () => {
+    await i18n.changeLanguage("en");
+    for (const v of [...ROUTINE_CHANGE_SUMMARIES, "My own note", "Created custom trigger"]) {
+      expect(xoRoutineChangeSummary(v)).toBe(v);
+    }
+    for (const v of [...SKILL_EDITABLE_REASONS, "Something else."]) {
+      expect(xoSkillEditableReason(v)).toBe(v);
+    }
+    for (const v of ["Plan approval - Ship it", "Confirmation requested", "Custom title"]) {
+      expect(xoAttentionTitle(v)).toBe(v);
+    }
+  });
+});
+
+describe("Ү6 7.11 helper-ууд (mn)", () => {
+  beforeAll(() => {
+    i18n.addResourceBundle("mn", "xo", Y6_7_11_MN, true, false);
+  });
+
+  it("mn дээр тогтмол ажлын changeSummary-г орчуулна", async () => {
+    await i18n.changeLanguage("mn");
+    expect(xoRoutineChangeSummary("Created routine")).toBe("Тогтмол ажил үүсгэсэн");
+    expect(xoRoutineChangeSummary("Updated routine")).toBe("Тогтмол ажлыг шинэчилсэн");
+    expect(xoRoutineChangeSummary("Rotated webhook trigger secret")).toBe("Вэбхүүк идэвхжүүлэгчийн нууц утгыг сэлгэсэн");
+    expect(xoRoutineChangeSummary("Created schedule trigger")).toBe("Идэвхжүүлэгч үүсгэсэн: хуваарь");
+    expect(xoRoutineChangeSummary("Updated webhook trigger")).toBe("Идэвхжүүлэгчийг шинэчилсэн: вэбхүүк");
+    expect(xoRoutineChangeSummary("Deleted api trigger")).toBe("Идэвхжүүлэгчийг устгасан: api");
+    expect(xoRoutineChangeSummary("Restored from revision 12")).toBe("12 дугаар хувилбараас сэргээсэн");
+    expect(xoRoutineChangeSummary("My own note")).toBe("My own note");
+    expect(xoRoutineChangeSummary("Restored from revision x")).toBe("Restored from revision x");
+  });
+
+  it("mn дээр skill-ийн editableReason-ийг орчуулна (брэнд XO)", async () => {
+    await i18n.changeLanguage("mn");
+    for (const v of SKILL_EDITABLE_REASONS) {
+      expect(xoSkillEditableReason(v), v).not.toBe(v);
+    }
+    expect(xoSkillEditableReason("Bundled Paperclip skills are read-only.")).toBe(
+      "XO-ийн багцад орсон чадварууд зөвхөн уншигдана.",
+    );
+    expect(xoSkillEditableReason("Something else.")).toBe("Something else.");
+  });
+
+  it("mn дээр attention гарчгийн «Plan approval - » угтварыг орчуулж, issue гарчгийг хэвээр үлдээнэ", async () => {
+    await i18n.changeLanguage("mn");
+    expect(xoAttentionTitle("Plan approval - Ship it")).toBe("Төлөвлөгөөний баталгаажуулалт - Ship it");
+    expect(xoAttentionTitle("Plan approval - {{x}} & <b>")).toBe("Төлөвлөгөөний баталгаажуулалт - {{x}} & <b>");
+    expect(xoAttentionTitle("Confirmation requested")).toBe("Баталгаажуулалт хүссэн");
+    expect(xoAttentionTitle("Custom title")).toBe("Custom title");
   });
 });

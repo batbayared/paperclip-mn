@@ -1,5 +1,6 @@
 import { AiConnectionCredentialStep } from "@/components/ai-connections/AiConnectionCredentialStep";
 import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
 import { ConnectionChoiceList } from "./ConnectionChoiceList";
 import { useCallback, useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -173,12 +174,12 @@ function githubRecoveryUrl(value: string | null): string | null {
 
 function oauthCallbackErrorMessage(outcome: string | null, code: string | null): string {
   if (outcome === "denied") {
-    return "Authorization was cancelled or declined. Your saved connection was not changed.";
+    return tx("Authorization was cancelled or declined. Your saved connection was not changed.");
   }
   if (code === "github_installation_required") {
-    return "GitHub access is required. Install Paperclip and grant at least one repository, then try again.";
+    return tx("GitHub access is required. Install Paperclip and grant at least one repository, then try again.");
   }
-  return "Authorization did not complete. Your saved connection is still here, so you can try again.";
+  return tx("Authorization did not complete. Your saved connection is still here, so you can try again.");
 }
 
 const ROUTE_STAGE_BY_STEP: Partial<Record<Step, string>> = {
@@ -701,7 +702,7 @@ export function ConnectionSetupFlow({
     const popup = oauthPopupRef.current;
     if (!popup || popup.closed) {
       setOAuthPhase("error");
-      setOAuthError("Paperclip couldn’t open the sign-in window. Open sign-in in a new tab to continue.");
+      setOAuthError(tx("{{brand}} couldn’t open the sign-in window. Open sign-in in a new tab to continue."));
       onPhaseChange?.("needs_retry");
       return;
     }
@@ -723,7 +724,7 @@ export function ConnectionSetupFlow({
     const timer = window.setInterval(() => {
       if (!oauthPopupRef.current?.closed) return;
       setOAuthPhase("error");
-      setOAuthError("The sign-in window closed. If authorization did not finish, try again.");
+      setOAuthError(tx("The sign-in window closed. If authorization did not finish, try again."));
       setAuthorizationFallbackUrl(null);
       onPhaseChange?.("needs_retry");
     }, 1_000);
@@ -741,7 +742,7 @@ export function ConnectionSetupFlow({
       if (target.kind === "reauthentication") {
         const destination = host === "dialog" ? oauthPopupRef.current : window;
         if (!destination || destination.closed || !start.handoff) {
-          throw new Error("Paperclip couldn’t preserve this sign-in while refreshing your account.");
+          throw new Error(tx("{{brand}} couldn’t preserve this sign-in while refreshing your account."));
         }
         savePendingCloudHandoff(start.handoff.session, destination.sessionStorage);
         setOAuthPhase("starting");
@@ -753,7 +754,7 @@ export function ConnectionSetupFlow({
     } catch (error) {
       if (controller.signal.aborted) return;
       setOAuthPhase("error");
-      setOAuthError(error instanceof Error ? error.message : "Paperclip couldn’t start secure sign-in. Try again.");
+      setOAuthError(error instanceof Error ? error.message : tx("{{brand}} couldn’t start secure sign-in. Try again."));
       onPhaseChange?.("needs_retry");
     } finally {
       if (oauthHandoffAbortRef.current === controller) oauthHandoffAbortRef.current = null;
@@ -774,13 +775,13 @@ export function ConnectionSetupFlow({
       }
       if (outcome === "declined") {
         setOAuthPhase("error");
-        setOAuthError("Authorization was cancelled. You can try again.");
+        setOAuthError(tx("Authorization was cancelled. You can try again."));
         onPhaseChange?.("needs_retry");
         return;
       }
       if (outcome !== "failed") return;
       setOAuthPhase("error");
-      setOAuthError("Authorization did not complete. Try again when you’re ready.");
+      setOAuthError(tx("Authorization did not complete. Try again when you’re ready."));
     };
     window.addEventListener("message", receiveOAuthOutcome);
     return () => window.removeEventListener("message", receiveOAuthOutcome);
@@ -799,7 +800,7 @@ export function ConnectionSetupFlow({
       if (!popup || popup.closed) {
         setDialogOAuthConnectionId(null);
         setOAuthPhase("error");
-        setOAuthError("The sign-in window closed. Try again to finish connecting GitHub.");
+        setOAuthError(tx("The sign-in window closed. Try again to finish connecting GitHub."));
         return;
       }
       let returned: URL;
@@ -808,7 +809,7 @@ export function ConnectionSetupFlow({
       if (returned.searchParams.has("oauth")) {
         setDialogOAuthConnectionId(null);
         setOAuthPhase("error");
-        setOAuthError("Authorization did not complete. Finish setup in the sign-in window or try again.");
+        setOAuthError(tx("Authorization did not complete. Finish setup in the sign-in window or try again."));
         return;
       }
       if (returned.searchParams.get("success") !== "1") return;
@@ -824,7 +825,7 @@ export function ConnectionSetupFlow({
         if (!cancelled) {
           setDialogOAuthConnectionId(null);
           setOAuthPhase("error");
-          setOAuthError("Could not confirm the connection. Try again.");
+          setOAuthError(tx("Could not confirm the connection. Try again."));
         }
       } finally { checking = false; }
     }, 1000);
@@ -998,7 +999,7 @@ export function ConnectionSetupFlow({
         popup.location.assign(target.url);
         popup.focus();
       } else {
-        setConnectorEnrollmentError("Open authorization in a new tab to continue.");
+        setConnectorEnrollmentError(tx("Open authorization in a new tab to continue."));
       }
       return;
     }
@@ -1027,7 +1028,7 @@ export function ConnectionSetupFlow({
     onSuccess: (status) => {
       if (!status.verificationUrl) {
         closeEnrollmentPopup();
-        setConnectorEnrollmentError("Paperclip Cloud did not return an enrollment link. Try again.");
+        setConnectorEnrollmentError(tx("{{brand}} Cloud did not return an enrollment link. Try again."));
         return;
       }
       openConnectorEnrollment(status.verificationUrl);
@@ -1035,7 +1036,7 @@ export function ConnectionSetupFlow({
     onError: (error) => {
       closeEnrollmentPopup();
       setConnectorEnrollmentError(
-        error instanceof Error ? error.message : "Paperclip couldn’t reach Paperclip Cloud. Try again.",
+        error instanceof Error ? error.message : tx("{{brand}} couldn’t reach {{brand}} Cloud. Try again."),
       );
     },
   });
@@ -1180,10 +1181,10 @@ export function ConnectionSetupFlow({
       onPhaseChange?.("needs_retry");
       setOAuthError(
         details?.code === "invalid_grant"
-          ? "Your authorization expired or was revoked. Reconnect to continue."
+          ? tx("Your authorization expired or was revoked. Reconnect to continue.")
           : error instanceof Error
             ? error.message
-            : "Paperclip couldn’t start secure sign-in. Try again.",
+            : tx("{{brand}} couldn’t start secure sign-in. Try again."),
       );
     },
   });
@@ -1352,10 +1353,10 @@ export function ConnectionSetupFlow({
         onPhaseChange?.("needs_retry");
         setOAuthError(
           details?.code === "invalid_grant"
-            ? "Your authorization expired or was revoked. Reconnect to continue."
+            ? tx("Your authorization expired or was revoked. Reconnect to continue.")
             : error instanceof Error
               ? error.message
-              : "Paperclip couldn’t start secure sign-in. Try again.",
+              : tx("{{brand}} couldn’t start secure sign-in. Try again."),
         );
         return;
       }
@@ -1372,7 +1373,7 @@ export function ConnectionSetupFlow({
       }
       pushToast({
         title: "Couldn’t connect",
-        body: error instanceof Error ? error.message : "Please check your key and try again.",
+        body: error instanceof Error ? error.message : tx("Please check your key and try again."),
         tone: "error",
       });
     },
@@ -1520,7 +1521,7 @@ export function ConnectionSetupFlow({
     if (automaticOAuth && directOAuthRetryingRef.current) return;
     if (automaticOAuth && (applicationsQuery.isError || connectionsQuery.isError)) {
       setOAuthPhase("error");
-      setOAuthError("Paperclip couldn’t check for an existing connection. Try again.");
+      setOAuthError(tx("{{brand}} couldn’t check for an existing connection. Try again."));
       setStep("key");
       return;
     }
@@ -1829,7 +1830,7 @@ export function ConnectionSetupFlow({
       <div className="max-w-5xl" data-testid="connection-existing-choice">
         <div className="mb-6">
           <h1 className="text-2xl font-bold tracking-tight">
-            Use an existing {requestedAppKey ? "connection" : "app connection"}
+            {requestedAppKey ? tx("Use an existing connection") : tx("Use an existing app connection")}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Reuse a connection without changing who already has access, or connect a new one.
@@ -1846,7 +1847,7 @@ export function ConnectionSetupFlow({
             setExistingConnectionError(null);
             try { await onUseExisting(id); }
             catch (error) {
-              setExistingConnectionError(error instanceof Error ? error.message : "Couldn’t use this connection.");
+              setExistingConnectionError(error instanceof Error ? error.message : tx("Couldn’t use this connection."));
               setExistingConnectionPendingId(null);
             }
           }}
@@ -1925,7 +1926,7 @@ export function ConnectionSetupFlow({
             ]);
             if (applicationsResult.isError || connectionsResult.isError) {
               setOAuthPhase("error");
-              setOAuthError("Paperclip couldn’t check for an existing connection. Try again.");
+              setOAuthError(tx("{{brand}} couldn’t check for an existing connection. Try again."));
               return;
             }
             const refreshedResumeConnection = resumeConnectionId
@@ -1985,7 +1986,7 @@ export function ConnectionSetupFlow({
     return (
       <OAuthConnectStateScreen
         identity={{
-          name: linkName.trim() || endpointHost(linkUrl) || "this server",
+          name: linkName.trim() || endpointHost(linkUrl) || tx("this server"),
           unverifiedHost: endpointHost(linkUrl),
         }}
         phase={oauthPhase}
@@ -2023,7 +2024,7 @@ export function ConnectionSetupFlow({
   const appName =
     connectResult?.application.name ??
     entry?.name ??
-    (linkName.trim() || defaultGenericMcpName(linkUrl) || "this app");
+    (linkName.trim() || defaultGenericMcpName(linkUrl) || tx("this app"));
   const credentialSourceMethods = connectionMethodsForCredentialSource(entry, credentialSource);
   const setupCredentialSourceMethods = preEnrollmentManagedMethod
     ? [preEnrollmentManagedMethod]
@@ -2081,8 +2082,8 @@ export function ConnectionSetupFlow({
   // a local setup screen, even when OAuth is already the selected method.
   const accessContinuesToProvider = Boolean(directOAuthEntry);
   const accessSubmitLabel = accessContinuesToProvider
-    ? `Continue to ${entry?.name ?? "sign-in"}`
-    : accessStepAuthKind === "oauth" ? "Continue" : "Save and continue";
+    ? entry ? tx("Continue to {{name}}", { name: entry.name }) : tx("Continue to sign-in")
+    : accessStepAuthKind === "oauth" ? tx("Continue") : tx("Save and continue");
 
   const stepIndex = reconnectConnection?.connectionPurpose === "ai" ? 0 : (zapierSource || entry) && step !== "gallery" && step !== "success"
     ? SELECTED_APP_STEP_INDEX[step]
@@ -2100,7 +2101,7 @@ export function ConnectionSetupFlow({
                 ? vercelConnectMode
                   ? "Choose a reviewed app to connect through Vercel."
                   : "Pick the app you want your agents to use."
-                : `Step ${stepIndex + 1} of ${stepLabels.length}`
+                : tx("Step {{step}} of {{total}}", { step: stepIndex + 1, total: stepLabels.length })
             }
             step={step}
             activeIndex={stepIndex}
@@ -2187,10 +2188,10 @@ export function ConnectionSetupFlow({
 
             {enrollmentAuthorizationUrl ? (
               <p className="mt-4 text-sm text-muted-foreground">
-                Finish authorization in the opened window.{' '}
-                <a className="underline" href={enrollmentAuthorizationUrl} target="_blank" rel="noopener noreferrer">
-                  Open authorization in a new tab
-                </a>
+                <XoTrans
+                  i18nKey="Finish authorization in the opened window. <anchor>Open authorization in a new tab</anchor>"
+                  components={{ anchor: <a className="underline" href={enrollmentAuthorizationUrl} target="_blank" rel="noopener noreferrer" /> }}
+                />
               </p>
             ) : null}
             <div className="mt-6 flex items-center justify-between gap-3">
@@ -2220,7 +2221,7 @@ export function ConnectionSetupFlow({
       ) : step === "key" && entry && credentialStep !== undefined ? credentialStep : step === "key" && entry ? (
         <KeyStep
           entry={entry}
-          error={connectMutation.isError ? (connectMutation.error instanceof Error ? connectMutation.error.message : "Please check your key and try again.") : null}
+          error={connectMutation.isError ? (connectMutation.error instanceof Error ? connectMutation.error.message : tx("Please check your key and try again.")) : null}
           values={credentials}
           onChange={setCredentials}
           oauthClientId={curatedOAuthClientId}
@@ -2265,11 +2266,11 @@ export function ConnectionSetupFlow({
             if (isGoogleSheetsRobotMethod(entry, connectionMethodKey)) {
               const parsed = parseGoogleSheetIds(googleSheetsLinks);
               if (parsed.invalidCount > 0) {
-                setGoogleSheetsError("That doesn't look like a Google Sheets link.");
+                setGoogleSheetsError(tx("That doesn't look like a Google Sheets link."));
                 return;
               }
               if (parsed.ids.length === 0) {
-                setGoogleSheetsError("Paste at least one Google Sheets link.");
+                setGoogleSheetsError(tx("Paste at least one Google Sheets link."));
                 return;
               }
             }
@@ -2413,6 +2414,23 @@ export function ConnectionSetupFlow({
   );
 }
 
+// XO: алхмын шошгыг render үед орчуулна; массивт англи түлхүүр хэвээр (key-д ашиглагдана).
+function connectionStepLabel(label: string): string {
+  switch (label) {
+    case "Pick app": return tx("Pick app");
+    case "Access": return tx("Access");
+    case "Add your key": return tx("Add your key");
+    case "Add MCP URL": return tx("Add MCP URL");
+    case "Reconnect account": return tx("Reconnect account");
+    case "Connect account": return tx("Connect account");
+    case "Choose connection": return tx("Choose connection");
+    case "Sign in": return tx("Sign in");
+    case "Share sheet": return tx("Share sheet");
+    case "Ready": return tx("Ready");
+    default: return label;
+  }
+}
+
 function StepHeader({
   subtitle,
   step,
@@ -2464,7 +2482,7 @@ function StepHeader({
               />
             ))}
           </div>
-          <div className="mt-2 text-xs text-muted-foreground">{labels.join("   ·   ")}</div>
+          <div className="mt-2 text-xs text-muted-foreground">{labels.map(connectionStepLabel).join("   ·   ")}</div>
         </div>
       )}
     </div>
@@ -2507,7 +2525,7 @@ export function OAuthConnectStateScreen({
   onBack: () => void;
   onCancel: () => void;
 }) {
-  const serverName = entry?.name ?? identity?.name ?? "this server";
+  const serverName = entry?.name ?? identity?.name ?? tx("this server");
   const unverifiedHost = entry ? null : identity?.unverifiedHost ?? null;
   const status = phase === "entry"
     ? {
@@ -2532,7 +2550,7 @@ export function OAuthConnectStateScreen({
           }
         : {
             title: `${serverName} couldn’t connect`,
-            body: error ?? "Paperclip couldn’t start secure sign-in. Try again.",
+            body: error ?? tx("{{brand}} couldn’t start secure sign-in. Try again."),
           };
 
   return (
@@ -2717,7 +2735,7 @@ function GalleryStep({
   const continueWithLink = () => {
     const next = normalizeAppLink(linkInput);
     if (!next) {
-      setLinkError("Paste a full http or https link.");
+      setLinkError(tx("Paste a full http or https link."));
       return;
     }
     setLinkError(null);
@@ -3091,7 +3109,7 @@ function LinkConnectStep({
               ))}
             </div>
             <p className="text-xs text-muted-foreground">
-              {GENERIC_AUTH_MODE_OPTIONS.find((option) => option.mode === authMode)?.hint}
+              {genericAuthModeHint(authMode)}
             </p>
 
             {authMode === "custom_headers" ? (
@@ -3111,7 +3129,7 @@ function LinkConnectStep({
                       value={row.value}
                       onChange={(e) => updateHeader(row.id, { value: e.target.value })}
                       placeholder="Value"
-                      aria-label={row.name.trim() ? `Value for ${row.name.trim()}` : "Header value"}
+                      aria-label={row.name.trim() ? tx("Value for {{name}}", { name: row.name.trim() }) : tx("Header value")}
                       className="h-10 font-mono"
                     />
                     <Button
@@ -3196,6 +3214,24 @@ function LinkConnectStep({
  * a client ID metadata document, dynamic registration, or the credentials pasted
  * below — none of which belongs on this screen.
  */
+// XO: hint-ийг render үед орчуулна (модулийн түвшинд tx дуудахгүй).
+function genericAuthModeHint(mode: GenericMcpAuthMode): string | undefined {
+  switch (mode) {
+    case "auto":
+      return tx("{{brand}} asks the server what it needs and walks you through it. Start here.");
+    case "none":
+      return tx("The server is open to anyone with the address.");
+    case "bearer":
+      return tx("{{brand}} sends your key as an Authorization header.");
+    case "custom_headers":
+      return tx("For servers that name their own headers. Values are stored as {{brand}} secrets and can’t be read back.");
+    case "oauth":
+      return tx("You’ll sign in at the provider. Add a client ID and secret only if the provider requires you to register {{brand}} first.");
+    default:
+      return GENERIC_AUTH_MODE_OPTIONS.find((option) => option.mode === mode)?.hint;
+  }
+}
+
 const GENERIC_AUTH_MODE_OPTIONS: Array<{ mode: GenericMcpAuthMode; label: string; hint: string }> = [
   {
     mode: "auto",
@@ -3399,7 +3435,7 @@ function KeyStep({
     <div>
       <label className="text-sm font-medium text-foreground">What should Paperclip be able to do?</label>
       <RadioCardGroup
-        ariaLabel={`Access level for ${entry.name}`}
+        ariaLabel={tx("Access level for {{name}}", { name: entry.name })}
         className="mt-2"
         value={capabilityKey}
         onValueChange={(nextKey) => {
@@ -3443,7 +3479,7 @@ function KeyStep({
     <div>
       <label className="text-sm font-medium text-foreground">How do you want to connect?</label>
       <RadioCardGroup
-        ariaLabel={`How to connect ${entry.name}`}
+        ariaLabel={tx("How to connect {{name}}", { name: entry.name })}
         className="mt-2"
         value={methodKey}
         onValueChange={(nextKey) => {
@@ -3932,17 +3968,17 @@ export function AccessStep({
     ? canSetCompanyInstall
     : installAgentIds.size > 0);
   const lockedAgentName = lockedAgentId
-    ? allAgents.find((agent) => agent.id === lockedAgentId)?.name ?? "the requesting agent"
+    ? allAgents.find((agent) => agent.id === lockedAgentId)?.name ?? tx("the requesting agent")
     : null;
-  const identityHeading = githubIdentity ? "Connect GitHub as" : "Which humans can use this credential?";
+  const identityHeading = githubIdentity ? tx("Connect GitHub as") : tx("Which humans can use this credential?");
   const agentAccessHeading = grantKind === "agent"
-    ? "Which agent owns this GitHub account?"
+    ? tx("Which agent owns this GitHub account?")
     : githubIdentity && grantKind === "user"
-      ? "Which agents may use your GitHub when you’re responsible?"
+      ? tx("Which agents may use your GitHub when you’re responsible?")
       : githubIdentity
-        ? "Which agents may use the shared GitHub account?"
-        : "Which agents can use this connection?";
-  const agentAccessLabel = githubIdentity ? agentAccessHeading : "Which agents can use this connection?";
+        ? tx("Which agents may use the shared GitHub account?")
+        : tx("Which agents can use this connection?");
+  const agentAccessLabel = githubIdentity ? agentAccessHeading : tx("Which agents can use this connection?");
 
   return (
     <div className="mx-auto max-w-2xl">
@@ -3988,7 +4024,7 @@ export function AccessStep({
               </div>
             ) : needsIdentityChoice ? (
               <RadioCardGroup
-                ariaLabel={githubIdentity ? identityHeading : "Which humans can use this credential?"}
+                ariaLabel={githubIdentity ? identityHeading : tx("Which humans can use this credential?")}
                 className="mt-4 sm:grid-cols-2"
                 value={grantKind}
                 onValueChange={(next) => {
@@ -4024,13 +4060,16 @@ export function AccessStep({
                       : undefined,
                     icon: <UsersRound className="h-4 w-4" aria-hidden="true" />,
                     accessibleLabel: canCreateOrganizationGrant
-                      ? githubIdentity ? "Shared company GitHub account (advanced)" : "Any human in the company"
-                      : `${githubIdentity ? "Shared company GitHub account (advanced)" : "Any human in the company"}. Unavailable: ${capabilities?.organizationGrantReason ??
-                        "Only a connection manager can share this credential with the organization."}`,
+                      ? githubIdentity ? tx("Shared company GitHub account (advanced)") : tx("Any human in the company")
+                      : tx("{{option}}. Unavailable: {{reason}}", {
+                        option: githubIdentity ? tx("Shared company GitHub account (advanced)") : tx("Any human in the company"),
+                        reason: capabilities?.organizationGrantReason ??
+                          tx("Only a connection manager can share this credential with the organization."),
+                      }),
                     tooltip: canCreateOrganizationGrant
                       ? undefined
                       : capabilities?.organizationGrantReason ??
-                        "Only a connection manager can share this credential with the organization.",
+                        tx("Only a connection manager can share this credential with the organization."),
                     disabled: !canCreateOrganizationGrant,
                   },
                 ].filter((option) => allowedGrantKinds.includes(option.value as ConnectionGrantKind))}
@@ -4056,8 +4095,11 @@ export function AccessStep({
               </div>
             ) : lockedAgentId ? (
               <p className="mt-2 text-sm text-muted-foreground">
-                This task grants access only to <span className="font-medium text-foreground">{lockedAgentName}</span>.
-                Existing connection access is left unchanged.
+                <XoTrans
+                  i18nKey="This task grants access only to <agent>{{agentName}}</agent>. Existing connection access is left unchanged."
+                  values={{ agentName: lockedAgentName }}
+                  components={{ agent: <span className="font-medium text-foreground" /> }}
+                />
               </p>
             ) : (
               grantKind === "agent" ? (
@@ -4088,13 +4130,16 @@ export function AccessStep({
                       : undefined,
                     icon: <BotGroupIcon />,
                     accessibleLabel: canSetCompanyInstall
-                      ? "Any agent"
-                      : `Any agent. Unavailable: ${capabilities?.companyInstallReason ??
-                        "Only someone who can configure this connection can choose this."}`,
+                      ? tx("Any agent")
+                      : tx("{{option}}. Unavailable: {{reason}}", {
+                        option: tx("Any agent"),
+                        reason: capabilities?.companyInstallReason ??
+                          tx("Only someone who can configure this connection can choose this."),
+                      }),
                     tooltip: canSetCompanyInstall
                       ? undefined
                       : capabilities?.companyInstallReason ??
-                        "Only someone who can configure this connection can choose this.",
+                        tx("Only someone who can configure this connection can choose this."),
                     disabled: !canSetCompanyInstall,
                   },
                 ]}
@@ -4159,21 +4204,25 @@ export function accessSummaryLines(input: {
   enabledCount: number;
 }): Array<{ label: string; value: string }> {
   const identity = input.authKind === "none"
-    ? "No identity required"
+    ? tx("No identity required")
     : input.grantKind === "user"
-      ? "Your identity"
+      ? tx("Your identity")
       : input.grantKind === "agent"
-        ? "Dedicated agent identity"
-      : "Organization identity";
+        ? tx("Dedicated agent identity")
+      : tx("Organization identity");
   const availableTo = input.installChoice === "all"
-    ? "Any agent"
-    : `${input.installCount} selected ${input.installCount === 1 ? "agent" : "agents"}`;
+    ? tx("Any agent")
+    : input.installCount === 1
+      ? tx("{{n}} selected agent", { n: input.installCount })
+      : tx("{{n}} selected agents", { n: input.installCount });
   return [
-    { label: "Identity", value: identity },
-    { label: "Available to", value: availableTo },
+    { label: tx("Identity"), value: identity },
+    { label: tx("Available to"), value: availableTo },
     {
-      label: "Actions",
-      value: `${input.enabledCount} ${input.enabledCount === 1 ? "action" : "actions"} on`,
+      label: tx("Actions"),
+      value: input.enabledCount === 1
+        ? tx("{{n}} action on", { n: input.enabledCount })
+        : tx("{{n}} actions on", { n: input.enabledCount }),
     },
   ];
 }

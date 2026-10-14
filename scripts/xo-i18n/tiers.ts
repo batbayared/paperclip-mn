@@ -234,4 +234,16 @@ export const XO_TRANSFORM_FILES: readonly string[] = [
   "ui/src/components/environment-variables-editor/SecretPicker.tsx",
   "ui/src/components/environment-variables-editor/CreateSecretPopover.tsx",
   "ui/src/components/RepositoryEditor.tsx",
+  // Ү6 7.11 — холболтын тохиргоо, төлөвлөгөөний задаргаа, хянах самбар, activity мөр
+  "ui/src/features/connections/ConnectionSetupFlow.tsx",
+  "ui/src/components/IssuePlanDecompositionsSection.tsx",
+  "ui/src/components/ActiveAgentsPanel.tsx",
+  "ui/src/components/ActivityCharts.tsx",
+  "ui/src/components/SmokeLabDashboardCard.tsx",
+  "ui/src/components/ActivityRow.tsx",
+  // Ү6 7.11 — аудит: агентын үйлдлийн бүртгэл, апп/хэрэгслийн аудит, гүйлтийн бүртгэл, сэтгэгдлийн эзэмшил
+  "ui/src/pages/audit/AuditFeed.tsx",
+  "ui/src/pages/tools/AuditTab.tsx",
+  "ui/src/components/IssueRunLedger.tsx",
+  "ui/src/components/CommentAttributionChip.tsx",
 ];

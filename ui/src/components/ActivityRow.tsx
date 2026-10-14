@@ -5,6 +5,7 @@ import { IssueReferenceActivitySummary } from "./IssueReferenceActivitySummary";
 import { timeAgo } from "../lib/timeAgo";
 import { cn } from "../lib/utils";
 import { formatActivityVerb } from "../lib/activity-format";
+import { tx } from "@/i18n/xo";
 import { deriveProjectUrlKey, type ActivityEvent, type Agent } from "@paperclipai/shared";
 import type { CompanyUserProfile } from "../lib/company-members";
 
@@ -48,7 +49,7 @@ export function ActivityRow({ event, agentMap, userProfileMap, entityNameMap, en
 
   const actor = event.actorType === "agent" ? agentMap.get(event.actorId) : null;
   const userProfile = event.actorType === "user" ? userProfileMap?.get(event.actorId) : null;
-  const actorName = actor?.name ?? (event.actorType === "system" ? "System" : userProfile?.label ?? (event.actorType === "user" ? "Board" : event.actorId || "Unknown"));
+  const actorName = actor?.name ?? (event.actorType === "system" ? tx("System") : userProfile?.label ?? (event.actorType === "user" ? tx("Board") : event.actorId || tx("Unknown")));
   const actorAvatarUrl = userProfile?.image ?? null;
 
   const inner = (

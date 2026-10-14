@@ -1,5 +1,5 @@
 import { tx } from "@/i18n/xo";
-import { xoLabel } from "@/xo/labels";
+import { xoAttentionTitle, xoLabel } from "@/xo/labels";
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { CheckCircle2, Inbox } from "lucide-react";
@@ -435,7 +435,7 @@ export function WhatNeedsMe() {
         id: `attention-dismiss-${item.id}`,
         dedupeKey: `attention-dismiss-${item.dismissalKey}`,
         title: "Dismissed",
-        body: item.subject.title ?? undefined,
+        body: item.subject.title != null ? xoAttentionTitle(item.subject.title) : undefined,
         tone: "info",
         ttlMs: 8000,
         action: { label: "Undo", onClick: () => handleUndoDismiss(item) },

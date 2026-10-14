@@ -159,6 +159,6 @@
   "ui/src/pages/tools/PasteConfigTab.tsx": 4,
   "ui/src/plugins/bridge.ts": 1,
   "ui/src/plugins/slots.tsx": 2,
-  "ui/src/xo/labels.ts": 3,
+  "ui/src/xo/labels.ts": 4,
   "ui/src/xo/serverMessage.ts": 2
 }

@@ -77,7 +77,7 @@ import { isProjectScanSkill } from "@/lib/skill-fork";
 import { cn, formatCents, relativeTime } from "@/lib/utils";
 import { tx } from "@/i18n/xo";
 import { XoTrans } from "@/xo/XoTrans";
-import { xoSkillTestTemplateText } from "@/xo/labels";
+import { xoSkillEditableReason, xoSkillTestTemplateText } from "@/xo/labels";
 import { SkillCardIcon, type DiscoveryCard } from "./CompanySkills";
 import {
   ResizableHandle,
@@ -1481,7 +1481,7 @@ function SkillPane({
             <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-500" />
             <div className="min-w-0 flex-1">
               <p>
-                {skill.editableReason ?? tx("This skill is read-only because it comes from an external source.")}
+                {skill.editableReason != null ? xoSkillEditableReason(skill.editableReason) : tx("This skill is read-only because it comes from an external source.")}
                 {" "}{tx("Make an editable copy to change it — the original stays untouched.")}
               </p>
               <Button

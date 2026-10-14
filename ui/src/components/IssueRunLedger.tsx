@@ -6,6 +6,8 @@ import {
 } from "@paperclipai/shared";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@/lib/router";
+import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
 import { accessApi, type CurrentBoardAccess } from "../api/access";
 import {
   activityApi,
@@ -90,7 +92,7 @@ type LivenessCopy = {
   description: string;
 };
 
-const LIVENESS_COPY: Record<RunLivenessState, LivenessCopy> = {
+const LIVENESS_COPY = (): Record<RunLivenessState, LivenessCopy> => ({
   completed: {
     label: "Completed",
     tone: "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300",
@@ -127,25 +129,25 @@ const LIVENESS_COPY: Record<RunLivenessState, LivenessCopy> = {
     description:
       "Run produced useful output but did not prove concrete progress.",
   },
-};
+});
 
-const PENDING_LIVENESS_COPY: LivenessCopy = {
+const PENDING_LIVENESS_COPY = (): LivenessCopy => ({
   label: "Checks after finish",
   tone: "border-border bg-background text-muted-foreground",
   description: "Liveness is evaluated after the run finishes.",
-};
+});
 
-const RETRY_PENDING_LIVENESS_COPY: LivenessCopy = {
+const RETRY_PENDING_LIVENESS_COPY = (): LivenessCopy => ({
   label: "Retry pending",
   tone: "border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-300",
-  description: "Paperclip queued an automatic retry that has not started yet.",
-};
+  description: tx("{{brand}} queued an automatic retry that has not started yet."),
+});
 
-const MISSING_LIVENESS_COPY: LivenessCopy = {
+const MISSING_LIVENESS_COPY = (): LivenessCopy => ({
   label: "No liveness data",
   tone: "border-border bg-background text-muted-foreground",
   description: "This run has no persisted liveness classification.",
-};
+});
 
 const TERMINAL_CHILD_STATUSES = new Set<Issue["status"]>(["done", "cancelled"]);
 const ACTIVE_RUN_STATUSES = new Set(["queued", "running"]);
@@ -159,9 +161,9 @@ type RunOutputSilenceCopy = {
   tone: string;
 };
 
-const RUN_OUTPUT_SILENCE_COPY: Partial<
+const RUN_OUTPUT_SILENCE_COPY = (): Partial<
   Record<RunOutputSilenceLevel, RunOutputSilenceCopy>
-> = {
+> => ({
   suspicious: {
     label: "Output silence",
     tone: "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300",
@@ -174,7 +176,7 @@ const RUN_OUTPUT_SILENCE_COPY: Partial<
     label: "Silence snoozed",
     tone: "border-cyan-500/30 bg-cyan-500/10 text-cyan-700 dark:text-cyan-300",
   },
-};
+});
 
 function asRecord(value: unknown): Record<string, unknown> | null {
   if (typeof value !== "object" || value === null || Array.isArray(value))
@@ -292,17 +294,20 @@ function runSummary(
   agentMap: ReadonlyMap<string, Pick<Agent, "name">>,
 ) {
   const agentName = compactAgentName(run, agentMap);
-  if (run.status === "running") return `Running now by ${agentName}`;
-  if (run.status === "queued") return `Queued for ${agentName}`;
+  if (run.status === "running") return tx("Running now by {{agentName}}", { agentName });
+  if (run.status === "queued") return tx("Queued for {{agentName}}", { agentName });
   if (run.status === "scheduled_retry")
-    return `Automatic retry scheduled for ${agentName}`;
-  return `${statusLabel(run.status)} by ${agentName}`;
+    return tx("Automatic retry scheduled for {{agentName}}", { agentName });
+  return tx("{{status}} by {{agentName}}", {
+    status: statusLabel(run.status),
+    agentName,
+  });
 }
 
 function livenessCopyForRun(run: LedgerRun) {
-  if (run.status === "scheduled_retry") return RETRY_PENDING_LIVENESS_COPY;
-  if (run.livenessState) return LIVENESS_COPY[run.livenessState];
-  return isActiveRun(run) ? PENDING_LIVENESS_COPY : MISSING_LIVENESS_COPY;
+  if (run.status === "scheduled_retry") return RETRY_PENDING_LIVENESS_COPY();
+  if (run.livenessState) return LIVENESS_COPY()[run.livenessState];
+  return isActiveRun(run) ? PENDING_LIVENESS_COPY() : MISSING_LIVENESS_COPY();
 }
 
 function stopReasonLabel(run: RunForIssue) {
@@ -312,56 +317,60 @@ function stopReasonLabel(run: RunForIssue) {
   const effectiveTimeoutSec = readNumber(result?.effectiveTimeoutSec);
   const timeoutText =
     effectiveTimeoutSec && effectiveTimeoutSec > 0
-      ? `${effectiveTimeoutSec}s timeout`
+      ? tx("{{seconds}}s timeout", { seconds: effectiveTimeoutSec })
       : null;
 
   if (timeoutFired || stopReason === "timeout") {
-    return timeoutText ? `timeout (${timeoutText})` : "timeout";
+    return timeoutText
+      ? tx("timeout ({{timeoutText}})", { timeoutText })
+      : tx("timeout");
   }
   if (
     stopReason === "max_turns_exhausted" ||
     stopReason === "turn_limit_exhausted"
   )
-    return "max turns exhausted";
-  if (stopReason === "budget_paused") return "budget paused";
-  if (stopReason === "cancelled") return "cancelled";
-  if (stopReason === "paused") return "paused by board";
-  if (stopReason === "process_lost") return "process lost";
+    return tx("max turns exhausted");
+  if (stopReason === "budget_paused") return tx("budget paused");
+  if (stopReason === "cancelled") return tx("cancelled");
+  if (stopReason === "paused") return tx("paused by board");
+  if (stopReason === "process_lost") return tx("process lost");
   if (stopReason === "unmanaged_background_task_stopped")
-    return "unmanaged background task stopped";
-  if (stopReason === "adapter_failed") return "adapter failed";
+    return tx("unmanaged background task stopped");
+  if (stopReason === "adapter_failed") return tx("adapter failed");
   if (stopReason === "completed")
-    return timeoutText ? `completed (${timeoutText})` : "completed";
+    return timeoutText
+      ? tx("completed ({{timeoutText}})", { timeoutText })
+      : tx("completed");
   return timeoutText;
 }
 
 function stopStatusLabel(run: LedgerRun, stopReason: string | null) {
   if (stopReason) return stopReason;
-  if (run.status === "scheduled_retry") return "Retry pending";
-  if (run.status === "queued") return "Waiting to start";
-  if (run.status === "running") return "Still running";
-  if (!run.livenessState) return "Unavailable";
-  return "No stop reason";
+  if (run.status === "scheduled_retry") return tx("Retry pending");
+  if (run.status === "queued") return tx("Waiting to start");
+  if (run.status === "running") return tx("Still running");
+  if (!run.livenessState) return tx("Unavailable");
+  return tx("No stop reason");
 }
 
 function lastUsefulActionLabel(run: LedgerRun) {
-  if (run.status === "scheduled_retry") return "Waiting for next attempt";
+  if (run.status === "scheduled_retry") return tx("Waiting for next attempt");
   if (run.lastUsefulActionAt) return relativeTime(run.lastUsefulActionAt);
-  if (isActiveRun(run)) return "No action recorded yet";
+  if (isActiveRun(run)) return tx("No action recorded yet");
   if (
     run.livenessState === "plan_only" ||
     run.livenessState === "needs_followup"
   ) {
-    return "No concrete action";
+    return tx("No concrete action");
   }
-  if (run.livenessState === "empty_response") return "No useful output";
-  if (!run.livenessState) return "Unavailable";
-  return "None recorded";
+  if (run.livenessState === "empty_response") return tx("No useful output");
+  if (!run.livenessState) return tx("Unavailable");
+  return tx("None recorded");
 }
 
 function continuationLabel(run: LedgerRun) {
   if (!run.continuationAttempt || run.continuationAttempt <= 0) return null;
-  return `Continuation attempt ${run.continuationAttempt}`;
+  return tx("Continuation attempt {{n}}", { n: run.continuationAttempt });
 }
 
 function hasExhaustedContinuation(run: RunForIssue) {
@@ -391,13 +400,18 @@ function compactAgentName(
 function formatSilenceAge(ms: number | null | undefined) {
   if (!ms || ms <= 0) return null;
   const totalMinutes = Math.floor(ms / 60_000);
-  if (totalMinutes < 1) return "under 1 minute";
+  if (totalMinutes < 1) return tx("under 1 minute");
   if (totalMinutes < 60)
-    return `${totalMinutes} minute${totalMinutes === 1 ? "" : "s"}`;
+    return totalMinutes === 1
+      ? tx("{{n}} minute", { n: totalMinutes })
+      : tx("{{n}} minutes", { n: totalMinutes });
   const hours = Math.floor(totalMinutes / 60);
   const minutes = totalMinutes % 60;
-  if (minutes === 0) return `${hours} hour${hours === 1 ? "" : "s"}`;
-  return `${hours}h ${minutes}m`;
+  if (minutes === 0)
+    return hours === 1
+      ? tx("{{n}} hour", { n: hours })
+      : tx("{{n}} hours", { n: hours });
+  return tx("{{hours}}h {{minutes}}m", { hours, minutes });
 }
 
 function canBoardRecordWatchdogDecision(
@@ -422,11 +436,13 @@ function canBoardRecordWatchdogDecision(
 
 function watchdogDecisionErrorMessage(error: unknown) {
   if (error instanceof ApiError && error.status === 403) {
-    return "Only the board or the assigned recovery owner can record watchdog decisions";
+    return tx(
+      "Only the board or the assigned recovery owner can record watchdog decisions",
+    );
   }
   return error instanceof Error && error.message.trim().length > 0
     ? error.message
-    : "Paperclip could not record the watchdog decision.";
+    : tx("{{brand}} could not record the watchdog decision.");
 }
 
 export function IssueRunLedger({
@@ -740,21 +756,32 @@ export function IssueRunLedgerContent({
               : "Output silence watchdog warning"}
           </p>
           <p className="mt-1">
-            Latest active run has been silent for{" "}
-            {formatSilenceAge(latestSilentRun.outputSilence.silenceAgeMs) ??
-              "an extended period"}
-            .
+            <XoTrans
+              i18nKey="Latest active run has been silent for {{age}}."
+              values={{
+                age:
+                  formatSilenceAge(latestSilentRun.outputSilence.silenceAgeMs) ??
+                  tx("an extended period"),
+              }}
+            />
             {latestSilentRun.outputSilence.evaluationIssueIdentifier ? (
               <>
                 {" "}
-                Review{" "}
-                <Link
-                  to={`/issues/${latestSilentRun.outputSilence.evaluationIssueIdentifier}`}
-                  className="font-medium underline underline-offset-2"
-                >
-                  {latestSilentRun.outputSilence.evaluationIssueIdentifier}
-                </Link>{" "}
-                for recovery context.
+                <XoTrans
+                  i18nKey="Review <issue>{{identifier}}</issue> for recovery context."
+                  values={{
+                    identifier:
+                      latestSilentRun.outputSilence.evaluationIssueIdentifier,
+                  }}
+                  components={{
+                    issue: (
+                      <Link
+                        to={`/issues/${latestSilentRun.outputSilence.evaluationIssueIdentifier}`}
+                        className="font-medium underline underline-offset-2"
+                      />
+                    ),
+                  }}
+                />
               </>
             ) : null}
           </p>
@@ -926,14 +953,14 @@ export function IssueRunLedgerContent({
                     </span>
                   ) : null}
                   {run.outputSilence &&
-                  RUN_OUTPUT_SILENCE_COPY[run.outputSilence.level] ? (
+                  RUN_OUTPUT_SILENCE_COPY()[run.outputSilence.level] ? (
                     <span
                       className={cn(
                         "rounded-md border px-1.5 py-0.5 text-(length:--text-micro) font-medium",
-                        RUN_OUTPUT_SILENCE_COPY[run.outputSilence.level]?.tone,
+                        RUN_OUTPUT_SILENCE_COPY()[run.outputSilence.level]?.tone,
                       )}
                     >
-                      {RUN_OUTPUT_SILENCE_COPY[run.outputSilence.level]?.label}
+                      {RUN_OUTPUT_SILENCE_COPY()[run.outputSilence.level]?.label}
                     </span>
                   ) : null}
                   {sourceResolvedFold ? <SourceResolvedFoldBadge /> : null}

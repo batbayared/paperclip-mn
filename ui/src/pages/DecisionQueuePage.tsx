@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Check, Loader2, Settings2, X } from "lucide-react";
 import type { Agent, AttentionItem } from "@paperclipai/shared";
 import { useParams } from "@/lib/router";
-import { xoDecisionQueueSeedText, xoLabel } from "@/xo/labels";
+import { xoAttentionTitle, xoDecisionQueueSeedText, xoLabel } from "@/xo/labels";
 import { attentionApi } from "../api/attention";
 import { agentsApi } from "../api/agents";
 import { authApi } from "../api/auth";
@@ -448,7 +448,7 @@ function QueueItemRow({
     onSuccess: () => {
       setOpen(false);
       setReason("");
-      pushToast({ title: "Removed from queue", body: item.subject.title ?? undefined, tone: "info" });
+      pushToast({ title: "Removed from queue", body: item.subject.title != null ? xoAttentionTitle(item.subject.title) : undefined, tone: "info" });
       onExcluded();
     },
     onError: (err) =>

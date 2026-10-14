@@ -175,6 +175,7 @@ import { tx } from "@/i18n/xo";
 import { XoTrans } from "@/xo/XoTrans";
 import {
   xoSkillDiscoverySortLabel,
+  xoSkillEditableReason,
   xoSkillSourceFilterLabel,
   xoSkillSourceLabel,
   xoSkillVersionLabel,
@@ -3122,7 +3123,7 @@ export function SkillDetailPage({
                   variant="outline"
                   size="sm"
                   onClick={onFork}
-                  title={skill.editableReason ?? "Fork this skill to edit it."}
+                  title={skill.editableReason != null ? xoSkillEditableReason(skill.editableReason) : "Fork this skill to edit it."}
                 >
                   <GitFork className="mr-1.5 h-3.5 w-3.5" />
                   Fork
@@ -3844,7 +3845,7 @@ function SkillPane({
                 {editMode ? "Stop editing" : "Edit"}
               </button>
             ) : (
-              <div className="text-sm text-muted-foreground">{detail.editableReason}</div>
+              <div className="text-sm text-muted-foreground">{detail.editableReason && xoSkillEditableReason(detail.editableReason)}</div>
             )}
           </div>
         </div>
