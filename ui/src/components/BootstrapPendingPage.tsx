@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { BOOTSTRAP_FALLBACK_COMMAND } from "@/bootstrapSetup";
 import type { AuthSession } from "@paperclipai/shared";
 import { Card } from "@/components/ui/card";
+import { XoTrans } from "@/xo/XoTrans";
 
 type BootstrapPendingPageProps = {
   claimAvailable: boolean;
@@ -153,11 +154,10 @@ export function BootstrapPendingPage({
         </span>
       </div>
       <p className="mt-3 text-xs text-muted-foreground">
-        Wrong account?{" "}
-        <Link to="/auth?next=/" className="underline underline-offset-2">
-          Switch account
-        </Link>
-        .
+        <XoTrans
+          i18nKey="Wrong account? <link>Switch account</link>."
+          components={{ link: <Link to="/auth?next=/" className="underline underline-offset-2" /> }}
+        />
       </p>
       {claimError && (
         <div

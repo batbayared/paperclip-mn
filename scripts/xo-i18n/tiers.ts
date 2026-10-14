@@ -222,4 +222,6 @@ export const XO_TRANSFORM_FILES: readonly string[] = [
   "ui/src/components/skill-studio/ForkSkillDialog.tsx",
   "ui/src/components/skill-studio/SkillPolicySurfaces.tsx",
   "ui/src/components/skill-studio/SkillProvenance.tsx",
+  // Ү6 7.10 — админгүй эхний тохиргооны дэлгэц
+  "ui/src/components/BootstrapPendingPage.tsx",
 ];
