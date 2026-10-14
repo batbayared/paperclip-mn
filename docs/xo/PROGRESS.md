@@ -17,7 +17,7 @@ BASE e42211749.
 | Шалгалт | xo:i18n check OK (11309), xo:i18n:test 438, UI 6585, tsc цэвэр, brand 487/150 |
 
 Үлдэгдэл (шийдвэргүй, мэдээллийн чанартай):
-- ui/src/lib/tool-installs.ts INSTALLED_HINT ашиглагдаагүй код, устгаагүй.
+- ui/src/lib/tool-installs.ts INSTALLED_HINT ашиглагдаагүй код байсан тул ED-ийн шийдвэрээр устгасан.
 - Pipelines.tsx targetStageName-ийн fallback humanizePipelineItemStatus-ийг ашигладаг (зөвхөн дэлгэц).
 - adapter-display-registry-д adapter-ийн бүтээгдэхүүний нэр англиар.
 - Inbox-ийн mn эрэмбэлэлт орчуулсан шошгоор localeCompare хийнэ.
