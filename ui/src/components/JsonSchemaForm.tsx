@@ -22,6 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { SecretBindingPicker, type SecretBindingValue } from "./SecretBindingPicker";
+import { tx } from "@/i18n/xo";
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -185,7 +186,7 @@ export function validateField(
 
   // Required check
   if (isRequired && (value === undefined || value === null || value === "")) {
-    return "This field is required";
+    return tx("This field is required");
   }
 
   // Skip further validation if empty and not required
@@ -195,16 +196,16 @@ export function validateField(
     return null;
   }
   if (type === "secret-ref" && typeof value === "object") {
-    return "Invalid secret reference";
+    return tx("Invalid secret reference");
   }
 
   if (type === "string" || type === "secret-ref") {
     const str = String(value);
     if (schema.minLength != null && str.length < schema.minLength) {
-      return `Must be at least ${schema.minLength} characters`;
+      return tx("Must be at least {{n}} characters", { n: schema.minLength });
     }
     if (schema.maxLength != null && str.length > schema.maxLength) {
-      return `Must be at most ${schema.maxLength} characters`;
+      return tx("Must be at most {{n}} characters", { n: schema.maxLength });
     }
     if (schema.pattern) {
       // Guard against ReDoS: reject overly complex patterns from plugin JSON Schemas.
@@ -214,7 +215,7 @@ export function validateField(
         try {
           const re = new RegExp(schema.pattern);
           if (!re.test(str)) {
-            return `Must match pattern: ${schema.pattern}`;
+            return tx("Must match pattern: {{pattern}}", { pattern: schema.pattern });
           }
         } catch {
           // Invalid regex in schema — skip
@@ -225,34 +226,34 @@ export function validateField(
 
   if (type === "number" || type === "integer") {
     const num = Number(value);
-    if (isNaN(num)) return "Must be a valid number";
+    if (isNaN(num)) return tx("Must be a valid number");
     if (schema.minimum != null && num < schema.minimum) {
-      return `Must be at least ${schema.minimum}`;
+      return tx("Must be at least {{n}}", { n: schema.minimum });
     }
     if (schema.maximum != null && num > schema.maximum) {
-      return `Must be at most ${schema.maximum}`;
+      return tx("Must be at most {{n}}", { n: schema.maximum });
     }
     if (schema.exclusiveMinimum != null && num <= schema.exclusiveMinimum) {
-      return `Must be greater than ${schema.exclusiveMinimum}`;
+      return tx("Must be greater than {{n}}", { n: schema.exclusiveMinimum });
     }
     if (schema.exclusiveMaximum != null && num >= schema.exclusiveMaximum) {
-      return `Must be less than ${schema.exclusiveMaximum}`;
+      return tx("Must be less than {{n}}", { n: schema.exclusiveMaximum });
     }
     if (type === "integer" && !Number.isInteger(num)) {
-      return "Must be a whole number";
+      return tx("Must be a whole number");
     }
     if (schema.multipleOf != null && num % schema.multipleOf !== 0) {
-      return `Must be a multiple of ${schema.multipleOf}`;
+      return tx("Must be a multiple of {{n}}", { n: schema.multipleOf });
     }
   }
 
   if (type === "array") {
     const arr = value as unknown[];
     if (schema.minItems != null && arr.length < schema.minItems) {
-      return `Must have at least ${schema.minItems} items`;
+      return tx("Must have at least {{n}} items", { n: schema.minItems });
     }
     if (schema.maxItems != null && arr.length > schema.maxItems) {
-      return `Must have at most ${schema.maxItems} items`;
+      return tx("Must have at most {{n}} items", { n: schema.maxItems });
     }
   }
 
@@ -636,7 +637,7 @@ const SecretField = React.memo(({
           value={
             stringValue.length === 0
               ? ""
-              : `Sensitive — ${stringValue.length} characters hidden. Click the eye to reveal.`
+              : tx("Sensitive — {{n}} characters hidden. Click the eye to reveal.", { n: stringValue.length })
           }
           readOnly
           placeholder={String(defaultValue ?? "")}
@@ -712,7 +713,7 @@ const SecretField = React.memo(({
           label=""
           placeholder="Select an existing secret"
           allowVersionSelector={false}
-          emptyHint="No active secrets yet. Create one or paste a raw value below."
+          emptyHint={tx("No active secrets yet. Create one or paste a raw value below.")}
           disabled={disabled}
         />
         {!isBoundToSecret ? (
@@ -1213,7 +1214,7 @@ export function JsonSchemaForm({
   errors = {},
   disabled,
   className,
-  advancedLabel = "Advanced options",
+  advancedLabel = tx("Advanced options"),
 }: JsonSchemaFormProps) {
   const type = resolveType(schema);
 
@@ -1259,7 +1260,7 @@ export function JsonSchemaForm({
     const groupOrder: string[] = [];
     const groups = new Map<string, Array<[string, JsonSchemaNode]>>();
     const advancedKeys = new Set<string>();
-    const DEFAULT_GROUP = "More options";
+    const DEFAULT_GROUP = tx("More options");
 
     for (const entry of Object.entries(properties)) {
       const [key, propSchema] = entry;

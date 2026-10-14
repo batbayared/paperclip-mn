@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
+import { tx } from "@/i18n/xo";
 import { copyTextToClipboard } from "@/lib/clipboard";
 import { Copy, GripHorizontal, Minus, Plus, RotateCcw } from "lucide-react";
 import {
@@ -165,7 +166,7 @@ export function TweakPanel() {
                     <div className="flex items-center justify-between text-(length:--text-micro)">
                       <span className="truncate font-mono text-muted-foreground">{t.name.replace("--motion-", "")}</span>
                       <span className="ml-2 shrink-0 tabular-nums">
-                        {t.kind === "time" ? `${Math.round(parseCssTimeMs(values[t.name] ?? "0"))}ms` : ""}
+                        {t.kind === "time" ? tx("{{ms}}ms", { ms: Math.round(parseCssTimeMs(values[t.name] ?? "0")) }) : ""}
                       </span>
                     </div>
                     {t.kind === "time" ? (

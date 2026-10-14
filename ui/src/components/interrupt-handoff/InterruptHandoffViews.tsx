@@ -1,5 +1,7 @@
 import { AlertTriangle, Info, PauseCircle, User, X } from "lucide-react";
 import { cn } from "../../lib/utils";
+import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
 import { AgentIcon } from "../AgentIconPicker";
 import {
   classifyAssigneeHandoff,
@@ -38,8 +40,8 @@ function agentIcon(agentId: string, resolvers: HandoffChipResolvers): string | n
 
 function userLabel(userId: string, resolvers: HandoffChipResolvers): string {
   const label = resolvers.resolveUserLabel?.(userId) ?? null;
-  const base = label ?? "Board";
-  return resolvers.currentUserId && resolvers.currentUserId === userId ? `${base} (you)` : base;
+  const base = label ?? tx("Board");
+  return resolvers.currentUserId && resolvers.currentUserId === userId ? tx("{{name}} (you)", { name: base }) : base;
 }
 
 const CHIP_CLASS =
@@ -80,8 +82,8 @@ export function AssigneeChip({
       data-testid="handoff-assignee-chip"
       data-kind="unassigned"
     >
-      <span className="sr-only">No responsible — </span>
-      Unassigned
+      <span className="sr-only">{tx("No responsible —")}{" "}</span>
+      {tx("Unassigned")}
     </span>
   );
 }
@@ -203,8 +205,11 @@ export function ComposerMentionCoach({
     >
       <Info className="h-3.5 w-3.5 shrink-0" aria-hidden />
       <span className="min-w-0 flex-1">
-        Did you mean <span className="font-medium">@{candidate.matchedText}</span>? Plain text won't
-        notify or assign an agent.
+        <XoTrans
+          i18nKey="Did you mean <m>@{{text}}</m>? Plain text won't notify or assign an agent."
+          values={{ text: candidate.matchedText }}
+          components={{ m: <span className="font-medium" /> }}
+        />
       </span>
       <button
         type="button"

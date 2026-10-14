@@ -19,6 +19,7 @@ import {
   updatedWithinLabel,
   type SearchFilters,
 } from "@/lib/search-filters";
+import { tx } from "@/i18n/xo";
 
 export interface SearchFilterAgent {
   id: string;
@@ -177,8 +178,8 @@ export function SearchFilterBar({
         selected={selectedAssignee ? [selectedAssignee] : []}
         onSelect={(value) => onChange(applyAssigneeToken(filters, value, data.currentUserId))}
         searchable
-        searchPlaceholder="Search assignees…"
-        emptyMessage="No assignees"
+        searchPlaceholder={tx("Search assignees…")}
+        emptyMessage={tx("No assignees")}
       />
       <SearchFilterMenu
         label="Project"
@@ -186,8 +187,8 @@ export function SearchFilterBar({
         selected={filters.projectId ? [filters.projectId] : []}
         onSelect={(value) => onChange({ ...filters, projectId: value })}
         searchable
-        searchPlaceholder="Search projects…"
-        emptyMessage="No projects"
+        searchPlaceholder={tx("Search projects…")}
+        emptyMessage={tx("No projects")}
       />
       <SearchFilterMenu
         label="Label"
@@ -195,8 +196,8 @@ export function SearchFilterBar({
         selected={filters.labelId ? [filters.labelId] : []}
         onSelect={(value) => onChange({ ...filters, labelId: value })}
         searchable
-        searchPlaceholder="Search labels…"
-        emptyMessage="No labels"
+        searchPlaceholder={tx("Search labels…")}
+        emptyMessage={tx("No labels")}
       />
       {/* PAP-411: Priority filter menu hidden behind SHOW_TASK_PRIORITY_UI (search DSL stays intact). */}
       {SHOW_TASK_PRIORITY_UI && (

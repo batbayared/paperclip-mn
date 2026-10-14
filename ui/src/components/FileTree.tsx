@@ -13,6 +13,7 @@ import { statusBadge, statusBadgeDefault } from "../lib/status-colors";
 import { Button } from "./ui/button";
 import { Skeleton } from "./ui/skeleton";
 import { Badge } from "@/components/ui/badge";
+import { tx } from "@/i18n/xo";
 
 // -- Tree types --------------------------------------------------------------
 
@@ -231,6 +232,24 @@ export const FRONTMATTER_FIELD_LABELS: Record<string, string> = {
   targetDate: "Target date",
 };
 
+export function frontmatterFieldLabel(key: string): string {
+  switch (key) {
+    case "name": return tx("Name");
+    case "title": return tx("Title");
+    case "kind": return tx("Kind");
+    case "reportsTo": return tx("Reports to");
+    case "skills": return tx("Skills");
+    case "status": return tx("Status");
+    case "description": return tx("Description");
+    case "priority": return tx("Priority");
+    case "assignee": return tx("Responsible");
+    case "project": return tx("Project");
+    case "recurring": return tx("Recurring");
+    case "targetDate": return tx("Target date");
+    default: return FRONTMATTER_FIELD_LABELS[key] ?? key;
+  }
+}
+
 // -- File tree component -----------------------------------------------------
 
 export type FileTreeProps = {
@@ -275,7 +294,7 @@ export function FileTree({
   loading = false,
   error,
   empty,
-  ariaLabel = "Files",
+  ariaLabel,
 }: FileTreeProps) {
   const effectiveCheckedFiles = checkedFiles ?? new Set<string>();
   const visibleNodes = useMemo(
@@ -338,7 +357,7 @@ export function FileTree({
 
   if (loading) {
     return (
-      <div aria-busy="true" aria-label={ariaLabel} role="tree" className="py-1">
+      <div aria-busy="true" aria-label={ariaLabel ?? tx("Files")} role="tree" className="py-1">
         {[0, 1, 2, 3].map((row) => (
           <div key={row} className={cn("flex items-center gap-2 px-4", TREE_ROW_HEIGHT_CLASS)}>
             <Skeleton className="h-4 w-4 shrink-0 rounded-sm" />
@@ -351,7 +370,7 @@ export function FileTree({
 
   if (error) {
     return (
-      <div aria-label={ariaLabel} role="tree" className="p-3">
+      <div aria-label={ariaLabel ?? tx("Files")} role="tree" className="p-3">
         <div
           role="treeitem"
           aria-level={1}
@@ -380,7 +399,7 @@ export function FileTree({
 
   if (nodes.length === 0) {
     return (
-      <div aria-label={ariaLabel} role="tree" className="p-3">
+      <div aria-label={ariaLabel ?? tx("Files")} role="tree" className="p-3">
         <div className="rounded-md border border-dashed border-border px-4 py-8 text-center">
           <div className="text-sm font-medium">{empty?.title ?? "No files"}</div>
           <div className="mt-1 text-xs text-muted-foreground">
@@ -392,7 +411,7 @@ export function FileTree({
   }
 
   return (
-    <div aria-label={ariaLabel} role="tree">
+    <div aria-label={ariaLabel ?? tx("Files")} role="tree">
       {visibleNodes.map(({ node, depth }, index) => {
         const expanded = node.kind === "dir" && expandedDirs.has(node.path);
         const { allChecked, someChecked } = checkboxState(node, effectiveCheckedFiles);

@@ -1,4 +1,5 @@
 import { PageTabBar } from "@/components/PageTabBar";
+import { tx } from "@/i18n/xo";
 import { Tabs } from "@/components/ui/tabs";
 import { useCloudInstance } from "@/hooks/useCloudInstance";
 import { useHiddenSettings } from "@/hooks/useHiddenSettings";
@@ -34,6 +35,24 @@ const hiddenSettingKeyByTab: Partial<Record<CompanySettingsTab, string>> = {
   "instance-plugins": "instance.plugins",
   "instance-adapters": "instance.adapters",
 };
+
+// XO: модулийн түвшний англи шошгыг render үед орчуулна (tx-ийн аргумент литерал байх ёстой).
+function settingsTabLabel(english: string): string {
+  switch (english) {
+    case "General": return tx("General");
+    case "Export": return tx("Export");
+    case "Import": return tx("Import");
+    case "Members": return tx("Members");
+    case "Secrets": return tx("Secrets");
+    case "Profile": return tx("Profile");
+    case "Environments": return tx("Environments");
+    case "Access": return tx("Access");
+    case "Experimental": return tx("Experimental");
+    case "Plugins": return tx("Plugins");
+    case "Adapters": return tx("Adapters");
+    default: return english;
+  }
+}
 
 export function getCompanySettingsTab(pathname: string): CompanySettingsTab {
   if (pathname.includes(`${INSTANCE_SETTINGS_PATH_PREFIX}/profile`)) {
@@ -115,7 +134,7 @@ export function CompanySettingsNav() {
   return (
     <Tabs value={activeTab} onValueChange={handleTabChange}>
       <PageTabBar
-        items={visibleItems.map(({ value, label }) => ({ value, label }))}
+        items={visibleItems.map(({ value, label }) => ({ value, label: settingsTabLabel(label) }))}
         value={activeTab}
         onValueChange={handleTabChange}
         align="start"

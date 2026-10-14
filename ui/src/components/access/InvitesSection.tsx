@@ -11,6 +11,7 @@ import { queryKeys } from "@/lib/queryKeys";
 import { copyTextToClipboard } from "@/lib/clipboard";
 import { Badge } from "@/components/ui/badge";
 import { xoLocaleDateTime } from "@/xo/date-format";
+import { tx } from "@/i18n/xo";
 
 const inviteRoleOptions = [
   {
@@ -85,7 +86,7 @@ export function InvitesSection() {
   }
 
   async function copyInviteUrl(url: string) {
-    return copyText(url, "The invite URL is selected. Copy it manually from the field.", selectLatestInviteUrl);
+    return copyText(url, tx("The invite URL is selected. Copy it manually from the field."), selectLatestInviteUrl);
   }
 
   const inviteHistoryQueryKey = queryKeys.access.invites(selectedCompanyId ?? "", "all", INVITE_HISTORY_PAGE_SIZE);
@@ -118,7 +119,7 @@ export function InvitesSection() {
     onSuccess: async (invite) => {
       setLatestInviteUrl(invite.inviteUrl);
       setLatestInviteCopied(false);
-      const copied = await copyText(invite.inviteUrl, "Copy the invite URL manually from the field below.");
+      const copied = await copyText(invite.inviteUrl, tx("Copy the invite URL manually from the field below."));
 
       await queryClient.invalidateQueries({ queryKey: inviteHistoryQueryKey });
       pushToast({
@@ -162,10 +163,10 @@ export function InvitesSection() {
   if (invitesQuery.error) {
     const message =
       invitesQuery.error instanceof ApiError && invitesQuery.error.status === 403
-        ? "You do not have permission to manage organization invites."
+        ? tx("You do not have permission to manage organization invites.")
         : invitesQuery.error instanceof Error
           ? invitesQuery.error.message
-          : "Failed to load invites.";
+          : tx("Failed to load invites.");
     return <div className="text-sm text-destructive">{message}</div>;
   }
 
@@ -212,7 +213,7 @@ export function InvitesSection() {
                       ) : null}
                     </span>
                     <span className="block max-w-2xl text-sm text-muted-foreground">{option.description}</span>
-                    <span className="block text-sm text-foreground">{option.gets}</span>
+                    <span className="block text-sm text-foreground">{inviteRoleGetsLabel(option.gets)}</span>
                   </span>
                 </label>
               );
@@ -374,11 +375,32 @@ export function InvitesSection() {
 }
 
 function formatInviteState(state: "active" | "accepted" | "expired" | "revoked") {
-  return state.charAt(0).toUpperCase() + state.slice(1);
+  switch (state) {
+    case "active": return tx("Active");
+    case "accepted": return tx("Accepted");
+    case "expired": return tx("Expired");
+    case "revoked": return tx("Revoked");
+    default: return (state as string).charAt(0).toUpperCase() + (state as string).slice(1);
+  }
+}
+
+function inviteRoleGetsLabel(gets: string) {
+  switch (gets) {
+    case "View-only organization membership.": return tx("View-only organization membership.");
+    case "Can assign tasks.": return tx("Can assign tasks.");
+    case "Can create agents, invite users, assign tasks, and approve join requests.":
+      return tx("Can create agents, invite users, assign tasks, and approve join requests.");
+    case "Everything in Admin, plus managing members.": return tx("Everything in Admin, plus managing members.");
+    default: return gets;
+  }
 }
 
 function formatInviteAudience(invite: Awaited<ReturnType<typeof accessApi.listInvites>>["invites"][number]) {
-  if (invite.allowedJoinTypes === "agent") return "Agent";
-  if (invite.allowedJoinTypes === "both") return invite.humanRole ? `Human or agent · ${invite.humanRole}` : "Human or agent";
-  return invite.humanRole ?? "Human";
+  if (invite.allowedJoinTypes === "agent") return tx("Agent");
+  if (invite.allowedJoinTypes === "both") {
+    return invite.humanRole
+      ? tx("Human or agent · {{humanRole}}", { humanRole: invite.humanRole })
+      : tx("Human or agent");
+  }
+  return invite.humanRole ?? tx("Human");
 }

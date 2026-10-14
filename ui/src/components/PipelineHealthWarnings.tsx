@@ -2,6 +2,7 @@ import { AlertTriangle, ChevronRight } from "lucide-react";
 import type { PipelineHealthWarning } from "@paperclipai/shared";
 import { Link } from "@/lib/router";
 import { cn } from "../lib/utils";
+import { tx } from "@/i18n/xo";
 
 /**
  * Setup-health warnings for pipelines, rendered in the same plain-language
@@ -10,7 +11,7 @@ import { cn } from "../lib/utils";
  */
 
 function warningCount(count: number) {
-  return `${count} thing${count === 1 ? "" : "s"} to fix`;
+  return count === 1 ? tx("{{n}} thing to fix", { n: count }) : tx("{{n}} things to fix", { n: count });
 }
 
 /** Board-bar caps its list so a busy pipeline doesn't render a wall of warnings. */

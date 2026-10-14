@@ -13,15 +13,19 @@ type SnippetStyle = {
   label: string;
 };
 
-const SNIPPET_STYLES: Record<string, SnippetStyle> = {
-  comment: { Icon: MessageSquare, label: "Comment" },
-  document: { Icon: FileText, label: "Doc" },
-  artifact: { Icon: Paperclip, label: "Artifact" },
-  description: { Icon: Quote, label: "Description" },
-};
-
 function snippetStyle(field: string, fallbackLabel: string): SnippetStyle {
-  return SNIPPET_STYLES[field] ?? { Icon: Quote, label: fallbackLabel };
+  switch (field) {
+    case "comment":
+      return { Icon: MessageSquare, label: tx("Comment") };
+    case "document":
+      return { Icon: FileText, label: tx("Doc") };
+    case "artifact":
+      return { Icon: Paperclip, label: tx("Artifact") };
+    case "description":
+      return { Icon: Quote, label: tx("Description") };
+    default:
+      return { Icon: Quote, label: fallbackLabel };
+  }
 }
 
 function formatRelativeTime(input: string | null): string {

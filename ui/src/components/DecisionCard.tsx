@@ -22,6 +22,9 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 import { MarkdownBody } from "./MarkdownBody";
+import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
+import { xoStatusLabel } from "@/xo/labels";
 
 /**
  * Presentational card for a single Decisions-v1 decision (PAP-14966 / PAP-14939
@@ -64,18 +67,27 @@ export interface DecisionCardProps {
 // --- small helpers ----------------------------------------------------------
 
 function humanStatus(status: string | null | undefined): string {
-  if (!status) return "unknown";
-  return status.replaceAll("_", " ");
+  if (!status) return tx("unknown");
+  return xoStatusLabel(status, status.replaceAll("_", " "));
 }
 
 function issueLabel(ref: DecisionIssueRef | null, fallbackId: string): string {
   if (ref?.identifier) return ref.identifier;
   if (ref?.title) return ref.title;
-  return `issue ${fallbackId.slice(0, 8)}`;
+  return tx("issue {{id}}", { id: fallbackId.slice(0, 8) });
 }
 
-function pluralize(count: number, singular: string): string {
-  return `${count} ${count === 1 ? singular : `${singular}s`}`;
+function decisionBadgeText(label: string): string {
+  switch (label) {
+    case "Pending": return tx("Pending");
+    case "Expired": return tx("Expired");
+    case "Cancelled": return tx("Cancelled");
+    case "Dismissed": return tx("Dismissed");
+    case "Decided": return tx("Decided");
+    case "Partial": return tx("Partial");
+    case "Failed": return tx("Failed");
+    default: return label;
+  }
 }
 
 function isDestructiveOption(option: DecisionOption): boolean {
@@ -97,35 +109,47 @@ function effectSummary(
   const target = issueLabel(resolve(effect.targetIssueId), effect.targetIssueId);
   switch (effect.type) {
     case "comment_on_issue":
-      return `Comment on ${target}`;
+      return tx("Comment on {{target}}", { target });
     case "create_issue": {
       const parent = effect.draft.parentId
         ? issueLabel(resolve(effect.draft.parentId), effect.draft.parentId)
         : target;
-      return `Create issue “${effect.draft.title}” under ${parent}`;
+      return tx("Create issue “{{title}}” under {{parent}}", { title: effect.draft.title, parent });
     }
     case "update_issue_status":
-      return `Set ${target} to ${humanStatus(effect.status)}`;
+      return tx("Set {{target}} to {{status}}", { target, status: humanStatus(effect.status) });
     case "assign_issue":
-      return `Reassign ${target}`;
+      return tx("Reassign {{target}}", { target });
     case "resolve_blocker":
-      return `Unblock ${target} — remove ${pluralize(effect.removeBlockedByIssueIds.length, "blocker")}`;
+      return effect.removeBlockedByIssueIds.length === 1
+        ? tx("Unblock {{target}} — remove {{n}} blocker", { target, n: effect.removeBlockedByIssueIds.length })
+        : tx("Unblock {{target}} — remove {{n}} blockers", { target, n: effect.removeBlockedByIssueIds.length });
     case "cancel_issue_tree": {
       const snapshot = snapshots[effect.targetIssueId];
       const descendantCount = snapshot?.descendantCount ?? snapshot?.descendantIds?.length ?? snapshot?.childCount ?? 0;
-      return `Cancel ${target} and its sub-tree (${pluralize(descendantCount + 1, "issue")})`;
+      return descendantCount + 1 === 1
+        ? tx("Cancel {{target}} and its sub-tree ({{n}} issue)", { target, n: descendantCount + 1 })
+        : tx("Cancel {{target}} and its sub-tree ({{n}} issues)", { target, n: descendantCount + 1 });
     }
     default:
-      return "Apply effect";
+      return tx("Apply effect");
   }
 }
 
-const FAILURE_CAUSE: Record<string, string> = {
-  deny_decision_intersection: "blocked by the permission boundary (fail-closed)",
-  invalid_effect_reference: "a referenced issue no longer exists",
-  target_changed: "the target changed since this was proposed",
-  effect_execution_failed: "the effect errored while running",
-};
+function failureCause(error: string): string | undefined {
+  switch (error) {
+    case "deny_decision_intersection":
+      return tx("blocked by the permission boundary (fail-closed)");
+    case "invalid_effect_reference":
+      return tx("a referenced issue no longer exists");
+    case "target_changed":
+      return tx("the target changed since this was proposed");
+    case "effect_execution_failed":
+      return tx("the effect errored while running");
+    default:
+      return undefined;
+  }
+}
 
 interface ResultRow {
   key: string;
@@ -142,43 +166,43 @@ function executionRow(
   const target = issueLabel(targetRef, execution.targetIssueId);
   const result = execution.result ?? {};
   if (execution.status === "skipped") {
-    return { key: execution.id, status: "skipped", summary: `Skipped ${target} — target changed since proposal`, link: targetRef };
+    return { key: execution.id, status: "skipped", summary: tx("Skipped {{target}} — target changed since proposal", { target }), link: targetRef };
   }
   if (execution.status === "failed") {
-    const cause = FAILURE_CAUSE[execution.error ?? ""] ?? execution.error ?? "the effect could not run";
-    return { key: execution.id, status: "failed", summary: `Failed on ${target} — ${cause}`, link: targetRef };
+    const cause = failureCause(execution.error ?? "") ?? execution.error ?? tx("the effect could not run");
+    return { key: execution.id, status: "failed", summary: tx("Failed on {{target}} — {{cause}}", { target, cause }), link: targetRef };
   }
   if (execution.status === "claimed") {
-    return { key: execution.id, status: "claimed", summary: `Running on ${target}…`, link: targetRef };
+    return { key: execution.id, status: "claimed", summary: tx("Running on {{target}}…", { target }), link: targetRef };
   }
   // executed
   switch (execution.effectType) {
     case "comment_on_issue":
-      return { key: execution.id, status: "executed", summary: `Commented on ${target}`, link: targetRef };
+      return { key: execution.id, status: "executed", summary: tx("Commented on {{target}}", { target }), link: targetRef };
     case "create_issue": {
       const createdId = typeof result.issueId === "string" ? result.issueId : null;
       const created = createdId ? resolve(createdId) : null;
       return {
         key: execution.id,
         status: "executed",
-        summary: `Created ${created ? issueLabel(created, createdId!) : "a new issue"}`,
+        summary: created ? tx("Created {{target}}", { target: issueLabel(created, createdId!) }) : tx("Created a new issue"),
         link: created ?? targetRef,
       };
     }
     case "update_issue_status":
-      return { key: execution.id, status: "executed", summary: `Set ${target} to ${humanStatus(typeof result.status === "string" ? result.status : null)}`, link: targetRef };
+      return { key: execution.id, status: "executed", summary: tx("Set {{target}} to {{status}}", { target, status: humanStatus(typeof result.status === "string" ? result.status : null) }), link: targetRef };
     case "assign_issue":
-      return { key: execution.id, status: "executed", summary: `Reassigned ${target}`, link: targetRef };
+      return { key: execution.id, status: "executed", summary: tx("Reassigned {{target}}", { target }), link: targetRef };
     case "resolve_blocker": {
       const removed = Array.isArray(result.removedBlockedByIssueIds) ? result.removedBlockedByIssueIds.length : 0;
-      return { key: execution.id, status: "executed", summary: `Removed ${pluralize(removed, "blocker")} from ${target}`, link: targetRef };
+      return { key: execution.id, status: "executed", summary: removed === 1 ? tx("Removed {{n}} blocker from {{target}}", { n: removed, target }) : tx("Removed {{n}} blockers from {{target}}", { n: removed, target }), link: targetRef };
     }
     case "cancel_issue_tree": {
       const cancelled = Array.isArray(result.cancelledIssueIds) ? result.cancelledIssueIds.length : 0;
-      return { key: execution.id, status: "executed", summary: `Cancelled ${pluralize(cancelled, "issue")} under ${target}`, link: targetRef };
+      return { key: execution.id, status: "executed", summary: cancelled === 1 ? tx("Cancelled {{n}} issue under {{target}}", { n: cancelled, target }) : tx("Cancelled {{n}} issues under {{target}}", { n: cancelled, target }), link: targetRef };
     }
     default:
-      return { key: execution.id, status: "executed", summary: `Applied effect on ${target}`, link: targetRef };
+      return { key: execution.id, status: "executed", summary: tx("Applied effect on {{target}}", { target }), link: targetRef };
   }
 }
 
@@ -337,7 +361,7 @@ export function DecisionCard({
             </span>
           )}
           <span className={cn("inline-flex items-center rounded-full border px-2 py-0.5 text-(length:--text-micro) font-semibold uppercase tracking-wide", BADGE[tone])}>
-            {badgeLabel}
+            {decisionBadgeText(badgeLabel)}
           </span>
         </div>
       </div>
@@ -390,7 +414,9 @@ export function DecisionCard({
         <div className="mt-3 rounded-lg border border-amber-500/50 bg-amber-500/10 px-3 py-2">
           <div className="flex items-center gap-2 text-sm font-medium text-amber-800 dark:text-amber-200">
             <AlertTriangle className="h-4 w-4 shrink-0" aria-hidden />
-            {pluralize(staleTargetIds.length, "target")} changed since this was proposed
+            {staleTargetIds.length === 1
+              ? tx("{{n}} target changed since this was proposed", { n: staleTargetIds.length })
+              : tx("{{n}} targets changed since this was proposed", { n: staleTargetIds.length })}
           </div>
           <ul className="mt-1.5 space-y-1 text-xs text-amber-900/90 dark:text-amber-100/90">
             {staleTargetIds.map((id) => {
@@ -401,7 +427,7 @@ export function DecisionCard({
                   <span className="font-medium">{issueLabel(ref, id)}:</span>
                   <span className="tabular-nums">{humanStatus(from?.status)}</span>
                   <ArrowRight className="h-3 w-3" aria-hidden />
-                  <span className="tabular-nums">{humanStatus(ref?.status) || "changed"}</span>
+                  <span className="tabular-nums">{humanStatus(ref?.status) || tx("changed")}</span>
                 </li>
               );
             })}
@@ -501,7 +527,9 @@ export function DecisionCard({
                     {previewRows && previewRows.length > 0 ? (
                       <>
                         <p className="mt-1 text-xs text-muted-foreground">
-                          {pluralize(previewRows.length, "issue")} will be cancelled:
+                          {previewRows.length === 1
+                            ? tx("{{n}} issue will be cancelled:", { n: previewRows.length })
+                            : tx("{{n}} issues will be cancelled:", { n: previewRows.length })}
                         </p>
                         <ul className="mt-1 max-h-40 space-y-0.5 overflow-auto text-xs">
                           {previewRows.map((row) => (
@@ -521,7 +549,11 @@ export function DecisionCard({
                       </p>
                     )}
                     <p className="mt-2 text-xs text-muted-foreground">
-                      Type <span className="font-mono font-medium text-foreground">{confirmToken}</span> to confirm.
+                      <XoTrans
+                        i18nKey="Type <b>{{token}}</b> to confirm."
+                        values={{ token: confirmToken }}
+                        components={{ b: <span className="font-mono font-medium text-foreground" /> }}
+                      />
                     </p>
                     <Input
                       value={confirmText}
@@ -549,7 +581,11 @@ export function DecisionCard({
                         onClick={() => onDecide?.(option.id, inputValues)}
                       >
                         {busy && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-                        {previewRows ? `Cancel ${pluralize(previewRows.length, "issue")}` : "Cancel tree"}
+                        {previewRows
+                          ? previewRows.length === 1
+                            ? tx("Cancel {{n}} issue", { n: previewRows.length })
+                            : tx("Cancel {{n}} issues", { n: previewRows.length })
+                          : "Cancel tree"}
                       </Button>
                     </div>
                   </div>

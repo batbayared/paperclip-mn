@@ -3,6 +3,7 @@ import type { Issue, Project } from "@paperclipai/shared";
 import { ArrowUpRight, ChevronRight } from "lucide-react";
 import { Link } from "@/lib/router";
 import { projectRouteRef } from "@/lib/utils";
+import { tx } from "@/i18n/xo";
 import { issueStatusOrder } from "@/lib/issue-filters";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -52,7 +53,7 @@ export function TaskDetailTasksPanel({ subtasks, createdTasks, projects, isLoadi
       ? projects.find((candidate) => candidate.id === item.projectId) ?? item.project
       : null;
     const group = groups.get(key) ?? {
-      name: project?.name ?? (item.projectId ? "Project" : "No project"),
+      name: project?.name ?? (item.projectId ? tx("Project") : tx("No project")),
       path: item.projectId ? `/projects/${projectRouteRef(project ?? { id: item.projectId })}/issues` : undefined,
       tasks: [],
     };
@@ -62,13 +63,13 @@ export function TaskDetailTasksPanel({ subtasks, createdTasks, projects, isLoadi
   return (
     <section className="flex flex-col gap-6" aria-label="Related tasks">
       {sortedSubtasks.length > 0 && (
-        <TaskGroup name="Subtasks">
+        <TaskGroup name={tx("Subtasks")}>
           <TaskDetailSubtasksPanel items={sortedSubtasks} issueLinkState={issueLinkState} />
         </TaskGroup>
       )}
       {[...groups.entries()].sort(([, a], [, b]) => a.name.localeCompare(b.name)).map(([id, group]) => (
         <TaskGroup key={id} name={group.name} projectPath={group.path}>
-          <TaskDetailTaskList items={group.tasks} ariaLabel={`${group.name} tasks`} issueLinkState={issueLinkState} />
+          <TaskDetailTaskList items={group.tasks} ariaLabel={tx("{{name}} tasks", { name: group.name })} issueLinkState={issueLinkState} />
         </TaskGroup>
       ))}
       {isLoading && <p role="status" className="text-sm text-muted-foreground">Loading tasks…</p>}

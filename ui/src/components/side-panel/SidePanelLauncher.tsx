@@ -13,6 +13,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import type { SidePanelLauncherItem, SidePanelLauncherSection } from "./types";
+import { tx } from "@/i18n/xo";
 
 export interface SidePanelLauncherProps {
   sections: SidePanelLauncherSection[];
@@ -93,10 +94,10 @@ export function SidePanelLauncher({
   trigger,
   open: controlledOpen,
   onOpenChange,
-  title = "Open a side panel tab",
-  description = "Choose a view or resource to open.",
-  placeholder = "Search tabs and resources…",
-  emptyMessage = "No matching tabs or resources.",
+  title = tx("Open a side panel tab"),
+  description = tx("Choose a view or resource to open."),
+  placeholder = tx("Search tabs and resources…"),
+  emptyMessage = tx("No matching tabs or resources."),
   className,
 }: SidePanelLauncherProps) {
   const [uncontrolledOpen, setUncontrolledOpen] = useState(false);

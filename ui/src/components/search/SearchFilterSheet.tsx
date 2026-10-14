@@ -21,6 +21,7 @@ import {
 } from "@/lib/search-filters";
 import { buildSearchFilterOptions, type SearchFilterDataProps } from "./SearchFilterBar";
 import type { FilterMenuOption } from "./SearchFilterMenu";
+import { tx } from "@/i18n/xo";
 
 function ChipToggleGroup({
   title,
@@ -131,8 +132,10 @@ export function SearchFilterSheet({
   const selectedAssignee = assigneeToken(draft, data.currentUserId);
   const applyLabel =
     previewTotal === null
-      ? "Show results"
-      : `Show ${previewTotal} ${previewTotal === 1 ? "result" : "results"}`;
+      ? tx("Show results")
+      : previewTotal === 1
+        ? tx("Show {{n}} result", { n: previewTotal })
+        : tx("Show {{n}} results", { n: previewTotal });
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>

@@ -153,15 +153,15 @@ function statusVariant(status: string | undefined) {
 }
 
 function traceBadgeLabel(status: string, expiresAt: string | Date) {
-  if (status === "capturing") return "Raw trace enabled";
-  if (status === "incomplete") return "Incomplete";
-  if (status === "truncated") return "Truncated";
-  if (status === "deleted") return "Deleted";
-  if (status === "expired") return "Expired";
+  if (status === "capturing") return tx("Raw trace enabled");
+  if (status === "incomplete") return tx("Incomplete");
+  if (status === "truncated") return tx("Truncated");
+  if (status === "deleted") return tx("Deleted");
+  if (status === "expired") return tx("Expired");
   const remainingMs = new Date(expiresAt).getTime() - Date.now();
-  if (!Number.isFinite(remainingMs) || remainingMs <= 0) return "Expired";
+  if (!Number.isFinite(remainingMs) || remainingMs <= 0) return tx("Expired");
   const hours = Math.max(1, Math.ceil(remainingMs / (60 * 60 * 1_000)));
-  return `Expires in ${hours}h`;
+  return tx("Expires in {{hours}}h", { hours });
 }
 
 function frameParsed(entry: TraceEntry) {
@@ -220,7 +220,7 @@ function visibilityDecision(event: HeartbeatRunEvent) {
       state: "hidden",
       action: "none",
       reasonCode: "presentation_surface_unregistered",
-      reason: "No production surface registration exists for this event type.",
+      reason: tx("No production surface registration exists for this event type."),
     };
   }
   return {
@@ -228,8 +228,8 @@ function visibilityDecision(event: HeartbeatRunEvent) {
     surface: registration.surface,
     container:
       registration.disposition === "inline"
-        ? "primary run turn"
-        : "collapsed activity",
+        ? tx("primary run turn")
+        : tx("collapsed activity"),
     state: registration.disposition,
     action:
       registration.disposition === "inline"
@@ -317,12 +317,12 @@ function buildOperations(
     groupEvents.forEach((event) => claimedEvents.add(event.id));
     const methods = unique(groupFrames.map(frameMethod));
     const itemTypes = unique(groupFrames.map(frameItemType));
-    const title = itemTypes.at(-1) || methods.at(-1) || text(groupFrames[0]?.direction) || "Provider frame";
+    const title = itemTypes.at(-1) || methods.at(-1) || text(groupFrames[0]?.direction) || tx("Provider frame");
     const firstFrame = groupFrames[0];
     const lastFrame = groupFrames.at(-1);
     const range = firstFrame === lastFrame
-      ? `frame ${firstFrame?.frameId}`
-      : `frames ${firstFrame?.frameId}–${lastFrame?.frameId}`;
+      ? tx("frame {{id}}", { id: firstFrame?.frameId })
+      : tx("frames {{from}}–{{to}}", { from: firstFrame?.frameId, to: lastFrame?.frameId });
     operations.push({
       key: `frames:${firstFrame?.frameId}`,
       frames: groupFrames,
@@ -348,7 +348,7 @@ function buildOperations(
       interpretations: [],
       events: [event],
       title: event.eventType,
-      subtitle: `PRP ${eventSourceId(event) || `event ${event.seq}`} · no raw correlation`,
+      subtitle: tx("PRP {{source}} · no raw correlation", { source: eventSourceId(event) || tx("event {{seq}}", { seq: event.seq }) }),
       itemType: "",
       nativeMethods: [],
       directions: [],
@@ -484,7 +484,7 @@ function JsonNode({
   );
 }
 
-function JsonExplorer({ value, label = "Search this JSON" }: { value: unknown; label?: string }) {
+function JsonExplorer({ value, label = tx("Search this JSON") }: { value: unknown; label?: string }) {
   const [query, setQuery] = useState("");
   return (
     <div className="overflow-hidden rounded-md border border-border bg-muted/20">
@@ -524,7 +524,7 @@ function fieldMappings(entry: TraceEntry): ProviderTraceFieldMapping[] {
         .map((path) => ({
           inputPath: path,
           action: "dropped" as const,
-          reason: text(entry.reason) || "Field was not carried into the next stage",
+          reason: text(entry.reason) || tx("Field was not carried into the next stage"),
         }))
     : [];
   return [...explicit, ...legacy];
@@ -592,12 +592,12 @@ function typedPrpFields(event: HeartbeatRunEvent) {
   const payload = record(prp.payload);
   const item = record(payload.item);
   return [
-    ["Event type", event.eventType],
-    ["Source event", text(prp.sourceEventId)],
-    ["Sequence", scalar(prp.sourceSequence) || String(event.seq)],
-    ["Item type", text(item.type) || text(payload.kind)],
-    ["Status", text(payload.status) || text(item.status)],
-    ["Query", text(payload.query) || text(item.query)],
+    [tx("Event type"), event.eventType],
+    [tx("Source event"), text(prp.sourceEventId)],
+    [tx("Sequence"), scalar(prp.sourceSequence) || String(event.seq)],
+    [tx("Item type"), text(item.type) || text(payload.kind)],
+    [tx("Status"), text(payload.status) || text(item.status)],
+    [tx("Query"), text(payload.query) || text(item.query)],
   ].filter(([, value]) => Boolean(value));
 }
 
@@ -757,7 +757,7 @@ export function RunnerInspector({
       })
       .catch((cause) => {
         if (!active || rawTraceAccessEpochRef.current !== loadEpoch) return;
-        setError(cause instanceof Error ? cause.message : "Runner inspection failed");
+        setError(cause instanceof Error ? cause.message : tx("Runner inspection failed"));
       })
       .finally(() => {
         if (active && rawTraceAccessEpochRef.current === loadEpoch) {
@@ -896,7 +896,7 @@ export function RunnerInspector({
     if (requestedAccess?.runId !== runId || requestedAccess.allowed !== true) {
       return;
     }
-    if (!window.confirm("This exact provider frame may contain prompts, tool arguments, secrets, or reasoning. Reveal it now?")) return;
+    if (!window.confirm(tx("This exact provider frame may contain prompts, tool arguments, secrets, or reasoning. Reveal it now?"))) return;
     const requestedRunId = runId;
     const frame = await heartbeatsApi.revealProviderTraceFrame(
       requestedRunId,
@@ -922,7 +922,7 @@ export function RunnerInspector({
     if (requestedAccess?.runId !== runId || requestedAccess.allowed !== true) {
       return;
     }
-    if (!window.confirm("Download the exact raw trace? It may contain sensitive prompts, tool arguments, and provider-only fields.")) return;
+    if (!window.confirm(tx("Download the exact raw trace? It may contain sensitive prompts, tool arguments, and provider-only fields."))) return;
     const blob = await heartbeatsApi.downloadProviderTrace(runId);
     const currentAccess = rawTraceAccessRef.current;
     if (
@@ -941,7 +941,7 @@ export function RunnerInspector({
     if (currentAccess?.runId !== runId || currentAccess.allowed !== true) {
       return;
     }
-    if (!window.confirm("Delete this raw trace immediately? This cannot be undone.")) return;
+    if (!window.confirm(tx("Delete this raw trace immediately? This cannot be undone."))) return;
     rawTraceAccessEpochRef.current += 1;
     const deletionAccess: RawTraceAccess = {
       ...currentAccess,
@@ -957,7 +957,7 @@ export function RunnerInspector({
     } catch (cause) {
       if (rawTraceAccessRef.current?.epoch === deletionAccess.epoch) {
         setError(
-          cause instanceof Error ? cause.message : "Raw trace deletion failed",
+          cause instanceof Error ? cause.message : tx("Raw trace deletion failed"),
         );
       }
       return;
@@ -1087,7 +1087,7 @@ export function RunnerInspector({
               <div className="space-y-6 p-5">
                 {loading ? <p className="text-sm text-muted-foreground">Loading run pipeline…</p> : null}
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-                  <StatCard label="Provider" value={capturedProviders.join(", ") || inspection?.trace?.provider || "PRP only"} detail={inspection?.trace ? `captured through ${inspection.trace.provider}` : "capture was off"} />
+                  <StatCard label="Provider" value={capturedProviders.join(", ") || inspection?.trace?.provider || tx("PRP only")} detail={inspection?.trace ? `captured through ${inspection.trace.provider}` : "capture was off"} />
                   <StatCard label="Raw frames" value={frames.length} detail={inspection?.trace ? formatBytes(inspection.trace.byteCount) : "no exact bytes"} />
                   <StatCard label="Operations" value={operations.length} detail="correlated groups" />
                   <StatCard label="PRP events" value={events.length} detail={`${visibleEventCount} visible`} />

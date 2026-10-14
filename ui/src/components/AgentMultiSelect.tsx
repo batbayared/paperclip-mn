@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { tx } from "@/i18n/xo";
 
 export interface AgentMultiSelectOption {
   id: string;
@@ -19,8 +20,8 @@ export function AgentSelect({
   agents,
   value,
   onChange,
-  placeholder = "Select agent…",
-  emptyMessage = "No agents yet.",
+  placeholder = tx("Select agent…"),
+  emptyMessage = tx("No agents yet."),
   disabled = false,
   triggerClassName,
   id,
@@ -88,7 +89,7 @@ export function AgentSelect({
                 key={agent.id}
                 type="button"
                 className="flex w-full items-start gap-2 px-3 py-2 text-left hover:bg-accent/30"
-                aria-label={`Select ${agent.name}`}
+                aria-label={tx("Select {{name}}", { name: agent.name })}
                 onClick={() => {
                   onChange(agent.id);
                   setOpen(false);
@@ -130,7 +131,7 @@ export function AgentMultiSelect({
   triggerClassName,
   contentAlign = "start",
   headerContent,
-  emptyMessage = "No agents yet.",
+  emptyMessage = tx("No agents yet."),
   showSelectionPreview = true,
   onOpenChange,
 }: {
@@ -212,8 +213,10 @@ export function AgentMultiSelect({
               {triggerIcon}
               <span className="truncate">
                 {triggerLabel ?? (selectedCount === 0
-                  ? "Select agents"
-                  : `${selectedCount} ${selectedCount === 1 ? "agent" : "agents"} selected`)}
+                  ? tx("Select agents")
+                  : selectedCount === 1
+                    ? tx("{{n}} agent selected", { n: selectedCount })
+                    : tx("{{n}} agents selected", { n: selectedCount }))}
               </span>
             </span>
             <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
@@ -253,7 +256,7 @@ export function AgentMultiSelect({
                   <Checkbox
                     checked={workingAgentIds.has(agent.id)}
                     disabled={optionDisabled}
-                    aria-label={`Allow ${agent.name}`}
+                    aria-label={tx("Allow {{name}}", { name: agent.name })}
                     onCheckedChange={(checked) => {
                       const next = new Set(workingAgentIds);
                       if (checked) next.add(agent.id);
@@ -279,7 +282,7 @@ export function AgentMultiSelect({
         )}
           <div className="flex items-center justify-between border-t border-border px-3 py-2">
             <span className="text-xs text-muted-foreground">
-              {workingAgentIds.size === 0 ? "No agents selected" : `${workingAgentIds.size} selected`}
+              {workingAgentIds.size === 0 ? tx("No agents selected") : tx("{{n}} selected", { n: workingAgentIds.size })}
             </span>
             <div className="flex items-center gap-2">
               {staged ? (
@@ -311,7 +314,7 @@ export function AgentMultiSelect({
             </div>
           ))}
           {selectedAgents.length > 3 ? (
-            <p className="px-1.5 pt-0.5 text-xs text-muted-foreground">and {selectedAgents.length - 3} more</p>
+            <p className="px-1.5 pt-0.5 text-xs text-muted-foreground">{tx("and {{n}} more", { n: selectedAgents.length - 3 })}</p>
           ) : null}
         </div>
       ) : null}

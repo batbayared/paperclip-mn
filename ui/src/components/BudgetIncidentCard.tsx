@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { tx } from "@/i18n/xo";
 
 function centsInputValue(value: number) {
   return (value / 100).toFixed(2);
@@ -18,11 +19,20 @@ function parseDollarInput(value: string) {
 }
 
 function incidentStateLabel(incident: BudgetIncident) {
-  if (incident.status === "resolved") return "Resolved";
-  if (incident.status === "dismissed") return "Dismissed";
-  if (incident.approvalStatus === "revision_requested") return "Escalated";
-  if (incident.approvalStatus === "pending") return "Pending approval";
-  return "Open";
+  if (incident.status === "resolved") return tx("Resolved");
+  if (incident.status === "dismissed") return tx("Dismissed");
+  if (incident.approvalStatus === "revision_requested") return tx("Escalated");
+  if (incident.approvalStatus === "pending") return tx("Pending approval");
+  return tx("Open");
+}
+
+function hardStopLabel(scopeType: string) {
+  switch (scopeType) {
+    case "company": return tx("company hard stop");
+    case "agent": return tx("agent hard stop");
+    case "project": return tx("project hard stop");
+    default: return `${scopeType} hard stop`;
+  }
 }
 
 export function BudgetIncidentCard({
@@ -49,7 +59,7 @@ export function BudgetIncidentCard({
           <div>
             <div className="flex flex-wrap items-center gap-2">
               <div className="text-(length:--text-micro) uppercase tracking-(--tracking-caps) text-red-700/90 dark:text-red-200/80">
-                {incident.scopeType} hard stop
+                {hardStopLabel(incident.scopeType)}
               </div>
               <Badge variant={incident.status === "resolved" ? "outline" : "secondary"}>
                 {stateLabel}
@@ -57,7 +67,7 @@ export function BudgetIncidentCard({
             </div>
             <CardTitle className="mt-1 text-base text-red-950 dark:text-red-50">{incident.scopeName}</CardTitle>
             <CardDescription className="mt-1 text-red-900/75 dark:text-red-100/70">
-              Spending reached {formatCents(incident.amountObserved)} against a limit of {formatCents(incident.amountLimit)}.
+              {tx("Spending reached {{observed}} against a limit of {{limit}}.", { observed: formatCents(incident.amountObserved), limit: formatCents(incident.amountLimit) })}
             </CardDescription>
           </div>
           <div className="rounded-full border border-red-400/30 bg-red-500/10 p-2 text-red-600 dark:text-red-200">

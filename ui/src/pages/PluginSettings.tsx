@@ -150,7 +150,7 @@ export function PluginSettings() {
       : plugin.status === "error"
         ? "destructive"
         : "secondary";
-  const pluginDescription = plugin.manifestJson.description || "No description provided.";
+  const pluginDescription = plugin.manifestJson.description || tx("No description provided.");
   const pluginCapabilities = plugin.manifestJson.capabilities ?? [];
   const environmentDrivers = plugin.manifestJson.environmentDrivers ?? [];
   const localFolderDeclarations = plugin.manifestJson.localFolders ?? [];
@@ -269,8 +269,7 @@ export function PluginSettings() {
                 <div className="rounded-md border border-border/60 bg-muted/20 px-4 py-3 text-sm">
                   <p className="font-medium text-foreground">Configure this plugin from Settings → Environments.</p>
                   <p className="mt-1 text-muted-foreground">
-                    {driverLabel || "This plugin"} registers environment runtime settings there so the execution target
-                    stays instance-scoped while secret bindings still resolve through the selected organization context.
+                    {tx("{{name}} registers environment runtime settings there so the execution target stays instance-scoped while secret bindings still resolve through the selected organization context.", { name: driverLabel || tx("This plugin") })}
                   </p>
                   <div className="mt-3">
                     <Link to="/company/settings/instance/environments">
@@ -675,13 +674,13 @@ function PluginLocalFolderRow({ pluginId, companyId, declaration, status }: Plug
       setMessage({
         type: nextStatus.healthy ? "success" : "error",
         text: nextStatus.healthy
-          ? "Local folder saved."
-          : "Local folder saved, but validation still needs attention.",
+          ? tx("Local folder saved.")
+          : tx("Local folder saved, but validation still needs attention."),
       });
       queryClient.invalidateQueries({ queryKey: queryKeys.plugins.localFolders(pluginId, companyId) });
     },
     onError: (err: Error) => {
-      setMessage({ type: "error", text: err.message || "Failed to save local folder." });
+      setMessage({ type: "error", text: err.message || tx("Failed to save local folder.") });
     },
   });
 
@@ -691,11 +690,11 @@ function PluginLocalFolderRow({ pluginId, companyId, declaration, status }: Plug
 
   const handleSave = useCallback(() => {
     if (!trimmedPath) {
-      setMessage({ type: "error", text: "Local folder path is required." });
+      setMessage({ type: "error", text: tx("Local folder path is required.") });
       return;
     }
     if (!isLikelyAbsolutePath(trimmedPath)) {
-      setMessage({ type: "error", text: "Local folder must be a full absolute path." });
+      setMessage({ type: "error", text: tx("Local folder must be a full absolute path.") });
       return;
     }
     setMessage(null);
@@ -727,11 +726,11 @@ function PluginLocalFolderRow({ pluginId, companyId, declaration, status }: Plug
       </div>
 
       <div className="grid gap-3 text-sm sm:grid-cols-3">
-        <FolderStatusMetric label="Configured" value={status?.configured ? "Yes" : "No"} ok={!!status?.configured} />
-        <FolderStatusMetric label="Readable" value={status?.readable ? "Yes" : "No"} ok={!!status?.readable} />
+        <FolderStatusMetric label="Configured" value={status?.configured ? tx("Yes") : tx("No")} ok={!!status?.configured} />
+        <FolderStatusMetric label="Readable" value={status?.readable ? tx("Yes") : tx("No")} ok={!!status?.readable} />
         <FolderStatusMetric
           label="Writable"
-          value={access === "read" ? "Not requested" : status?.writable ? "Yes" : "No"}
+          value={access === "read" ? tx("Not requested") : status?.writable ? tx("Yes") : tx("No")}
           ok={access === "read" || !!status?.writable}
         />
       </div>
@@ -837,14 +836,14 @@ function FolderRequirements({
         title="Required directories"
         items={requiredDirectories}
         missingItems={missingDirectories}
-        missingLabel="Missing directories"
+        missingLabel={tx("Missing directories")}
         inspectionUnavailable={rootNotInspected}
       />
       <RequirementList
         title="Required files"
         items={requiredFiles}
         missingItems={missingFiles}
-        missingLabel="Missing files"
+        missingLabel={tx("Missing files")}
         inspectionUnavailable={rootNotInspected}
       />
     </div>
@@ -991,11 +990,11 @@ function PluginConfigForm({ pluginId, companyId, schema, initialValues, isLoadin
   // Save mutation
   const saveMutation = useMutation({
     mutationFn: (configJson: Record<string, unknown>) => {
-      if (!companyId) throw new Error("Select an organization before saving plugin configuration.");
+      if (!companyId) throw new Error(tx("Select an organization before saving plugin configuration."));
       return pluginsApi.saveConfig(pluginId, companyId, configJson);
     },
     onSuccess: () => {
-      setSaveMessage({ type: "success", text: "Configuration saved." });
+      setSaveMessage({ type: "success", text: tx("Configuration saved.") });
       setTestResult(null);
       if (companyId) {
         queryClient.invalidateQueries({ queryKey: queryKeys.plugins.config(pluginId, companyId) });
@@ -1004,25 +1003,25 @@ function PluginConfigForm({ pluginId, companyId, schema, initialValues, isLoadin
       setTimeout(() => setSaveMessage(null), 3000);
     },
     onError: (err: Error) => {
-      setSaveMessage({ type: "error", text: err.message || "Failed to save configuration." });
+      setSaveMessage({ type: "error", text: err.message || tx("Failed to save configuration.") });
     },
   });
 
   // Test configuration mutation
   const testMutation = useMutation({
     mutationFn: (configJson: Record<string, unknown>) => {
-      if (!companyId) throw new Error("Select an organization before testing plugin configuration.");
+      if (!companyId) throw new Error(tx("Select an organization before testing plugin configuration."));
       return pluginsApi.testConfig(pluginId, companyId, configJson);
     },
     onSuccess: (result) => {
       if (result.valid) {
-        setTestResult({ type: "success", text: "Configuration test passed." });
+        setTestResult({ type: "success", text: tx("Configuration test passed.") });
       } else {
-        setTestResult({ type: "error", text: result.message || "Configuration test failed." });
+        setTestResult({ type: "error", text: result.message || tx("Configuration test failed.") });
       }
     },
     onError: (err: Error) => {
-      setTestResult({ type: "error", text: err.message || "Configuration test failed." });
+      setTestResult({ type: "error", text: err.message || tx("Configuration test failed.") });
     },
   });
 

@@ -24,7 +24,10 @@ import {
 } from "./tools/shared";
 import { cn } from "../lib/utils";
 import { brandChipBadge } from "../lib/status-colors";
-import { installPayload, installStateFrom, isAgentInstalled, INSTALLED_HINT } from "../lib/tool-installs";
+import { installPayload, installStateFrom, isAgentInstalled } from "../lib/tool-installs";
+import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
+import { xoBrandVars } from "@/xo/labels";
 
 function isGitHubConnection(connection: ToolConnection): boolean {
   return (connection.config?.sourceTemplateKey ?? connection.transportConfig?.sourceTemplateKey) === "github";
@@ -90,7 +93,9 @@ function GitHubIdentitySection({
                 </p>
                 {personalIdentity ? (
                   <p className="mt-1 text-xs text-muted-foreground">
-                    Your account is connected{personalLogin ? ` as @${personalLogin}` : ""}.
+                    {personalLogin
+                      ? tx("Your account is connected as @{{login}}.", { login: personalLogin })
+                      : tx("Your account is connected.")}
                   </p>
                 ) : null}
               </>
@@ -245,7 +250,7 @@ function InstalledAppsSection({
                           ? "Installed from the app page for every agent. Remove the all-agents install there."
                           : checked
                             ? "Loaded into this agent's runtime context."
-                            : INSTALLED_HINT}
+                            : tx("Has access — tick to load its tools into this agent's context.")}
                       </span>
                     </span>
                   </label>
@@ -285,7 +290,7 @@ function InstallBadge({
   installedForAll: boolean;
   permitted: boolean;
 }) {
-  const label = installed ? (installedForAll ? "Installed for all" : "Installed") : permitted ? "Permitted only" : "Not permitted";
+  const label = installed ? (installedForAll ? tx("Installed for all") : tx("Installed")) : permitted ? tx("Permitted only") : tx("Not permitted");
   return (
     <span
       className={cn(
@@ -314,14 +319,24 @@ function InstallSaveStatusChip({
   return <span className="text-xs text-muted-foreground">Saved</span>;
 }
 
-const POLICY_EFFECT_LABEL: Record<string, string> = {
-  allow: "allow",
-  block: "block",
-  deny: "deny",
-  require_approval: "require approval",
-  redact: "redact",
-  rate_limit: "rate limit",
-};
+function policyEffectLabel(policyType: string): string {
+  switch (policyType) {
+    case "allow":
+      return tx("allow");
+    case "block":
+      return tx("block");
+    case "deny":
+      return tx("deny");
+    case "require_approval":
+      return tx("require approval");
+    case "redact":
+      return tx("redact");
+    case "rate_limit":
+      return tx("rate limit");
+    default:
+      return policyType;
+  }
+}
 
 const DENIED_TOOLS_DISPLAY_LIMIT = 30;
 
@@ -565,13 +580,11 @@ export function AgentToolsTab({ agent, companyId }: { agent: AgentDetailRecord; 
         tone="info"
         title="Effective access"
         body={
-          <>
-            This is exactly the tool set Paperclip will accept for{" "}
-            <span className="font-medium">{agent.name}</span>. Profile and policy edits are
-            reflected within ~5 seconds. The agent's prompt can narrow this list but{" "}
-            <span className="font-medium">cannot expand it</span> — everything else is blocked by
-            default.
-          </>
+          <XoTrans
+            i18nKey="This is exactly the tool set {{brand}} will accept for <b>{{name}}</b>. Profile and policy edits are reflected within ~5 seconds. The agent's prompt can narrow this list but <b>cannot expand it</b> — everything else is blocked by default."
+            values={{ ...xoBrandVars(), name: agent.name }}
+            components={{ b: <span className="font-medium" /> }}
+          />
         }
       />
 
@@ -729,7 +742,7 @@ export function AgentToolsTab({ agent, companyId }: { agent: AgentDetailRecord; 
                         #{order} {policy.name}
                       </span>
                       <span className="shrink-0 rounded border border-border px-1.5 py-0.5 text-(length:--text-nano) uppercase text-muted-foreground">
-                        {POLICY_EFFECT_LABEL[policy.policyType] ?? policy.policyType}
+                        {policyEffectLabel(policy.policyType)}
                       </span>
                     </div>
                     {policy.description ? (

@@ -37,12 +37,14 @@ interface ArtifactsPanelProps {
 
 type FilterValue = "all" | "in_progress" | "for_review" | "completed";
 
-const FILTERS: Array<{ label: string; value: FilterValue }> = [
-  { label: "All", value: "all" },
-  { label: "In Progress", value: "in_progress" },
-  { label: "For Review", value: "for_review" },
-  { label: "Completed", value: "completed" },
-];
+function getFilters(): Array<{ label: string; value: FilterValue }> {
+  return [
+    { label: "All", value: "all" },
+    { label: "In Progress", value: "in_progress" },
+    { label: "For Review", value: "for_review" },
+    { label: "Completed", value: "completed" },
+  ];
+}
 
 function matchesFilter(wp: IssueWorkProduct, filter: FilterValue): boolean {
   if (filter === "all") return true;
@@ -136,7 +138,7 @@ export function ArtifactsPanel({ taskId, isAgentWorking, openDocKey, openDocTitl
 
       {/* Filter chips */}
       <div className="px-4 py-2 flex flex-wrap gap-1 border-b border-border">
-        {FILTERS.map((f) => (
+        {getFilters().map((f) => (
           <button
             key={f.value}
             className={cn(

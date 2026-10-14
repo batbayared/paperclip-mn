@@ -1,6 +1,7 @@
 import type { FinanceByKind } from "@paperclipai/shared";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { financeEventKindDisplayName, formatCents } from "@/lib/utils";
+import { tx } from "@/i18n/xo";
 
 interface FinanceKindCardProps {
   rows: FinanceByKind[];
@@ -25,13 +26,15 @@ export function FinanceKindCard({ rows }: FinanceKindCardProps) {
               <div className="min-w-0">
                 <div className="truncate text-sm font-medium">{financeEventKindDisplayName(row.eventKind)}</div>
                 <div className="text-xs text-muted-foreground">
-                  {row.eventCount} event{row.eventCount === 1 ? "" : "s"} · {row.billerCount} biller{row.billerCount === 1 ? "" : "s"}
+                  {row.eventCount === 1 ? tx("{{n}} event", { n: row.eventCount }) : tx("{{n}} events", { n: row.eventCount })}
+                  {" · "}
+                  {row.billerCount === 1 ? tx("{{n}} biller", { n: row.billerCount }) : tx("{{n}} billers", { n: row.billerCount })}
                 </div>
               </div>
               <div className="text-right tabular-nums">
                 <div className="text-sm font-medium">{formatCents(row.netCents)}</div>
                 <div className="text-xs text-muted-foreground">
-                  {formatCents(row.debitCents)} debits
+                  {tx("{{amount}} debits", { amount: formatCents(row.debitCents) })}
                 </div>
               </div>
             </div>

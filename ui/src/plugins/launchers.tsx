@@ -29,6 +29,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate, useLocation } from "@/lib/router";
 import { queryKeys } from "@/lib/queryKeys";
 import { cn } from "@/lib/utils";
+import { tx } from "@/i18n/xo";
 import {
   PluginBridgeContext,
   type PluginHostContext,
@@ -129,7 +130,7 @@ const PluginLauncherRuntimeContext = createContext<PluginLauncherRuntimeContextV
 
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error && error.message) return error.message;
-  return "Unknown error";
+  return tx("Unknown error");
 }
 
 function buildLauncherHostContext(

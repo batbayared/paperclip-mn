@@ -28,6 +28,7 @@ import {
 } from "@/lib/timeline/layout";
 import { xoLocaleDate } from "@/xo/date-format";
 import { xoLocaleTime } from "@/xo/date-format";
+import { tx } from "@/i18n/xo";
 
 export type ZoomLevel = "hour" | "day" | "week";
 
@@ -142,23 +143,25 @@ export function formatVisibleDurationMinutes(minutes: number): string {
   const rounded = Math.max(1, Math.round(minutes));
   if (rounded >= 7 * 24 * 60 && rounded % (7 * 24 * 60) === 0) {
     const weeks = rounded / (7 * 24 * 60);
-    return `${weeks} week${weeks === 1 ? "" : "s"} visible`;
+    return weeks === 1 ? tx("{{n}} week visible", { n: weeks }) : tx("{{n}} weeks visible", { n: weeks });
   }
   if (rounded >= 24 * 60 && rounded % (24 * 60) === 0) {
     const days = rounded / (24 * 60);
-    return `${days} day${days === 1 ? "" : "s"} visible`;
+    return days === 1 ? tx("{{n}} day visible", { n: days }) : tx("{{n}} days visible", { n: days });
   }
   if (rounded >= 24 * 60) {
     const days = Math.floor(rounded / (24 * 60));
     const hours = Math.round((rounded % (24 * 60)) / 60);
-    return `${days}d${hours > 0 ? ` ${hours}h` : ""} visible`;
+    return hours > 0
+      ? tx("{{days}}d {{hours}}h visible", { days, hours })
+      : tx("{{days}}d visible", { days });
   }
   if (rounded >= 60 && rounded % 60 === 0) {
     const hours = rounded / 60;
-    return `${hours} hour${hours === 1 ? "" : "s"} visible`;
+    return hours === 1 ? tx("{{n}} hour visible", { n: hours }) : tx("{{n}} hours visible", { n: hours });
   }
-  if (rounded >= 60) return `${Math.floor(rounded / 60)}h ${rounded % 60}m visible`;
-  return `${rounded} minutes visible`;
+  if (rounded >= 60) return tx("{{hours}}h {{minutes}}m visible", { hours: Math.floor(rounded / 60), minutes: rounded % 60 });
+  return tx("{{n}} minutes visible", { n: rounded });
 }
 
 function truncate(text: string, n = 42): string {
@@ -454,8 +457,8 @@ export function WorkTimelineChart({
     const related = layout.connectors.filter((c) => c.sourceRunId === bar.span.runId || c.targetRunId === bar.span.runId);
     if (related.length === 0) return null;
     return related.some((c) => c.dashed)
-      ? "dashed handoff: retry or changes requested"
-      : "solid handoff: delegation or assignment";
+      ? tx("dashed handoff: retry or changes requested")
+      : tx("solid handoff: delegation or assignment");
   };
 
   const showTooltip = (evt: React.MouseEvent, bar: PositionedBar) => {
@@ -802,13 +805,13 @@ function Tooltip({ tooltip, now }: { tooltip: TooltipState; now: number }) {
     >
       <div className="text-(length:--text-compact) font-medium text-foreground">{truncate(title)}</div>
       <div className="mt-0.5 text-muted-foreground">
-        {fmtClock(startMs)}–{bar.span.end ? fmtClock(endMs) : "now"} · {formatDuration(startMs, endMs)} ·{" "}
+        {fmtClock(startMs)}–{bar.span.end ? fmtClock(endMs) : tx("now")} · {formatDuration(startMs, endMs)} ·{" "}
         <span className="font-medium text-foreground">{bar.span.status}</span>
       </div>
       {bar.kickoff && (
         <div className="text-muted-foreground">
-          kicked off by: {(bar.kickoff as WorkTimelineActor).name}
-          {bar.span.retryOfRunId ? " · retry" : ""}
+          {tx("kicked off by: {{name}}", { name: (bar.kickoff as WorkTimelineActor).name })}
+          {bar.span.retryOfRunId ? tx(" · retry") : ""}
         </div>
       )}
       {tooltip.connectorHint && (

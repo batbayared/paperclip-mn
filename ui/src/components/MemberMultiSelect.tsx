@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { tx } from "@/i18n/xo";
 
 export interface MemberMultiSelectOption {
   userId: string;
@@ -44,9 +45,9 @@ export function MemberMultiSelect({
   triggerFullWidth = true,
   triggerClassName,
   contentAlign = "start",
-  emptyMessage = "No members yet.",
+  emptyMessage = tx("No members yet."),
   showSelectionPreview = true,
-  filterPlaceholder = "Filter people",
+  filterPlaceholder = tx("Filter people"),
   onOpenChange,
 }: {
   members: MemberMultiSelectOption[];
@@ -123,8 +124,10 @@ export function MemberMultiSelect({
             <span className="flex min-w-0 items-center">
               <span className="truncate">
                 {triggerLabel ?? (selectedCount === 0
-                  ? "Select people"
-                  : `${selectedCount} ${selectedCount === 1 ? "person" : "people"} selected`)}
+                  ? tx("Select people")
+                  : selectedCount === 1
+                    ? tx("{{n}} person selected", { n: selectedCount })
+                    : tx("{{n}} people selected", { n: selectedCount }))}
               </span>
             </span>
             <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
@@ -160,7 +163,7 @@ export function MemberMultiSelect({
                   >
                     <Checkbox
                       checked={workingUserIds.has(member.userId)}
-                      aria-label={`Allow ${label}`}
+                      aria-label={tx("Allow {{name}}", { name: label })}
                       onCheckedChange={(checked) => {
                         const next = new Set(workingUserIds);
                         if (checked) next.add(member.userId);
@@ -184,7 +187,7 @@ export function MemberMultiSelect({
           )}
           <div className="flex items-center justify-between border-t border-border px-3 py-2">
             <span className="text-xs text-muted-foreground" aria-live="polite">
-              {workingUserIds.size === 0 ? "No people selected" : `${workingUserIds.size} selected`}
+              {workingUserIds.size === 0 ? tx("No people selected") : tx("{{n}} selected", { n: workingUserIds.size })}
             </span>
             <div className="flex items-center gap-2">
               {staged ? (
@@ -216,7 +219,7 @@ export function MemberMultiSelect({
           ))}
           {selectedMembers.length > 3 ? (
             <p className="px-1.5 pt-0.5 text-xs text-muted-foreground">
-              and {selectedMembers.length - 3} more
+              {tx("and {{n}} more", { n: selectedMembers.length - 3 })}
             </p>
           ) : null}
         </div>

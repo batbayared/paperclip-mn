@@ -9,6 +9,7 @@ import {
 import {
   AI_PROVIDERS,
   aiMethodLabel,
+  aiSubscriptionName,
   type AiAuthMethod,
   type AiProvider,
 } from "./model";
@@ -51,6 +52,7 @@ function AuthAttempt({
 }: AiConnectionAuthProps) {
   const [value, setValue] = useState("");
   const info = AI_PROVIDERS[provider];
+  const subscriptionName = aiSubscriptionName(provider);
   const busy = state.phase === "starting" || state.phase === "submitting";
   const unsupported =
     state.phase === "unsupported" ||
@@ -143,7 +145,7 @@ function AuthAttempt({
                 </ProviderSubscriptionCard>
               ) : (
                 <p className="text-sm text-muted-foreground">
-                  Sign in with your {info.subscriptionName}.
+                  Sign in with your {subscriptionName}.
                 </p>
               )}
             </>

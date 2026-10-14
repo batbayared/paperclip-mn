@@ -1,4 +1,6 @@
 import { KeyRound, Save } from "lucide-react";
+import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
 import type { CompanySecret, RoutineEnvConfig } from "@paperclipai/shared";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "./EmptyState";
@@ -59,7 +61,7 @@ export function StageSecretsPanel({
     );
   }
 
-  const displayName = agentName?.trim() || "the responsible agent";
+  const displayName = agentName?.trim() || tx("the responsible agent");
 
   return (
     <div className="space-y-5">
@@ -70,10 +72,11 @@ export function StageSecretsPanel({
           <KeyRound className="h-3.5 w-3.5 mt-0.5 shrink-0" />
         )}
         <p>
-          These env vars are injected when{" "}
-          <span className="font-medium text-foreground">{displayName}</span> runs this step. They override
-          matching project and agent env on collisions. <span className="font-mono">PAPERCLIP_*</span> names
-          are reserved.
+          <XoTrans
+            i18nKey="These env vars are injected when <agent>{{agent}}</agent> runs this step. They override matching project and agent env on collisions. <code>{{prefix}}</code> names are reserved."
+            values={{ agent: displayName, prefix: "PAPERCLIP_*" }}
+            components={{ agent: <span className="font-medium text-foreground" />, code: <span className="font-mono" /> }}
+          />
         </p>
       </div>
 

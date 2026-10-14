@@ -1,3 +1,4 @@
+import { tx } from "@/i18n/xo";
 import { useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -118,8 +119,9 @@ export function BuiltInAgentGate({ agentKey, companyId, featureLabel, children }
             </>
           }
         >
-          Its built-in agent was paused{pausedAt ? ` ${pausedAt}` : ""}, so new{" "}
-          {label.toLowerCase()} isn't being generated.
+          {pausedAt
+            ? tx("Its built-in agent was paused {{pausedAt}}, so new {{label}} isn't being generated.", { pausedAt, label: label.toLowerCase() })
+            : tx("Its built-in agent was paused, so new {{label}} isn't being generated.", { label: label.toLowerCase() })}
         </InlineBanner>
         {/* Paused ≠ hidden: keep existing content readable, marked stale. */}
         <div className="opacity-70">{children}</div>

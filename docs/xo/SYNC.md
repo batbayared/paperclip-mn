@@ -259,6 +259,31 @@ Gates (2026-10-14): xo:i18n:check OK 5894, xo:i18n:test 11 / 129, tsc 0, vitest 
 - company-members.ts-ийн «Board» шошго.
 - en-д ConnectionSetupFlow-ийн брэнд «XO» гэж гарна (en байт ижил зарчмаас ухамсартай гажсан).
 
+## Ү6 7.15-д хөндсөн upstream файлууд
+
+Tier-гүй үлдэгдлийн 2-р шат. BASE 2c6c90260. ED шийдвэр (2026-10-14): анхдагч холболтын нэр, AI_PROVIDERS subscription нэрийг орчуулна; TEAMS_*_COMMAND_DESCRIPTION англиар.
+
+| Файл | Өөрчлөлт |
+|---|---|
+| ui/src/pages/{Pipelines, PipelineSettings, …}, components/Pipeline*, StatusCard* (14) | T1; tx, XoTrans |
+| ui/src/adapters/**/config-fields, components/AgentConfigForm, new-agent/*, agent-config-primitives, AiConnectionField, AiConnectionAuth, OnboardingWizard, ConnectionSetupFlow, ConnectionIntentInteractionBody (36) | T1; анхдагч «My …» нэр tx; help → getter |
+| ui/src/components/{RunnerInspector, TeamCatalog, AgentToolsTab}, pages/{PluginSettings, AdapterManager, PluginManager}, plugins/launchers, slots | T1; tx, XoTrans |
+| ui/src/components/access/*, workspace, project бүрэлдэхүүн (27), FileTree | T1; frontmatterFieldLabel |
+| ui/src/components/Issue*, Case*, Decision*, Task* (53) | T1; tone map-ийн «body»/«action» түлхүүрийг computed key болгосон |
+| ui/src/components бусад (68): SystemNotice, TrustPresetSection г.м. | T1; tone.label → tone.labelClass; XoTrans {{product}} |
+| ui/src/components/ai-connections/model.ts | aiSubscriptionName() |
+| ui/src/lib/pipeline-breakdown.ts | гар tx, {{brand}} xoBrandVars(), joinWithAnd |
+| ui/src/components/WorkspaceRuntimeControls.tsx | «Run» → xoRunActionLabel(), «run once» tx |
+| ui/src/pages/NewAgent.tsx, pages/PluginPage.tsx, components/access/CompanySettingsNav.tsx | breadcrumb tx, XoTrans, табын шошго render үед tx |
+
+XO-ийн өмч: scripts/xo-i18n/tiers.ts (+206 файл T1), ui/src/xo/labels.ts (xoRunActionLabel), ui/src/i18n/xo/* (keys=10831, +2690; keep-en +47).
+
+XO-ийн тестүүд: scripts/xo-i18n/tiers-y6-7-15.test.ts (шинэ).
+
+Gates (2026-10-14): xo:i18n:check OK 10831, xo:i18n:test 415, tsc 0; xo:brand-scan OK (baseline 552 / 160 хэвээр, одоо 505 / 152).
+
+Үлдэгдэл (Ү6 7.15): IssueMonitorBanner {{eta}}/{{time}}; frontmatterFieldLabel-ийг CompanyImport/Export, PackageFileTree-д хэрэглээгүй; «Unnamed attachment» англиар (серверт очдог); TEAMS_*_COMMAND_DESCRIPTION англиар.
+
 ## Ү6 7.14-д хөндсөн upstream файлууд
 
 Tier-гүй үлдэгдлийн 1-р шат. BASE 732c337e9. ED шийдвэр (2026-10-14): хөгжүүлэгчийн туршилтын хуудсыг хасна; хоёр шатанд (7.14 apps/tools/холболт, 7.15 бусад).

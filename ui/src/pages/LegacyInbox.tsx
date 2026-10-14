@@ -182,6 +182,8 @@ import {
   reconcileInboxOrderPin,
   type InboxOrderPin,
 } from "../lib/inboxOrderPin";
+import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
 
 const INBOX_HEARTBEAT_RUN_LIMIT = 200;
 const INBOX_ISSUE_LIST_LIMIT = 500;
@@ -220,7 +222,7 @@ function firstNonEmptyLine(value: string | null | undefined): string | null {
 }
 
 function runFailureMessage(run: HeartbeatRun): string {
-  return firstNonEmptyLine(run.error) ?? firstNonEmptyLine(run.stderrExcerpt) ?? "Run exited with an error.";
+  return firstNonEmptyLine(run.error) ?? firstNonEmptyLine(run.stderrExcerpt) ?? tx("Run exited with an error.");
 }
 
 function approvalStatusLabel(status: Approval["status"]): string {
@@ -257,7 +259,9 @@ export function formatJoinRequestInboxLabel(
   },
 ) {
   if (joinRequest.requestType !== "human") {
-    return `Agent join request${joinRequest.agentName ? `: ${joinRequest.agentName}` : ""}`;
+    return joinRequest.agentName
+      ? tx("Agent join request: {{name}}", { name: joinRequest.agentName })
+      : tx("Agent join request");
   }
 
   const requesterName = nonEmptyLabel(joinRequest.requesterUser?.name);
@@ -270,7 +274,7 @@ export function formatJoinRequestInboxLabel(
   if (requesterEmail) return requesterEmail;
   if (requesterName) return requesterName;
   if (requesterId) return requesterId;
-  return "Human join request";
+  return tx("Human join request");
 }
 
 
@@ -513,7 +517,7 @@ function ApprovalInboxRow({
             </span>
             <span className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
               <span className="capitalize">{approvalStatusLabel(approval.status)}</span>
-              {requesterName ? <span>requested by {requesterName}</span> : null}
+              {requesterName ? <span>{tx("requested by {{name}}", { name: requesterName })}</span> : null}
               <span>updated {timeAgo(approval.updatedAt)}</span>
             </span>
           </span>
@@ -639,8 +643,8 @@ function JoinRequestInboxRow({
               {label}
             </span>
             <span className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
-              <span>requested {timeAgo(joinRequest.createdAt)} from IP {joinRequest.requestIp}</span>
-              {joinRequest.adapterType && <span>adapter: {joinRequest.adapterType}</span>}
+              <span>{tx("requested {{time}} from IP {{ip}}", { time: timeAgo(joinRequest.createdAt), ip: joinRequest.requestIp })}</span>
+              {joinRequest.adapterType && <span>{tx("adapter: {{type}}", { type: joinRequest.adapterType })}</span>}
             </span>
           </span>
         </div>
@@ -2472,11 +2476,11 @@ export function Inbox() {
                 <PopoverContent align="end" className="w-40 p-2">
                   <div className="space-y-0.5">
                     {([
-                      ["none", "None"],
-                      ["type", "Type"],
-                      ["assignee", "Responsible"],
-                      ["project", "Project"],
-                      ...(isolatedWorkspacesEnabled ? ([["workspace", "Workspace"]] as const) : []),
+                      ["none", tx("None")],
+                      ["type", tx("Type")],
+                      ["assignee", tx("Responsible")],
+                      ["project", tx("Project")],
+                      ...(isolatedWorkspacesEnabled ? ([["workspace", tx("Workspace")]] as const) : []),
                     ] as const).map(([value, label]) => (
                       <button
                         key={value}
@@ -2519,7 +2523,9 @@ export function Inbox() {
                       <DialogHeader>
                         <DialogTitle>Mark all as read?</DialogTitle>
                         <DialogDescription>
-                          This will mark {unreadIssueIds.length} unread {unreadIssueIds.length === 1 ? "item" : "items"} as read.
+                          {unreadIssueIds.length === 1
+                            ? tx("This will mark {{n}} unread item as read.", { n: unreadIssueIds.length })
+                            : tx("This will mark {{n}} unread items as read.", { n: unreadIssueIds.length })}
                         </DialogDescription>
                       </DialogHeader>
                       <DialogFooter>
@@ -2734,7 +2740,9 @@ export function Inbox() {
                       }
                       titleSuffix={hasChildren && !isExpanded && depth === 0 ? (
                         <span className="ml-1.5 text-xs text-muted-foreground">
-                          ({childCount} sub-task{childCount !== 1 ? "s" : ""})
+                          {childCount === 1
+                            ? tx("({{n}} sub-task)", { n: childCount })
+                            : tx("({{n}} sub-tasks)", { n: childCount })}
                         </span>
                       ) : undefined}
                       mobileMeta={issueActivityText(issue).toLowerCase()}
@@ -2844,8 +2852,8 @@ export function Inbox() {
                               variant="ghost"
                               size="icon-xs"
                               className="-mr-2 text-muted-foreground"
-                              title={`New task in ${group.label}`}
-                              aria-label={`New task in ${group.label}`}
+                              title={tx("New task in {{group}}", { group: group.label })}
+                              aria-label={tx("New task in {{group}}", { group: group.label })}
                               onClick={(event) => {
                                 event.stopPropagation();
                                 openCreateIssueForGroup(group);
@@ -3113,8 +3121,11 @@ export function Inbox() {
                   >
                     <AlertTriangle className="h-4 w-4 shrink-0 text-red-600 dark:text-red-400" />
                     <span className="text-sm">
-                      <span className="font-medium">{dashboard!.agents.error}</span>{" "}
-                      {dashboard!.agents.error === 1 ? "agent has" : "agents have"} errors
+                      {dashboard!.agents.error === 1 ? (
+                        <XoTrans i18nKey="<b>{{n}}</b> agent has errors" values={{ n: dashboard!.agents.error }} components={{ b: <span className="font-medium" /> }} />
+                      ) : (
+                        <XoTrans i18nKey="<b>{{n}}</b> agents have errors" values={{ n: dashboard!.agents.error }} components={{ b: <span className="font-medium" /> }} />
+                      )}
                     </span>
                   </Link>
                   <button
@@ -3135,9 +3146,7 @@ export function Inbox() {
                   >
                     <AlertTriangle className="h-4 w-4 shrink-0 text-yellow-400" />
                     <span className="text-sm">
-                      Budget at{" "}
-                      <span className="font-medium">{dashboard!.costs.monthUtilizationPercent}%</span>{" "}
-                      utilization this month
+                      <XoTrans i18nKey="Budget at <b>{{percent}}%</b> utilization this month" values={{ percent: dashboard!.costs.monthUtilizationPercent }} components={{ b: <span className="font-medium" /> }} />
                     </span>
                   </Link>
                   <button

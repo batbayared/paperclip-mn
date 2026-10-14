@@ -59,7 +59,7 @@ export function IssueContinuationHandoff({
 
   if (!document) return null;
 
-  const title = document.title?.trim() || "Continuation handoff";
+  const title = document.title?.trim() || tx("Continuation handoff");
 
   return (
     <div

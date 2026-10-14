@@ -22,6 +22,9 @@ import { Input } from "@/components/ui/input";
 import { CaseCopyableToken } from "@/components/CaseIdentifierKey";
 import { hasBlockingShortcutDialog, isKeyboardShortcutTextInputTarget } from "@/lib/keyboardShortcuts";
 import { cn, relativeTime } from "@/lib/utils";
+import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
+import { xoLabel, xoStatusLabel } from "@/xo/labels";
 
 type GroupBy = "type" | "project" | "status" | "none";
 type CaseColumn = "id" | "key" | "title" | "status" | "updated" | "created" | "type" | "project" | "parent";
@@ -72,6 +75,35 @@ const CASE_SORT_LABELS: Record<CaseSortField, string> = {
   type: "Type",
   project: "Project",
 };
+function caseColumnLabel(column: CaseColumn): string {
+  switch (column) {
+    case "id": return tx("ID");
+    case "key": return tx("Key");
+    case "title": return tx("Title");
+    case "status": return tx("Status");
+    case "updated": return tx("Updated");
+    case "created": return tx("Created at");
+    case "type": return tx("Type");
+    case "project": return tx("Project");
+    case "parent": return tx("Parent case");
+    default: return CASE_COLUMN_LABELS[column];
+  }
+}
+function caseSortLabel(field: CaseSortField): string {
+  switch (field) {
+    case "updated": return tx("Last updated");
+    case "created": return tx("Created at");
+    case "title": return tx("Title");
+    case "status": return tx("Status");
+    case "id": return tx("ID");
+    case "type": return tx("Type");
+    case "project": return tx("Project");
+    default: return CASE_SORT_LABELS[field];
+  }
+}
+function caseGroupOptionLabel(label: string): string {
+  return label === "Type" ? tx("Type") : xoLabel(label);
+}
 const defaultCaseViewState: CaseViewState = {
   search: "",
   typeFilters: [],
@@ -324,7 +356,7 @@ function CaseTrailingColumns({
                     <button
                       type="button"
                       className="flex h-4 w-4 items-center justify-center rounded-sm transition-colors hover:bg-accent/50"
-                      aria-label={`${treeCollapsed ? "Expand" : "Collapse"} ${row.title}`}
+                      aria-label={treeCollapsed ? tx("Expand {{title}}", { title: row.title }) : tx("Collapse {{title}}", { title: row.title })}
                       aria-expanded={!treeCollapsed}
                       onClick={(event) => {
                         event.preventDefault();
@@ -489,7 +521,7 @@ function CaseColumnHeader({
         <span className="grid min-w-0 flex-1 items-center gap-2" style={{ gridTemplateColumns: caseTrailingGridTemplate(trailingColumns) }}>
           {trailingColumns.map((column) => (
             <span key={column} className={cn("truncate", (column === "updated" || column === "created") && "text-right")}>
-              {CASE_COLUMN_LABELS[column]}
+              {caseColumnLabel(column)}
             </span>
           ))}
         </span>
@@ -653,7 +685,7 @@ function CaseColumnPicker({
               className="flex w-full items-center justify-between rounded px-2 py-1.5 text-sm hover:bg-accent/50"
               onClick={() => onToggle(column, !visibleColumns.has(column))}
             >
-              <span>{CASE_COLUMN_LABELS[column]}</span>
+              <span>{caseColumnLabel(column)}</span>
               {visibleColumns.has(column) ? <Check className="h-3.5 w-3.5 text-muted-foreground" /> : null}
             </button>
           ))}
@@ -700,7 +732,7 @@ function CaseSortPicker({
               }
             }}
           >
-            <span>{CASE_SORT_LABELS[field]}</span>
+            <span>{caseSortLabel(field)}</span>
             {sortField === field ? (
               <span className="text-xs text-muted-foreground">{sortDir === "asc" ? "↑" : "↓"}</span>
             ) : null}
@@ -728,12 +760,17 @@ function CasesEmptyHero() {
 {slug, target_audience, publish_url} and key <release>/<slug>."`}
         </pre>
         <p className="text-xs text-muted-foreground">
-          See the paperclip skill → <code className="font-mono">references/cases.md</code> for the API.
+          <XoTrans
+            i18nKey="See the paperclip skill → <c>references/cases.md</c> for the API."
+            components={{ c: <code className="font-mono" /> }}
+          />
         </p>
       </div>
       <p className="text-xs text-muted-foreground">
-        Feature is gated by the <code className="font-mono">enableCases</code> experimental flag
-        (Settings → Experimental).
+        <XoTrans
+          i18nKey="Feature is gated by the <c>enableCases</c> experimental flag (Settings → Experimental)."
+          components={{ c: <code className="font-mono" /> }}
+        />
       </p>
     </div>
   );
@@ -892,7 +929,7 @@ export function Cases() {
       let key: string;
       if (viewState.groupBy === "type") key = c.caseType;
       else if (viewState.groupBy === "status") key = c.status;
-      else key = c.projectId ? projectName.get(c.projectId) ?? "Unknown project" : "No project";
+      else key = c.projectId ? projectName.get(c.projectId) ?? tx("Unknown project") : tx("No project");
       const bucket = map.get(key);
       if (bucket) bucket.push(c);
       else map.set(key, [c]);
@@ -1020,33 +1057,36 @@ export function Cases() {
   }, [selectedIndex]);
 
   const activeFilters: FilterValue[] = [];
-  if (viewState.search.trim()) activeFilters.push({ key: "search", label: "Search", value: viewState.search.trim() });
+  if (viewState.search.trim()) activeFilters.push({ key: "search", label: tx("Search"), value: viewState.search.trim() });
   if (viewState.typeFilters.length > 0) {
-    activeFilters.push({ key: "type", label: "Type", value: viewState.typeFilters.join(", ") });
+    activeFilters.push({ key: "type", label: tx("Type"), value: viewState.typeFilters.join(", ") });
   }
   if (!usesDefaultStatusFilter) {
     activeFilters.push({
       key: "status",
-      label: "Status",
+      label: tx("Status"),
       value: viewState.statusFilters.length === CASE_STATUSES.length
-        ? "All"
+        ? tx("All")
         : viewState.statusFilters
-          .map((status) => STATUS_FILTER_OPTIONS.find((option) => option.value === status)?.label ?? status)
+          .map((status) => {
+            const option = STATUS_FILTER_OPTIONS.find((o) => o.value === status);
+            return option ? xoStatusLabel(option.value, option.label) : status;
+          })
           .join(", "),
     });
   }
   if (viewState.projectFilters.length > 0) {
     activeFilters.push({
       key: "project",
-      label: "Project",
+      label: tx("Project"),
       value: viewState.projectFilters
-        .map((projectId) => projectId === ALL ? "No project" : projectName.get(projectId) ?? "Project")
+        .map((projectId) => projectId === ALL ? tx("No project") : projectName.get(projectId) ?? tx("Project"))
         .join(", "),
     });
   }
   if (viewState.labelFilter !== ALL) {
-    const name = (labelsQuery.data ?? []).find((l) => l.id === viewState.labelFilter)?.name ?? "Label";
-    activeFilters.push({ key: "label", label: "Label", value: name });
+    const name = (labelsQuery.data ?? []).find((l) => l.id === viewState.labelFilter)?.name ?? tx("Label");
+    activeFilters.push({ key: "label", label: tx("Label"), value: name });
   }
 
   function removeFilter(key: string) {
@@ -1258,7 +1298,7 @@ export function Cases() {
                         {STATUS_FILTER_OPTIONS.map((option) => (
                           <FilterCheckboxRow
                             key={option.value}
-                            label={option.label}
+                            label={xoStatusLabel(option.value, option.label)}
                             checked={viewState.statusFilters.includes(option.value)}
                             onCheckedChange={(checked) => toggleStatusFilter(option.value, checked)}
                           />
@@ -1331,7 +1371,7 @@ export function Cases() {
                       )}
                       onClick={() => updateView({ groupBy: value })}
                     >
-                      <span>{label}</span>
+                      <span>{caseGroupOptionLabel(label)}</span>
                       {viewState.groupBy === value && <Check className="h-3.5 w-3.5" />}
                     </button>
                   ))}

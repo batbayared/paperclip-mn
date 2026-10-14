@@ -7,6 +7,7 @@ import { useToastActions } from "../context/ToastContext";
 import { queryKeys } from "../lib/queryKeys";
 import { issueReviewPolicyBadge } from "../lib/review-policy";
 import { cn } from "../lib/utils";
+import { tx } from "@/i18n/xo";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
@@ -32,6 +33,15 @@ const ACTION_PAST_TENSE: Record<StalledReviewDecisionAction, string> = {
   request_changes: "Changes requested — issue returned to the assignee.",
   send_back: "Sent back to work — issue returned to the assignee.",
 };
+
+function actionPastTense(action: StalledReviewDecisionAction): string {
+  switch (action) {
+    case "approve": return tx("Review approved — issue marked done.");
+    case "request_changes": return tx("Changes requested — issue returned to the assignee.");
+    case "send_back": return tx("Sent back to work — issue returned to the assignee.");
+    default: return ACTION_PAST_TENSE[action];
+  }
+}
 
 /**
  * The three review verbs an operator can take on a *stalled* in-review issue —
@@ -66,7 +76,7 @@ export function StalledReviewActions({
       queryClient.invalidateQueries({ queryKey: queryKeys.issues.detail(issueId) });
       queryClient.invalidateQueries({ queryKey: queryKeys.issues.activity(issueId) });
       setNote("");
-      pushToast({ title: ACTION_PAST_TENSE[action], tone: "success" });
+      pushToast({ title: actionPastTense(action), tone: "success" });
       onResolved?.(action);
     },
     onError: (error) => {

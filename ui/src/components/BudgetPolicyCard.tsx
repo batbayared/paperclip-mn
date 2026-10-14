@@ -5,6 +5,7 @@ import { cn, formatCents } from "../lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { tx } from "@/i18n/xo";
 
 function centsInputValue(value: number) {
   return (value / 100).toFixed(2);
@@ -19,7 +20,18 @@ function parseDollarInput(value: string) {
 }
 
 function windowLabel(windowKind: BudgetPolicySummary["windowKind"]) {
-  return windowKind === "lifetime" ? "Lifetime budget" : "Monthly UTC budget";
+  return windowKind === "lifetime" ? tx("Lifetime budget") : tx("Monthly UTC budget");
+}
+
+function pauseLabel(reason: NonNullable<BudgetPolicySummary["pauseReason"]>): string {
+  switch (reason) {
+    case "manual": return tx("manual pause");
+    case "budget": return tx("budget pause");
+    case "system": return tx("system pause");
+    case "company_archived": return tx("company_archived pause");
+    case "import": return tx("import pause");
+    default: return `${reason} pause`;
+  }
 }
 
 function statusTone(status: BudgetPolicySummary["status"]) {
@@ -59,7 +71,7 @@ export function BudgetPolicyCard({
         <div className="text-(length:--text-micro) uppercase tracking-(--tracking-caps) text-muted-foreground">Observed</div>
         <div className="mt-2 text-xl font-semibold tabular-nums">{formatCents(summary.observedAmount)}</div>
         <div className="mt-1 text-xs text-muted-foreground">
-          {summary.amount > 0 ? `${summary.utilizationPercent}% of limit` : "No cap configured"}
+          {summary.amount > 0 ? tx("{{percent}}% of limit", { percent: summary.utilizationPercent }) : "No cap configured"}
         </div>
       </div>
       <div>
@@ -68,7 +80,7 @@ export function BudgetPolicyCard({
           {summary.amount > 0 ? formatCents(summary.amount) : "Disabled"}
         </div>
         <div className="mt-1 text-xs text-muted-foreground">
-          Soft alert at {summary.warnPercent}%{summary.paused && summary.pauseReason ? ` · ${summary.pauseReason} pause` : ""}
+          {tx("Soft alert at {{percent}}%", { percent: summary.warnPercent })}{summary.paused && summary.pauseReason ? ` · ${pauseLabel(summary.pauseReason)}` : ""}
         </div>
       </div>
     </div>
@@ -78,7 +90,7 @@ export function BudgetPolicyCard({
         <div className="text-(length:--text-micro) uppercase tracking-(--tracking-caps) text-muted-foreground">Observed</div>
         <div className="mt-2 text-xl font-semibold tabular-nums">{formatCents(summary.observedAmount)}</div>
         <div className="mt-1 text-xs text-muted-foreground">
-          {summary.amount > 0 ? `${summary.utilizationPercent}% of limit` : "No cap configured"}
+          {summary.amount > 0 ? tx("{{percent}}% of limit", { percent: summary.utilizationPercent }) : "No cap configured"}
         </div>
       </div>
       <div className="rounded-xl border border-border/70 bg-black/[0.18] px-4 py-3">
@@ -87,7 +99,7 @@ export function BudgetPolicyCard({
           {summary.amount > 0 ? formatCents(summary.amount) : "Disabled"}
         </div>
         <div className="mt-1 text-xs text-muted-foreground">
-          Soft alert at {summary.warnPercent}%{summary.paused && summary.pauseReason ? ` · ${summary.pauseReason} pause` : ""}
+          {tx("Soft alert at {{percent}}%", { percent: summary.warnPercent })}{summary.paused && summary.pauseReason ? ` · ${pauseLabel(summary.pauseReason)}` : ""}
         </div>
       </div>
     </div>
@@ -105,7 +117,7 @@ export function BudgetPolicyCard({
           aria-valuenow={Math.round(progress)}
           aria-valuemin={0}
           aria-valuemax={100}
-          aria-label={`Budget utilization: ${Math.round(progress)}% used`}
+          aria-label={tx("Budget utilization: {{percent}}% used", { percent: Math.round(progress) })}
           className={cn(
             "h-full rounded-full transition-(--tp-width-background-color) duration-200",
             summary.status === "hard_stop"

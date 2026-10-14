@@ -29,6 +29,8 @@ import {
 } from "@/components/ui/dialog";
 import { useToastActions } from "@/context/ToastContext";
 import { cn } from "@/lib/utils";
+import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
 
 function firstNonEmptyLine(value: string | null | undefined): string | null {
   if (!value) return null;
@@ -40,7 +42,7 @@ function firstNonEmptyLine(value: string | null | undefined): string | null {
 }
 
 function getPluginErrorSummary(plugin: PluginRecord): string {
-  return firstNonEmptyLine(plugin.lastError) ?? "Plugin entered an error state without a stored error message.";
+  return firstNonEmptyLine(plugin.lastError) ?? tx("Plugin entered an error state without a stored error message.");
 }
 
 function isExperimentalPluginIdentity(input: {
@@ -503,7 +505,11 @@ export function PluginManager() {
           <DialogHeader>
             <DialogTitle>Uninstall Plugin</DialogTitle>
             <DialogDescription>
-              Are you sure you want to uninstall <strong>{uninstallPluginName}</strong>? This action cannot be undone.
+              <XoTrans
+                i18nKey="Are you sure you want to uninstall <strong>{{name}}</strong>? This action cannot be undone."
+                values={{ name: uninstallPluginName }}
+                components={{ strong: <strong /> }}
+              />
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -533,7 +539,7 @@ export function PluginManager() {
           <DialogHeader>
             <DialogTitle>Error Details</DialogTitle>
             <DialogDescription>
-              {errorDetailsPlugin?.manifestJson.displayName ?? errorDetailsPlugin?.packageName ?? "Plugin"} hit an error state.
+              {tx("{{name}} hit an error state.", { name: errorDetailsPlugin?.manifestJson.displayName ?? errorDetailsPlugin?.packageName ?? tx("Plugin") })}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
@@ -553,7 +559,7 @@ export function PluginManager() {
             <div className="space-y-2">
               <p className="text-sm font-medium">Full error output</p>
               <pre className="max-h-(--sz-50vh) overflow-auto rounded-md border bg-muted/40 p-3 text-xs leading-5 whitespace-pre-wrap break-words">
-                {errorDetailsPlugin?.lastError ?? "No stored error message."}
+                {errorDetailsPlugin?.lastError ?? tx("No stored error message.")}
               </pre>
             </div>
           </div>

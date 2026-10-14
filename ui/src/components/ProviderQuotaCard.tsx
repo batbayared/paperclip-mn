@@ -14,6 +14,7 @@ import {
 } from "@/lib/utils";
 import { xoLocaleDate } from "@/xo/date-format";
 import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
 
 // ordered display labels for rolling-window rows
 const ROLLING_WINDOWS = ["5h", "24h", "7d"] as const;
@@ -140,16 +141,17 @@ export function ProviderQuotaCard({
               {providerDisplayName(provider)}
             </CardTitle>
             <CardDescription className="text-xs mt-0.5">
-              <span className="font-mono">{formatTokens(totalInputTokens)}</span> in
+              <XoTrans i18nKey="<m>{{n}}</m> in" values={{ n: formatTokens(totalInputTokens) }} components={{ m: <span className="font-mono" /> }} />
               {" · "}
-              <span className="font-mono">{formatTokens(totalOutputTokens)}</span> out
+              <XoTrans i18nKey="<m>{{n}}</m> out" values={{ n: formatTokens(totalOutputTokens) }} components={{ m: <span className="font-mono" /> }} />
               {(totalApiRuns > 0 || totalSubRuns > 0) && (
                 <span className="ml-1.5">
                   ·{" "}
-                  {totalApiRuns > 0 && `~${totalApiRuns} api`}
-                  {totalApiRuns > 0 && totalSubRuns > 0 && " / "}
-                  {totalSubRuns > 0 && `~${totalSubRuns} sub`}
-                  {" runs"}
+                  {totalApiRuns > 0 && totalSubRuns > 0
+                    ? tx("~{{api}} api / ~{{sub}} sub runs", { api: totalApiRuns, sub: totalSubRuns })
+                    : totalApiRuns > 0
+                      ? tx("~{{api}} api runs", { api: totalApiRuns })
+                      : tx("~{{sub}} sub runs", { sub: totalSubRuns })}
                 </span>
               )}
             </CardDescription>
@@ -167,14 +169,14 @@ export function ProviderQuotaCard({
               label="Period spend"
               percentUsed={budgetPct}
               leftLabel={formatCents(totalCostCents)}
-              rightLabel={`${Math.round(budgetPct)}% of allocation`}
+              rightLabel={tx("{{percent}}% of allocation", { percent: Math.round(budgetPct) })}
               showDeficitNotch={showDeficitNotch}
             />
             <QuotaBar
               label="This week"
               percentUsed={weekPct}
               leftLabel={formatCents(weekSpendCents)}
-              rightLabel={`~${formatCents(Math.round(weeklyBudgetShare))} / wk`}
+              rightLabel={tx("~{{amount}} / wk", { amount: formatCents(Math.round(weeklyBudgetShare)) })}
               showDeficitNotch={weekPct >= 100}
             />
           </div>
@@ -228,17 +230,17 @@ export function ProviderQuotaCard({
                 Subscription
               </p>
               <p className="text-xs text-muted-foreground">
-                <span className="font-mono text-foreground">{totalSubRuns}</span> runs
+                <XoTrans i18nKey="<m>{{n}}</m> runs" values={{ n: totalSubRuns }} components={{ m: <span className="font-mono text-foreground" /> }} />
                 {" · "}
                 {totalSubTokens > 0 && (
                   <>
-                    <span className="font-mono text-foreground">{formatTokens(totalSubTokens)}</span> total
+                    <XoTrans i18nKey="<m>{{n}}</m> total" values={{ n: formatTokens(totalSubTokens) }} components={{ m: <span className="font-mono text-foreground" /> }} />
                     {" · "}
                   </>
                 )}
-                <span className="font-mono text-foreground">{formatTokens(totalSubInputTokens)}</span> in
+                <XoTrans i18nKey="<m>{{n}}</m> in" values={{ n: formatTokens(totalSubInputTokens) }} components={{ m: <span className="font-mono text-foreground" /> }} />
                 {" · "}
-                <span className="font-mono text-foreground">{formatTokens(totalSubOutputTokens)}</span> out
+                <XoTrans i18nKey="<m>{{n}}</m> out" values={{ n: formatTokens(totalSubOutputTokens) }} components={{ m: <span className="font-mono text-foreground" /> }} />
               </p>
               {subSharePct > 0 && (
                 <>
@@ -249,7 +251,7 @@ export function ProviderQuotaCard({
                     />
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    {Math.round(subSharePct)}% of token usage via subscription
+                    {tx("{{percent}}% of token usage via subscription", { percent: Math.round(subSharePct) })}
                   </p>
                 </>
               )}
@@ -290,13 +292,13 @@ export function ProviderQuotaCard({
                       <div
                         className="absolute inset-y-0 left-0 bg-primary/60 transition-(--tp-width) duration-150"
                         style={{ width: `${tokenPct}%` }}
-                        title={`${Math.round(tokenPct)}% of provider tokens`}
+                        title={tx("{{percent}}% of provider tokens", { percent: Math.round(tokenPct) })}
                       />
                       {/* cost share overlay — narrower, opaque, shows relative cost weight */}
                       <div
                         className="absolute inset-y-0 left-0 bg-primary/85 transition-(--tp-width) duration-150"
                         style={{ width: `${costPct}%` }}
-                        title={`${Math.round(costPct)}% of provider cost`}
+                        title={tx("{{percent}}% of provider cost", { percent: Math.round(costPct) })}
                       />
                     </div>
                   </div>
@@ -352,7 +354,7 @@ export function ProviderQuotaCard({
                             {qw.valueLabel != null ? (
                               <span className="font-medium tabular-nums">{qw.valueLabel}</span>
                             ) : qw.usedPercent != null ? (
-                              <span className="font-medium tabular-nums">{qw.usedPercent}% used</span>
+                              <span className="font-medium tabular-nums">{tx("{{percent}}% used", { percent: qw.usedPercent })}</span>
                             ) : null}
                           </div>
                           {qw.usedPercent != null && fillColor != null && (

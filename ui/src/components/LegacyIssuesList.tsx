@@ -46,6 +46,8 @@ import {
   type InboxIssueColumn,
 } from "../lib/inbox";
 import { cn, formatDurationMs, formatTokens } from "../lib/utils";
+import { tx } from "@/i18n/xo";
+import { xoCreateIssueLabels, xoLabel, xoStatusLabel } from "@/xo/labels";
 import { SHOW_TASK_PRIORITY_UI } from "../lib/ui-flags";
 import { collectSubtreeLiveCounts } from "../lib/liveIssueIds";
 import {
@@ -319,8 +321,20 @@ export function issueAgeBucket(date: Date | string, now: number = Date.now()): 0
   return 2;
 }
 
+function legacySortLabel(label: string): string {
+  switch (label) {
+    case "Workflow": return tx("Workflow");
+    case "Status": return tx("Status");
+    case "Priority": return tx("Priority");
+    case "Title": return tx("Title");
+    case "Created": return tx("Created");
+    case "Updated": return tx("Updated");
+    default: return label;
+  }
+}
+
 export function issueAgeSeparatorLabel(bucket: 1 | 2): string {
-  return bucket === 1 ? "Older than a day" : "Older than a week";
+  return bucket === 1 ? tx("Older than a day") : tx("Older than a week");
 }
 
 export function issueAgeBucketsCrossed(
@@ -611,10 +625,14 @@ function SubIssueProgressSummaryStrip({
               <>
                 <span
                   className="text-muted-foreground tabular-nums"
-                  title={`${costSummary.runCount.toLocaleString()} run${
-                    costSummary.runCount === 1 ? "" : "s"
-                  } across ${costSummary.issueCount} sub-task${
-                    costSummary.issueCount === 1 ? "" : "s"
+                  title={`${
+                    costSummary.runCount === 1
+                      ? tx("{{n}} run", { n: costSummary.runCount.toLocaleString() })
+                      : tx("{{n}} runs", { n: costSummary.runCount.toLocaleString() })
+                  } ${
+                    costSummary.issueCount === 1
+                      ? tx("across {{n}} sub-task", { n: costSummary.issueCount })
+                      : tx("across {{n}} sub-tasks", { n: costSummary.issueCount })
                   }`}
                 >
                   {formatTokens(totalTokens)} tokens
@@ -638,7 +656,7 @@ function SubIssueProgressSummaryStrip({
                 key={status}
                 className={cn("h-full", progressSegmentClasses[status])}
                 style={{ width: `${(count / summary.totalCount) * 100}%` }}
-                title={`${issueStatusLabels[status]}: ${count}`}
+                title={`${xoStatusLabel(status, issueStatusLabels[status])}: ${count}`}
                 aria-hidden="true"
               />
             ))}
@@ -983,7 +1001,7 @@ export function IssuesList({
     if (currentUserId) {
       options.set(`user:${currentUserId}`, {
         id: `user:${currentUserId}`,
-        label: currentUserId === "local-board" ? "Board" : "Me",
+        label: currentUserId === "local-board" ? tx("Board") : tx("Me"),
         kind: "user",
         searchText: currentUserId === "local-board" ? "board me human local-board" : `me board human ${currentUserId}`,
       });
@@ -1622,8 +1640,7 @@ export function IssuesList({
     viewState.groupBy,
   ]);
 
-  const createActionLabel = createIssueLabel ? `Create ${createIssueLabel}` : "Create Task";
-  const createButtonLabel = createIssueLabel ? `New ${createIssueLabel}` : "New Task";
+  const { action: createActionLabel, button: createButtonLabel } = xoCreateIssueLabels(createIssueLabel);
   const openCreateIssueDialog = useCallback((group?: { key: string; items: Issue[] }) => {
     openNewIssue(newIssueDefaults(group));
   }, [newIssueDefaults, openNewIssue]);
@@ -1853,7 +1870,7 @@ export function IssuesList({
                         }
                       }}
                     >
-                      <span>{label}</span>
+                      <span>{legacySortLabel(label)}</span>
                       {viewState.sortField === field && (
                         <span className="text-xs text-muted-foreground">
                           {viewState.sortDir === "asc" ? "\u2191" : "\u2193"}
@@ -1895,7 +1912,7 @@ export function IssuesList({
                       }`}
                       onClick={() => updateView({ groupBy: value })}
                     >
-                      <span>{label}</span>
+                      <span>{xoLabel(label)}</span>
                       {viewState.groupBy === value && <Check className="h-3.5 w-3.5" />}
                     </button>
                   ))}
@@ -2043,14 +2060,16 @@ export function IssuesList({
                       if (!blockerIssue) return null;
                       const label = blockerIssue.identifier ?? blockerIssue.id.slice(0, 8);
                       const blockerStep = checklistMeta?.stepNumberByIssueId.get(blockerId);
-                      const blockerStepSuffix = blockerStep ? ` \u00b7 step ${blockerStep}` : "";
-                      return { blockerId, chipLabel: `blocked by ${label}${blockerStepSuffix}` };
+                      const chipLabel = blockerStep
+                        ? tx("blocked by {{label}} \u00b7 step {{step}}", { label, step: blockerStep })
+                        : tx("blocked by {{label}}", { label });
+                      return { blockerId, chipLabel };
                     })
                     .filter((chip): chip is { blockerId: string; chipLabel: string } => chip !== null);
                   const firstVisibleBlockerChip = visibleBlockerChips[0] ?? null;
                   const additionalVisibleBlockerCount = Math.max(visibleBlockerChips.length - 1, 0);
                   const additionalVisibleBlockerLabel = additionalVisibleBlockerCount > 0
-                    ? ` ... and ${additionalVisibleBlockerCount} more`
+                    ? ` ${tx("... and {{n}} more", { n: additionalVisibleBlockerCount })}`
                     : "";
                   const firstVisibleBlockerDisplayLabel = firstVisibleBlockerChip
                     ? `${firstVisibleBlockerChip.chipLabel}${additionalVisibleBlockerLabel}`
@@ -2229,7 +2248,7 @@ export function IssuesList({
                                         <Identity name={agentName(issue.assigneeAgentId)!} size="sm" shape="square" className="min-w-0" />
                                       ) : issue.assigneeUserId ? (
                                         <Identity
-                                          name={assigneeUserLabel ?? "User"}
+                                          name={assigneeUserLabel ?? tx("User")}
                                           avatarUrl={assigneeUserProfile?.image ?? null}
                                           size="sm"
                                           className="min-w-0"
@@ -2365,7 +2384,7 @@ export function IssuesList({
                 {isLoadingMoreIssues
                   ? "Loading more tasks..."
                   : remainingIssueRowCount > 0
-                    ? `Rendering ${Math.min(renderedIssueRowLimit, filtered.length)} of ${filtered.length} tasks`
+                    ? tx("Rendering {{shown}} of {{total}} tasks", { shown: Math.min(renderedIssueRowLimit, filtered.length), total: filtered.length })
                     : "Scroll to load more tasks"}
               </p>
             </div>

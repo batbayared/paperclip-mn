@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { tx } from "@/i18n/xo";
 import { PauseCircle, PlayCircle, Repeat, XCircle } from "lucide-react";
 import { Button } from "./ui/button";
 import {
@@ -103,14 +104,15 @@ export function TaskTreeControlDialog({
   onApply: () => void;
 }) {
   const cancel = mode === "cancel";
-  const tasks = `${affectedCount} task${affectedCount === 1 ? "" : "s"}`;
+  const one = affectedCount === 1;
+  const n = affectedCount;
   const title = cancel
-    ? "Cancel subtree?"
+    ? tx("Cancel subtree?")
     : mode === "restore"
-      ? "Restore subtree"
+      ? tx("Restore subtree")
       : scope === "leaf"
-        ? "Resume work"
-        : "Resume subtree";
+        ? tx("Resume work")
+        : tx("Resume subtree");
   return (
     <Dialog
       open={open}
@@ -126,10 +128,12 @@ export function TaskTreeControlDialog({
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>
             {loading
-              ? "Loading…"
+              ? tx("Loading…")
               : cancel
-                ? `${tasks} will be cancelled.`
-                : `${tasks} will ${mode === "restore" ? "be restored" : "resume"}.`}
+                ? (one ? tx("{{n}} task will be cancelled.", { n }) : tx("{{n}} tasks will be cancelled.", { n }))
+                : mode === "restore"
+                  ? (one ? tx("{{n}} task will be restored.", { n }) : tx("{{n}} tasks will be restored.", { n }))
+                  : (one ? tx("{{n}} task will resume.", { n }) : tx("{{n}} tasks will resume.", { n }))}
           </DialogDescription>
         </DialogHeader>
         {error ? (
@@ -172,11 +176,11 @@ export function TaskTreeControlDialog({
             onClick={onApply}
           >
             {pending
-              ? "Applying…"
+              ? tx("Applying…")
               : cancel
-                ? `Cancel ${tasks}`
+                ? (one ? tx("Cancel {{n}} task", { n }) : tx("Cancel {{n}} tasks", { n }))
                 : mode === "restore"
-                  ? `Restore ${tasks}`
+                  ? (one ? tx("Restore {{n}} task", { n }) : tx("Restore {{n}} tasks", { n }))
                   : title}
           </Button>
         </DialogFooter>

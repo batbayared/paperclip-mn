@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useRef, useState } from "react";
+import { tx } from "@/i18n/xo";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   PIPELINE_CASE_BODY_DOCUMENT_KEY,
@@ -55,12 +56,12 @@ function getPipelineRevisionActor(
     const profile = maps.userProfileMap?.get(revision.createdByUserId);
     return {
       kind: "user",
-      name: profile?.label ?? (revision.createdByUserId === "local-board" ? "Board" : revision.createdByUserId.slice(0, 8)),
+      name: profile?.label ?? (revision.createdByUserId === "local-board" ? tx("Board") : revision.createdByUserId.slice(0, 8)),
       imageUrl: profile?.image ?? null,
     };
   }
 
-  return { kind: "system", name: "System" };
+  return { kind: "system", name: tx("System") };
 }
 
 function isNotFound(error: unknown) {
@@ -305,7 +306,7 @@ export function PipelineItemBodyDocument({
         </div>
         <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
           <span className="text-(length:--text-micro) text-muted-foreground">
-            Saving creates rev {(doc?.latestRevisionNumber ?? 0) + 1} · ⌘↵ to save · Esc to cancel
+            {tx("Saving creates rev {{n}} · ⌘↵ to save · Esc to cancel", { n: (doc?.latestRevisionNumber ?? 0) + 1 })}
           </span>
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="sm" onClick={cancelEdit} disabled={saveMutation.isPending}>
@@ -413,7 +414,7 @@ export function PipelineItemBodyDocument({
     >
       <DocumentFrameHeader
         documentKey={BODY_DOCUMENT_KEY}
-        documentLabel="Item body document"
+        documentLabel={tx("Item body document")}
         folded={folded}
         onToggleFolded={() => setFolded((value) => !value)}
         revisionMenu={hasDocument ? {

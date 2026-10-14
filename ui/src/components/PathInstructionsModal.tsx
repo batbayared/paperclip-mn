@@ -8,42 +8,48 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
 
 type Platform = "mac" | "windows" | "linux";
 
-const platforms: { id: Platform; label: string; icon: typeof Apple }[] = [
-  { id: "mac", label: "macOS", icon: Apple },
-  { id: "windows", label: "Windows", icon: Monitor },
-  { id: "linux", label: "Linux", icon: Terminal },
-];
+function getPlatforms(): { id: Platform; label: string; icon: typeof Apple }[] {
+  return [
+    { id: "mac", label: "macOS", icon: Apple },
+    { id: "windows", label: "Windows", icon: Monitor },
+    { id: "linux", label: "Linux", icon: Terminal },
+  ];
+}
 
-const instructions: Record<Platform, { steps: string[]; tip?: string }> = {
+function getInstructions(): Record<Platform, { steps: string[]; tip?: string }> {
+  return {
   mac: {
     steps: [
-      "Open Finder and navigate to the folder.",
-      "Right-click (or Control-click) the folder.",
-      "Hold the Option (⌥) key — \"Copy\" changes to \"Copy as Pathname\".",
-      "Click \"Copy as Pathname\", then paste here.",
+      tx("Open Finder and navigate to the folder."),
+      tx("Right-click (or Control-click) the folder."),
+      tx("Hold the Option (⌥) key — \"Copy\" changes to \"Copy as Pathname\"."),
+      tx("Click \"Copy as Pathname\", then paste here."),
     ],
-    tip: "You can also open Terminal, type cd, drag the folder into the terminal window, and press Enter. Then type pwd to see the full path.",
+    tip: tx("You can also open Terminal, type cd, drag the folder into the terminal window, and press Enter. Then type pwd to see the full path."),
   },
   windows: {
     steps: [
-      "Open File Explorer and navigate to the folder.",
-      "Click in the address bar at the top — the full path will appear.",
-      "Copy the path, then paste here.",
+      tx("Open File Explorer and navigate to the folder."),
+      tx("Click in the address bar at the top — the full path will appear."),
+      tx("Copy the path, then paste here."),
     ],
-    tip: "Alternatively, hold Shift and right-click the folder, then select \"Copy as path\".",
+    tip: tx("Alternatively, hold Shift and right-click the folder, then select \"Copy as path\"."),
   },
   linux: {
     steps: [
-      "Open a terminal and navigate to the directory with cd.",
-      "Run pwd to print the full path.",
-      "Copy the output and paste here.",
+      tx("Open a terminal and navigate to the directory with cd."),
+      tx("Run pwd to print the full path."),
+      tx("Copy the output and paste here."),
     ],
-    tip: "In most file managers, Ctrl+L reveals the full path in the address bar.",
+    tip: tx("In most file managers, Ctrl+L reveals the full path in the address bar."),
   },
 };
+}
 
 function detectPlatform(): Platform {
   const ua = navigator.userAgent.toLowerCase();
@@ -63,7 +69,7 @@ export function PathInstructionsModal({
 }: PathInstructionsModalProps) {
   const [platform, setPlatform] = useState<Platform>(detectPlatform);
 
-  const current = instructions[platform];
+  const current = getInstructions()[platform];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -71,15 +77,16 @@ export function PathInstructionsModal({
         <DialogHeader>
           <DialogTitle className="text-base">How to get a full path</DialogTitle>
           <DialogDescription>
-            Paste the absolute path (e.g.{" "}
-            <code className="text-xs bg-muted px-1 py-0.5 rounded">/Users/you/project</code>
-            ) into the input field.
+            <XoTrans
+              i18nKey="Paste the absolute path (e.g. <code>/Users/you/project</code>) into the input field."
+              components={{ code: <code className="text-xs bg-muted px-1 py-0.5 rounded" /> }}
+            />
           </DialogDescription>
         </DialogHeader>
 
         {/* Platform tabs */}
         <div className="flex gap-1 rounded-md border border-border p-0.5">
-          {platforms.map((p) => (
+          {getPlatforms().map((p) => (
             <button
               key={p.id}
               type="button"

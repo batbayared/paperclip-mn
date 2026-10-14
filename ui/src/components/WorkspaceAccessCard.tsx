@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "../lib/utils";
 import type { WorkspaceAccessState } from "../lib/workspace-access-state";
+import { tx } from "@/i18n/xo";
 
 /**
  * Workspace access surface (PAP-17572).
@@ -38,6 +39,18 @@ const STATE_LABELS: Record<ActiveWorkspaceAccessState, string> = {
   repairing: "Repairing",
   failed: "Failed",
 };
+
+function stateLabel(state: ActiveWorkspaceAccessState): string {
+  switch (state) {
+    case "provisioning": return tx("Provisioning");
+    case "validating": return tx("Validating clone");
+    case "ready": return tx("Ready");
+    case "degraded": return tx("Degraded");
+    case "repairing": return tx("Repairing");
+    case "failed": return tx("Failed");
+    default: return STATE_LABELS[state];
+  }
+}
 
 const ACTION_ICONS = {
   open: ExternalLink,
@@ -93,7 +106,7 @@ export function WorkspaceAccessCard({
               {(access.state === "repairing" || access.state === "provisioning") && (
                 <Loader2 className="mr-1.5 h-3 w-3 animate-spin" />
               )}
-              {STATE_LABELS[access.state]}
+              {stateLabel(access.state)}
             </span>
           ) : null}
         </div>

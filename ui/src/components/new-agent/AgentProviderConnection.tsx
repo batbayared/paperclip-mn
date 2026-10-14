@@ -1,3 +1,4 @@
+import { tx } from "@/i18n/xo";
 import { healthApi } from "@/api/health";
 import { aiConnectionsApi } from "@/api/ai-connections";
 import { useLocalAiLogin } from "../ai-connections/useLocalAiLogin";
@@ -192,7 +193,7 @@ export function AgentProviderConnection({
       if (connected) onConnected(connection);
       else
         setError(
-          "The provider did not respond. Check the connection and try again.",
+          tx("The provider did not respond. Check the connection and try again."),
         );
     } catch (cause) {
       if (run !== epoch.current) return;
@@ -200,7 +201,7 @@ export function AgentProviderConnection({
       setError(
         cause instanceof Error
           ? cause.message
-          : "Could not connect to the provider.",
+          : tx("Could not connect to the provider."),
       );
     } finally {
       if (run === epoch.current) setBusy(false);
@@ -278,8 +279,8 @@ export function AgentProviderConnection({
               <OnboardingLoginCard
                 instruction={
                   savedKeys.options.length
-                    ? "Choose a saved API key or enter a new one"
-                    : `Provide your ${provider} API key to connect`
+                    ? tx("Choose a saved API key or enter a new one")
+                    : tx("Provide your {{provider}} API key to connect", { provider })
                 }
               >
                 <SavedProviderKeySelect
@@ -336,7 +337,7 @@ export function AgentProviderConnection({
                 }}
                 onConnected={(sessionId) => {
                   if (managedAccount) {
-                    if (!sessionId) { setError("The login did not return a saved connection. Try again."); return; }
+                    if (!sessionId) { setError(tx("The login did not return a saved connection. Try again.")); return; }
                     const run = epoch.current;
                     setLoginPhase("connecting");
                     void aiConnectionsApi.loginResult(companyId, sessionId).then((result) => {
@@ -344,7 +345,7 @@ export function AgentProviderConnection({
                     }).catch(() => {
                       if (run !== epoch.current) return;
                       setLoginPhase("ready");
-                      setError("Could not retrieve the saved connection. Go back and retry.");
+                      setError(tx("Could not retrieve the saved connection. Go back and retry."));
                     });
                     return;
                   }
@@ -387,17 +388,17 @@ export function AgentProviderConnection({
         }}
         primaryLabel={
           opened && needsLogin
-            ? loginPhase === "waiting" ? "Waiting for code"
-              : loginPhase === "connecting" ? "Connecting"
-              : `Sign in to ${provider}`
+            ? loginPhase === "waiting" ? tx("Waiting for code")
+              : loginPhase === "connecting" ? tx("Connecting")
+              : tx("Sign in to {{provider}}", { provider })
             : busy
-            ? "Connecting"
+            ? tx("Connecting")
             : method === "subscription" &&
                 (storedLogin.data || savedSubscription)
-              ? "Use saved subscription"
+              ? tx("Use saved subscription")
               : method === "api" && selectedKey
-                ? "Use saved API key"
-                : "Connect"
+                ? tx("Use saved API key")
+                : tx("Connect")
         }
         primaryDisabled={
           managedAccount?.disabled ||

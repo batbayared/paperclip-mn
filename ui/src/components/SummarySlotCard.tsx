@@ -93,7 +93,7 @@ export function resolveGenerationStatusLine(status: LiveGenerationStatus | null)
   if (!status) return null;
   if (status.message) return status.message;
   if (status.lastAssistantSnippet) return status.lastAssistantSnippet;
-  if (status.currentToolName) return `Working with ${status.currentToolName}`;
+  if (status.currentToolName) return tx("Working with {{tool}}", { tool: status.currentToolName });
   return null;
 }
 
@@ -203,7 +203,7 @@ export function SummarySlotCard({
       ]);
     },
     onError: (error) => {
-      setActionError(error instanceof Error ? error.message : "Summary generation could not be started.");
+      setActionError(error instanceof Error ? error.message : tx("Summary generation could not be started."));
     },
   });
 
@@ -236,7 +236,7 @@ export function SummarySlotCard({
     .toSorted((left, right) => right.revisionNumber - left.revisionNumber)
     .slice(0, MAX_REVISION_OPTIONS - (latestDocument ? 1 : 0));
   const revisionSelectValue = historicalRevision?.id ?? LATEST_REVISION_SELECT_VALUE;
-  const latestSelectLabel = latestDocument ? latestRevisionOptionLabel(latestDocument, latestRevision) : "Latest";
+  const latestSelectLabel = latestDocument ? latestRevisionOptionLabel(latestDocument, latestRevision) : tx("Latest");
   const generatingIssue = slotQuery.data?.generatingIssue ?? null;
   const liveStatusLine = resolveGenerationStatusLine(useGenerationStatus(generatingIssue?.id ?? null));
   const draftStream = useSummaryDraftStream(companyId, generatingIssue);

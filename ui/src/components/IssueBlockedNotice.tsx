@@ -32,6 +32,8 @@ import {
   readRecoveryRetryLineage,
 } from "../lib/recovery-lineage";
 import { StatusGlyph } from "./StatusGlyph";
+import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
 
 function BlockerRecoveryIndicator({
   action,
@@ -83,10 +85,10 @@ function SuccessfulRunRetryNowControl({
     : null;
   const relative = dueAtIso ? formatMonitorOffset(dueAtIso) : null;
   const scheduleLabel = relative === "now"
-    ? "due now"
+    ? tx("due now")
     : relative
-      ? `scheduled ${relative}`
-      : "scheduled";
+      ? tx("scheduled {{relative}}", { relative })
+      : tx("scheduled");
   const success = retryNow.isSuccess
     && (retryNow.data?.outcome === "promoted" || retryNow.data?.outcome === "already_promoted");
 
@@ -158,7 +160,7 @@ function WaitingChipLink({
       <StatusGlyph
         status={blocker.status}
         size="sm"
-        title={`${waitingTaskStatusLabel(blocker.status)} status`}
+        title={tx("{{status}} status", { status: waitingTaskStatusLabel(blocker.status) })}
       />
       <span>{blocker.identifier ?? blocker.id.slice(0, 8)}</span>
       <span className="max-w-(--sz-18rem) truncate font-sans text-(length:--text-micro) text-blue-800 dark:text-blue-200">
@@ -275,7 +277,7 @@ function WaitingOnLiveWorkNotice({
     nowRunning.push(blocker);
   }
 
-  const queuedNoun = total === 1 ? "task" : "tasks";
+  const queuedNoun = total === 1 ? tx("task") : tx("tasks");
 
   return (
     <div
@@ -299,8 +301,8 @@ function WaitingOnLiveWorkNotice({
 
           <div className="space-y-1" data-testid="issue-blocked-notice-progress">
             <div className="text-xs font-medium text-blue-800 dark:text-blue-200">
-              {doneCount} of {total} done
-              {runningCount > 0 ? ` · ${runningCount} running` : null}
+              {tx("{{doneCount}} of {{total}} done", { doneCount, total })}
+              {runningCount > 0 ? ` · ${tx("{{n}} running", { n: runningCount })}` : null}
             </div>
             <div
               role="progressbar"
@@ -461,7 +463,7 @@ export function IssueBlockedNotice({
       ? { issueId, scheduledRetry }
       : null;
 
-  const blockerLabel = blockers.length === 1 ? "the linked task" : "the linked tasks";
+  const blockerLabel = blockers.length === 1 ? tx("the linked task") : tx("the linked tasks");
   const terminalBlockers = blockers
     .flatMap((blocker) => blocker.terminalBlockers ?? [])
     .filter((blocker, index, all) => all.findIndex((candidate) => candidate.id === blocker.id) === index);
@@ -632,7 +634,7 @@ export function IssueBlockedNotice({
                   </span>
                 ) : null}
                 <span className="rounded-md border border-amber-300/70 bg-background/80 px-2 py-1 text-amber-900 dark:border-amber-500/40 dark:bg-background/40 dark:text-amber-100">
-                  Asked {agentName ?? "the assignee"} to choose the next step
+                  {tx("Asked {{name}} to choose the next step", { name: agentName ?? tx("the assignee") })}
                 </span>
               </div>
               {successfulRunHandoff.detectedProgressSummary ? (
@@ -669,15 +671,19 @@ export function IssueBlockedNotice({
                   data-testid="issue-blocked-notice-reopen-suppressed"
                   className="text-xs font-medium leading-5 text-amber-900 dark:text-amber-100"
                 >
-                  Still blocked by{" "}
-                  <span className="font-mono">{reopenSuppressedLeafId}</span>
-                  {reopenSuppressedLeafStatus ? <> ({reopenSuppressedLeafStatus})</> : null}
-                  {reopenSuppressedOtherCount > 0
-                    ? ` and ${reopenSuppressedOtherCount} other ${
-                        reopenSuppressedOtherCount === 1 ? "task" : "tasks"
-                      }`
-                    : null}
-                  .
+                  <XoTrans
+                    i18nKey="Still blocked by <m>{{id}}</m>{{status}}{{others}}."
+                    values={{
+                      id: reopenSuppressedLeafId,
+                      status: reopenSuppressedLeafStatus ? ` (${reopenSuppressedLeafStatus})` : "",
+                      others: reopenSuppressedOtherCount > 0
+                        ? ` ${reopenSuppressedOtherCount === 1
+                          ? tx("and {{n}} other task", { n: reopenSuppressedOtherCount })
+                          : tx("and {{n}} other tasks", { n: reopenSuppressedOtherCount })}`
+                        : "",
+                    }}
+                    components={{ m: <span className="font-mono" /> }}
+                  />
                 </p>
               ) : null}
               {blockers.length > 0 ? (

@@ -2,6 +2,8 @@ import { Clock, RotateCcw, AlertCircle, Loader2, CheckCircle2 } from "lucide-rea
 import { Link } from "@/lib/router";
 import { Button } from "@/components/ui/button";
 import { cn, formatDateTime } from "@/lib/utils";
+import { tx } from "@/i18n/xo";
+import { xoBrandVars } from "@/xo/labels";
 import { formatMonitorOffset } from "@/lib/issue-monitor";
 import { formatRetryReason } from "@/lib/runRetryState";
 import type { IssueScheduledRetry } from "@paperclipai/shared";
@@ -57,21 +59,21 @@ export function IssueScheduledRetryCard({
       ? scheduledRetry.scheduledRetryAttempt
       : null;
 
-  const badgeLabel = continuation ? "Continuation scheduled" : "Retry scheduled";
-  const titleAction = continuation ? "Automatic continuation" : "Automatic retry";
+  const badgeLabel = continuation ? tx("Continuation scheduled") : tx("Retry scheduled");
+  const titleAction = continuation ? tx("Automatic continuation") : tx("Automatic retry");
   let titleSuffix: string;
   if (relative === "now") {
-    titleSuffix = "due now";
+    titleSuffix = tx("due now");
   } else if (relative) {
     titleSuffix = relative;
   } else {
-    titleSuffix = "pending schedule";
+    titleSuffix = tx("pending schedule");
   }
   const title = `${titleAction} ${titleSuffix}`;
 
   const helperIdle = continuation
-    ? "Pulls continuation forward immediately"
-    : "Pulls retry forward immediately";
+    ? tx("Pulls continuation forward immediately")
+    : tx("Pulls retry forward immediately");
   const isError = retryNow.isError || retryNow.lastError !== null;
   const isSuccessTransient = retryNow.isSuccess
     && (retryNow.data?.outcome === "promoted" || retryNow.data?.outcome === "already_promoted");
@@ -115,7 +117,7 @@ export function IssueScheduledRetryCard({
           ) : null}
           {scheduledRetry.error ? (
             <div className="mt-1 text-xs text-muted-foreground">
-              Last attempt failed: {scheduledRetry.error}. Paperclip will retry automatically.
+              {tx("Last attempt failed: {{error}}. {{brand}} will retry automatically.", { error: scheduledRetry.error, ...xoBrandVars() })}
             </div>
           ) : null}
           {isError ? (

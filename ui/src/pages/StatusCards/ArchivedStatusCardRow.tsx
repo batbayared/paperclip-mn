@@ -1,4 +1,5 @@
 import { xoLocaleDate } from "@/xo/date-format";
+import { tx } from "@/i18n/xo";
 import { useQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 
@@ -37,8 +38,8 @@ export function ArchivedStatusCardRow({
       <div className="min-w-0">
         <p className="truncate text-sm font-semibold">{card.title ?? "Untitled card"}</p>
         <p className="mt-0.5 text-xs text-muted-foreground" title={card.archivedAt ? formatDateTime(card.archivedAt) : undefined}>
-          archived {shortDate(card.archivedAt)} · last summary {shortDate(card.lastGeneratedAt)}
-          {rollup ? ` · lifetime ${formatTokens(rollup.totalTokens)} / ${formatCents(rollup.totalCostCents)}` : ""}
+          {tx("archived {{archived}} · last summary {{last}}", { archived: shortDate(card.archivedAt), last: shortDate(card.lastGeneratedAt) })}
+          {rollup ? ` ${tx("· lifetime {{tokens}} / {{cost}}", { tokens: formatTokens(rollup.totalTokens), cost: formatCents(rollup.totalCostCents) })}` : ""}
         </p>
       </div>
       {/* View is the more common intent on an archived row (reading the last

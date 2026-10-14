@@ -4,6 +4,7 @@ import { toolsApi } from "@/api/tools";
 import { queryKeys } from "@/lib/queryKeys";
 import { AgentMultiSelect } from "@/components/AgentMultiSelect";
 import { RadioCardGroup } from "@/components/ui/radio-card";
+import { tx } from "@/i18n/xo";
 
 export function EmailConnectionAccess({
   companyId,
@@ -45,12 +46,12 @@ export function EmailConnectionAccess({
   const everyone = active.some((g) => g.kind === "organization");
   const personal = active.find((g) => g.kind === "user");
   const humanLabel = everyone
-    ? "Any human in the company"
+    ? tx("Any human in the company")
     : personal
       ? personal.subjectUserId === grants.data?.currentUserId
-        ? "Just me"
-        : "Only the credential owner"
-      : "Access revoked";
+        ? tx("Just me")
+        : tx("Only the credential owner")
+      : tx("Access revoked");
   const allAgents =
     installs.data?.installs.some((i) => i.targetType === "company") ?? false;
   const selected = new Set(
@@ -72,7 +73,7 @@ export function EmailConnectionAccess({
           Which agents can use this connection?
         </h2>
         <RadioCardGroup
-          ariaLabel="Which agents can use this connection"
+          ariaLabel={tx("Which agents can use this connection")}
           value={allAgents ? "all" : "selected"}
           disabled={disabled}
           className="sm:grid-cols-2"

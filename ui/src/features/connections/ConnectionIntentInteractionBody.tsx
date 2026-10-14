@@ -315,7 +315,7 @@ export function ConnectionIntentInteractionBody({
       : setupQuery.data?.aiConnection ? <AiConnectionCredentialStep
           companyId={interaction.companyId}
           provider={setupQuery.data.aiConnection.provider}
-          name={`My ${AI_PROVIDERS[setupQuery.data.aiConnection.provider].name} account`}
+          name={tx("My {{name}} account", { name: AI_PROVIDERS[setupQuery.data.aiConnection.provider].name })}
           ownership="personal"
           agentIds={[interaction.payload.requestingAgentId]}
           allAgents={false}

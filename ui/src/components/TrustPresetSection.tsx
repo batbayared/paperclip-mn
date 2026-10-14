@@ -18,14 +18,39 @@ import {
   type LowTrustBoundaryTarget,
 } from "../lib/trust-policy-ui";
 import { cn } from "../lib/utils";
+import { tx } from "@/i18n/xo";
+import { xoBrandVars } from "@/xo/labels";
+import { XoTrans } from "@/xo/XoTrans";
 
 const inputClass =
   "w-full rounded-md border border-border px-2.5 py-1.5 bg-transparent outline-none text-sm font-mono placeholder:text-muted-foreground/40";
 
-function formatCount(value: readonly unknown[] | undefined, singular: string, plural: string) {
-  const count = value?.length ?? 0;
-  if (count === 0) return "-";
-  return `${count} ${count === 1 ? singular : plural}`;
+function formatCount(value: readonly unknown[] | undefined, kind: "project" | "issue" | "agent" | "binding") {
+  const n = value?.length ?? 0;
+  if (n === 0) return "-";
+  switch (kind) {
+    case "project": return n === 1 ? tx("{{n}} project", { n }) : tx("{{n}} projects", { n });
+    case "issue": return n === 1 ? tx("{{n}} issue", { n }) : tx("{{n}} issues", { n });
+    case "agent": return n === 1 ? tx("{{n}} agent", { n }) : tx("{{n}} agents", { n });
+    case "binding": return n === 1 ? tx("{{n}} binding", { n }) : tx("{{n}} bindings", { n });
+  }
+}
+
+function trustPresetLabel(preset: TrustPreset): string {
+  switch (preset) {
+    case "standard": return tx("Standard");
+    case "low_trust_review": return tx("Low-trust review");
+    default: return TRUST_PRESET_LABELS[preset];
+  }
+}
+
+function trustPresetDescription(preset: TrustPreset): string {
+  switch (preset) {
+    case "standard": return tx("Organization-visible collaboration. This is the default for normal work.");
+    case "low_trust_review":
+      return tx("Contained for hostile or untrusted input. Narrow {{brand}} API, quarantined output. Use for PR review and external-content triage.", xoBrandVars());
+    default: return TRUST_PRESET_DESCRIPTIONS[preset];
+  }
 }
 
 function PolicyRow({ label, value }: { label: string; value: string }) {
@@ -44,11 +69,13 @@ export interface LowTrustBoundaryCandidate {
 
 type LowTrustBoundaryTargetType = LowTrustBoundaryTarget["type"];
 
-const BOUNDARY_TARGET_LABELS: Record<LowTrustBoundaryTargetType, string> = {
-  project: "Project",
-  root_issue: "Root issue",
-  issue: "Issue",
-};
+function boundaryTargetLabel(type: LowTrustBoundaryTargetType): string {
+  switch (type) {
+    case "project": return tx("Project");
+    case "root_issue": return tx("Root issue");
+    case "issue": return tx("Issue");
+  }
+}
 
 export function TrustPresetSection({
   permissions,
@@ -115,11 +142,11 @@ export function TrustPresetSection({
             onChange={(event) => handlePresetChange(event.target.value)}
             disabled={disabled}
           >
-            <option value="standard">{TRUST_PRESET_LABELS.standard}</option>
-            <option value="low_trust_review">{TRUST_PRESET_LABELS.low_trust_review}</option>
+            <option value="standard">{trustPresetLabel("standard")}</option>
+            <option value="low_trust_review">{trustPresetLabel("low_trust_review")}</option>
           </select>
         </Field>
-        <p className="text-xs text-muted-foreground">{TRUST_PRESET_DESCRIPTIONS[preset]}</p>
+        <p className="text-xs text-muted-foreground">{trustPresetDescription(preset)}</p>
 
         {lowTrust ? (
           <div
@@ -163,7 +190,7 @@ export function TrustPresetSection({
                         {allowSingleIssue && <option value="issue">Issue</option>}
                       </select>
                     </Field>
-                    <Field label={BOUNDARY_TARGET_LABELS[targetType]}>
+                    <Field label={boundaryTargetLabel(targetType)}>
                       <select
                         className={inputClass}
                         value={boundaryValue}
@@ -174,7 +201,7 @@ export function TrustPresetSection({
                           {candidatesLoading
                             ? "Loading…"
                             : targetCandidates.length === 0
-                              ? `No ${targetType === "project" ? "projects" : "issues"} available`
+                              ? (targetType === "project" ? tx("No projects available") : tx("No issues available"))
                               : "Select boundary"}
                         </option>
                         {targetCandidates.map((candidate) => (
@@ -207,20 +234,25 @@ export function TrustPresetSection({
                 <div className="rounded-md border border-border/70 bg-background/70 p-3 text-foreground">
                   <p className="text-sm font-medium">Managed by EE/API</p>
                   <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                    This policy has {summarizeLowTrustBoundaryTarget(boundary).toLowerCase()} and cannot be edited by the CE single-boundary editor.
+                    {tx("This policy has {{summary}} and cannot be edited by the CE single-boundary editor.", { summary: summarizeLowTrustBoundaryTarget(boundary).toLowerCase() })}
                   </p>
                 </div>
               )}
               <p className="text-xs text-muted-foreground">
-                Want to set more than one containment boundary?{" "}
-                <a
-                  className="underline underline-offset-2 hover:text-foreground"
-                  href="https://paperclip.ing/ee"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Get Paperclip EE.
-                </a>
+                <XoTrans
+                  i18nKey="Want to set more than one containment boundary? <a>Get {{product}} EE.</a>"
+                  values={{ product: xoBrandVars().brand }}
+                  components={{
+                    a: (
+                      <a
+                        className="underline underline-offset-2 hover:text-foreground"
+                        href="https://paperclip.ing/ee"
+                        target="_blank"
+                        rel="noreferrer"
+                      />
+                    ),
+                  }}
+                />
               </p>
               <CollapsibleSection
                 title="View policy"
@@ -228,19 +260,19 @@ export function TrustPresetSection({
                 onToggle={() => setPolicyOpen((open) => !open)}
               >
                 <div className="divide-y divide-border/60 text-foreground">
-                  <PolicyRow label="Preset" value="Low-trust review v1" />
-                  <PolicyRow label="Raw output" value="Quarantined from higher-trust agents" />
-                  <PolicyRow label="Projects" value={formatCount(boundary?.projectIds, "project", "projects")} />
+                  <PolicyRow label="Preset" value={tx("Low-trust review v1")} />
+                  <PolicyRow label="Raw output" value={tx("Quarantined from higher-trust agents")} />
+                  <PolicyRow label="Projects" value={formatCount(boundary?.projectIds, "project")} />
                   <PolicyRow label="Root issue" value={boundary?.rootIssueId ? boundary.rootIssueId.slice(0, 8) : "-"} />
-                  <PolicyRow label="Explicit issues" value={formatCount(boundary?.issueIds, "issue", "issues")} />
-                  <PolicyRow label="Allowed agents" value={formatCount(boundary?.allowedAgentIds, "agent", "agents")} />
+                  <PolicyRow label="Explicit issues" value={formatCount(boundary?.issueIds, "issue")} />
+                  <PolicyRow label="Allowed agents" value={formatCount(boundary?.allowedAgentIds, "agent")} />
                   <PolicyRow label="Allowed tools" value={boundary?.allowedToolClasses?.join(" · ") || "-"} />
-                  <PolicyRow label="Allowed secrets" value={formatCount(boundary?.allowedSecretBindingIds, "binding", "bindings")} />
+                  <PolicyRow label="Allowed secrets" value={formatCount(boundary?.allowedSecretBindingIds, "binding")} />
                   <PolicyRow label="Promotion target" value={boundary?.outputPromotionTarget?.issueId?.slice(0, 8) ?? "-"} />
                   <PolicyRow
                     label="EE fields"
                     value={Object.keys(policy ?? {}).some((key) => !["trustPreset", "reviewPreset", "trustBoundary"].includes(key))
-                      ? "Custom advanced policy fields preserved"
+                      ? tx("Custom advanced policy fields preserved")
                       : "-"}
                   />
                 </div>

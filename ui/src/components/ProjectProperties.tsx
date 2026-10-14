@@ -21,6 +21,8 @@ import { DraftInput } from "./agent-config-primitives";
 import { InlineEditor } from "./InlineEditor";
 import { EnvironmentVariablesEditor } from "./environment-variables-editor";
 import { Badge } from "@/components/ui/badge";
+import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
 
 interface ProjectPropertiesProps {
   project: Project;
@@ -71,6 +73,19 @@ const SHARED_WORKSPACE_CONCURRENCY_OPTIONS: {
     help: "Runs never wait for the workspace; concurrent edits are possible.",
   },
 ];
+
+function sharedWorkspaceConcurrencyHelp(help: string | undefined): string | undefined {
+  switch (help) {
+    case "Concurrent runs on local/SSH runners; runs take turns in cloud environments.":
+      return tx("Concurrent runs on local/SSH runners; runs take turns in cloud environments.");
+    case "Runs always take turns in the shared project workspace.":
+      return tx("Runs always take turns in the shared project workspace.");
+    case "Runs never wait for the workspace; concurrent edits are possible.":
+      return tx("Runs never wait for the workspace; concurrent edits are possible.");
+    default:
+      return help;
+  }
+}
 
 function SaveIndicator({ state }: { state: ProjectFieldSaveState }) {
   if (state === "saving") {
@@ -147,7 +162,7 @@ function ArchiveDangerZone({
 }) {
   const [confirming, setConfirming] = useState(false);
   const isArchive = !project.archivedAt;
-  const action = isArchive ? "Archive" : "Unarchive";
+  const action = isArchive ? tx("Archive") : tx("Unarchive");
 
   return (
     <div className="space-y-3 rounded-md border border-destructive/40 bg-destructive/5 px-4 py-4">
@@ -239,7 +254,7 @@ export function ProjectProperties({ project, repositories, onUpdate, onFieldUpda
   });
   const createSecret = useMutation({
     mutationFn: (input: { name: string; value: string }) => {
-      if (!selectedCompanyId) throw new Error("Select an organization to create secrets");
+      if (!selectedCompanyId) throw new Error(tx("Select an organization to create secrets"));
       return secretsApi.create(selectedCompanyId, input);
     },
     onSuccess: () => {
@@ -395,7 +410,7 @@ export function ProjectProperties({ project, repositories, onUpdate, onFieldUpda
       return;
     }
     if (!isAbsolutePath(cwd)) {
-      setWorkspaceError("Local folder must be a full absolute path.");
+      setWorkspaceError(tx("Local folder must be a full absolute path."));
       return;
     }
     setWorkspaceError(null);
@@ -405,8 +420,8 @@ export function ProjectProperties({ project, repositories, onUpdate, onFieldUpda
   const clearLocalWorkspace = () => {
     const confirmed = window.confirm(
       codebase.repoUrl
-        ? "Clear local folder from this workspace?"
-        : "Delete this workspace local folder?",
+        ? tx("Clear local folder from this workspace?")
+        : tx("Delete this workspace local folder?"),
     );
     if (!confirmed) return;
     persistCodebase({ cwd: null });
@@ -780,9 +795,9 @@ export function ProjectProperties({ project, repositories, onUpdate, onFieldUpda
                         </div>
                       )}
                       <p className="text-(length:--text-micro) text-muted-foreground">
-                        {SHARED_WORKSPACE_CONCURRENCY_OPTIONS.find(
+                        {sharedWorkspaceConcurrencyHelp(SHARED_WORKSPACE_CONCURRENCY_OPTIONS.find(
                           (option) => option.value === executionWorkspaceSharedConcurrency,
-                        )?.help}
+                        )?.help)}
                       </p>
                     </div>
 
@@ -801,7 +816,10 @@ export function ProjectProperties({ project, repositories, onUpdate, onFieldUpda
                     {executionWorkspaceAdvancedOpen ? (
                       <div className="space-y-3">
                         <div className="text-xs text-muted-foreground">
-                          Host-managed implementation: <span className="text-foreground">Git worktree</span>
+                          <XoTrans
+                            i18nKey="Host-managed implementation: <span>Git worktree</span>"
+                            components={{ span: <span className="text-foreground" /> }}
+                          />
                         </div>
                         {showExecutionWorkspaceEnvironmentControl ? (
                           <div>

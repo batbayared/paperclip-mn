@@ -1,5 +1,36 @@
 # XO ахицын бүртгэл
 
+## Ү6 7.15 Tier-гүй үлдэгдэл, 2-р шат: пайплайн, агент, plugin, ажлын талбар, issue/case (2026-10-14)
+
+Зорилго: 7.14-ийн дараа tier-гүй үлдсэн pages, components, adapters-ийг орчуулах.
+
+BASE 2c6c90260. ED шийдвэр (2026-10-14): хадгалагддаг анхдагч нэр («My … subscription/API/account») болон AI_PROVIDERS-ийн subscription нэрийг орчуулна (бүтээгдэхүүний нэр Латинаар); TEAMS_*_COMMAND_DESCRIPTION англиар; хөгжүүлэгчийн туршилтын хуудас, IssueChatLongThreadPerf хасагдсан хэвээр.
+
+| Хэсэг | Агуулга |
+|---|---|
+| Хүрээ | tiers.ts «// Ү6 7.15» блокт 206 файл; scripts/xo-i18n/tiers-y6-7-15.test.ts |
+| Каталог | merge t1–t9; ганц/олон тооны 16 хос _one/_other болсон |
+| Helper засвар | ai-connections/model.ts aiSubscriptionName(); agent-config-primitives (help → getter); FileTree frontmatterFieldLabel; lib/pipeline-breakdown.ts (хураангуй өгүүлбэр, механизмын жагсаалт, joinWithAnd «ба»); xo/labels.ts xoRunActionLabel() (WorkspaceRuntimeControls-ийн «Run» товч → «Ажиллуулах», en-д guard) |
+| Хөтчөөр олдсон | NewAgent breadcrumb, PluginPage breadcrumb ба маршрутын зөрчлийн мэдэгдэл, CompanySettingsNav-ийн табууд (production Layout) |
+| Нэр томьёо | skill → «ур чадвар» (7.15-ийн 3 утга засагдсан, y6-7-9-keys.test) |
+| keep-en (+47) | бүтээгдэхүүний нэр, JSON жишээ, зам, үйлдлийн системийн нэр, Claim secret, OK, Debounce, Worktree, XO, {{sentence}}. г.м. |
+| Брэнд | SystemNotice tone.label → tone.labelClass; TrustPresetSection-д XoTrans доторх {{brand}}-ийг {{product}} болгосон (глобал defaultVariables brand-ийг дарахгүй тул) |
+
+Түлхүүр: 10831 (+2690).
+
+### Шалгалтын үр дүн
+
+- Gates (2026-10-14): xo:i18n:check OK keys=10831 (untranslated 0, manual 0), xo:i18n:test 415, ui tsc 0 алдаа, xo:brand-scan OK (baseline 552 / 160, одоо 505 / 152). vitest ui/src 6583 / 6585: y6-7-9-keys (skill) засагдаж давсан; CompanyEnvironments.test.tsx (хөндөөгүй файл) ачааллын үед унаж, дангаар давсан.
+- Хөтчийн шалгалт (3110, mn): /YB/agents/new, company/settings/instance/plugins, adapters. Латин үсгээр бүтээгдэхүүний нэр, plugin-ийн манифестийн тайлбар (серверийн өгөгдөл) л үлдсэн. Pipelines хуудас энэ instance-д dashboard руу шилждэг тул хөтчөөр шалгаагүй. en горимд adapters англи хэвээр.
+
+### Үлдэгдэл
+
+- IssueMonitorBanner-ийн {{eta}}/{{time}} (lib/issue-monitor) англиар.
+- CompanyImport, CompanyExport, PackageFileTree frontmatterFieldLabel-ийг хэрэглээгүй.
+- ExternallyConnectedTaskBanner «Unnamed attachment» серверт илгээгддэг тул англиар.
+- lib/tool-installs.ts INSTALLED_HINT ашиглагдахгүй болсон (устгаагүй).
+- Pipeline-ийн хэсгийн нэр ({{noun}}) хэрэглэгчийн тохируулсан англи үг хэвээр.
+
 ## Ү6 7.14 Tier-гүй үлдэгдэл, 1-р шат: apps, tools, холболт (2026-10-14)
 
 Зорилго: 7.13-ын тооллогоор tier-гүй үлдсэн файлуудаас apps, tools, холболтын хэсгийг орчуулах.

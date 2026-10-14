@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { copyTextToClipboard } from "@/lib/clipboard";
+import { tx } from "@/i18n/xo";
 
 export type WorkspaceServiceControlState =
   | "stopped"
@@ -114,7 +115,7 @@ function CopyUrlButton({ url, disabled }: { url: string; disabled?: boolean }) {
   useEffect(() => () => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
   }, []);
-  const copyLabel = copyState === "copied" ? "URL copied" : copyState === "failed" ? "Copy failed" : "Copy URL";
+  const copyLabel = copyState === "copied" ? tx("URL copied") : copyState === "failed" ? tx("Copy failed") : tx("Copy URL");
   return (
     <Button
       variant="ghost"
@@ -365,7 +366,7 @@ function ServicePopoverRow({
     : live
       ? displayUrl
     : entry.state === "starting" && entry.port
-      ? `starting on :${entry.port}…`
+      ? tx("starting on :{{port}}…", { port: entry.port })
       : entry.state === "failed" && entry.failureDetail
         ? entry.failureDetail
         : `${meta.label.toLowerCase().replace(/…$/, "")}${entry.port ? ` · :${entry.port}` : ""}`;
@@ -432,7 +433,7 @@ function MultiServiceBar({
 
   const aggregateEntry: WorkspaceServiceControlEntry = {
     key: "__all__",
-    name: "All services",
+    name: tx("All services"),
     state: anyTransitional
       ? "starting"
       : anyFailed

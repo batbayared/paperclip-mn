@@ -17,6 +17,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { InlineBanner } from "@/components/InlineBanner";
 import { queryKeys } from "@/lib/queryKeys";
 import { SummarizerAgentSelect } from "./SummarizerAgentSelect";
+import { tx } from "@/i18n/xo";
 
 const EXAMPLES = [
   "issues about evals",
@@ -67,7 +68,7 @@ export function CreateStatusCardDialog({
       ]);
       close();
     },
-    onError: (err) => setError(err instanceof Error ? err.message : "Could not create the card."),
+    onError: (err) => setError(err instanceof Error ? err.message : tx("Could not create the card.")),
   });
 
   return (

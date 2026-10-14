@@ -3,6 +3,7 @@ import type { Issue } from "@paperclipai/shared";
 import type { IssueSiblingNavigation as IssueSiblingNavigationState } from "@/lib/issue-detail-subissues";
 import { createIssueDetailPath, withIssueDetailHeaderSeed } from "@/lib/issueDetailBreadcrumb";
 import { cn } from "@/lib/utils";
+import { tx } from "@/i18n/xo";
 import { Link } from "@/lib/router";
 import { StatusIcon } from "./StatusIcon";
 
@@ -46,8 +47,8 @@ function SiblingLink({
   className?: string;
 }) {
   const issuePathId = issue.identifier ?? issue.id;
-  const label = direction === "previous" ? "Previous" : "Next";
-  const ariaDirection = direction === "previous" ? "Previous sub-task" : "Next sub-task";
+  const label = direction === "previous" ? tx("Previous") : tx("Next");
+  const ariaDirection = direction === "previous" ? tx("Previous sub-task") : tx("Next sub-task");
   const identifier = issue.identifier ?? issue.id.slice(0, 8);
   const Icon = direction === "previous" ? ChevronLeft : ChevronRight;
 

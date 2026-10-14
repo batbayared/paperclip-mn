@@ -25,6 +25,7 @@ import type {
   WorkspaceFileListMode,
   WorkspaceFileSelector,
 } from "@paperclipai/shared";
+import { tx } from "@/i18n/xo";
 
 type BrowserSource = "current" | "other";
 
@@ -835,11 +836,13 @@ export function WorkspaceFileBrowser({
   ]);
 
   const announcement = useMemo(() => {
-    if (listQuery.isFetching) return "Loading workspace files…";
-    if (listQuery.isError) return "Unable to load workspace files.";
+    if (listQuery.isFetching) return tx("Loading workspace files…");
+    if (listQuery.isError) return tx("Unable to load workspace files.");
     if (data?.state === "unavailable") return describeUnavailable(data.unavailableReason ?? "").title;
-    if (items.length === 0) return "No matching files.";
-    return `${items.length} item${items.length === 1 ? "" : "s"} found.`;
+    if (items.length === 0) return tx("No matching files.");
+    return items.length === 1
+      ? tx("{{itemCount}} item found.", { itemCount: items.length })
+      : tx("{{itemCount}} items found.", { itemCount: items.length });
   }, [data, items.length, listQuery.isError, listQuery.isFetching]);
 
   function openTypedPath() {

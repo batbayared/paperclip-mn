@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "../lib/utils";
+import { tx } from "@/i18n/xo";
 
 export interface SecretBindingValue {
   secretId: string;
@@ -63,7 +64,7 @@ const VERSION_LATEST: SecretVersionSelector = "latest";
 function describeSecret(secret: CompanySecret): string {
   const provider = secret.provider.replaceAll("_", " ");
   if (secret.managedMode === "external_reference") {
-    return `External · ${provider}`;
+    return tx("External · {{provider}}", { provider });
   }
   return provider;
 }
@@ -86,10 +87,10 @@ function statusTone(status: CompanySecret["status"]): string {
 export function SecretBindingPicker({
   value,
   onChange,
-  label = "Secret",
-  placeholder = "Select secret",
+  label = tx("Secret"),
+  placeholder = tx("Select secret"),
   allowVersionSelector = true,
-  emptyHint = "No matching secrets. Create one to bind it here.",
+  emptyHint = tx("No matching secrets. Create one to bind it here."),
   className,
   disabled,
   statusFilter = ["active"],
@@ -148,7 +149,7 @@ export function SecretBindingPicker({
       setCreateError(null);
     },
     onError: (error) => {
-      setCreateError(error instanceof Error ? error.message : "Failed to create secret");
+      setCreateError(error instanceof Error ? error.message : tx("Failed to create secret"));
     },
   });
 
@@ -197,10 +198,10 @@ export function SecretBindingPicker({
             {selectedMissing && value ? (
               <option value={value.secretId}>
                 {missingHint
-                  ? `${missingHint.name} — ${missingHint.companyName ?? "another organization"}`
+                  ? `${missingHint.name} — ${missingHint.companyName ?? tx("another organization")}`
                   : hintsPending
-                    ? `Secret (${value.secretId.slice(0, 8)}…)`
-                    : `Missing secret (${value.secretId.slice(0, 8)}…)`}
+                    ? tx("Secret ({{id}}…)", { id: value.secretId.slice(0, 8) })
+                    : tx("Missing secret ({{id}}…)", { id: value.secretId.slice(0, 8) })}
               </option>
             ) : null}
             {filteredSecrets.map((secret) => (
@@ -251,20 +252,22 @@ export function SecretBindingPicker({
 
       {selectedSecret ? (
         <p className={cn("text-(length:--text-micro) text-muted-foreground", statusTone(selectedSecret.status))}>
-          {selectedSecret.status !== "active" ? `Status: ${selectedSecret.status}. ` : null}
-          Bound to {versionDisplay(value?.version)} · {selectedSecret.key}
+          {selectedSecret.status !== "active" ? tx("Status: {{status}}. ", { status: selectedSecret.status }) : null}
+          {tx("Bound to {{version}} · {{key}}", { version: versionDisplay(value?.version), key: selectedSecret.key })}
         </p>
       ) : crossCompanyHint ? (
         <p className="text-(length:--text-micro) text-muted-foreground flex items-center gap-1">
           <AlertCircle className="h-3 w-3" />
-          Owned by {crossCompanyHint.companyName ? `the ${crossCompanyHint.companyName} organization` : "another organization"}. The binding keeps working; selecting a secret from this list re-points it here.
+          {crossCompanyHint.companyName
+            ? tx("Owned by the {{company}} organization. The binding keeps working; selecting a secret from this list re-points it here.", { company: crossCompanyHint.companyName })
+            : tx("Owned by another organization. The binding keeps working; selecting a secret from this list re-points it here.")}
         </p>
       ) : missingHint ? (
         <p className="text-(length:--text-micro) text-destructive flex items-center gap-1">
           <AlertCircle className="h-3 w-3" />
           {missingHint.status === "deleted"
             ? "The previously selected secret was deleted. Pick another or remove the binding."
-            : `This secret is ${missingHint.status}; runs cannot resolve it until it is active again.`}
+            : tx("This secret is {{status}}; runs cannot resolve it until it is active again.", { status: missingHint.status })}
         </p>
       ) : hintsPending ? (
         <p className="text-(length:--text-micro) text-muted-foreground flex items-center gap-1">

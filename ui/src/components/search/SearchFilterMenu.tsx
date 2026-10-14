@@ -5,6 +5,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { tx } from "@/i18n/xo";
 
 export interface FilterMenuOption {
   value: string;
@@ -62,8 +63,8 @@ export function SearchFilterMenu(props: SearchFilterMenuProps) {
     options,
     selected,
     searchable = false,
-    searchPlaceholder = "Search…",
-    emptyMessage = "No options",
+    searchPlaceholder = tx("Search…"),
+    emptyMessage = tx("No options"),
     triggerClassName,
     contentClassName,
     align = "start",
@@ -102,7 +103,7 @@ export function SearchFilterMenu(props: SearchFilterMenuProps) {
             active && "border-primary/60 text-foreground",
             triggerClassName,
           )}
-          aria-label={`Filter by ${label}`}
+          aria-label={tx("Filter by {{label}}", { label })}
         >
           <span className="truncate">{summarizeTrigger(label, selected, options)}</span>
           {active ? (

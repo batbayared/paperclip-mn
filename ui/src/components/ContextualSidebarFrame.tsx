@@ -9,6 +9,7 @@ import {
 } from "@/lib/shell-navigation";
 import { cn } from "@/lib/utils";
 import { SidebarNavExpandedProvider } from "./SidebarNavItem";
+import { tx } from "@/i18n/xo";
 
 export function ContextualSidebarFrame({
   surface,
@@ -52,7 +53,7 @@ export function ContextualSidebarFrame({
               type="button"
               onClick={goBack}
               className="flex items-center gap-1.5 rounded-md px-2 py-1 text-left text-xs text-muted-foreground transition-colors hover:bg-background hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              aria-label={`Back from ${title}`}
+              aria-label={tx("Back from {{title}}", { title })}
             >
               <ChevronLeft className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
               <span className="truncate">{selectedCompany?.name ?? "Organization"}</span>

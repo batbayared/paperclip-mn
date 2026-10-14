@@ -4,6 +4,7 @@ import { useSmokeLabEnabled } from "@/hooks/useSmokeLabEnabled";
 import { useReviewCount } from "@/pages/apps/useReviewCount";
 import { SidebarNavItem } from "./SidebarNavItem";
 import { contextualSidebarStyles } from "./contextual-sidebar-styles";
+import { tx } from "@/i18n/xo";
 
 /**
  * Secondary sidebar for the Apps area.
@@ -37,7 +38,7 @@ export function AppsSidebar() {
             icon={ShieldQuestion}
             badge={reviewCount > 0 ? reviewCount : undefined}
             badgeTone="warning"
-            badgeLabel="waiting for your OK"
+            badgeLabel={tx("waiting for your OK")}
           />
         </div>
         {developerTabs.length > 0 ? (

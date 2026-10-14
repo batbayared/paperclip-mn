@@ -26,27 +26,28 @@ const TONE_ICONS: Record<IssueWriteDenialTone, typeof ShieldX> = {
   attribution: UserCog,
 };
 
+// Class-name keys use computed form so the xo-i18n transform does not treat them as copy.
 const TONE_CLASSES: Record<IssueWriteDenialTone, { surface: string; icon: string; action: string }> = {
   // A real authorization wall — the strongest signal.
   boundary: {
     surface:
       "border-red-300/70 bg-red-50/90 text-red-950 dark:border-red-500/40 dark:bg-red-500/10 dark:text-red-100",
     icon: "text-red-600 dark:text-red-300",
-    action: "text-red-800 dark:text-red-200",
+    ["action"]: "text-red-800 dark:text-red-200",
   },
   // Run-lifecycle machinery that clears on its own; not a permission problem.
   lock: {
     surface:
       "border-amber-300/70 bg-amber-50/90 text-amber-950 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-100",
     icon: "text-amber-600 dark:text-amber-300",
-    action: "text-amber-800 dark:text-amber-200",
+    ["action"]: "text-amber-800 dark:text-amber-200",
   },
   // A rate backstop — the write was allowed, the budget was not.
   cap: {
     surface:
       "border-amber-300/70 bg-amber-50/90 text-amber-950 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-100",
     icon: "text-amber-600 dark:text-amber-300",
-    action: "text-amber-800 dark:text-amber-200",
+    ["action"]: "text-amber-800 dark:text-amber-200",
   },
   // Rejected attribution: the write is fine, the claimed identity is not.
   // Neutral surface, but the action lines stay near-foreground — on a muted
@@ -55,7 +56,7 @@ const TONE_CLASSES: Record<IssueWriteDenialTone, { surface: string; icon: string
     surface:
       "border-border bg-muted/60 text-foreground dark:border-border dark:bg-muted/30",
     icon: "text-muted-foreground",
-    action: "text-foreground/80",
+    ["action"]: "text-foreground/80",
   },
 };
 

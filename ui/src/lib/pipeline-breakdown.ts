@@ -1,4 +1,6 @@
 import type { PipelineStage } from "../api/pipelines";
+import { tx } from "@/i18n/xo";
+import { xoBrandVars } from "@/xo/labels";
 
 /**
  * UI-side reader + copy helpers for the "Break into pieces" stage primitive.
@@ -125,8 +127,8 @@ export function joinWithAnd(items: string[]): string {
   const list = items.filter((item) => item.trim().length > 0);
   if (list.length === 0) return "";
   if (list.length === 1) return list[0]!;
-  if (list.length === 2) return `${list[0]} and ${list[1]}`;
-  return `${list.slice(0, -1).join(", ")} and ${list[list.length - 1]}`;
+  if (list.length === 2) return tx("{{first}} and {{last}}", { first: list[0], last: list[1] });
+  return tx("{{first}} and {{last}}", { first: list.slice(0, -1).join(", "), last: list[list.length - 1] });
 }
 
 export interface BreakdownCopyNames {
@@ -151,19 +153,27 @@ export function breakdownSummarySentence(
   }
   const noun = config.pieceNoun;
   const parts: string[] = [
-    `Paperclip will create one ${noun} per item in ${names.targetPipelineName} → ${names.entryStageName}`,
+    tx("{{brand}} will create one {{noun}} per item in {{pipeline}} → {{stage}}", {
+      ...xoBrandVars(),
+      noun,
+      pipeline: names.targetPipelineName,
+      stage: names.entryStageName,
+    }),
   ];
   if (names.inheritedFieldLabels.length > 0) {
-    parts.push(`carry over ${joinWithAnd(names.inheritedFieldLabels)}`);
+    parts.push(tx("carry over {{fields}}", { fields: joinWithAnd(names.inheritedFieldLabels) }));
   }
   if (names.advanceToName) {
-    parts.push(`move this case to ${names.advanceToName}`);
+    parts.push(tx("move this case to {{stage}}", { stage: names.advanceToName }));
   }
   let sentence = parts.join(", ");
   if (config.waitForPieces && names.whenFinishedName) {
-    sentence += `, then wait until every ${noun} is finished before moving it to ${names.whenFinishedName}`;
+    sentence += tx(", then wait until every {{noun}} is finished before moving it to {{stage}}", {
+      noun,
+      stage: names.whenFinishedName,
+    });
   }
-  return `${sentence}.`;
+  return tx("{{sentence}}.", { sentence });
 }
 
 /**
@@ -176,18 +186,34 @@ export function breakdownMechanicsBullets(
 ): string[] {
   const noun = config.pieceNoun;
   const bullets: string[] = [
-    `Creates one ${noun} per item the agent returns, in ${names.targetPipelineName || "the destination pipeline"} → ${names.entryStageName || "its entry step"}.`,
-    `Links every ${noun} to this case so progress rolls up here.`,
+    tx("Creates one {{noun}} per item the agent returns, in {{pipeline}} → {{stage}}.", {
+      noun,
+      pipeline: names.targetPipelineName || tx("the destination pipeline"),
+      stage: names.entryStageName || tx("its entry step"),
+    }),
+    tx("Links every {{noun}} to this case so progress rolls up here.", { noun }),
   ];
   if (names.inheritedFieldLabels.length > 0) {
-    bullets.push(`Carries over ${joinWithAnd(names.inheritedFieldLabels)} from this case onto each ${noun}.`);
+    bullets.push(
+      tx("Carries over {{fields}} from this case onto each {{noun}}.", {
+        fields: joinWithAnd(names.inheritedFieldLabels),
+        noun,
+      }),
+    );
   }
   if (names.advanceToName) {
-    bullets.push(`Moves this case to ${names.advanceToName} as soon as the pieces are created.`);
+    bullets.push(tx("Moves this case to {{stage}} as soon as the pieces are created.", { stage: names.advanceToName }));
   }
   if (config.waitForPieces && names.whenFinishedName) {
-    bullets.push(`Waits until every ${noun} is finished, then moves this case to ${names.whenFinishedName}.`);
-    bullets.push(`If the agent returns an empty list, this case skips ahead to ${names.whenFinishedName}.`);
+    bullets.push(
+      tx("Waits until every {{noun}} is finished, then moves this case to {{stage}}.", {
+        noun,
+        stage: names.whenFinishedName,
+      }),
+    );
+    bullets.push(
+      tx("If the agent returns an empty list, this case skips ahead to {{stage}}.", { stage: names.whenFinishedName }),
+    );
   }
   return bullets;
 }

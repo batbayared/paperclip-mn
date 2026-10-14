@@ -33,6 +33,7 @@ import { AgentIcon } from "../components/AgentIconPicker";
 import { cn, formatDateTime } from "../lib/utils";
 import type { FeedbackVoteValue } from "@paperclipai/shared";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { tx } from "@/i18n/xo";
 
 /**
  * Board Concierge Chat — a chat interface powered by the board-member skill.
@@ -555,7 +556,7 @@ export function BoardChat() {
       setInput("");
       setStreamingText("");
       setErrorText("");
-      setStatusText("Connecting...");
+      setStatusText(tx("Connecting..."));
 
       try {
         const controller = new AbortController();
@@ -576,7 +577,7 @@ export function BoardChat() {
           throw new Error("Board chat stream not available");
         }
 
-        setStatusText("Thinking...");
+        setStatusText(tx("Thinking..."));
 
         const reader = res.body.getReader();
         const decoder = new TextDecoder();
@@ -606,7 +607,7 @@ export function BoardChat() {
               } else if (event.type === "error") {
                 setErrorText(
                   event.message ||
-                    "The board assistant couldn't respond. Please try again.",
+                    tx("The board assistant couldn't respond. Please try again."),
                 );
                 setStatusText("");
               } else if (event.type === "done") {
@@ -634,7 +635,7 @@ export function BoardChat() {
         console.error("Board chat error:", err);
         setStatusText("");
         setErrorText(
-          "The board assistant is unavailable right now. Please try again in a moment.",
+          tx("The board assistant is unavailable right now. Please try again in a moment."),
         );
       } finally {
         setSending(false);
@@ -743,12 +744,12 @@ export function BoardChat() {
               {welcomeRevealed && ceoAgent && selectedCompany && (() => {
                 const ceoName = ceoAgent.name;
                 const companyName = selectedCompany.name;
-                const missionLine = missionText
-                  ? ` — your mission is "${missionText}".`
-                  : ".";
+                const welcomeIntro = missionText
+                  ? tx("Welcome to **{{companyName}}**! I'm {{ceoName}}, your team lead. I've read through what you shared in the wizard — your mission is \"{{missionText}}\".", { companyName, ceoName, missionText })
+                  : tx("Welcome to **{{companyName}}**! I'm {{ceoName}}, your team lead. I've read through what you shared in the wizard.", { companyName, ceoName });
                 const welcomeBody =
-                  `Welcome to **${companyName}**! I'm ${ceoName}, your team lead. I've read through what you shared in the wizard${missionLine}\n\n` +
-                  `Here are a few things I can help you put on paper right now. Pick one below and I'll draft it for you using everything you told us.`;
+                  `${welcomeIntro}\n\n` +
+                  tx("Here are a few things I can help you put on paper right now. Pick one below and I'll draft it for you using everything you told us.");
 
                 const userHasReplied = sortedComments.some(
                   (c) => !c.authorAgentId && c.authorUserId !== "board-concierge",
@@ -829,7 +830,7 @@ export function BoardChat() {
                 const agent = comment.authorAgentId
                   ? agentMap.get(comment.authorAgentId) ?? null
                   : ceoAgent ?? null;
-                const agentName = agent?.name ?? "Assistant";
+                const agentName = agent?.name ?? tx("Assistant");
                 const agentIconValue = agent?.icon ?? null;
                 return (
                   <div key={comment.id} className="flex flex-col items-start">
@@ -906,9 +907,9 @@ export function BoardChat() {
               {sending && (
                 <div className="flex items-center gap-2 pl-1 text-xs text-muted-foreground">
                   <img src="/paperclip-thinking.svg" alt="" className="inline-block shrink-0" style={{ width: 14, height: 14 }} />
-                  <span>{statusText || "Thinking..."}</span>
+                  <span>{statusText || tx("Thinking...")}</span>
                   {elapsedSec > 0 && (
-                    <span className="opacity-50">{elapsedSec.toFixed(1)}s</span>
+                    <span className="opacity-50">{tx("{{seconds}}s", { seconds: elapsedSec.toFixed(1) })}</span>
                   )}
                 </div>
               )}
@@ -972,7 +973,7 @@ export function BoardChat() {
               surface="translucent"
               submitting={sending}
               disabled={sending}
-              sendLabel="Send message"
+              sendLabel={tx("Send message")}
               className="pointer-events-auto"
             />
           </div>

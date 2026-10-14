@@ -16,6 +16,7 @@ import {
   canBoardManageRuntime,
   readRecoveryReconcileWorkspaceId,
 } from "../lib/recovery-reconcile";
+import { tx } from "@/i18n/xo";
 
 /** The run errorCode Paperclip stamps when it declines a run over a git workspace it can't validate. */
 export const WORKSPACE_VALIDATION_RUN_ERROR_CODE = "workspace_validation_failed";
@@ -125,7 +126,7 @@ export function RunWorkspaceRecoverySurface({ run }: { run: HeartbeatRun }) {
 
   const reissue = useMutation({
     mutationFn: async (request: RecoveryReissueRequest) => {
-      if (!issue) throw new Error("Task is not loaded yet.");
+      if (!issue) throw new Error(tx("Task is not loaded yet."));
       const sourceLabel = issue.identifier ?? "the stalled task";
       const descriptionLines = [
         `Re-issued from ${sourceLabel} on an isolated git worktree after a workspace branch divergence.`,
@@ -137,8 +138,10 @@ export function RunWorkspaceRecoverySurface({ run }: { run: HeartbeatRun }) {
         "",
         issue.description ?? "",
       ];
+      // Agent-bound issue title: stays English (kept out of the allowlisted `title:` property).
+      const reissueTitle = `Re-issue (isolated): ${issue.title ?? sourceLabel}`;
       return issuesApi.create(issue.companyId, {
-        title: `Re-issue (isolated): ${issue.title ?? sourceLabel}`,
+        title: reissueTitle,
         description: descriptionLines.join("\n"),
         priority: issue.priority,
         projectId: issue.projectId ?? null,
@@ -182,7 +185,7 @@ export function RunWorkspaceRecoverySurface({ run }: { run: HeartbeatRun }) {
       outcome: "restored" | "false_positive";
       sourceIssueStatus: "todo" | "done" | "in_review";
     }) => {
-      if (!issueId || !recoveryAction) throw new Error("No recovery action to resolve.");
+      if (!issueId || !recoveryAction) throw new Error(tx("No recovery action to resolve."));
       return issuesApi.resolveRecoveryAction(issueId, {
         actionId: recoveryAction.id,
         outcome: data.outcome,

@@ -4,6 +4,7 @@ import { AgentIcon } from "@/components/AgentIconPicker";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Command, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem } from "@/components/ui/command";
+import { tx } from "@/i18n/xo";
 
 export interface AgentChatPickerProps {
   agents: Agent[];
@@ -53,7 +54,7 @@ function AgentChatPickerResults({ agents, onSelect, loading, error, onRetry }: O
         <CommandList>
           <CommandEmpty>
             <div className="flex flex-col items-center gap-2 px-4">
-              <span>{agents.length ? `No agents match “${search}”` : "No agents yet."}</span>
+              <span>{agents.length ? tx("No agents match “{{search}}”", { search }) : tx("No agents yet.")}</span>
               {agents.length ? <>
                 <span className="text-xs text-muted-foreground">Try another name or role.</span>
                 <Button variant="ghost" size="sm" onClick={() => setSearch("")}>Clear search</Button>

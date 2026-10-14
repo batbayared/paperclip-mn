@@ -69,10 +69,10 @@ export function JoinRequestQueue() {
   if (requestsQuery.error) {
     const message =
       requestsQuery.error instanceof ApiError && requestsQuery.error.status === 403
-        ? "You do not have permission to review join requests for this organization."
+        ? tx("You do not have permission to review join requests for this organization.")
         : requestsQuery.error instanceof Error
           ? requestsQuery.error.message
-          : "Failed to load join requests.";
+          : tx("Failed to load join requests.");
     return <div className="text-sm text-destructive">{message}</div>;
   }
 
@@ -174,8 +174,10 @@ export function JoinRequestQueue() {
                   <div className="text-xs font-medium uppercase tracking-wide">Invite context</div>
                   <div className="mt-2">
                     {request.invite
-                      ? `${request.invite.allowedJoinTypes} join invite${request.invite.humanRole ? ` • default role ${request.invite.humanRole}` : ""}`
-                      : "Invite metadata unavailable"}
+                      ? (request.invite.humanRole
+                        ? tx("{{joinTypes}} join invite • default role {{humanRole}}", { joinTypes: request.invite.allowedJoinTypes, humanRole: request.invite.humanRole })
+                        : tx("{{joinTypes}} join invite", { joinTypes: request.invite.allowedJoinTypes }))
+                      : tx("Invite metadata unavailable")}
                   </div>
                   {request.invite?.inviteMessage ? (
                     <div className="mt-2 text-foreground">{request.invite.inviteMessage}</div>

@@ -52,6 +52,7 @@ import type {
   WorkspaceFileContent,
   WorkspaceFileSelector,
 } from "@paperclipai/shared";
+import { tx } from "@/i18n/xo";
 
 const FILE_VIEWER_LABELLED_BY_ID = "paperclip-file-viewer-title";
 const FILE_VIEWER_DESCRIBED_BY_ID = "paperclip-file-viewer-description";
@@ -217,8 +218,9 @@ export function FileViewerMetadataRow({
             <>
               <span aria-hidden="true" className="opacity-50">·</span>
               <span>
-                Line {state.line}
-                {state.column ? `, Col ${state.column}` : ""}
+                {state.column
+                  ? tx("Line {{line}}, Col {{column}}", { line: state.line, column: state.column })
+                  : tx("Line {{line}}", { line: state.line })}
               </span>
             </>
           ) : null}
@@ -258,7 +260,11 @@ export function FileContentViewer({ content, highlightedLine, onLoaded }: FileCo
 
   useEffect(() => {
     if (!lines) return;
-    onLoaded?.(`File loaded, ${lines.length} ${lines.length === 1 ? "line" : "lines"}.`);
+    onLoaded?.(
+      lines.length === 1
+        ? tx("File loaded, {{lineCount}} line.", { lineCount: lines.length })
+        : tx("File loaded, {{lineCount}} lines.", { lineCount: lines.length }),
+    );
   }, [lines, onLoaded]);
 
   useEffect(() => {
@@ -554,14 +560,14 @@ export function FileViewerSheet({
   useEffect(() => {
     if (resolveQuery.isError) {
       const normalized = normalizeError(resolveQuery.error);
-      setAnnouncement(normalized.message || "Unable to load file.");
+      setAnnouncement(normalized.message || tx("Unable to load file."));
     }
   }, [resolveQuery.isError, resolveQuery.error]);
 
   useEffect(() => {
     if (contentQuery.isError) {
       const normalized = normalizeError(contentQuery.error);
-      setAnnouncement(normalized.message || "Unable to load file content.");
+      setAnnouncement(normalized.message || tx("Unable to load file content."));
     }
   }, [contentQuery.isError, contentQuery.error]);
 
@@ -643,7 +649,7 @@ export function FileViewerSheet({
       await copyTextToClipboard(value);
       showCopyFeedback(field, message);
     } catch {
-      showCopyFeedback(null, "Copy failed");
+      showCopyFeedback(null, tx("Copy failed"));
     } finally {
       setCopyingField((current) => (current === field ? null : current));
     }
@@ -658,17 +664,17 @@ export function FileViewerSheet({
         content = result.data;
       }
       if (!content) {
-        showCopyFeedback(null, "File contents unavailable");
+        showCopyFeedback(null, tx("File contents unavailable"));
         return;
       }
-      const message = content.content.encoding === "base64" ? "Copied file data" : "Copied contents";
+      const message = content.content.encoding === "base64" ? tx("Copied file data") : tx("Copied contents");
       await copyToClipboard(content.content.data, "content", message);
     })();
   }, [canPreview, contentQuery, copyToClipboard, showCopyFeedback, state]);
 
   const handleCopyLink = useCallback(() => {
     if (typeof window === "undefined") return;
-    void copyToClipboard(window.location.href, "link", "Copied link");
+    void copyToClipboard(window.location.href, "link", tx("Copied link"));
   }, [copyToClipboard]);
 
   const handleRetry = useCallback(() => {
@@ -707,10 +713,10 @@ export function FileViewerSheet({
     });
   }, []);
 
-  const title = state ? basename(state.path) : "Browse workspace";
+  const title = state ? basename(state.path) : tx("Browse workspace");
   const description = state
     ? middleTruncatePath(state.path)
-    : "Search and preview files from this issue's workspace.";
+    : tx("Search and preview files from this issue's workspace.");
   const showDescription = state ? description !== title : true;
 
   return (

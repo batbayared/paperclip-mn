@@ -11,6 +11,7 @@ import {
 } from "react";
 import { AlertTriangle, Check, Loader2, Paperclip, Send } from "lucide-react";
 import { cn } from "../lib/utils";
+import { tx } from "@/i18n/xo";
 
 /**
  * Shared chat composer (PAP-95a / PAP-96).
@@ -113,7 +114,7 @@ export const ChatComposer = forwardRef<ChatComposerHandle, ChatComposerProps>(fu
     value,
     onChange,
     onSubmit,
-    placeholder = "Message…",
+    placeholder = tx("Message…"),
     disabled = false,
     submitting = false,
     submitKey = "mod-enter",
@@ -121,7 +122,7 @@ export const ChatComposer = forwardRef<ChatComposerHandle, ChatComposerProps>(fu
     tone = "standard",
     surface = "card",
     autoFocus = false,
-    sendLabel = "Send message",
+    sendLabel = tx("Send message"),
     onAttachFiles,
     attachments = [],
     attaching = false,
@@ -288,12 +289,12 @@ export const ChatComposer = forwardRef<ChatComposerHandle, ChatComposerProps>(fu
             const sizeLabel = formatAttachmentSize(attachment.size);
             const statusLabel =
               attachment.status === "uploading"
-                ? "Uploading…"
+                ? tx("Uploading…")
                 : attachment.status === "error"
-                  ? attachment.error ?? "Upload failed"
+                  ? attachment.error ?? tx("Upload failed")
                   : attachment.inline
-                    ? "Inserted inline"
-                    : "Attached";
+                    ? tx("Inserted inline")
+                    : tx("Attached");
             return (
               <div
                 key={attachment.id}

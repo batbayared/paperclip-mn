@@ -4,6 +4,7 @@ import { ExternalObjectPill } from "./ExternalObjectPill";
 import type { IssueExternalObjectGroup } from "../hooks/useIssueExternalObjects";
 import { externalObjectToneSeverity } from "../lib/external-objects";
 import { Badge } from "@/components/ui/badge";
+import { tx } from "@/i18n/xo";
 
 type GroupedSource = {
   label: string;
@@ -194,7 +195,7 @@ export function IssueRelatedWorkPanel({
         title="References"
         description="Other tasks this task currently points at in its title, description, comments, or documents."
         items={outbound}
-        emptyLabel="This task does not reference any other tasks yet."
+        emptyLabel={tx("This task does not reference any other tasks yet.")}
       />
       {externalObjectsEnabled ? (
         <ExternalObjectsSection
@@ -208,7 +209,7 @@ export function IssueRelatedWorkPanel({
         title="Referenced by"
         description="Other tasks that currently point at this task."
         items={inbound}
-        emptyLabel="No other tasks reference this task yet."
+        emptyLabel={tx("No other tasks reference this task yet.")}
       />
     </div>
   );

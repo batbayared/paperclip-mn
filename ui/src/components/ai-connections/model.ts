@@ -41,9 +41,23 @@ export const AI_CONNECTION_STATUS: Record<AiConnectionStatus, string> = {
   revoked: "Revoked",
 };
 
+/** AI_PROVIDERS[provider].subscriptionName-ийн харагдах (орчуулсан) хэлбэр. */
+export function aiSubscriptionName(provider: AiProvider): string | undefined {
+  switch (AI_PROVIDERS[provider].subscriptionName) {
+    case "Claude subscription":
+      return tx("Claude subscription");
+    case "ChatGPT subscription":
+      return tx("ChatGPT subscription");
+    case "Grok subscription":
+      return tx("Grok subscription");
+    default:
+      return AI_PROVIDERS[provider].subscriptionName;
+  }
+}
+
 export function aiMethodLabel(provider: AiProvider, method: AiAuthMethod) {
   return method === "subscription"
-    ? (AI_PROVIDERS[provider].subscriptionName ?? tx("Subscription unavailable"))
+    ? (aiSubscriptionName(provider) ?? tx("Subscription unavailable"))
     : tx("API key");
 }
 

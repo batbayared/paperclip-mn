@@ -5,6 +5,7 @@ import {
   readIssueChangeReceipt,
 } from "../lib/issue-change-receipt";
 import { cn } from "../lib/utils";
+import { XoTrans } from "@/xo/XoTrans";
 
 /**
  * Field-level audit receipt under an `issue.updated` row in the activity stream
@@ -85,7 +86,11 @@ export function IssueFieldChangeReceipt({
           />
           {responsibleUserName ? (
             <>
-              for <span className="text-foreground">{responsibleUserName}</span>
+              <XoTrans
+                i18nKey="for <u>{{name}}</u>"
+                values={{ name: responsibleUserName }}
+                components={{ u: <span className="text-foreground" /> }}
+              />
               {" · "}
             </>
           ) : null}

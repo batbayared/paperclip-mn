@@ -2,6 +2,7 @@ import type { MouseEvent } from "react";
 import { Loader2, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "../lib/utils";
+import { tx } from "@/i18n/xo";
 
 export interface StarToggleProps {
   /** Whether the resource is currently starred (post-optimistic value). */
@@ -51,7 +52,7 @@ export function StarToggle({
   className,
   revealClassName,
 }: StarToggleProps) {
-  const ariaLabel = starred ? `Unstar ${resourceName}` : `Star ${resourceName}`;
+  const ariaLabel = starred ? tx("Unstar {{name}}", { name: resourceName }) : tx("Star {{name}}", { name: resourceName });
   const Icon = pending ? Loader2 : Star;
 
   function handleClick(event: MouseEvent<HTMLButtonElement>) {

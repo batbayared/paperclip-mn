@@ -8,6 +8,7 @@ import {
   rememberIssueDetailLocationState,
 } from "@/lib/issueDetailBreadcrumb";
 import { Link } from "@/lib/router";
+import { tx } from "@/i18n/xo";
 
 export interface TaskDetailRelationItem {
   id: string;
@@ -155,7 +156,7 @@ export function TaskDetailSubtasksPanel({
           <RelationNavigationList
             items={[rootBlocker]}
             emptyMessage=""
-            ariaLabel="Root blocker"
+            ariaLabel={tx("Root blocker")}
             issueLinkState={issueLinkState}
           />
         </section>
@@ -168,7 +169,7 @@ export function TaskDetailSubtasksPanel({
           </h3>
           <TaskDetailTaskList
             items={[nextAction]}
-            ariaLabel="Next subtask action"
+            ariaLabel={tx("Next subtask action")}
             issueLinkState={issueLinkState}
           />
         </section>
@@ -187,7 +188,7 @@ export function TaskDetailSubtasksPanel({
           </h3>
           <TaskDetailTaskList
             items={remainingItems}
-            ariaLabel={nextAction ? "Other subtasks" : "Subtasks"}
+            ariaLabel={nextAction ? tx("Other subtasks") : tx("Subtasks")}
             issueLinkState={issueLinkState}
           />
         </section>
@@ -220,8 +221,8 @@ export function TaskDetailReferencesPanel({
         </h3>
         <RelationNavigationList
           items={referenced}
-          emptyMessage="This task does not reference another task."
-          ariaLabel="Referenced tasks"
+          emptyMessage={tx("This task does not reference another task.")}
+          ariaLabel={tx("Referenced tasks")}
           issueLinkState={issueLinkState}
         />
       </section>
@@ -231,8 +232,8 @@ export function TaskDetailReferencesPanel({
         </h3>
         <RelationNavigationList
           items={mentionedIn}
-          emptyMessage="No other task mentions this task."
-          ariaLabel="Tasks that mention this task"
+          emptyMessage={tx("No other task mentions this task.")}
+          ariaLabel={tx("Tasks that mention this task")}
           issueLinkState={issueLinkState}
         />
       </section>

@@ -1,5 +1,6 @@
 import { xoLocaleDate, xoLocaleDateTime } from "@/xo/date-format";
 import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
 import { useCallback, useEffect, useMemo, useState, type FormEvent, type ReactNode } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { groupWarningsByStage, LOW_TRUST_REVIEW_PRESET } from "@paperclipai/shared";
@@ -181,7 +182,7 @@ export function validateDraftRows(rows: DraftRow[], fields: PipelineIntakeField[
     const rowErrors: FieldErrors = {};
     for (const field of fields) {
       if (field.required && isBlank(row.values[field.key])) {
-        rowErrors[field.key] = `${field.label} is required.`;
+        rowErrors[field.key] = tx("{{label}} is required.", { label: field.label });
       }
     }
     if (Object.keys(rowErrors).length > 0) {
@@ -209,25 +210,21 @@ export function buildBatchPayload(rows: DraftRow[], fields: PipelineIntakeField[
 export function plainBatchError(result: Extract<PipelineBatchIngestResult, { ok: false }>) {
   const details = result.error?.details ?? {};
   if (details.code === "required_field" && typeof details.label === "string") {
-    return `${details.label} is required.`;
+    return tx("{{label}} is required.", { label: details.label });
   }
   if (details.code === "invalid_select_value" && typeof details.label === "string") {
-    return `${details.label} needs one of the available choices.`;
+    return tx("{{label}} needs one of the available choices.", { label: details.label });
   }
   if (details.code === "duplicate_batch_key") {
-    return "This item duplicates another row.";
+    return tx("This item duplicates another row.");
   }
   if (details.code === "blocker_cycle") {
-    return "This item waits on another row that also waits on it.";
+    return tx("This item waits on another row that also waits on it.");
   }
   if (typeof result.error?.message === "string" && result.error.message.trim()) {
     return result.error.message.replace(/^Pipeline\s+/i, "");
   }
-  return "This item needs attention before it can be submitted.";
-}
-
-function itemCountLabel(count: number) {
-  return `${count} ${count === 1 ? "item" : "items"}`;
+  return tx("This item needs attention before it can be submitted.");
 }
 
 function currentStageAutomation(stage: PipelineStage) {
@@ -339,9 +336,11 @@ function retryCleanupFromIds(ids: Set<string>): PipelineAutomationRetryCleanupOp
 function retryPrimaryActionLabel(plan: PipelineAutomationRetryPlan) {
   const retiredOutputCount = plan.effectCounts.directChildren + plan.effectCounts.descendants;
   if (retiredOutputCount > 0 && (plan.defaultCleanup.retireDirectChildren || plan.defaultCleanup.retireDescendants)) {
-    return `Retry and retire ${formatNumber(retiredOutputCount)} ${retiredOutputCount === 1 ? "item" : "items"}`;
+    return retiredOutputCount === 1
+      ? tx("Retry and retire {{n}} item", { n: formatNumber(retiredOutputCount) })
+      : tx("Retry and retire {{n}} items", { n: formatNumber(retiredOutputCount) });
   }
-  return plan.scope === "previous_stage" ? "Retry previous step" : "Re-run this step";
+  return plan.scope === "previous_stage" ? tx("Retry previous step") : tx("Re-run this step");
 }
 
 export function Pipelines() {
@@ -421,7 +420,7 @@ function descendantActiveWorkCount(value: { descendantActiveWorkCount?: number |
 }
 
 function formatLiveDownstream(count: number) {
-  return `${formatNumber(count)} live downstream`;
+  return tx("{{n}} live downstream", { n: formatNumber(count) });
 }
 
 function pipelineActivityTime(pipeline: PipelineListItem) {
@@ -431,13 +430,15 @@ function pipelineActivityTime(pipeline: PipelineListItem) {
 type PipelineSortField = "name" | "activity" | "review" | "inMotion" | "openItems";
 type PipelineSortDir = "asc" | "desc";
 
-const PIPELINE_SORT_OPTIONS: ReadonlyArray<readonly [PipelineSortField, string]> = [
-  ["name", "Name"],
-  ["activity", "Last activity"],
-  ["review", "Most to review"],
-  ["inMotion", "Most in motion"],
-  ["openItems", "Most open items"],
-];
+function pipelineSortOptions(): ReadonlyArray<readonly [PipelineSortField, string]> {
+  return [
+    ["name", tx("Name")],
+    ["activity", tx("Last activity")],
+    ["review", tx("Most to review")],
+    ["inMotion", tx("Most in motion")],
+    ["openItems", tx("Most open items")],
+  ];
+}
 
 function comparePipelinesBySort(field: PipelineSortField, dir: PipelineSortDir) {
   const factor = dir === "asc" ? 1 : -1;
@@ -711,7 +712,7 @@ export function PipelinesIndexTable({
             </PopoverTrigger>
             <PopoverContent align="end" className="w-48 p-0">
               <div className="space-y-0.5 p-2">
-                {PIPELINE_SORT_OPTIONS.map(([field, label]) => (
+                {pipelineSortOptions().map(([field, label]) => (
                   <button
                     key={field}
                     type="button"
@@ -813,7 +814,7 @@ export function PipelinesIndexTable({
             </tbody>
           </table>
           <p className="mt-4 text-sm text-muted-foreground">
-            Showing {formatNumber(rows.length)} of {formatNumber(filteredPipelines.length)}.
+            {tx("Showing {{shown}} of {{total}}.", { shown: formatNumber(rows.length), total: formatNumber(filteredPipelines.length) })}
           </p>
         </div>
       )}
@@ -996,7 +997,7 @@ function PipelinesIndex() {
         }}
         onSubmit={(data) => createPipeline.mutate(data)}
         pending={createPipeline.isPending}
-        error={createPipeline.error ? "Could not create the pipeline. Try a different name." : null}
+        error={createPipeline.error ? tx("Could not create the pipeline. Try a different name.") : null}
       />
     </div>
   );
@@ -1007,7 +1008,6 @@ function PipelinesIndex() {
 // ---------------------------------------------------------------------------
 
 const UNASSIGNED_STAGE_ID = "__pipeline_unassigned_stage";
-const UNASSIGNED_STAGE_NAME = "Unassigned";
 
 type BoardCase = PipelineCase & {
   activeWork?: PipelineCaseActiveWork | null;
@@ -1067,7 +1067,7 @@ export function getCaseTitle(caseItem: BoardCase) {
     const value = asText(fields[key]);
     if (value) return value;
   }
-  return "Untitled item";
+  return tx("Untitled item");
 }
 
 export function isWorkingCase(caseItem: BoardCase) {
@@ -1115,7 +1115,7 @@ export function createUnassignedStage(pipelineId: string): PipelineStage {
     id: UNASSIGNED_STAGE_ID,
     pipelineId,
     key: "__unassigned",
-    name: UNASSIGNED_STAGE_NAME,
+    name: tx("Unassigned"),
     kind: "working",
     position: Number.MAX_SAFE_INTEGER,
     config: {},
@@ -1281,7 +1281,9 @@ function PipelineCaseCard({
         </div>
         {childrenSummary != null ? (
           <p className="mt-1.5 text-xs text-muted-foreground">
-            Built from {formatNumber(childrenSummary)} {childrenSummary === 1 ? "item" : "items"}
+            {childrenSummary === 1
+              ? tx("Built from {{n}} item", { n: formatNumber(childrenSummary) })
+              : tx("Built from {{n}} items", { n: formatNumber(childrenSummary) })}
           </p>
         ) : null}
       </Link>
@@ -1570,7 +1572,7 @@ function PipelineBoard({ pipelineId }: { pipelineId: string }) {
       if (breakdown?.targetPipelineId) {
         map.set(stage.id, {
           pipelineId: breakdown.targetPipelineId,
-          name: pipelineNameById.get(breakdown.targetPipelineId) ?? "another pipeline",
+          name: pipelineNameById.get(breakdown.targetPipelineId) ?? tx("another pipeline"),
         });
       }
     }
@@ -1677,8 +1679,8 @@ function PipelineBoard({ pipelineId }: { pipelineId: string }) {
     const targetStageKey = stageKeyById.get(targetStageId);
     if (!targetStageKey) return;
 
-    const sourceName = stageNameById.get(sourceStageId ?? "") ?? UNASSIGNED_STAGE_NAME;
-    const targetName = stageNameById.get(targetStageId) ?? UNASSIGNED_STAGE_NAME;
+    const sourceName = stageNameById.get(sourceStageId ?? "") ?? tx("Unassigned");
+    const targetName = stageNameById.get(targetStageId) ?? tx("Unassigned");
     setPendingMove({
       caseId: activeCase.id,
       caseVersion: activeCase.version ?? 1,
@@ -1826,7 +1828,7 @@ function PipelineBoard({ pipelineId }: { pipelineId: string }) {
                   isDragTargeted={isDragTargeted}
                   isDragBlocked={isDragBlocked}
                   onColumnEmpty={(columnStage) =>
-                    columnStage.id === UNASSIGNED_STAGE_ID ? "Unassigned items" : "Drop items here"
+                    columnStage.id === UNASSIGNED_STAGE_ID ? tx("Unassigned items") : tx("Drop items here")
                   }
                 />
               );
@@ -2545,7 +2547,7 @@ export function PipelineItemDetailView({ pipelineId, caseId }: { pipelineId: str
       pushToast({ title: "Step automation re-run started", tone: "success" });
     },
     onError: (error: unknown) => {
-      const message = error instanceof ApiError && error.message ? error.message : "Could not re-run this step.";
+      const message = error instanceof ApiError && error.message ? error.message : tx("Could not re-run this step.");
       setRetryDialogError(message);
       pushToast({ title: "Could not re-run this step", tone: "error" });
     },
@@ -2570,7 +2572,7 @@ export function PipelineItemDetailView({ pipelineId, caseId }: { pipelineId: str
       pushToast({ title: "Retry started", tone: "success" });
     },
     onError: (error: unknown) => {
-      const message = error instanceof ApiError && error.message ? error.message : "Could not retry this automation.";
+      const message = error instanceof ApiError && error.message ? error.message : tx("Could not retry this automation.");
       setRetryDialogError(message);
       pushToast({ title: "Could not retry this automation", tone: "error" });
     },
@@ -2614,7 +2616,7 @@ export function PipelineItemDetailView({ pipelineId, caseId }: { pipelineId: str
     onError: (error: unknown) => {
       const message = error instanceof ApiError && error.message
         ? error.message
-        : "Could not retry. Please try again.";
+        : tx("Could not retry. Please try again.");
       setLivenessRetryError(message);
       pushToast({ title: "Could not retry the automation", tone: "error" });
     },
@@ -2762,8 +2764,8 @@ export function PipelineItemDetailView({ pipelineId, caseId }: { pipelineId: str
   const pieceCountDone = childRows.filter((row) =>
     (row.case.terminalKind ?? row.stage.kind)?.trim().toLowerCase() === "done"
   ).length;
-  const pieceNoun = breakdown?.pieceNoun ?? "piece";
-  const pieceNounPluralLabel = pieceNounPlural(pieceNoun);
+  const pieceNoun = breakdown?.pieceNoun ?? tx("piece");
+  const pieceNounPluralLabel = breakdown?.pieceNoun != null ? pieceNounPlural(breakdown.pieceNoun) : tx("pieces");
   const pieceLabel = (count: number) => (count === 1 ? pieceNoun : pieceNounPluralLabel);
   const changedNotice = itemHasChangedNotice(detail.case) ?? changedNoticeFromEvents(eventRows);
   const primaryAction = conversationIssue
@@ -2962,7 +2964,7 @@ export function PipelineItemDetailView({ pipelineId, caseId }: { pipelineId: str
               onClick={() => moveItemToStage.mutate()}
               disabled={!selectedMoveStage || moveItemToStage.isPending}
             >
-              {moveItemToStage.isPending ? "Moving..." : `Move to ${selectedMoveStage?.name ?? "stage"}`}
+              {moveItemToStage.isPending ? "Moving..." : tx("Move to {{stage}}", { stage: selectedMoveStage?.name ?? tx("stage") })}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -3230,7 +3232,7 @@ export function PipelineItemDetailView({ pipelineId, caseId }: { pipelineId: str
             <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
               <ListTree className="h-4 w-4 text-muted-foreground" />
               {breakdown
-                ? `Waiting on ${waitingChildren.length} of ${pieceCountTotal} ${pieceLabel(pieceCountTotal)} · ${pieceCountDone} finished`
+                ? tx("Waiting on {{waiting}} of {{total}} {{pieces}} · {{done}} finished", { waiting: waitingChildren.length, total: pieceCountTotal, pieces: pieceLabel(pieceCountTotal), done: pieceCountDone })
                 : `Waiting on ${waitingChildren.length} of ${pieceCountTotal} child ${pieceCountTotal === 1 ? "item" : "items"}`}
             </div>
             <ul className="divide-y divide-border">
@@ -3366,14 +3368,14 @@ export function PipelineItemDetailView({ pipelineId, caseId }: { pipelineId: str
             title={
               breakdown
                 ? pieceCountTotal > 0
-                  ? `Built from ${pieceCountTotal} ${pieceLabel(pieceCountTotal)}`
+                  ? tx("Built from {{total}} {{pieces}}", { total: pieceCountTotal, pieces: pieceLabel(pieceCountTotal) })
                   : `No ${pieceNounPluralLabel} needed`
                 : `Built from ${pieceCountTotal} ${pieceCountTotal === 1 ? "item" : "items"}`
             }
           >
             {breakdown && pieceCountTotal > 0 ? (
               <p className="py-2 text-sm text-muted-foreground">
-                {pieceCountDone} of {pieceCountTotal} {pieceLabel(pieceCountTotal)} finished
+                {tx("{{done}} of {{total}} {{pieces}} finished", { done: pieceCountDone, total: pieceCountTotal, pieces: pieceLabel(pieceCountTotal) })}
               </p>
             ) : null}
             {breakdown && pieceCountTotal === 0 ? (
@@ -3449,10 +3451,10 @@ export function PipelineItemDetailView({ pipelineId, caseId }: { pipelineId: str
 
 function ActivePipelineWorkBanner({ activeWork }: { activeWork: PipelineCaseActiveWork }) {
   const isAutomation = activeWork.issueRole === "automation";
-  const title = isAutomation ? "Automation is running" : "Linked work is running";
+  const title = isAutomation ? tx("Automation is running") : tx("Linked work is running");
   const issueLabel = activeWork.issueIdentifier ?? activeWork.issueTitle;
   const issuePath = createIssueDetailPath(activeWork.issueIdentifier ?? activeWork.issueId);
-  const startedLabel = activeWork.startedAt ? `Started ${relativeTime(activeWork.startedAt)}` : null;
+  const startedLabel = activeWork.startedAt ? tx("Started {{time}}", { time: relativeTime(activeWork.startedAt) }) : null;
 
   return (
     <section
@@ -3624,12 +3626,11 @@ function reviewDecisionActions(
 }
 
 function reviewDecisionToastTitle(decision: PipelineReviewDecision, movedToNextItem: boolean) {
-  const prefix = decision === "approve"
-    ? "Item approved"
-    : decision === "request_changes"
-      ? "Changes requested"
-      : "Item rejected";
-  return movedToNextItem ? `${prefix}; moved to the next review` : prefix;
+  if (decision === "approve") return movedToNextItem ? tx("Item approved; moved to the next review") : tx("Item approved");
+  if (decision === "request_changes") {
+    return movedToNextItem ? tx("Changes requested; moved to the next review") : tx("Changes requested");
+  }
+  return movedToNextItem ? tx("Item rejected; moved to the next review") : tx("Item rejected");
 }
 
 function ReviewDecisionPanel({
@@ -3735,7 +3736,7 @@ function PipelineEventText({
 }) {
   const kind = event.type.startsWith("case.") ? event.type.slice("case.".length) : event.type;
   if (kind === "automation_executed" && event.automation) {
-    const routineName = event.automation.routine?.title ?? "the automation";
+    const routineName = event.automation.routine?.title ?? tx("the automation");
     const issue = event.automation.issue;
     return (
       <>
@@ -3794,25 +3795,35 @@ function DetailSection({
   );
 }
 
-const DELIVERABLE_OUTPUT_PATTERNS: Array<[RegExp, string]> = [
-  [/brief/i, "Brief"],
-  [/spec/i, "Spec"],
-  [/report/i, "Report"],
-  [/design/i, "Design"],
-  [/summary/i, "Summary"],
-  [/plan/i, "Plan"],
-];
+function deliverableOutputPatterns(): Array<[RegExp, string]> {
+  return [
+    [/brief/i, tx("Brief")],
+    [/spec/i, tx("Spec")],
+    [/report/i, tx("Report")],
+    [/design/i, tx("Design")],
+    [/summary/i, tx("Summary")],
+    [/plan/i, tx("Plan")],
+  ];
+}
 
-const OUTPUT_SOURCE_ROLE_LABELS: Record<string, string> = {
-  origin: "Origin",
-  conversation: "Conversation",
-  work: "Work",
-  automation: "Automation",
-};
+function outputSourceRoleLabel(role: string): string | undefined {
+  switch (role) {
+    case "origin":
+      return tx("Origin");
+    case "conversation":
+      return tx("Conversation");
+    case "work":
+      return tx("Work");
+    case "automation":
+      return tx("Automation");
+    default:
+      return undefined;
+  }
+}
 
 function deliverableDocumentLabel(item: PipelineCaseDocumentOutputItem): string | null {
   const haystack = `${item.title} ${item.documentKey}`;
-  for (const [pattern, label] of DELIVERABLE_OUTPUT_PATTERNS) {
+  for (const [pattern, label] of deliverableOutputPatterns()) {
     if (pattern.test(haystack)) return label;
   }
   return null;
@@ -3820,7 +3831,7 @@ function deliverableDocumentLabel(item: PipelineCaseDocumentOutputItem): string 
 
 function humanizeOutputStatus(status: string) {
   const normalized = status.trim().toLowerCase();
-  if (!normalized) return "Unknown";
+  if (!normalized) return tx("Unknown");
   return normalized.charAt(0).toUpperCase() + normalized.slice(1).replace(/_/g, " ");
 }
 
@@ -3891,7 +3902,7 @@ function OutputPreview({ text, dimmed }: { text: string; dimmed: boolean }) {
 
 function ItemOutputMeta({ item, children }: { item: PipelineCaseOutputItem; children?: ReactNode }) {
   const statusClass = issueStatusText[item.sourceIssueStatus] ?? issueStatusTextDefault;
-  const roleLabel = OUTPUT_SOURCE_ROLE_LABELS[item.sourceRole] ?? humanizeOutputStatus(item.sourceRole);
+  const roleLabel = outputSourceRoleLabel(item.sourceRole) ?? humanizeOutputStatus(item.sourceRole);
   return (
     <div className="mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-(length:--text-micro) text-muted-foreground">
       <Link
@@ -3976,7 +3987,7 @@ function ItemOutputWorkProductRow({ item }: { item: PipelineCaseWorkProductOutpu
 }
 
 function ItemOutputAttachmentRow({ item }: { item: PipelineCaseAttachmentOutputItem }) {
-  const filename = item.filename ?? item.title ?? "Attachment";
+  const filename = item.filename ?? item.title ?? tx("Attachment");
   const isImage = item.contentType?.startsWith("image/");
   return (
     <div
@@ -4151,7 +4162,9 @@ function BuiltFromTree({
               <span className="block truncate font-medium text-foreground">{row.case.title}</span>
               {(row.case.childCount ?? 0) > 0 ? (
                 <span className="block text-xs text-muted-foreground">
-                  {row.case.childCount} nested {(row.case.childCount ?? 0) === 1 ? "item" : "items"} hidden
+                  {(row.case.childCount ?? 0) === 1
+                    ? tx("{{n}} nested item hidden", { n: row.case.childCount })
+                    : tx("{{n}} nested items hidden", { n: row.case.childCount })}
                 </span>
               ) : null}
             </span>
@@ -4223,7 +4236,12 @@ function PipelineAddItems({ pipelineId }: { pipelineId: string }) {
         queryClient.invalidateQueries({ queryKey: queryKeys.pipelines.detail(pipelineId) }),
         queryClient.invalidateQueries({ queryKey: queryKeys.pipelines.cases(pipelineId) }),
       ]);
-      pushToast({ title: `${itemCountLabel(rows.length)} submitted`, tone: "success" });
+      pushToast({
+        title: rows.length === 1
+          ? tx("{{n}} item submitted", { n: rows.length })
+          : tx("{{n}} items submitted", { n: rows.length }),
+        tone: "success",
+      });
       navigate(`/pipelines/${pipelineId}`);
     },
   });
@@ -4233,7 +4251,7 @@ function PipelineAddItems({ pipelineId }: { pipelineId: string }) {
     return <div className="mx-auto max-w-3xl py-10 text-sm text-muted-foreground">Pipeline not found.</div>;
   }
 
-  const firstStageName = intake.data.stageName ?? pipeline.data.stages[0]?.name ?? "first stage";
+  const firstStageName = intake.data.stageName ?? pipeline.data.stages[0]?.name ?? tx("first stage");
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-8">
@@ -4250,7 +4268,11 @@ function PipelineAddItems({ pipelineId }: { pipelineId: string }) {
       <div className="mb-5 flex items-center gap-2 border border-border bg-muted/20 px-3 py-2 text-sm text-muted-foreground">
         <Info className="h-4 w-4 shrink-0" />
         <span>
-          These fields come from <span className="font-medium text-foreground">Pipeline settings -&gt; {firstStageName} stage</span>.
+          <XoTrans
+            i18nKey="These fields come from <target>{{target}}</target>."
+            values={{ target: tx("Pipeline settings -> {{stage}} stage", { stage: firstStageName }) }}
+            components={{ target: <span className="font-medium text-foreground" /> }}
+          />
         </span>
       </div>
 
@@ -4298,7 +4320,9 @@ function PipelineAddItems({ pipelineId }: { pipelineId: string }) {
             {rows.length === 0 ? "Add at least one item." : "Count updates live."}
           </span>
           <Button disabled={invalid || submit.isPending} onClick={() => submit.mutate()}>
-            {submit.isPending ? "Submitting..." : `Submit ${itemCountLabel(rows.length)}`}
+            {submit.isPending ? "Submitting..." : (rows.length === 1
+              ? tx("Submit {{n}} item", { n: rows.length })
+              : tx("Submit {{n}} items", { n: rows.length }))}
           </Button>
         </div>
       </div>
@@ -4439,11 +4463,11 @@ export interface ReviewQueueRow {
   fields: Record<string, unknown> | null;
 }
 
-const REVIEW_QUEUE_SECTION_LABELS: Record<ReviewQueueKind, string> = {
-  suggestion: "Suggestions to review",
-  review: "Final calls",
-  headsUp: "Heads-up",
-};
+function reviewQueueSectionLabel(kind: ReviewQueueKind): string {
+  if (kind === "suggestion") return tx("Suggestions to review");
+  if (kind === "review") return tx("Final calls");
+  return tx("Heads-up");
+}
 
 const REVIEW_QUEUE_SECTION_ORDER: ReviewQueueKind[] = ["suggestion", "review", "headsUp"];
 
@@ -4478,7 +4502,7 @@ export function buildReviewQueueRows({
       title: entry.case.title,
       prompt:
         entry.suggestion.rationale?.trim() ||
-        `${entry.case.pipeline.name} thinks ${entry.case.title} is ready to move forward.`,
+        tx("{{pipeline}} thinks {{title}} is ready to move forward.", { pipeline: entry.case.pipeline.name, title: entry.case.title }),
       kind: "suggestion",
       createdAt: entry.suggestion.createdAt ?? entry.case.updatedAt ?? null,
       expectedVersion: entry.case.version ?? null,
@@ -4499,7 +4523,7 @@ export function buildReviewQueueRows({
       title: entry.case.title,
       prompt:
         entry.case.summary?.trim() ||
-        `Decide whether ${entry.case.title} is ready to move forward.`,
+        tx("Decide whether {{title}} is ready to move forward.", { title: entry.case.title }),
       kind: "review",
       createdAt: entry.case.updatedAt ?? entry.case.createdAt ?? null,
       expectedVersion: entry.review.expectedVersion ?? entry.case.version ?? null,
@@ -4520,8 +4544,8 @@ export function buildReviewQueueRows({
       pipelineName: entry.case.pipeline.name,
       title: entry.case.title,
       prompt: upstreamTitle
-        ? `${upstreamTitle} changed upstream. Take a quick look before work continues.`
-        : `${entry.case.title} needs a quick look before work continues.`,
+        ? tx("{{upstream}} changed upstream. Take a quick look before work continues.", { upstream: upstreamTitle })
+        : tx("{{title}} needs a quick look before work continues.", { title: entry.case.title }),
       kind: "headsUp",
       createdAt: entry.drift.createdAt ?? entry.case.updatedAt ?? null,
       expectedVersion: entry.case.version ?? null,
@@ -4552,7 +4576,7 @@ export function buildReviewQueueRows({
       prompt:
         pendingSuggestion?.rationale?.trim() ||
         entry.case.summary?.trim() ||
-        `Decide whether ${entry.case.title} is ready to move forward.`,
+        tx("Decide whether {{title}} is ready to move forward.", { title: entry.case.title }),
       kind: "review",
       createdAt: entry.case.updatedAt ?? entry.case.createdAt ?? null,
       expectedVersion: typeof entry.case.version === "number" ? entry.case.version : null,
@@ -5080,7 +5104,9 @@ export function ReviewQueue() {
           onClick={() => bulkApprove.mutate(selectedRows)}
         >
           {bulkApprove.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
-          Approve {formatNumber(selectedCount)} item{selectedCount === 1 ? "" : "s"}
+          {selectedCount === 1
+            ? tx("Approve {{n}} item", { n: formatNumber(selectedCount) })
+            : tx("Approve {{n}} items", { n: formatNumber(selectedCount) })}
         </Button>
       </div>
 
@@ -5095,7 +5121,7 @@ export function ReviewQueue() {
           {groupedRows.map((group) => (
             <ReviewQueueSection
               key={group.kind}
-              title={REVIEW_QUEUE_SECTION_LABELS[group.kind]}
+              title={reviewQueueSectionLabel(group.kind)}
               rows={group.rows}
               activeRowId={activeRowId}
               failedRowIds={failedRowIds}
@@ -5121,7 +5147,10 @@ export function ReviewQueue() {
       )}
 
       <p className="text-xs text-muted-foreground">
-        Shortcuts: <span className="font-semibold">j</span>/<span className="font-semibold">k</span> or arrow keys move, <span className="font-semibold">Enter</span> opens item, <span className="font-semibold">a</span> approves.
+        <XoTrans
+          i18nKey="Shortcuts: <b>j</b>/<b>k</b> or arrow keys move, <b>Enter</b> opens item, <b>a</b> approves."
+          components={{ b: <span className="font-semibold" /> }}
+        />
       </p>
 
       <ReviewQueueDetailDialog

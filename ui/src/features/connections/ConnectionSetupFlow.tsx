@@ -2046,7 +2046,7 @@ export function ConnectionSetupFlow({
   const credentialStep = entry ? renderCredentialStep?.({ app: entry, name: galleryName || entry.name, grantKind: effectiveGrantKind, agentIds: [...installAgentIds], allAgents: installChoice === "all", onBack: () => setAppStep("access") }) ?? (aiMethod && selectedCompanyId ? <><AiConnectionCredentialStep
     companyId={selectedCompanyId} provider={aiMethod.provider} fixedMethod={Boolean(aiConnection && aiConnection.mode !== "responsible_user")} initialMethod={reconnectConnection?.connectionPurpose === "ai" ? (reconnectConnection.config?.ai as { method: "subscription" | "api_key" }).method : aiMethod.method}
     connectionId={reconnectConnection?.connectionPurpose === "ai" ? reconnectConnection.id : undefined}
-    name={reconnectConnection?.connectionPurpose === "ai" ? reconnectConnection.name : galleryName || `My ${entry.name} ${aiMethod.method === "subscription" ? "subscription" : "API"}`}
+    name={reconnectConnection?.connectionPurpose === "ai" ? reconnectConnection.name : galleryName || (aiMethod.method === "subscription" ? tx("My {{name}} subscription", { name: entry.name }) : tx("My {{name}} API", { name: entry.name }))}
     ownership={(reconnectConnection?.connectionPurpose === "ai" ? reconnectConnection.credentialPolicy === "shared" : effectiveGrantKind === "organization") ? "shared" : "personal"}
     agentIds={[...installAgentIds]} allAgents={installChoice === "all"}
     onCancel={() => onCancel ? onCancel() : navigate("/apps")}

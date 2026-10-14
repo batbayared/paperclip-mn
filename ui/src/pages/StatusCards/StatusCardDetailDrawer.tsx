@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { tx } from "@/i18n/xo";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { CompanySearchIssueSummary, StatusCardUpdate, SummarySlotIssueRef } from "@paperclipai/shared";
 import { AlertTriangle, ChevronDown, ExternalLink, History, Loader2, RefreshCw, Wand2 } from "lucide-react";
@@ -126,9 +127,9 @@ export function StatusCardDetailDrawer({
     },
     onSuccess: async () => {
       await invalidateCard();
-      setActionNote("Refresh queued — the Summarizer is updating this card.");
+      setActionNote(tx("Refresh queued — the Summarizer is updating this card."));
     },
-    onError: (err) => setActionError(err instanceof Error ? err.message : "Could not refresh the card."),
+    onError: (err) => setActionError(err instanceof Error ? err.message : tx("Could not refresh the card.")),
   });
 
   const recompileMutation = useMutation({
@@ -139,9 +140,9 @@ export function StatusCardDetailDrawer({
     },
     onSuccess: async () => {
       await invalidateCard();
-      setActionNote("Run queued — the Summarizer is updating this card.");
+      setActionNote(tx("Run queued — the Summarizer is updating this card."));
     },
-    onError: (err) => setActionError(err instanceof Error ? err.message : "Could not run the card."),
+    onError: (err) => setActionError(err instanceof Error ? err.message : tx("Could not run the card.")),
   });
 
   const saveSettingsMutation = useMutation({
@@ -168,7 +169,7 @@ export function StatusCardDetailDrawer({
         queryClient.invalidateQueries({ queryKey: queryKeys.statusCards.detail(card.id) }),
       ]);
     },
-    onError: (err) => setActionError(err instanceof Error ? err.message : "Could not save settings."),
+    onError: (err) => setActionError(err instanceof Error ? err.message : tx("Could not save settings.")),
   });
 
   if (!card) return null;
@@ -241,7 +242,7 @@ export function StatusCardDetailDrawer({
             )}
           </div>
           <p className="text-xs text-muted-foreground">
-            {card.lastGeneratedAt ? `Updated ${relativeTime(card.lastGeneratedAt)}` : "No summary yet"} ·{" "}
+            {card.lastGeneratedAt ? tx("Updated {{time}}", { time: relativeTime(card.lastGeneratedAt) }) : "No summary yet"} ·{" "}
             {describeRefreshPolicy(card.refreshPolicy)}
           </p>
         </SheetHeader>
@@ -360,8 +361,13 @@ export function StatusCardDetailDrawer({
               {displayedChanges.length > 0 ? (
                 <section className="space-y-2">
                   <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                    {selectedRevision ? "Integrated in this revision" : "Integrated in this update"} (
-                    {displayedChanges.length} {displayedChanges.length === 1 ? "change" : "changes"})
+                    {displayedChanges.length === 1
+                      ? selectedRevision
+                        ? tx("Integrated in this revision ({{n}} change)", { n: displayedChanges.length })
+                        : tx("Integrated in this update ({{n}} change)", { n: displayedChanges.length })
+                      : selectedRevision
+                        ? tx("Integrated in this revision ({{n}} changes)", { n: displayedChanges.length })
+                        : tx("Integrated in this update ({{n}} changes)", { n: displayedChanges.length })}
                   </h3>
                   <div className="space-y-1.5">
                     {displayedChanges.map((change) => (
@@ -384,10 +390,10 @@ export function StatusCardDetailDrawer({
               ) : (
                 <>
                   <div className="text-xs text-muted-foreground">
-                    Today: {todayRollup.updateCount}{" "}
-                    {todayRollup.updateCount === 1 ? "update" : "updates"} ·{" "}
-                    {formatTokens(todayRollup.totalTokens)} · {formatCents(todayRollup.totalCostCents)}
-                    {card.refreshPolicy.dailyTokenCap ? ` · daily cap ${formatTokens(card.refreshPolicy.dailyTokenCap)}` : ""}
+                    {todayRollup.updateCount === 1
+                      ? tx("Today: {{n}} update · {{tokens}} · {{cost}}", { n: todayRollup.updateCount, tokens: formatTokens(todayRollup.totalTokens), cost: formatCents(todayRollup.totalCostCents) })
+                      : tx("Today: {{n}} updates · {{tokens}} · {{cost}}", { n: todayRollup.updateCount, tokens: formatTokens(todayRollup.totalTokens), cost: formatCents(todayRollup.totalCostCents) })}
+                    {card.refreshPolicy.dailyTokenCap ? ` ${tx("· daily cap {{cap}}", { cap: formatTokens(card.refreshPolicy.dailyTokenCap) })}` : ""}
                   </div>
                   <div className="divide-y divide-border">
                     {updates.map((update) => (
@@ -504,7 +510,7 @@ function QueryDebugSection({ card }: { card: StatusCardView }) {
     <Collapsible className="rounded-md border border-border">
       <CollapsibleTrigger className="group flex w-full items-center justify-between gap-2 px-3 py-2.5 text-sm font-semibold">
         <span className="flex items-center gap-2">
-          Query debug
+          {tx("Query debug")}
           <Badge variant="secondary">v{card.queryVersion}</Badge>
         </span>
         <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
@@ -515,7 +521,7 @@ function QueryDebugSection({ card }: { card: StatusCardView }) {
         </pre>
         <p className="text-xs text-muted-foreground">
           {card.queryCompiledAt
-            ? `Compiled by Summarizer ${relativeTime(card.queryCompiledAt)} · version ${card.queryVersion}. Edit “What this card watches” above to rebuild it.`
+            ? tx("Compiled by Summarizer {{time}} · version {{version}}. Edit “What this card watches” above to rebuild it.", { time: relativeTime(card.queryCompiledAt), version: card.queryVersion })
             : "Not compiled yet. The query builds automatically once the card finishes setting up."}
         </p>
       </CollapsibleContent>
@@ -613,7 +619,7 @@ function ChangeRow({ change }: { change: StatusCardUpdate["changes"][number] }) 
 }
 
 function describeChangeKind(changeKind: string): string {
-  if (changeKind === "entered_query" || changeKind === "new") return "new issue matched the query";
-  if (changeKind === "left_query") return "left the query";
+  if (changeKind === "entered_query" || changeKind === "new") return tx("new issue matched the query");
+  if (changeKind === "left_query") return tx("left the query");
   return changeKind.replace(/_/g, " ");
 }

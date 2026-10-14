@@ -15,6 +15,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "./ui/dialog";
+import { tx } from "@/i18n/xo";
+import { xoBrandVars } from "@/xo/labels";
+import { XoTrans } from "@/xo/XoTrans";
 
 type ExecutionWorkspaceCloseDialogProps = {
   workspaceId: string;
@@ -45,7 +48,7 @@ export function ExecutionWorkspaceCloseDialog({
 }: ExecutionWorkspaceCloseDialogProps) {
   const queryClient = useQueryClient();
   const { pushToast } = useToastActions();
-  const actionLabel = currentStatus === "cleanup_failed" ? "Retry close" : "Close workspace";
+  const actionLabel = currentStatus === "cleanup_failed" ? tx("Retry close") : tx("Close workspace");
 
   const readinessQuery = useQuery({
     queryKey: queryKeys.executionWorkspaces.closeReadiness(workspaceId),
@@ -93,8 +96,11 @@ export function ExecutionWorkspaceCloseDialog({
         <DialogHeader>
           <DialogTitle>{actionLabel}</DialogTitle>
           <DialogDescription className="break-words">
-            Archive <span className="font-medium text-foreground">{workspaceName}</span> and clean up any owned workspace
-            artifacts. Paperclip keeps the workspace record and task history, but removes it from active workspace views.
+            <XoTrans
+              i18nKey="Archive <span>{{workspaceName}}</span> and clean up any owned workspace artifacts. {{brand}} keeps the workspace record and task history, but removes it from active workspace views."
+              values={{ workspaceName, ...xoBrandVars() }}
+              components={{ span: <span className="font-medium text-foreground" /> }}
+            />
           </DialogDescription>
         </DialogHeader>
 

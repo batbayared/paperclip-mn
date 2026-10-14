@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Clock, Pencil, ShieldCheck } from "lucide-react";
 import type { ToolRiskLevel } from "@paperclipai/shared";
 import { cn } from "@/lib/utils";
+import { XoTrans } from "@/xo/XoTrans";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -280,7 +281,11 @@ export function ActionCard({
             {policyNumber != null ? (
               <>
                 {" "}
-                <span className="font-medium text-foreground">Policy #{policyNumber}</span> requires approval here.
+                <XoTrans
+                  i18nKey="<p>Policy #{{policyNumber}}</p> requires approval here."
+                  values={{ policyNumber }}
+                  components={{ p: <span className="font-medium text-foreground" /> }}
+                />
               </>
             ) : null}
           </p>

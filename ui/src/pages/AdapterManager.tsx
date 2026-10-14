@@ -32,6 +32,8 @@ import { cn } from "@/lib/utils";
 import { ChoosePathButton } from "@/components/PathInstructionsModal";
 import { invalidateDynamicParser } from "@/adapters/dynamic-loader";
 import { invalidateConfigSchemaCache } from "@/adapters/schema-config-fields";
+import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
 
 function AdapterRow({
   adapter,
@@ -206,10 +208,11 @@ function ReinstallDialog({
         <DialogHeader>
           <DialogTitle>Reinstall Adapter</DialogTitle>
           <DialogDescription>
-            This will pull the latest version of{" "}
-            <strong>{adapter?.packageName}</strong> from npm and hot-swap
-            the running adapter module. Existing agents will use the new
-            version on their next run.
+            <XoTrans
+              i18nKey="This will pull the latest version of <strong>{{packageName}}</strong> from npm and hot-swap the running adapter module. Existing agents will use the new version on their next run."
+              values={{ packageName: adapter?.packageName ?? "" }}
+              components={{ strong: <strong /> }}
+            />
           </DialogDescription>
         </DialogHeader>
 
@@ -295,7 +298,9 @@ export function AdapterManager() {
       setIsLocalPath(false);
       pushToast({
         title: "Adapter installed",
-        body: `Type "${result.type}" registered successfully.${result.version ? ` (v${result.version})` : ""}`,
+        body: result.version
+          ? tx("Type \"{{type}}\" registered successfully. (v{{version}})", { type: result.type, version: result.version })
+          : tx("Type \"{{type}}\" registered successfully.", { type: result.type }),
         tone: "success",
       });
     },
@@ -345,7 +350,9 @@ export function AdapterManager() {
       invalidateConfigSchemaCache(result.type);
       pushToast({
         title: "Adapter reloaded",
-        body: `Type "${result.type}" reloaded.${result.version ? ` (v${result.version})` : ""}`,
+        body: result.version
+          ? tx("Type \"{{type}}\" reloaded. (v{{version}})", { type: result.type, version: result.version })
+          : tx("Type \"{{type}}\" reloaded.", { type: result.type }),
         tone: "success",
       });
     },
@@ -362,7 +369,9 @@ export function AdapterManager() {
       invalidateConfigSchemaCache(result.type);
       pushToast({
         title: "Adapter reinstalled",
-        body: `Type "${result.type}" updated from npm.${result.version ? ` (v${result.version})` : ""}`,
+        body: result.version
+          ? tx("Type \"{{type}}\" updated from npm. (v{{version}})", { type: result.type, version: result.version })
+          : tx("Type \"{{type}}\" updated from npm.", { type: result.type }),
         tone: "success",
       });
     },
@@ -573,9 +582,9 @@ export function AdapterManager() {
                   isToggling={isBuiltinOverride ? overrideMutation.isPending : toggleMutation.isPending}
                   isReloading={reloadMutation.isPending}
                   isReinstalling={reinstallMutation.isPending}
-                  toggleTitleDisabled={isBuiltinOverride ? "Pause external override" : undefined}
-                  toggleTitleEnabled={isBuiltinOverride ? "Resume external override" : undefined}
-                  disabledBadgeLabel={isBuiltinOverride ? "Override paused" : undefined}
+                  toggleTitleDisabled={isBuiltinOverride ? tx("Pause external override") : undefined}
+                  toggleTitleEnabled={isBuiltinOverride ? tx("Resume external override") : undefined}
+                  disabledBadgeLabel={isBuiltinOverride ? tx("Override paused") : undefined}
                 />
               );
             })}
@@ -645,12 +654,15 @@ export function AdapterManager() {
           <DialogHeader>
             <DialogTitle>Remove Adapter</DialogTitle>
             <DialogDescription>
-              Are you sure you want to remove the <strong>{removeType}</strong> adapter?
-              It will be unregistered and removed from the adapter store.
+              <XoTrans
+                i18nKey="Are you sure you want to remove the <strong>{{type}}</strong> adapter? It will be unregistered and removed from the adapter store."
+                values={{ type: removeType ?? "" }}
+                components={{ strong: <strong /> }}
+              />
               {removeType && adapters?.find((a) => a.type === removeType)?.packageName && (
-                <> npm packages will be cleaned up from disk.</>
+                <>{" "}{tx("npm packages will be cleaned up from disk.")}</>
               )}
-              {" "}This action cannot be undone.
+              {" "}{tx("This action cannot be undone.")}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

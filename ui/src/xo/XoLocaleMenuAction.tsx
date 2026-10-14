@@ -2,9 +2,11 @@ import { Languages } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { resolveLocale, setLocale, type XoLocale } from "./locale";
 
-const COPY: Record<XoLocale, { label: string; description: string }> = {
-  mn: { label: "Switch to English", description: "Одоогийн хэл: Монгол" },
-  en: { label: "Монгол хэл рүү шилжих", description: "Current language: English" },
+// Intentionally bilingual: each locale shows the switch action in the *other* language.
+// Keys are not `label`/`description` so the xo-i18n transform leaves these literals alone.
+const COPY: Record<XoLocale, { actionText: string; currentText: string }> = {
+  mn: { actionText: "Switch to English", currentText: "Одоогийн хэл: Монгол" },
+  en: { actionText: "Монгол хэл рүү шилжих", currentText: "Current language: English" },
 };
 
 type XoLocaleMenuActionProps = {
@@ -20,7 +22,7 @@ export function XoLocaleMenuAction({
 }: XoLocaleMenuActionProps) {
   const current = resolveLocale();
   const next: XoLocale = current === "mn" ? "en" : "mn";
-  const { label, description } = COPY[current];
+  const { actionText: label, currentText: description } = COPY[current];
 
   const handleClick = () => {
     onAfterSelect?.();

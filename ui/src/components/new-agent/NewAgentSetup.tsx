@@ -1,3 +1,4 @@
+import { tx } from "@/i18n/xo";
 import { AiConnectionField, aiProviderForAdapter } from "../ai-connections/AiConnectionField";
 import type { AiConnectionBinding } from "@paperclipai/shared";
 import { DEFAULT_CODEX_LOCAL_MODEL } from "@paperclipai/adapter-codex-local";
@@ -254,7 +255,7 @@ function Setup({
     environmentError =
       cause instanceof Error
         ? cause.message
-        : "Could not resolve the environment.";
+        : tx("Could not resolve the environment.");
   }
   const environment = envs.data?.find((env) => env.id === environmentId);
   const sandboxProvider =
@@ -380,12 +381,12 @@ function Setup({
   }
   function preparedConfig(nextConnection = connection) {
     if (multiProvider && (!model.trim() || !model.includes("/")))
-      throw new Error("Choose or enter a model in provider/model format.");
+      throw new Error(tx("Choose or enter a model in provider/model format."));
     if (
       adapterType === "cursor_cloud" &&
       !/^https:\/\/github\.com\/[^/]+\/[^/]+/.test(repository.trim())
     )
-      throw new Error("Enter a GitHub repository URL.");
+      throw new Error(tx("Enter a GitHub repository URL."));
     if (
       ["cursor_cloud", "hermes_gateway"].includes(adapterType) &&
       !apiKey.trim() &&
@@ -393,19 +394,19 @@ function Setup({
     )
       throw new Error(
         adapterType === "cursor_cloud"
-          ? "Enter a Cursor API key."
-          : `Enter ${envKey} or select an organization secret.`,
+          ? tx("Enter a Cursor API key.")
+          : tx("Enter {{envKey}} or select an organization secret.", { envKey }),
       );
     if (adapterType === "hermes_gateway") {
       try {
         const url = new URL(gatewayUrl.trim());
         if (!["https:", "http:"].includes(url.protocol)) throw new Error();
       } catch {
-        throw new Error("Enter the Hermes API base URL.");
+        throw new Error(tx("Enter the Hermes API base URL."));
       }
     }
     if (usingKimiApi && !kimiModel.trim())
-      throw new Error("Enter the Kimi API model name.");
+      throw new Error(tx("Enter the Kimi API model name."));
     return buildConfig(nextConnection);
   }
   function pendingCredentials(nextConnection = connection) {
@@ -448,7 +449,7 @@ function Setup({
     } catch (cause) {
       if (run === generation.current) {
         setError(
-          cause instanceof Error ? cause.message : "Could not test the agent.",
+          cause instanceof Error ? cause.message : tx("Could not test the agent."),
         );
         setTestState("fail");
       }
@@ -534,7 +535,7 @@ function Setup({
       ]);
     } catch (cause) {
       setError(
-        cause instanceof Error ? cause.message : "Could not create the agent.",
+        cause instanceof Error ? cause.message : tx("Could not create the agent."),
       );
     } finally {
       if (!hired) {
@@ -543,7 +544,7 @@ function Setup({
         } catch {
           setError(
             (original) =>
-              `${original ? `${original} ` : ""}Could not remove an unused setup credential. Remove it from Secrets before retrying.`,
+              `${original ? `${original} ` : ""}${tx("Could not remove an unused setup credential. Remove it from Secrets before retrying.")}`,
           );
         }
       }
@@ -587,9 +588,9 @@ function Setup({
     "saved" as const,
   ];
   const labels = {
-    connect: "Connect",
-    runtime: "Configure",
-    saved: "Confirmation",
+    connect: tx("Connect"),
+    runtime: tx("Configure"),
+    saved: tx("Confirmation"),
   };
   const confirmationEnvironment = created?.defaultEnvironmentId
     ? envs.data?.find((env) => env.id === created.defaultEnvironmentId)
@@ -603,7 +604,7 @@ function Setup({
       ? createdKimiModel
       : (createdKimiModel as { value?: string } | undefined)?.value) ||
     model ||
-    "Default";
+    tx("Default");
   const environmentLabel =
     adapterType === "cursor_cloud"
       ? "Cursor Cloud"
@@ -611,7 +612,7 @@ function Setup({
         ? "Hermes Gateway"
         : confirmationEnvironment
           ? environmentDisplayLabel(confirmationEnvironment)
-          : "Local machine";
+          : tx("Local machine");
   const setupError =
     adapters.error ??
     envs.error ??
@@ -710,7 +711,7 @@ function Setup({
                     <div className="mb-8">
                       <OnboardingHeading
                         title="Connect a model"
-                        lede={`Connect ${name} to ${connectionAdapter === "claude_local" ? "Claude" : connectionAdapter === "grok_local" ? "Grok" : "OpenAI"}.`}
+                        lede={tx("Connect {{name}} to {{provider}}.", { name, provider: connectionAdapter === "claude_local" ? "Claude" : connectionAdapter === "grok_local" ? "Grok" : "OpenAI" })}
                         center
                       />
                     </div>
@@ -1002,9 +1003,8 @@ function Setup({
                               </div>
                             )}
                             <p className="text-xs text-muted-foreground sm:col-span-2">
-                              New keys are saved as organization secrets when
-                              you finish setup.
-                              {multiProvider && ` Use a ${provider}/model ID.`}
+                              {tx("New keys are saved as organization secrets when you finish setup.")}
+                              {multiProvider && ` ${tx("Use a {{provider}}/model ID.", { provider })}`}
                             </p>
                           </div>
                         )}
@@ -1053,7 +1053,7 @@ function Setup({
                             </Field>
                             <Field
                               label="Kimi API base URL"
-                              hint="Optional override for your provider endpoint."
+                              hint={tx("Optional override for your provider endpoint.")}
                             >
                               <Input
                                 aria-label="Kimi API base URL"

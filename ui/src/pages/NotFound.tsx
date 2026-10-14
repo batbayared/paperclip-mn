@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useBreadcrumbs } from "../context/BreadcrumbContext";
 import { useCompany } from "../context/CompanyContext";
+import { tx } from "@/i18n/xo";
 
 type NotFoundScope = "board" | "invalid_company_prefix" | "global";
 
@@ -27,11 +28,11 @@ export function NotFoundPage({ scope = "global", requestedPrefix }: NotFoundPage
   const currentPath = `${location.pathname}${location.search}${location.hash}`;
   const normalizedPrefix = requestedPrefix?.toUpperCase();
 
-  const title = scope === "invalid_company_prefix" ? "Organization not found" : "Page not found";
+  const title = scope === "invalid_company_prefix" ? tx("Organization not found") : tx("Page not found");
   const description =
     scope === "invalid_company_prefix"
-      ? `No organization matches prefix "${normalizedPrefix ?? "unknown"}".`
-      : "This route does not exist.";
+      ? tx("No organization matches prefix \"{{prefix}}\".", { prefix: normalizedPrefix ?? "unknown" })
+      : tx("This route does not exist.");
 
   return (
     <div className="mx-auto max-w-2xl py-10">

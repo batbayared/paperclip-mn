@@ -6,6 +6,7 @@ import { useSidebar } from "@/context/SidebarContext";
 import type { Agent } from "@paperclipai/shared";
 import { agentRouteRef, cn } from "@/lib/utils";
 import { orderChatAgents } from "@/lib/recent-agent-chats";
+import { tx } from "@/i18n/xo";
 export function AgentChatSidebar({
   activeId,
   starredIds,
@@ -45,7 +46,7 @@ export function AgentChatSidebar({
             type="button"
             variant="ghost"
             size="icon-xs"
-            aria-label={`${pinned ? "Unstar" : "Star"} ${agent.name}`}
+            aria-label={pinned ? tx("Unstar {{name}}", { name: agent.name }) : tx("Star {{name}}", { name: agent.name })}
             aria-pressed={pinned}
             title={pinned ? "Unstar agent" : "Star agent to pin"}
             onClick={(event) => {

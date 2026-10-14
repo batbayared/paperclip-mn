@@ -4,6 +4,7 @@ import type { Agent, DocumentAnnotationThreadWithComments, IssueDocument } from 
 import { MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { tx } from "@/i18n/xo";
 import { documentAnnotationsApi, type DocumentAnnotationTarget } from "@/api/document-annotations";
 import { queryKeys } from "@/lib/queryKeys";
 import { parseDocumentAnnotationHash } from "@/lib/document-annotation-hash";
@@ -130,13 +131,13 @@ export function IssueDocumentAnnotations({
 
   const newCommentDisabled = draftDirty || draftConflicted || historicalPreview || !doc.latestRevisionId;
   const newCommentDisabledReason = historicalPreview
-    ? "New comments are disabled while previewing a historical revision."
+    ? tx("New comments are disabled while previewing a historical revision.")
     : draftConflicted
-      ? "Resolve the document conflict before adding new comments."
+      ? tx("Resolve the document conflict before adding new comments.")
       : draftDirty
-        ? "Save the draft to anchor new comments."
+        ? tx("Save the draft to anchor new comments.")
         : !doc.latestRevisionId
-          ? "Document has no saved revision yet."
+          ? tx("Document has no saved revision yet.")
           : null;
 
   const handleSelectionAnchorChange = useCallback((anchor: PendingAnchor | null) => {

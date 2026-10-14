@@ -23,6 +23,7 @@ import {
   Layers,
 } from "lucide-react";
 import { cn } from "../lib/utils";
+import { tx } from "@/i18n/xo";
 import { MarkdownEditor, type MarkdownEditorRef } from "./MarkdownEditor";
 import { StatusBadge } from "./StatusBadge";
 
@@ -32,6 +33,16 @@ const levelLabels: Record<string, string> = {
   agent: "Agent",
   task: "Task",
 };
+
+function goalLevelLabel(level: string): string {
+  switch (level) {
+    case "company": return tx("Organization");
+    case "team": return tx("Team");
+    case "agent": return tx("Agent");
+    case "task": return tx("Task");
+    default: return levelLabels[level] ?? level;
+  }
+}
 
 export function NewGoalDialog() {
   const { newGoalOpen, newGoalDefaults, closeNewGoal } = useDialog();
@@ -213,7 +224,7 @@ export function NewGoalDialog() {
             <PopoverTrigger asChild>
               <button className="inline-flex items-center gap-1.5 rounded-md border border-border px-2 py-1 text-xs hover:bg-accent/50 transition-colors">
                 <Layers className="h-3 w-3 text-muted-foreground" />
-                {levelLabels[level] ?? level}
+                {goalLevelLabel(level)}
               </button>
             </PopoverTrigger>
             <PopoverContent className="w-40 p-1" align="start">
@@ -226,7 +237,7 @@ export function NewGoalDialog() {
                   )}
                   onClick={() => { setLevel(l); setLevelOpen(false); }}
                 >
-                  {levelLabels[l] ?? l}
+                  {goalLevelLabel(l)}
                 </button>
               ))}
             </PopoverContent>

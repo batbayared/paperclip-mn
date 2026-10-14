@@ -132,8 +132,8 @@ function rangeWindow(range: DateRangeState): Pick<WorkTimelineParams, "from" | "
 }
 
 function rangeError(range: DateRangeState): string | null {
-  if (!range.fromDate || !range.toDate) return "Choose a start and end date.";
-  if (!rangeWindow(range)) return "Start date must be before end date.";
+  if (!range.fromDate || !range.toDate) return tx("Choose a start and end date.");
+  if (!rangeWindow(range)) return tx("Start date must be before end date.");
   return null;
 }
 
@@ -283,7 +283,7 @@ function TimelineSummaryStats({
     { label: "Run time", value: formatDuration(0, summary.activeMs), icon: Clock3 },
     {
       label: "Tokens used",
-      value: summary.totalTokens > 0 ? formatCompactInteger(summary.totalTokens) : "Not tracked",
+      value: summary.totalTokens > 0 ? formatCompactInteger(summary.totalTokens) : tx("Not tracked"),
       icon: Coins,
     },
   ];
@@ -399,7 +399,7 @@ export function Timeline({ embedded = false }: { embedded?: boolean } = {}) {
 
   const rangeControls = (
     <label className="flex min-w-0 flex-wrap items-center gap-2 text-xs text-muted-foreground">
-      Range
+      {tx("Range")}
       <Segmented
         value={rangePreset}
         onChange={(preset) => {

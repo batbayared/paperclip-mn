@@ -12,6 +12,7 @@ import {
 import { OutputVideoPlayer } from "./OutputVideoPlayer";
 import { OutputFileTile } from "./OutputFileTile";
 import { Card } from "@/components/ui/card";
+import { tx } from "@/i18n/xo";
 
 interface OutputPrimaryCardProps {
   item: IssueOutputItem;
@@ -44,7 +45,7 @@ export function OutputPrimaryCard({ item, creatorName, onMediaClick }: OutputPri
           <button
             type="button"
             className="block aspect-video w-full overflow-hidden bg-black"
-            aria-label={`Browse ${filename} in gallery`}
+            aria-label={tx("Browse {{filename}} in gallery", { filename })}
             onClick={() => onMediaClick(item)}
           >
             <img src={meta.contentPath} alt={filename} className="h-full w-full object-contain" />
@@ -55,7 +56,7 @@ export function OutputPrimaryCard({ item, creatorName, onMediaClick }: OutputPri
             target="_blank"
             rel="noreferrer"
             className="block aspect-video w-full overflow-hidden bg-black"
-            aria-label={`Open ${filename}`}
+            aria-label={tx("Open {{filename}}", { filename })}
           >
             <img src={meta.contentPath} alt={filename} className="h-full w-full object-contain" />
           </a>
@@ -114,7 +115,7 @@ export function OutputPrimaryCard({ item, creatorName, onMediaClick }: OutputPri
               </Button>
             ) : null}
             <Button asChild size="sm" className="max-md:flex-1">
-              <a href={meta.downloadPath} aria-label={`Download ${filename}`}>
+              <a href={meta.downloadPath} aria-label={tx("Download {{filename}}", { filename })}>
                 <Download className="h-4 w-4" />
                 Download
               </a>

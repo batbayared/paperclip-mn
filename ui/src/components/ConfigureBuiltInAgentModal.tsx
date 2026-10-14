@@ -1,3 +1,5 @@
+import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -111,7 +113,7 @@ export function ConfigureBuiltInAgentModal({
     models.some((candidate) => candidate.id === normalizedModel);
   const modelError = modelKnown
     ? null
-    : `Model “${normalizedModel}” is not available for ${adapterType}. Choose a known model.`;
+    : tx("Model “{{model}}” is not available for {{adapterType}}. Choose a known model.", { model: normalizedModel, adapterType });
   const budgetMonthlyCents = parseBudgetMonthlyCents(budgetDollars);
   const budgetValid = !budgetDollars.trim() || budgetMonthlyCents !== undefined;
   const canSubmit =
@@ -143,7 +145,7 @@ export function ConfigureBuiltInAgentModal({
       onOpenChange(false);
     },
     onError: (err) => {
-      setError(err instanceof ApiError ? err.message : "Failed to configure the built-in agent.");
+      setError(err instanceof ApiError ? err.message : tx("Failed to configure the built-in agent."));
     },
   });
 
@@ -157,9 +159,11 @@ export function ConfigureBuiltInAgentModal({
 
         <div className="space-y-4">
           <InlineBanner tone="info" compact>
-            Creates <strong>{definition.displayName}</strong> in your roster, badged{" "}
-            <strong>Built-in</strong>. Organizations that require hire approval will queue this for the
-            board.
+            <XoTrans
+              i18nKey="Creates <strong>{{name}}</strong> in your roster, badged <strong>Built-in</strong>. Organizations that require hire approval will queue this for the board."
+              values={{ name: definition.displayName }}
+              components={{ strong: <strong /> }}
+            />
           </InlineBanner>
 
           <Field label="Adapter type">
@@ -201,7 +205,7 @@ export function ConfigureBuiltInAgentModal({
             </InlineBanner>
           )}
 
-          <Field label="Monthly budget (optional)" hint="Leave blank for no cap.">
+          <Field label="Monthly budget (optional)" hint={tx("Leave blank for no cap.")}>
             <div className="flex items-center gap-2">
               <span className="text-sm text-muted-foreground">$</span>
               <Input

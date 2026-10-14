@@ -14,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn, relativeTime } from "@/lib/utils";
+import { tx } from "@/i18n/xo";
 
 const EVENT_LABEL: Record<CaseEventKind, string> = {
   created: "created",
@@ -31,9 +32,9 @@ const EVENT_LABEL: Record<CaseEventKind, string> = {
 
 /** Human label for the actor, preferring the resolved agent name. */
 function actorLabel(event: CaseEvent): string {
-  if (event.actorType === "agent") return event.actorAgentName ?? "Agent";
-  if (event.actorType === "user") return "User";
-  return "System";
+  if (event.actorType === "agent") return event.actorAgentName ?? tx("Agent");
+  if (event.actorType === "user") return tx("User");
+  return tx("System");
 }
 
 function ActorIcon({ event }: { event: CaseEvent }) {
@@ -110,10 +111,10 @@ export function CaseActivityFeed({ events }: { events: CaseEvent[] }) {
   }
 
   const filterLabel = active.size === 0
-    ? "All activity"
+    ? tx("All activity")
     : active.size === 1
       ? EVENT_LABEL[[...active][0]!] ?? [...active][0]!
-      : `${active.size} filters`;
+      : tx("{{n}} filters", { n: active.size });
 
   if (events.length === 0) {
     return <p className="py-6 text-center text-sm text-muted-foreground">No activity yet.</p>;

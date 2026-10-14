@@ -309,6 +309,13 @@ export function xoNewIssueInlineLabel(english: "For" | "in"): string {
   return english === "For" ? tx("For (assignee)") : tx("in (project picker)");
 }
 
+// WorkspaceRuntimeControls-ийн «Run» товч: глобал "Run" түлхүүр нэр үг («Ажиллагаа») тул
+// үйл үгийн контексттой түлхүүр хэрэглэж, en дээр guard англиар буцаана.
+export function xoRunActionLabel(): string {
+  if (!(i18n.resolvedLanguage ?? i18n.language ?? "").startsWith("mn")) return "Run";
+  return tx("Run (action)");
+}
+
 // Агентын үүрэг (AGENT_ROLE_LABELS-ийн key). en дээр guard англиар буцаана.
 export function xoRoleLabel(role: string, english: string): string {
   if (!(i18n.resolvedLanguage ?? i18n.language ?? "").startsWith("mn")) return english;

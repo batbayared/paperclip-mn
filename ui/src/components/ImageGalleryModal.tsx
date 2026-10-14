@@ -3,6 +3,7 @@ import { Dialog as DialogPrimitive } from "radix-ui";
 import { ChevronLeft, ChevronRight, Download, X } from "lucide-react";
 import { attachmentDownloadPath, attachmentFilename } from "@/lib/issue-attachments";
 import { isVideoLikeOutput } from "@/lib/issue-output";
+import { tx } from "@/i18n/xo";
 
 export interface GalleryMediaItem {
   id: string;
@@ -105,7 +106,7 @@ export function ImageGalleryModal({
                 download={filename}
                 className="text-white/50 hover:text-white transition-colors"
                 title="Download"
-                aria-label={`Download ${filename}`}
+                aria-label={tx("Download {{filename}}", { filename })}
                 onClick={(e) => e.stopPropagation()}
               >
                 <Download className="h-4.5 w-4.5" />

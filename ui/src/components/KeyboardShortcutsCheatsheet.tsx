@@ -1,4 +1,5 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { XoTrans } from "@/xo/XoTrans";
 
 interface ShortcutEntry {
   keys: string[];
@@ -13,53 +14,55 @@ interface ShortcutSection {
   shortcuts: ShortcutEntry[];
 }
 
-const sections: ShortcutSection[] = [
-  {
-    title: "Inbox",
-    shortcuts: [
-      { keys: ["j"], label: "Move down" },
-      { keys: ["↓"], label: "Move down" },
-      { keys: ["k"], label: "Move up" },
-      { keys: ["↑"], label: "Move up" },
-      { keys: ["←"], label: "Collapse selected group" },
-      { keys: ["→"], label: "Expand selected group" },
-      { keys: ["Enter"], label: "Open selected item" },
-      { keys: ["a"], label: "Archive item" },
-      { keys: ["y"], label: "Archive item" },
-      { keys: ["r"], label: "Mark as read" },
-      { keys: ["U"], label: "Mark as unread" },
-    ],
-  },
-  {
-    title: "Task detail",
-    shortcuts: [
-      { keys: ["y"], label: "Quick-archive back to inbox" },
-      { keys: ["g", "i"], label: "Go to inbox" },
-      { keys: ["g", "c"], label: "Focus comment composer" },
-    ],
-  },
-  {
-    title: "Decisions",
-    shortcuts: [
-      { keys: ["j"], label: "Move down" },
-      { keys: ["↓"], label: "Move down" },
-      { keys: ["k"], label: "Move up" },
-      { keys: ["↑"], label: "Move up" },
-      { keys: ["Enter"], label: "Open or close selected decision" },
-      { keys: ["x"], label: "Dismiss selected decision" },
-    ],
-  },
-  {
-    title: "Global",
-    shortcuts: [
-      { keys: ["/"], label: "Search current page or quick search" },
-      { keys: ["c"], label: "New task" },
-      { keys: ["["], label: "Toggle sidebar" },
-      { keys: ["]"], label: "Toggle panel" },
-      { keys: ["?"], label: "Show keyboard shortcuts" },
-    ],
-  },
-];
+function getSections(): ShortcutSection[] {
+  return [
+    {
+      title: "Inbox",
+      shortcuts: [
+        { keys: ["j"], label: "Move down" },
+        { keys: ["↓"], label: "Move down" },
+        { keys: ["k"], label: "Move up" },
+        { keys: ["↑"], label: "Move up" },
+        { keys: ["←"], label: "Collapse selected group" },
+        { keys: ["→"], label: "Expand selected group" },
+        { keys: ["Enter"], label: "Open selected item" },
+        { keys: ["a"], label: "Archive item" },
+        { keys: ["y"], label: "Archive item" },
+        { keys: ["r"], label: "Mark as read" },
+        { keys: ["U"], label: "Mark as unread" },
+      ],
+    },
+    {
+      title: "Task detail",
+      shortcuts: [
+        { keys: ["y"], label: "Quick-archive back to inbox" },
+        { keys: ["g", "i"], label: "Go to inbox" },
+        { keys: ["g", "c"], label: "Focus comment composer" },
+      ],
+    },
+    {
+      title: "Decisions",
+      shortcuts: [
+        { keys: ["j"], label: "Move down" },
+        { keys: ["↓"], label: "Move down" },
+        { keys: ["k"], label: "Move up" },
+        { keys: ["↑"], label: "Move up" },
+        { keys: ["Enter"], label: "Open or close selected decision" },
+        { keys: ["x"], label: "Dismiss selected decision" },
+      ],
+    },
+    {
+      title: "Global",
+      shortcuts: [
+        { keys: ["/"], label: "Search current page or quick search" },
+        { keys: ["c"], label: "New task" },
+        { keys: ["["], label: "Toggle sidebar" },
+        { keys: ["]"], label: "Toggle panel" },
+        { keys: ["?"], label: "Show keyboard shortcuts" },
+      ],
+    },
+  ];
+}
 
 function KeyCap({ children }: { children: string }) {
   return (
@@ -73,7 +76,7 @@ export function KeyboardShortcutsCheatsheetContent() {
   return (
     <>
       <div className="divide-y divide-border border-t border-border">
-        {sections.map((section) => (
+        {getSections().map((section) => (
           <div key={section.title} className="px-5 py-3">
             <h3 className="mb-2 text-(length:--text-micro) font-semibold uppercase tracking-wider text-muted-foreground">
               {section.title}
@@ -105,7 +108,10 @@ export function KeyboardShortcutsCheatsheetContent() {
       </div>
       <div className="border-t border-border px-5 py-3">
         <p className="text-xs text-muted-foreground">
-          Press <KeyCap>Esc</KeyCap> to close &middot; Shortcuts are disabled in text fields
+          <XoTrans
+            i18nKey="Press <key>Esc</key> to close · Shortcuts are disabled in text fields"
+            components={{ key: <KeyCap>Esc</KeyCap> }}
+          />
         </p>
       </div>
     </>

@@ -8,6 +8,7 @@ import {
   type FilterChipLookups,
   type SearchFilters,
 } from "@/lib/search-filters";
+import { tx } from "@/i18n/xo";
 
 export function ZeroResultsRecovery({
   query,
@@ -40,9 +41,11 @@ export function ZeroResultsRecovery({
       <div className="space-y-1">
         <div className="text-base font-semibold">No results with these filters</div>
         <p className="text-sm text-muted-foreground">
-          {unfilteredTotal === 1 ? "1 result matches" : `${unfilteredTotal} results match`}
-          {query ? <> &ldquo;{query}&rdquo;</> : null}, but your{" "}
-          {activeCount === 1 ? "active filter hides" : `${activeCount} active filters hide`} all of them.
+          {unfilteredTotal === 1 ? tx("1 result matches") : tx("{{n}} results match", { n: unfilteredTotal })}
+          {query ? <> &ldquo;{query}&rdquo;</> : null}
+          {activeCount === 1
+            ? tx(", but your active filter hides all of them.")
+            : tx(", but your {{n}} active filters hide all of them.", { n: activeCount })}
         </p>
       </div>
 
@@ -65,7 +68,9 @@ export function ZeroResultsRecovery({
                 </span>
               </span>
               <span className="shrink-0 tabular-nums text-emerald-600 dark:text-emerald-400">
-                +{suggestion.additionalCount} {suggestion.additionalCount === 1 ? "result" : "results"}
+                {suggestion.additionalCount === 1
+                  ? tx("+{{n}} result", { n: suggestion.additionalCount })
+                  : tx("+{{n}} results", { n: suggestion.additionalCount })}
               </span>
             </button>
           ))}

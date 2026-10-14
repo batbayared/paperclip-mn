@@ -1,3 +1,5 @@
+import { xoBrandVars } from "@/xo/labels";
+import { tx } from "@/i18n/xo";
 import { configFieldsForSection } from "../config-sections";
 import type { AdapterConfigFieldsProps } from "../types";
 import {
@@ -13,8 +15,8 @@ import { LocalWorkspaceRuntimeFields } from "../local-workspace-runtime-fields";
 const inputClass =
   "w-full rounded-md border border-border px-2.5 py-1.5 bg-transparent outline-none text-sm font-mono placeholder:text-muted-foreground/40";
 
-const instructionsFileHint =
-  "Absolute path to a markdown file (e.g. AGENTS.md) that defines this agent's behavior. Injected into the system prompt at runtime.";
+const instructionsFileHint = () =>
+  tx("Absolute path to a markdown file (e.g. AGENTS.md) that defines this agent's behavior. Injected into the system prompt at runtime.");
 
 export function ClaudeLocalConfigFields({
   section,
@@ -32,7 +34,7 @@ export function ClaudeLocalConfigFields({
   return configFieldsForSection(section, (
     <>
       {!hideInstructionsFile && (
-        <Field label="Agent instructions file" hint={instructionsFileHint}>
+        <Field label="Agent instructions file" hint={instructionsFileHint()}>
           <div className="flex items-center gap-2">
             <DraftInput
               value={
@@ -96,7 +98,7 @@ export function ClaudeLocalAdvancedFields({
         environment owns both, so the managed-sandbox-only policy hides them,
         the same way `runnerManaged` hides them for the Paperclip Runner.
       */}
-      {!managedSandboxOnly && <Field label="Execution engine" hint="Default uses ACP. If ACP is unavailable, the run fails with a setup error. Choose CLI explicitly to use it.">
+      {!managedSandboxOnly && <Field label="Execution engine" hint={tx("Default uses ACP. If ACP is unavailable, the run fails with a setup error. Choose CLI explicitly to use it.")}>
         <select
           className={inputClass}
           value={engine}
@@ -117,7 +119,7 @@ export function ClaudeLocalAdvancedFields({
           {!managedSandboxOnly && (
             <Field configSection="advanced"
               label="ACP server command"
-              hint="Optional override for the Claude ACP server command. Defaults to the package-local claude-agent-acp binary."
+              hint={tx("Optional override for the Claude ACP server command. Defaults to the package-local claude-agent-acp binary.")}
             >
               <DraftInput
                 value={
@@ -136,7 +138,7 @@ export function ClaudeLocalAdvancedFields({
               />
             </Field>
           )}
-          <Field configSection="runPolicy" label="ACP session mode" hint="Persistent keeps ACP session state between runs. One-shot starts fresh each run.">
+          <Field configSection="runPolicy" label="ACP session mode" hint={tx("Persistent keeps ACP session state between runs. One-shot starts fresh each run.")}>
             <select
               className={inputClass}
               value={
@@ -157,7 +159,7 @@ export function ClaudeLocalAdvancedFields({
           </Field>
           <Field
             label="ACP non-interactive permissions"
-            hint="Fallback if the ACP agent asks for input outside an interactive session."
+            hint={tx("Fallback if the ACP agent asks for input outside an interactive session.")}
           >
             <select
               className={inputClass}
@@ -180,7 +182,7 @@ export function ClaudeLocalAdvancedFields({
           {!managedSandboxOnly && (
             <Field
               label="ACP state directory"
-              hint="Optional ACP session state directory. Defaults to Paperclip-managed organization/agent scoped storage."
+              hint={tx("Optional ACP session state directory. Defaults to {{brand}}-managed organization/agent scoped storage.", xoBrandVars())}
             >
               <div className="flex items-center gap-2">
                 <DraftInput
@@ -204,7 +206,7 @@ export function ClaudeLocalAdvancedFields({
           )}
           <Field configSection="runPolicy"
             label="ACP warm process idle ms"
-            hint="Defaults to 0, which closes the ACP process after each run while retaining persistent session state."
+            hint={tx("Defaults to 0, which closes the ACP process after each run while retaining persistent session state.")}
           >
             {isCreate ? (
               <input

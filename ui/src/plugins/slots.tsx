@@ -41,6 +41,7 @@ import { pluginsApi, type PluginUiContribution } from "@/api/plugins";
 import { authApi } from "@/api/auth";
 import { queryKeys } from "@/lib/queryKeys";
 import { cn } from "@/lib/utils";
+import { tx } from "@/i18n/xo";
 import {
   PluginBridgeContext,
   type PluginHostContext,
@@ -154,7 +155,7 @@ function requiresEntityType(slotType: PluginUiSlotType): boolean {
 
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error && error.message) return error.message;
-  return "Unknown error";
+  return tx("Unknown error");
 }
 
 /**

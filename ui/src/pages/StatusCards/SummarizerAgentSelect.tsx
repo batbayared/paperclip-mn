@@ -6,6 +6,7 @@ import { AgentIcon } from "@/components/AgentIconPicker";
 import { InlineEntitySelector, type InlineEntityOption } from "@/components/InlineEntitySelector";
 import { isAgentTaskTarget } from "@/lib/company-members";
 import { queryKeys } from "@/lib/queryKeys";
+import { tx } from "@/i18n/xo";
 
 /**
  * Picker for the agent that runs a card's updates. `value` is the override
@@ -60,8 +61,8 @@ export function SummarizerAgentSelect({
       options={agentOptions}
       placeholder="Summarizer (default)"
       noneLabel="Summarizer (default)"
-      searchPlaceholder="Search agents..."
-      emptyMessage="No agents found."
+      searchPlaceholder={tx("Search agents...")}
+      emptyMessage={tx("No agents found.")}
       onChange={(next) => onChange(next.startsWith("agent:") ? next.slice("agent:".length) : "")}
       className="h-8 text-sm"
       renderTriggerValue={renderAgent}

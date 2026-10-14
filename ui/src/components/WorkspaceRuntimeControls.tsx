@@ -18,6 +18,8 @@ import type {
   WorkspaceServiceControlAction,
   WorkspaceServiceControlEntry,
 } from "@/components/WorkspaceServiceControlBar";
+import { tx } from "@/i18n/xo";
+import { xoRunActionLabel } from "@/xo/labels";
 
 export type WorkspaceRuntimeAction = "start" | "stop" | "restart" | "run";
 
@@ -121,7 +123,7 @@ function buildJobItem(
     key: `command:${command.id}`,
     title: command.name,
     kind: "job",
-    statusLabel: "run once",
+    statusLabel: tx("run once"),
     lifecycle: null,
     healthStatus: null,
     exposure: null,
@@ -134,7 +136,7 @@ function buildJobItem(
     workspaceCommandId: command.id,
     runtimeServiceId: null,
     serviceIndex: null,
-    disabledReason: command.disabledReason ?? (!command.command ? "This job is missing a command." : null),
+    disabledReason: command.disabledReason ?? (!command.command ? tx("This job is missing a command.") : null),
   };
 }
 
@@ -184,7 +186,7 @@ export function buildWorkspaceRuntimeControlSections(input: {
       workspaceCommandId: null,
       runtimeServiceId: runtimeService.id,
       serviceIndex: runtimeService.configIndex ?? null,
-      disabledReason: "This runtime service no longer matches a configured workspace command.",
+      disabledReason: tx("This runtime service no longer matches a configured workspace command."),
     }));
 
   return {
@@ -223,13 +225,13 @@ function exposureFailureCopy(exposure: RuntimeExposureStatus | null) {
   if (exposure?.state === "failed") {
     return {
       label: "HTTPS unavailable",
-      remediation: "Check the Tailscale broker and node HTTPS configuration.",
+      remediation: tx("Check the Tailscale broker and node HTTPS configuration."),
     };
   }
   if (exposure?.state === "cleanup_pending") {
     return {
       label: "HTTPS cleanup pending",
-      remediation: "Restart the host broker before reusing this port.",
+      remediation: tx("Restart the host broker before reusing this port."),
     };
   }
   return null;
@@ -297,14 +299,14 @@ export function buildWorkspaceServiceControlEntries(input: {
 
     const runtimeService = item.runtimeServiceId ? runtimeServicesById.get(item.runtimeServiceId) ?? null : null;
     const failureDetail = state === "failed"
-      ? `Service failed${runtimeService?.stoppedAt ? ` · ${timeAgo(runtimeService.stoppedAt)}` : ""}`
+      ? (runtimeService?.stoppedAt ? tx("Service failed · {{timeAgo}}", { timeAgo: timeAgo(runtimeService.stoppedAt) }) : tx("Service failed"))
       : null;
     const exposure = runtimeService?.exposure ?? item.exposure;
     const exposureFailure = exposureFailureCopy(exposure);
     const exposureDetail = exposure?.state === "pending"
-      ? "Provisioning HTTPS…"
+      ? tx("Provisioning HTTPS…")
       : exposure?.state === "ready"
-        ? "HTTPS ready"
+        ? tx("HTTPS ready")
         : exposureFailure
           ? `${exposureFailure.label} · ${exposureFailure.remediation}`
           : null;
@@ -403,12 +405,12 @@ function CommandActionButtons({
         const request = buildRequest(item, action);
         const Icon = action === "stop" ? Square : action === "restart" ? RotateCcw : Play;
         const label = action === "run"
-          ? "Run"
+          ? xoRunActionLabel()
           : action === "start"
-            ? "Start"
+            ? tx("Start")
             : action === "stop"
-              ? "Stop"
-              : "Restart";
+              ? tx("Stop")
+              : tx("Restart");
         const showSpinner = isPending && requestMatchesPending(pendingRequest, request);
         const disabled =
           isPending
@@ -540,8 +542,8 @@ export function WorkspaceRuntimeControls({
   items,
   isPending = false,
   pendingRequest = null,
-  serviceEmptyMessage = "No services are configured for this workspace.",
-  jobEmptyMessage = "No one-shot jobs are configured for this workspace.",
+  serviceEmptyMessage,
+  jobEmptyMessage,
   emptyMessage,
   disabledHint = null,
   onAction,
@@ -556,7 +558,8 @@ export function WorkspaceRuntimeControls({
     jobs: [],
     otherServices: [],
   };
-  const resolvedServiceEmptyMessage = emptyMessage ?? serviceEmptyMessage;
+  const resolvedServiceEmptyMessage = emptyMessage ?? serviceEmptyMessage ?? tx("No services are configured for this workspace.");
+  const resolvedJobEmptyMessage = jobEmptyMessage ?? tx("No one-shot jobs are configured for this workspace.");
   const runningCount = [...resolvedSections.services, ...resolvedSections.otherServices].filter(
     (item) => item.statusLabel === "running" || item.statusLabel === "starting",
   ).length;
@@ -605,7 +608,7 @@ export function WorkspaceRuntimeControls({
         title="Jobs"
         description="One-shot commands that run now and exit when they finish."
         items={resolvedSections.jobs}
-        emptyMessage={jobEmptyMessage}
+        emptyMessage={resolvedJobEmptyMessage}
         isPending={isPending}
         pendingRequest={pendingRequest}
         onAction={onAction}

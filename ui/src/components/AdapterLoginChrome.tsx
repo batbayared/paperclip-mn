@@ -1,3 +1,4 @@
+import { tx } from "@/i18n/xo";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { Copy, Check, Loader2 } from "lucide-react";
@@ -360,8 +361,8 @@ export function OnboardingCardField({
   onSubmit,
   onPaste,
   disabled,
-  label = "Authorization code",
-  placeholder = "Paste authorization code here",
+  label = tx("Authorization code"),
+  placeholder = tx("Paste authorization code here"),
   masked = false,
   autoFocus = false,
 }: {
@@ -459,7 +460,7 @@ export function ProviderApiKeyCard({
 }) {
   return (
     <OnboardingLoginCard
-      instruction={`Provide your ${providerName} API key to connect`}
+      instruction={tx("Provide your {{provider}} API key to connect", { provider: providerName })}
     >
       <OnboardingCardField {...field} label="API key" masked />
     </OnboardingLoginCard>

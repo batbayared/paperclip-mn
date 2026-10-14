@@ -112,6 +112,8 @@ import {
   XOctagon,
 } from "lucide-react";
 import { GithubIcon } from "../components/icons/github-icon";
+import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
 
 // Matches design §11 breakpoints. Module-level so stories and the page agree.
 const DESKTOP_MIN = 1024;
@@ -239,33 +241,42 @@ export function teamRoute(catalogRef: string, filePath?: string | null): string 
 
 const TRUST_META: Record<
   CatalogTeamTrustLevel,
-  { label: string; tip: string; tone: string; Icon: typeof ShieldCheck }
+  { label: string; tone: string; Icon: typeof ShieldCheck }
 > = {
   markdown_only: {
     label: "Markdown only",
-    tip: "Contains only markdown and references. No executable content.",
     tone: "text-emerald-600 dark:text-emerald-300 border-emerald-500/30",
     Icon: ShieldCheck,
   },
   assets: {
     label: "Assets",
-    tip: "Includes static assets (images, fixtures). No executable content.",
     tone: "text-emerald-600 dark:text-emerald-300 border-emerald-500/30",
     Icon: ShieldCheck,
   },
   scripts_executables: {
     label: "Scripts",
-    tip: "Includes executable scripts that were security-reviewed before bundling.",
     tone: "text-amber-600 dark:text-amber-300 border-amber-500/30",
     Icon: AlertTriangle,
   },
   external_sources: {
     label: "External sources",
-    tip: "References external sources resolved at install time.",
     tone: "text-amber-600 dark:text-amber-300 border-amber-500/30",
     Icon: AlertTriangle,
   },
 };
+
+function trustTip(level: CatalogTeamTrustLevel): string {
+  switch (level) {
+    case "markdown_only":
+      return tx("Contains only markdown and references. No executable content.");
+    case "assets":
+      return tx("Includes static assets (images, fixtures). No executable content.");
+    case "scripts_executables":
+      return tx("Includes executable scripts that were security-reviewed before bundling.");
+    case "external_sources":
+      return tx("References external sources resolved at install time.");
+  }
+}
 
 function TrustChip({ level, iconOnly = false }: { level: CatalogTeamTrustLevel; iconOnly?: boolean }) {
   const meta = TRUST_META[level];
@@ -283,7 +294,7 @@ function TrustChip({ level, iconOnly = false }: { level: CatalogTeamTrustLevel; 
           {!iconOnly && meta.label}
         </Badge>
       </TooltipTrigger>
-      <TooltipContent>{meta.tip}</TooltipContent>
+      <TooltipContent>{trustTip(level)}</TooltipContent>
     </Tooltip>
   );
 }
@@ -868,12 +879,18 @@ export function TeamDetailPane({
 
 type WizardStep = "target_manager" | "source_policy" | "skill_plan" | "preview";
 
-const STEP_LABELS: Record<WizardStep, string> = {
-  target_manager: "Target manager",
-  source_policy: "Source policy",
-  skill_plan: "Prerequisite skills",
-  preview: "Preview",
-};
+function stepLabel(step: WizardStep): string {
+  switch (step) {
+    case "target_manager":
+      return tx("Target manager");
+    case "source_policy":
+      return tx("Source policy");
+    case "skill_plan":
+      return tx("Prerequisite skills");
+    case "preview":
+      return tx("Preview");
+  }
+}
 
 // `simplified` is the onboarding seam (design §6): the newly created company is
 // treated as a full-company-equivalent target, so the target-manager step is
@@ -1014,7 +1031,7 @@ export function useInstallTeamCatalogEntry({
       setPreviewError(null);
     },
     onError: (error) => {
-      setPreviewError(error instanceof Error ? error.message : "Failed to load install preview.");
+      setPreviewError(error instanceof Error ? error.message : tx("Failed to load install preview."));
     },
   });
 
@@ -1032,7 +1049,7 @@ export function useInstallTeamCatalogEntry({
     },
     onError: (error) => {
       setPhase("error");
-      setApplyError(error instanceof Error ? error.message : "Install failed.");
+      setApplyError(error instanceof Error ? error.message : tx("Install failed."));
     },
   });
 
@@ -1158,7 +1175,7 @@ function TeamInstallerDialog({
           selectableAdapterTypes,
         );
         if (!resolvedAdapterType) {
-          throw new Error("Enable a legacy adapter before installing this team.");
+          throw new Error(tx("Enable a legacy adapter before installing this team."));
         }
         overrides[slug] = {
           adapterType: resolvedAdapterType,
@@ -1172,7 +1189,7 @@ function TeamInstallerDialog({
         selectableAdapterTypes,
       );
       if (!adapterType) {
-        throw new Error("Enable a legacy adapter before installing this team.");
+        throw new Error(tx("Enable a legacy adapter before installing this team."));
       }
       if (adapterType !== agent.adapterType) {
         overrides[agent.slug] = { adapterType };
@@ -1195,7 +1212,7 @@ function TeamInstallerDialog({
       setPreviewError(null);
     },
     onError: (error) => {
-      setPreviewError(error instanceof Error ? error.message : "Failed to load install preview.");
+      setPreviewError(error instanceof Error ? error.message : tx("Failed to load install preview."));
     },
   });
 
@@ -1212,7 +1229,7 @@ function TeamInstallerDialog({
     },
     onError: (error) => {
       setPhase("error");
-      setApplyError(error instanceof Error ? error.message : "Install failed.");
+      setApplyError(error instanceof Error ? error.message : tx("Install failed."));
     },
   });
 
@@ -1285,7 +1302,7 @@ function TeamInstallerDialog({
     phase === "form" ? (
       <span className="flex items-center gap-2">
         <span>
-          Step {stepIndex + 1} of {totalSteps} · {STEP_LABELS[currentStep]}
+          {tx("Step {{step}} of {{total}} · {{label}}", { step: stepIndex + 1, total: totalSteps, label: stepLabel(currentStep) })}
         </span>
         <span className="flex items-center gap-1" aria-hidden>
           {steps.map((s, i) => (
@@ -2007,9 +2024,11 @@ export function StepPreview({
 
       {/* Provenance */}
       <div className="rounded-md border border-border px-3 py-2.5 text-xs text-muted-foreground">
-        Imported entities are stamped with <code className="font-mono">metadata.paperclip.catalogTeam</code>{" "}
-        ({team.packageName ?? team.key}, content hash <code className="font-mono">{team.contentHash.slice(0, 16)}…</code>),
-        and an activity event is recorded for preview and install.
+        <XoTrans
+          i18nKey="Imported entities are stamped with <code>{{field}}</code> ({{source}}, content hash <code>{{hash}}…</code>), and an activity event is recorded for preview and install."
+          values={{ field: "metadata.paperclip.catalogTeam", source: team.packageName ?? team.key, hash: team.contentHash.slice(0, 16) }}
+          components={{ code: <code className="font-mono" /> }}
+        />
       </div>
     </div>
   );
@@ -2167,7 +2186,7 @@ export function TeamRow({
       </div>
       <div className="flex items-center gap-1.5 text-(length:--text-micro) text-muted-foreground">
         <span>
-          {team.counts.agents}a · {team.counts.projects}p · {team.counts.routines}r · {skillCount(team)}s
+          {tx("{{agents}}a · {{projects}}p · {{routines}}r · {{skills}}s", { agents: team.counts.agents, projects: team.counts.projects, routines: team.counts.routines, skills: skillCount(team) })}
         </span>
         <TrustChip level={team.trustLevel} iconOnly />
       </div>
@@ -2212,9 +2231,9 @@ export function TeamCard({
       <div className="space-y-0.5">
         <h3 className="text-sm font-semibold leading-snug">{team.name}</h3>
         <p className="text-xs text-muted-foreground">
-          {team.counts.agents} agent{team.counts.agents === 1 ? "" : "s"} ·{" "}
-          {team.counts.projects} project{team.counts.projects === 1 ? "" : "s"} ·{" "}
-          {team.counts.routines} routine{team.counts.routines === 1 ? "" : "s"}
+          {team.counts.agents === 1 ? tx("{{n}} agent", { n: team.counts.agents }) : tx("{{n}} agents", { n: team.counts.agents })} ·{" "}
+          {team.counts.projects === 1 ? tx("{{n}} project", { n: team.counts.projects }) : tx("{{n}} projects", { n: team.counts.projects })} ·{" "}
+          {team.counts.routines === 1 ? tx("{{n}} routine", { n: team.counts.routines }) : tx("{{n}} routines", { n: team.counts.routines })}
         </p>
       </div>
 
@@ -2426,7 +2445,7 @@ export function TeamCatalog() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm" className="h-8">
-                {categoryFilter ? `Category · ${titleCase(categoryFilter)}` : "All categories"}
+                {categoryFilter ? tx("Category · {{name}}", { name: titleCase(categoryFilter) }) : "All categories"}
                 <ChevronDown className="h-3.5 w-3.5" />
               </Button>
             </DropdownMenuTrigger>

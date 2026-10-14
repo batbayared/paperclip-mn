@@ -1,6 +1,8 @@
 import { Flag } from "lucide-react";
 import type { Agent } from "@paperclipai/shared";
 import { Button } from "@/components/ui/button";
+import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
 
 interface IssueAssignedBacklogNoticeProps {
   issueStatus: string;
@@ -20,7 +22,7 @@ export function IssueAssignedBacklogNotice({
   if (issueStatus !== "backlog") return null;
   if (!assigneeAgent && !assigneeUserId) return null;
 
-  const assigneeLabel = assigneeAgent?.name ?? "the assignee";
+  const assigneeLabel = assigneeAgent?.name ?? tx("the assignee");
 
   return (
     <div
@@ -32,8 +34,11 @@ export function IssueAssignedBacklogNotice({
         <Flag className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-300" />
         <div className="min-w-0 flex-1 space-y-1.5">
           <p className="leading-5">
-            <span className="font-medium">Parked</span> —{" "}
-            <span className="font-medium">{assigneeLabel}</span> will not be asked to work on this until status changes to To do or In progress.
+            <XoTrans
+              i18nKey="<b>Parked</b> — <b>{{assignee}}</b> will not be asked to work on this until status changes to To do or In progress."
+              values={{ assignee: assigneeLabel }}
+              components={{ b: <span className="font-medium" /> }}
+            />
           </p>
           {assigneeAgent ? (
             <p className="text-xs leading-5 text-amber-800 dark:text-amber-200">

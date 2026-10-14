@@ -114,12 +114,14 @@ function getEventTier(event: ActivityEvent): EventTier {
 type FilterValue = "all" | "in-progress" | "for-review" | "completed";
 type GroupMode = "flat" | "by-task";
 
-const FILTER_OPTIONS: Array<{ value: FilterValue; label: string }> = [
-  { value: "all", label: "All" },
-  { value: "in-progress", label: "In Progress" },
-  { value: "for-review", label: "In Review" },
-  { value: "completed", label: "Done" },
-];
+function getFilterOptions(): Array<{ value: FilterValue; label: string }> {
+  return [
+    { value: "all", label: "All" },
+    { value: "in-progress", label: "In Progress" },
+    { value: "for-review", label: "In Review" },
+    { value: "completed", label: "Done" },
+  ];
+}
 
 const FILTER_ACTIONS: Record<FilterValue, Set<string> | null> = {
   all: null,
@@ -260,9 +262,9 @@ function CollapsedFeedGroup({
     ? agentMap.get(group.latestEvent.actorId)
     : null;
   const actorName = actor?.name
-    ?? (group.latestEvent.actorType === "system" ? "System"
-      : group.latestEvent.actorType === "user" ? "Board"
-      : "Unknown");
+    ?? (group.latestEvent.actorType === "system" ? tx("System")
+      : group.latestEvent.actorType === "user" ? tx("Board")
+      : tx("Unknown"));
   const entityName = entityNameMap.get(`${group.entityType}:${group.entityId}`);
 
   return (
@@ -289,7 +291,7 @@ function CollapsedFeedGroup({
         }
         <span className="flex-1 min-w-0 truncate">
           <span data-fc="actor" className="font-medium text-(--hex-959596) group-hover:text-white">{actorName}</span>
-          <span data-fc="verb" className="ml-1 text-(--hex-959596)">made {group.events.length} updates to</span>
+          <span data-fc="verb" className="ml-1 text-(--hex-959596)">{tx("made {{n}} updates to", { n: group.events.length })}</span>
           <span data-fc="title" className="ml-1 text-(--hex-959596) group-hover:text-white">{entityName ?? group.entityId}</span>
         </span>
         <span data-fc="time" className="text-muted-foreground shrink-0">
@@ -570,7 +572,7 @@ export function ActivityFeed({ className }: ActivityFeedProps) {
       const issueName = entityNameMap.get(`issue:${groupKey}`);
       const issueTitle = entityTitleMap.get(`issue:${groupKey}`);
       const label = isOther
-        ? "Other activity"
+        ? tx("Other activity")
         : `${issueName ?? groupKey}${issueTitle ? ` — ${issueTitle}` : ""}`;
 
       return (
@@ -592,19 +594,19 @@ export function ActivityFeed({ className }: ActivityFeedProps) {
     if (!agents) return null;
     if (agents.length === 0) {
       return {
-        text: "No agents set up yet. Add an agent to get started.",
+        text: tx("No agents set up yet. Add an agent to get started."),
         showPulse: false,
       };
     }
     const allPaused = agents.every((a) => a.status === "paused");
     if (allPaused) {
       return {
-        text: "All agents are paused. Resume agents from the sidebar to see activity.",
+        text: tx("All agents are paused. Resume agents from the sidebar to see activity."),
         showPulse: false,
       };
     }
     return {
-      text: "Your agents are running — activity will appear here shortly.",
+      text: tx("Your agents are running — activity will appear here shortly."),
       showPulse: true,
     };
   }, [agents]);
@@ -671,7 +673,7 @@ export function ActivityFeed({ className }: ActivityFeedProps) {
                 value={filter}
                 onValueChange={(v) => setFilter(v as FilterValue)}
               >
-                {FILTER_OPTIONS.map(({ value, label }) => (
+                {getFilterOptions().map(({ value, label }) => (
                   <DropdownMenuRadioItem key={value} value={value}>
                     {label === "All" ? tx("All") : xoStatusLabel(label, label)}
                   </DropdownMenuRadioItem>

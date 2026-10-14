@@ -161,7 +161,7 @@ export function AiConnectionField({
             companyId={companyId}
             provider={provider}
             initialMethod={method}
-            name={`My ${provider === "anthropic" ? "Claude" : provider === "openai" ? "OpenAI" : provider === "xai" ? "Grok" : "OpenRouter"} ${method === "subscription" ? "subscription" : "API"}`}
+            name={(() => { const name = provider === "anthropic" ? "Claude" : provider === "openai" ? "OpenAI" : provider === "xai" ? "Grok" : "OpenRouter"; return method === "subscription" ? tx("My {{name}} subscription", { name }) : tx("My {{name}} API", { name }); })()}
             ownership="personal"
             agentIds={agentId ? [agentId] : []}
             allAgents={false}

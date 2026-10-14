@@ -9,24 +9,27 @@ import { isAgentTaskTarget } from "@/lib/company-members";
 import { AgentMultiSelect } from "@/components/AgentMultiSelect";
 import { Button } from "@/components/ui/button";
 import { RadioCardGroup, type RadioCardOption } from "@/components/ui/radio-card";
+import { tx } from "@/i18n/xo";
 
-const MODE_OPTIONS: RadioCardOption[] = [
-  {
-    value: "open",
-    title: "Any of my agents",
-    description: "Let any agent you manage archive tasks out of your inbox.",
-  },
-  {
-    value: "allowlist",
-    title: "Only chosen agents",
-    description: "Restrict inbox tidying to the agents you pick below.",
-  },
-  {
-    value: "disabled",
-    title: "Off",
-    description: "Agents can never archive tasks from your inbox.",
-  },
-];
+function getModeOptions(): RadioCardOption[] {
+  return [
+    {
+      value: "open",
+      title: "Any of my agents",
+      description: "Let any agent you manage archive tasks out of your inbox.",
+    },
+    {
+      value: "allowlist",
+      title: "Only chosen agents",
+      description: "Restrict inbox tidying to the agents you pick below.",
+    },
+    {
+      value: "disabled",
+      title: "Off",
+      description: "Agents can never archive tasks from your inbox.",
+    },
+  ];
+}
 
 function policyKey(mode: InboxAgentPolicyMode, allowedAgentIds: string[]): string {
   return `${mode}:${[...allowedAgentIds].sort().join(",")}`;
@@ -135,10 +138,10 @@ export function InboxAgentPolicyControl({ companyId }: { companyId: string | nul
       </div>
 
       <RadioCardGroup
-        ariaLabel="Inbox agent archiving policy"
+        ariaLabel={tx("Inbox agent archiving policy")}
         value={draft.mode}
         onValueChange={(value) => setDraft((current) => (current ? { ...current, mode: value as InboxAgentPolicyMode } : current))}
-        options={MODE_OPTIONS}
+        options={getModeOptions()}
         className="max-w-2xl"
       />
 
@@ -155,12 +158,14 @@ export function InboxAgentPolicyControl({ companyId }: { companyId: string | nul
             }
             triggerLabel={
               selectedAgentIds.size === 0
-                ? "Select agents"
-                : `${selectedAgentIds.size} ${selectedAgentIds.size === 1 ? "agent" : "agents"} selected`
+                ? tx("Select agents")
+                : selectedAgentIds.size === 1
+                  ? tx("{{n}} agent selected", { n: selectedAgentIds.size })
+                  : tx("{{n}} agents selected", { n: selectedAgentIds.size })
             }
             triggerFullWidth={false}
             showSelectionPreview={false}
-            emptyMessage="You don’t manage any agents yet."
+            emptyMessage={tx("You don’t manage any agents yet.")}
           />
         </div>
       ) : null}

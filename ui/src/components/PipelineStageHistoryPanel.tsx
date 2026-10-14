@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { cn } from "../lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { tx } from "@/i18n/xo";
+import { xoBrandVars } from "@/xo/labels";
 
 /**
  * Compact revisions panel for a per-stage instructions document. Mirrors the
@@ -56,15 +58,15 @@ export function PipelineStageHistoryPanel({
       ]);
       onRestored(result.revision.body, result.revision.id);
       pushToast({
-        title: `Restored revision ${result.restoredFromRevisionNumber}`,
-        body: `Saved as revision ${result.revision.revisionNumber}.`,
+        title: tx("Restored revision {{n}}", { n: result.restoredFromRevisionNumber }),
+        body: tx("Saved as revision {{n}}.", { n: result.revision.revisionNumber }),
         tone: "success",
       });
     },
     onError: (error) => {
       pushToast({
         title: "Failed to restore revision",
-        body: error instanceof Error ? error.message : "Paperclip could not restore the revision.",
+        body: error instanceof Error ? error.message : tx("{{brand}} could not restore the revision.", xoBrandVars()),
         tone: "error",
       });
     },

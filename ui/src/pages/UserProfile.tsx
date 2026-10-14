@@ -21,6 +21,7 @@ import {
   providerDisplayName,
   relativeTime,
 } from "../lib/utils";
+import { tx } from "@/i18n/xo";
 
 const NO_COMPANY = "__none__";
 
@@ -116,7 +117,11 @@ function UsageChart({ points }: { points: UserProfileDailyPoint[] }) {
               <div
                 className="w-full bg-foreground/80 transition-opacity group-hover:bg-foreground"
                 style={{ height: `${heightPct}%`, minHeight: tokens === 0 ? 1 : undefined }}
-                title={`${formatShortDate(point.date)}: ${formatTokens(tokens)} tokens, ${point.completedIssues} completed`}
+                title={tx("{{date}}: {{tokens}} tokens, {{completed}} completed", {
+                  date: formatShortDate(point.date),
+                  tokens: formatTokens(tokens),
+                  completed: point.completedIssues,
+                })}
               />
               {completedPct > 0 ? (
                 <div
@@ -212,14 +217,14 @@ export function UserProfile() {
 
   const allTime = data?.stats.find((entry) => entry.key === "all");
   const last7 = data?.stats.find((entry) => entry.key === "last7");
-  const displayName = data?.user.name?.trim() || data?.user.email?.split("@")[0] || "User";
+  const displayName = data?.user.name?.trim() || data?.user.email?.split("@")[0] || tx("User");
 
   const agentUsageRows = useMemo<UsageRow[]>(
     () =>
       (data?.topAgents ?? []).map((row) => ({
         key: row.agentId ?? "unknown",
-        label: row.agentName ?? (row.agentId ? row.agentId.slice(0, 8) : "unknown"),
-        sublabel: "Task-linked usage",
+        label: row.agentName ?? (row.agentId ? row.agentId.slice(0, 8) : tx("unknown")),
+        sublabel: tx("Task-linked usage"),
         costCents: row.costCents,
         inputTokens: row.inputTokens,
         cachedInputTokens: row.cachedInputTokens,
@@ -233,7 +238,7 @@ export function UserProfile() {
       (data?.topProviders ?? []).map((row) => ({
         key: `${row.provider}:${row.biller}:${row.model}`,
         label: `${providerDisplayName(row.provider)} / ${row.model}`,
-        sublabel: `Billed through ${providerDisplayName(row.biller)}`,
+        sublabel: tx("Billed through {{biller}}", { biller: providerDisplayName(row.biller) }),
         costCents: row.costCents,
         inputTokens: row.inputTokens,
         cachedInputTokens: row.cachedInputTokens,
@@ -258,7 +263,7 @@ export function UserProfile() {
   const metaParts = [
     data.user.membershipRole ?? "member",
     data.user.membershipStatus,
-    `joined ${formatDate(data.user.joinedAt)}`,
+    tx("joined {{date}}", { date: formatDate(data.user.joinedAt) }),
   ];
 
   return (
@@ -351,8 +356,8 @@ export function UserProfile() {
       </div>
 
       <div className="grid gap-10 xl:grid-cols-2">
-        <UsageList title="Agent attribution" empty="No issue-linked token usage yet." rows={agentUsageRows} />
-        <UsageList title="Provider mix" empty="No provider usage attributed yet." rows={providerUsageRows} />
+        <UsageList title="Agent attribution" empty={tx("No issue-linked token usage yet.")} rows={agentUsageRows} />
+        <UsageList title="Provider mix" empty={tx("No provider usage attributed yet.")} rows={providerUsageRows} />
       </div>
     </div>
   );

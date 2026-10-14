@@ -38,6 +38,7 @@ import { IssueDocumentsSection } from "@/components/IssueDocumentsSection";
 import { CaseCopyableToken, CaseIdentifierKey } from "@/components/CaseIdentifierKey";
 import { copyTextToClipboard } from "@/lib/clipboard";
 import { cn } from "@/lib/utils";
+import { tx } from "@/i18n/xo";
 
 const STATUS_LABEL: Record<CaseStatus, string> = {
   draft: "Draft",
@@ -428,7 +429,7 @@ function CasePropertiesContent({
         )}
       </PropertySection>
 
-      <PropertySection title={`Children${childCases.length > 0 ? ` ${childCases.length}` : ""}`}>
+      <PropertySection title={childCases.length > 0 ? tx("Children {{n}}", { n: childCases.length }) : tx("Children")}>
         <CaseChildrenTree children={childCases} />
       </PropertySection>
 

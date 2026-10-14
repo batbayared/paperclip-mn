@@ -49,6 +49,7 @@ import { extractCompanyPrefixFromPath, toCompanyRelativePath } from "../lib/comp
 import { useLocation } from "../lib/router";
 import { agentRouteRef } from "../lib/utils";
 import { buildSameOriginWebSocketUrl } from "../lib/websocket-url";
+import { tx } from "@/i18n/xo";
 
 const TOAST_COOLDOWN_WINDOW_MS = 10_000;
 const TOAST_COOLDOWN_MAX = 3;
@@ -177,14 +178,14 @@ function resolveActorLabel(
   if (actorType === "agent" && actorId) {
     return (
       resolveAgentName(queryClient, companyId, actorId) ??
-      `Agent ${shortId(actorId)}`
+      tx("Agent {{id}}", { id: shortId(actorId) })
     );
   }
-  if (actorType === "system") return "System";
+  if (actorType === "system") return tx("System");
   if (actorType === "user" && actorId) {
-    return resolveUserName(queryClient, companyId, actorId) ?? "Board";
+    return resolveUserName(queryClient, companyId, actorId) ?? tx("Board");
   }
-  return "Someone";
+  return tx("Someone");
 }
 
 interface IssueToastContext {
@@ -267,7 +268,7 @@ function resolveIssueToastContext(
     readString(details?.identifier) ??
     readString(details?.issueIdentifier) ??
     cachedIssue?.identifier ??
-    `Task ${shortId(issueId)}`;
+    tx("Task {{id}}", { id: shortId(issueId) });
   const title =
     readString(details?.title) ??
     readString(details?.issueTitle) ??
@@ -879,29 +880,29 @@ function describeIssueUpdate(
   if (!details) return null;
   const changes: string[] = [];
   if (typeof details.status === "string")
-    changes.push(`status -> ${details.status.replace(/_/g, " ")}`);
+    changes.push(tx("status -> {{status}}", { status: details.status.replace(/_/g, " ") }));
   if (typeof details.priority === "string")
-    changes.push(`priority -> ${details.priority}`);
+    changes.push(tx("priority -> {{priority}}", { priority: details.priority }));
   if (
     typeof details.assigneeAgentId === "string" ||
     typeof details.assigneeUserId === "string"
   ) {
-    changes.push("reassigned");
+    changes.push(tx("reassigned"));
   } else if (
     details.assigneeAgentId === null ||
     details.assigneeUserId === null
   ) {
-    changes.push("unassigned");
+    changes.push(tx("unassigned"));
   }
   if (details.reopened === true) {
     const from = readString(details.reopenedFrom);
     changes.push(
-      from ? `reopened from ${from.replace(/_/g, " ")}` : "reopened",
+      from ? tx("reopened from {{from}}", { from: from.replace(/_/g, " ") }) : tx("reopened"),
     );
   }
-  if (typeof details.title === "string") changes.push("title changed");
+  if (typeof details.title === "string") changes.push(tx("title changed"));
   if (typeof details.description === "string")
-    changes.push("description changed");
+    changes.push(tx("description changed"));
   if (changes.length > 0) return changes.join(", ");
   return null;
 }
@@ -946,7 +947,7 @@ function buildActivityToast(
 
   if (action === "issue.created") {
     return {
-      title: `${actor} created ${issue.ref}`,
+      title: tx("{{actor}} created {{ref}}", { actor, ref: issue.ref }),
       body: issue.title ? truncate(issue.title, 96) : undefined,
       tone: "success",
       action: { label: `View ${issue.ref}`, href: issue.href },
@@ -968,7 +969,7 @@ function buildActivityToast(
         ? truncate(issue.title, 96)
         : issue.label;
     return {
-      title: `${actor} updated ${issue.ref}`,
+      title: tx("{{actor}} updated {{ref}}", { actor, ref: issue.ref }),
       body: truncate(body, 100),
       tone: "info",
       action: { label: `View ${issue.ref}`, href: issue.href },
@@ -983,14 +984,14 @@ function buildActivityToast(
   const reopenedFrom = readString(details?.reopenedFrom);
   const reopenedLabel = reopened
     ? reopenedFrom
-      ? `reopened from ${reopenedFrom.replace(/_/g, " ")}`
-      : "reopened"
+      ? tx("reopened from {{from}}", { from: reopenedFrom.replace(/_/g, " ") })
+      : tx("reopened")
     : null;
   const title = reopened
-    ? `${actor} reopened and commented on ${issue.ref}`
+    ? tx("{{actor}} reopened and commented on {{ref}}", { actor, ref: issue.ref })
     : updated
-      ? `${actor} commented and updated ${issue.ref}`
-      : `${actor} commented on ${issue.ref}`;
+      ? tx("{{actor}} commented and updated {{ref}}", { actor, ref: issue.ref })
+      : tx("{{actor}} commented on {{ref}}", { actor, ref: issue.ref });
   const body = bodySnippet
     ? reopenedLabel
       ? `${reopenedLabel} - ${bodySnippet.replace(/^#+\s*/m, "").replace(/\n/g, " ")}`
@@ -1022,11 +1023,9 @@ function buildJoinRequestToast(
     return null;
 
   const requestType = readString(details?.requestType);
-  const label = requestType === "agent" ? "Agent" : "Someone";
-
   return {
-    title: `${label} wants to join`,
-    body: "A new join request is waiting for approval.",
+    title: requestType === "agent" ? tx("Agent wants to join") : tx("Someone wants to join"),
+    body: tx("A new join request is waiting for approval."),
     tone: "info",
     action: { label: "View inbox", href: "/inbox/mine" },
     dedupeKey: `join-request:${entityId}`,
@@ -1044,8 +1043,8 @@ function buildAgentStatusToast(
   if (!agentId || !status || !AGENT_TOAST_STATUSES.has(status)) return null;
 
   const tone = status === "error" ? "error" : "info";
-  const name = nameOf(agentId) ?? `Agent ${shortId(agentId)}`;
-  const title = status === "running" ? `${name} started` : `${name} errored`;
+  const name = nameOf(agentId) ?? tx("Agent {{id}}", { id: shortId(agentId) });
+  const title = status === "running" ? tx("{{name}} started", { name }) : tx("{{name}} errored", { name });
 
   const agents = queryClient.getQueryData<Agent[]>(
     queryKeys.agents.list(companyId),
@@ -1081,15 +1080,15 @@ function buildRunStatusToast(
   if (errorCode === "workspace_busy") return null;
   const contextSource = readString(payload.contextSource);
   const triggerDetail = readString(payload.triggerDetail);
-  const name = nameOf(agentId) ?? "Agent";
+  const name = nameOf(agentId) ?? tx("Agent");
   if (
     status === "failed" &&
     errorCode === "low_trust_isolation_unavailable" &&
     contextSource?.startsWith("chat:")
   ) {
     return {
-      title: `${name} couldn't start this chat`,
-      body: "This external chat identity isn't linked, and isolated guest workspaces are disabled. Link the identity in Connectors or enable isolated workspaces, then start a new task.",
+      title: tx("{{name}} couldn't start this chat", { name }),
+      body: tx("This external chat identity isn't linked, and isolated guest workspaces are disabled. Link the identity in Connectors or enable isolated workspaces, then start a new task."),
       tone: "warn",
       ttlMs: 10_000,
       action: { label: "Open chat connections", href: "/apps" },
@@ -1102,21 +1101,20 @@ function buildRunStatusToast(
       : status === "cancelled"
         ? "info"
         : "error";
-  const statusLabel =
+  const title =
     status === "succeeded"
-      ? "succeeded"
+      ? tx("{{name}} run succeeded", { name })
       : status === "failed"
-        ? "failed"
+        ? tx("{{name}} run failed", { name })
         : status === "timed_out"
-          ? "timed out"
-          : "cancelled";
-  const title = `${name} run ${statusLabel}`;
+          ? tx("{{name}} run timed out", { name })
+          : tx("{{name}} run cancelled", { name });
 
   let body: string | undefined;
   if (error) {
     body = truncate(error, 100);
   } else if (triggerDetail) {
-    body = `Trigger: ${triggerDetail}`;
+    body = tx("Trigger: {{trigger}}", { trigger: triggerDetail });
   }
 
   return {
