@@ -59,6 +59,7 @@ import { hidesCompanySection } from "@paperclipai/shared";
 import { useCompany } from "../context/CompanyContext";
 import { useHiddenSettings } from "../hooks/useHiddenSettings";
 import { useBreadcrumbs } from "../context/BreadcrumbContext";
+import { useSidebar } from "../context/SidebarContext";
 import { useToastActions } from "../context/ToastContext";
 import {
   secretsApi,
@@ -672,6 +673,7 @@ export function Secrets() {
   const { hidden: hiddenSettings } = useHiddenSettings();
   const hideVaultsTab = hidesCompanySection(hiddenSettings, "company.secrets.vaults");
   const hideProposalsTab = hidesCompanySection(hiddenSettings, "company.secrets.proposals");
+  const { isMobile } = useSidebar();
   useEffect(() => {
     if ((activeTab === "vaults" && hideVaultsTab) || (activeTab === "proposals" && hideProposalsTab)) {
       setActiveTab("secrets");
@@ -1847,7 +1849,8 @@ export function Secrets() {
               : [
                   {
                     value: "proposals",
-                    label: (
+                    // PageTabBar-ийн mobile <select> зөвхөн string label харуулдаг (бусад үед value-г); en-д value-тэй ижил "proposals".
+                    label: isMobile ? tx("proposals") : (
                       <span className="inline-flex items-center gap-1.5">
                         Proposals
                         {pendingProposalCount > 0 ? (

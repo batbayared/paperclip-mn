@@ -9,6 +9,7 @@ import { formatLineageLabel } from "@/lib/skill-fork";
 import { Button } from "@/components/ui/button";
 import { tx } from "@/i18n/xo";
 import { XoTrans } from "@/xo/XoTrans";
+import { xoSkillSourceLabel } from "@/xo/labels";
 
 /**
  * Lineage chip for forked skills (PAP-13112, plan §3.1): "Forked from
@@ -62,7 +63,9 @@ export function ProjectScanNotice({
   skill: CompanySkillDetail;
   onEditACopy: () => void;
 }) {
-  const location = skill.sourcePath ?? skill.sourceLabel ?? tx("the project working tree");
+  const location = skill.sourcePath
+    ?? (skill.sourceLabel != null ? xoSkillSourceLabel(skill.sourceLabel) : null)
+    ?? tx("the project working tree");
 
   return (
     <div className="flex flex-wrap items-start gap-2 border-b border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground">

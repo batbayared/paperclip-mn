@@ -42,6 +42,7 @@ import {
   xoFireDispositionLabel,
   xoSigningModeDescription,
   xoSigningModeLabel,
+  xoStatusLabel,
   xoTriggerKindLabel,
 } from "@/xo/labels";
 
@@ -168,9 +169,9 @@ export function OverviewSection({
             options={assigneeOptions}
             recentOptionIds={recentAssigneeIds}
             placeholder="Responsible"
-            noneLabel="No responsible"
-            searchPlaceholder="Search responsible..."
-            emptyMessage="No responsible found."
+            noneLabel={tx("No responsible")}
+            searchPlaceholder={tx("Search responsible...")}
+            emptyMessage={tx("No responsible found.")}
             onChange={(assigneeAgentId) =>
               setEditDraft((current) => ({ ...current, assigneeAgentId }))
             }
@@ -215,9 +216,9 @@ export function OverviewSection({
             options={projectOptions}
             recentOptionIds={recentProjectIds}
             placeholder="Project"
-            noneLabel="No project"
-            searchPlaceholder="Search projects..."
-            emptyMessage="No projects found."
+            noneLabel={tx("No project")}
+            searchPlaceholder={tx("Search projects...")}
+            emptyMessage={tx("No projects found.")}
             onChange={(projectId) => setEditDraft((current) => ({ ...current, projectId }))}
             onConfirm={() => descriptionEditorRef.current?.focus()}
             renderTriggerValue={(option) =>
@@ -332,18 +333,18 @@ export function OverviewSection({
         <SummaryCard
           icon={Clock3}
           label="Triggers"
-          value={activeTriggers === 0 ? "None" : `${activeTriggers} active`}
-          hint={nextFire ? `Next fire ${nextFire}` : "No schedule"}
+          value={activeTriggers === 0 ? tx("None") : tx("{{n}} active", { n: activeTriggers })}
+          hint={nextFire ? tx("Next fire {{time}}", { time: nextFire }) : tx("No schedule")}
           to={() => navigateToSection("triggers")}
-          ariaLabel={`${activeTriggers} triggers. Open triggers.`}
+          ariaLabel={tx("{{n}} triggers. Open triggers.", { n: activeTriggers })}
         />
         <SummaryCard
           icon={Play}
           label="Last run"
-          value={lastRun ? lastRun.status.replaceAll("_", " ") : "No runs"}
-          hint={lastRun ? timeAgo(lastRun.triggeredAt) : "Trigger a run"}
+          value={lastRun ? xoStatusLabel(lastRun.status, lastRun.status.replaceAll("_", " ")) : tx("No runs")}
+          hint={lastRun ? timeAgo(lastRun.triggeredAt) : tx("Trigger a run")}
           to={() => navigateToSection("runs")}
-          ariaLabel={lastRun ? `Last run ${lastRun.status}. Open runs.` : "No runs. Open runs."}
+          ariaLabel={lastRun ? tx("Last run {{status}}. Open runs.", { status: xoStatusLabel(lastRun.status, lastRun.status) }) : tx("No runs. Open runs.")}
         />
       </div>
 
@@ -711,7 +712,7 @@ export function DeliverySection() {
           Concurrency
         </p>
         <RadioCardGroup
-          ariaLabel="Concurrency policy"
+          ariaLabel={tx("Concurrency policy")}
           value={editDraft.concurrencyPolicy}
           onValueChange={(concurrencyPolicy) =>
             setEditDraft((current) => ({ ...current, concurrencyPolicy }))
@@ -724,7 +725,7 @@ export function DeliverySection() {
           Catch-up
         </p>
         <RadioCardGroup
-          ariaLabel="Catch-up policy"
+          ariaLabel={tx("Catch-up policy")}
           value={editDraft.catchUpPolicy}
           onValueChange={(catchUpPolicy) =>
             setEditDraft((current) => ({ ...current, catchUpPolicy }))
@@ -737,7 +738,7 @@ export function DeliverySection() {
           Advanced run policy
         </p>
         <RadioCardGroup
-          ariaLabel="Advanced run policy"
+          ariaLabel={tx("Advanced run policy")}
           value={editDraft.activityGatePolicy}
           onValueChange={(activityGatePolicy) =>
             setEditDraft((current) => ({ ...current, activityGatePolicy }))
@@ -754,7 +755,7 @@ export function DeliverySection() {
           <div className="space-y-2 rounded-lg border border-border p-3">
             <Label className="text-xs font-medium">Activity scope</Label>
             <RadioCardGroup
-              ariaLabel="Activity gate scope"
+              ariaLabel={tx("Activity gate scope")}
               value={editDraft.activityGateScope}
               onValueChange={(activityGateScope) =>
                 setEditDraft((current) => ({ ...current, activityGateScope }))

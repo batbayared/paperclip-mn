@@ -76,6 +76,10 @@ export function xoStatusLabel(status: string, english: string): string {
     case "archived": return tx("Archived");
     case "deleted": return tx("Deleted");
     case "executed": return tx("Executed");
+    case "received": return tx("Received");
+    case "coalesced": return tx("Coalesced");
+    case "skipped": return tx("Skipped");
+    case "issue_created": return tx("Issue created");
     default: return english;
   }
 }
@@ -706,5 +710,120 @@ export function xoSkillPolicyDenialRemediation(code: string, fallback: string): 
     case "skill_secret_handling_blocked": return tx("Remove the secret value before saving.");
     case "skill_actor_restricted": return tx("Retry from an account with access to this action.");
     default: return fallback;
+  }
+}
+
+function xoIsMn(): boolean {
+  return (i18n.resolvedLanguage ?? i18n.language ?? "").startsWith("mn");
+}
+
+/** company-skills sourceLabel — зөвхөн серверийн тогтмол хоёр утга; бусад (owner/repo, зам) хэвээр. */
+export function xoSkillSourceLabel(english: string): string {
+  if (!xoIsMn()) return english;
+  switch (english) {
+    case "Paperclip bundled": return tx("{{brand}} bundled");
+    case "Paperclip workspace": return tx("{{brand}} workspace");
+    default: return english;
+  }
+}
+
+/** company-skills хувилбарын label — серверийн "Initial version"; хэрэглэгчийн label хэвээр. */
+export function xoSkillVersionLabel(english: string): string {
+  if (!xoIsMn()) return english;
+  switch (english) {
+    case "Initial version": return tx("Initial version");
+    default: return english;
+  }
+}
+
+/** Skills Studio анхдагч туршилтын загварын нэр ба тайлбар (сервер seed). */
+export function xoSkillTestTemplateText(english: string): string {
+  if (!xoIsMn()) return english;
+  switch (english) {
+    case "Default test template": return tx("Default test template");
+    case "Paperclip's read-only default harness instructions for Skills Studio runs.":
+      return tx("{{brand}}'s read-only default harness instructions for Skills Studio runs.");
+    default: return english;
+  }
+}
+
+/** attention.ts interactionLabel() — харилцан үйлдлийн төрлийн англи шошго. */
+export function xoAttentionInteractionLabel(english: string): string {
+  if (!xoIsMn()) return english;
+  switch (english) {
+    case "Confirmation requested": return tx("Confirmation requested");
+    case "Selection confirmation requested": return tx("Selection confirmation requested");
+    case "Questions need answers": return tx("Questions need answers");
+    case "Suggested tasks need a decision": return tx("Suggested tasks need a decision");
+    case "Item verdicts need a decision": return tx("Item verdicts need a decision");
+    case "Interaction needs a decision": return tx("Interaction needs a decision");
+    default: return english;
+  }
+}
+
+const ATTENTION_WHY_NOW_SUFFIX = " on an issue thread.";
+
+/** attention.ts whyNow = `${interactionLabel(kind)} on an issue thread.` — бусад whyNow хэвээр. */
+export function xoAttentionWhyNow(english: string): string {
+  if (!xoIsMn() || !english.endsWith(ATTENTION_WHY_NOW_SUFFIX)) return english;
+  const prefix = english.slice(0, -ATTENTION_WHY_NOW_SUFFIX.length);
+  const label = xoAttentionInteractionLabel(prefix);
+  if (label === prefix) return english;
+  return tx("{{label}} on an issue thread.", { label });
+}
+
+/** decision-queues.ts DECISION_QUEUE_SEEDS — гарчиг, тайлбар, дүрмийн тайлбар. Хэрэглэгчийн дараалал хэвээр. */
+export function xoDecisionQueueSeedText(english: string): string {
+  if (!xoIsMn()) return english;
+  switch (english) {
+    case "PRs": return tx("PRs");
+    case "Plans": return tx("Plans");
+    case "Questions": return tx("Questions");
+    case "Pull-request and merge decisions detected from issue work products.":
+      return tx("Pull-request and merge decisions detected from issue work products.");
+    case "Attention items whose issue has a pull_request work product.":
+      return tx("Attention items whose issue has a pull_request work product.");
+    case "Plan revisions waiting for confirmation.": return tx("Plan revisions waiting for confirmation.");
+    case "Pending request_confirmation interactions bound to the issue's plan document.":
+      return tx("Pending request_confirmation interactions bound to the issue's plan document.");
+    case "Structured questions waiting for a board response.":
+      return tx("Structured questions waiting for a board response.");
+    case "Pending ask_user_questions interactions.": return tx("Pending ask_user_questions interactions.");
+    default: return english;
+  }
+}
+
+/** ROUTINE_RUN_SOURCES: schedule / manual / api / webhook — api латинаар үлдэнэ. en дээр raw. */
+export function xoRoutineRunSourceLabel(source: string): string {
+  if (!xoIsMn()) return source;
+  switch (source) {
+    case "manual": return tx("manual");
+    default: return xoTriggerKindLabel(source);
+  }
+}
+
+/** `trigger.label ?? trigger.kind`-ийн орлуулга: label байхгүй эсвэл kind-тай тэнцүү бол kind-ийг орчуулна. */
+export function xoRoutineTriggerLabel(label: string | null | undefined, kind: string): string {
+  if (label == null || label === kind) return xoTriggerKindLabel(kind);
+  return label;
+}
+
+/** RoutineHistoryTab snapshot утгууд: priority, status, concurrency/catch-up policy (зай эсвэл доогуур зураастай). */
+export function xoRoutineHistoryValueLabel(value: string): string {
+  if (!xoIsMn()) return value;
+  switch (value.replaceAll(" ", "_")) {
+    case "low": return tx("Low");
+    case "medium": return tx("Medium");
+    case "high": return tx("High");
+    case "critical": return tx("Critical");
+    case "active": return tx("Active");
+    case "paused": return tx("Paused");
+    case "archived": return tx("Archived");
+    case "coalesce_if_active": return tx("Coalesce if active");
+    case "always_enqueue": return tx("Always enqueue");
+    case "skip_if_active": return tx("Skip if active");
+    case "skip_missed": return tx("Skip missed");
+    case "enqueue_missed_with_cap": return tx("Enqueue missed with cap");
+    default: return value;
   }
 }

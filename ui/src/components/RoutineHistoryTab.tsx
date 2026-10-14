@@ -37,7 +37,13 @@ import { EmptyState } from "./EmptyState";
 import { MarkdownBody } from "./MarkdownBody";
 import { Badge } from "@/components/ui/badge";
 import { tx } from "@/i18n/xo";
-import { xoRoutineDirtyFieldLabel, xoRoutineHistoryFieldLabel } from "@/xo/labels";
+import {
+  xoRoutineDirtyFieldLabel,
+  xoRoutineHistoryFieldLabel,
+  xoRoutineHistoryValueLabel,
+  xoRoutineTriggerLabel,
+  xoTriggerKindLabel,
+} from "@/xo/labels";
 
 type AgentLookup = Map<string, { id: string; name: string }>;
 type ProjectLookup = Map<string, { id: string; name: string }>;
@@ -532,13 +538,13 @@ function RevisionPreview({
     {
       key: "priority",
       label: "Priority",
-      value: snapshot.priority,
+      value: xoRoutineHistoryValueLabel(snapshot.priority),
       differs: !!currentSnapshot && currentSnapshot.priority !== snapshot.priority,
     },
     {
       key: "status",
       label: "Status",
-      value: snapshot.status,
+      value: xoRoutineHistoryValueLabel(snapshot.status),
       differs: !!currentSnapshot && currentSnapshot.status !== snapshot.status,
     },
     {
@@ -556,13 +562,13 @@ function RevisionPreview({
     {
       key: "concurrencyPolicy",
       label: "Concurrency",
-      value: snapshot.concurrencyPolicy.replaceAll("_", " "),
+      value: xoRoutineHistoryValueLabel(snapshot.concurrencyPolicy.replaceAll("_", " ")),
       differs: !!currentSnapshot && currentSnapshot.concurrencyPolicy !== snapshot.concurrencyPolicy,
     },
     {
       key: "catchUpPolicy",
       label: "Catch-up",
-      value: snapshot.catchUpPolicy.replaceAll("_", " "),
+      value: xoRoutineHistoryValueLabel(snapshot.catchUpPolicy.replaceAll("_", " ")),
       differs: !!currentSnapshot && currentSnapshot.catchUpPolicy !== snapshot.catchUpPolicy,
     },
     {
@@ -648,9 +654,9 @@ function RevisionPreview({
             {triggers.map((trigger) => (
               <li key={trigger.id} className="py-2 flex flex-wrap items-center gap-2 text-sm">
                 <Badge variant="outline" className="border-border text-(length:--text-nano) uppercase tracking-(--tracking-eyebrow) text-muted-foreground">
-                  {trigger.kind}
+                  {xoTriggerKindLabel(trigger.kind)}
                 </Badge>
-                <span className="font-medium">{trigger.label ?? trigger.kind}</span>
+                <span className="font-medium">{xoRoutineTriggerLabel(trigger.label, trigger.kind)}</span>
                 <span className="text-xs text-muted-foreground">
                   {summarizeTriggerSnapshot(trigger)}
                 </span>
@@ -1004,7 +1010,7 @@ function summarizeTriggerSnapshot(trigger: RoutineRevisionSnapshotTriggerV1): st
     return [trigger.cronExpression, trigger.timezone].filter(Boolean).join(" · ");
   }
   if (trigger.kind === "webhook") {
-    const replay = trigger.replayWindowSec != null ? `replay ${trigger.replayWindowSec}s` : "";
+    const replay = trigger.replayWindowSec != null ? tx("replay {{seconds}}s", { seconds: trigger.replayWindowSec }) : "";
     return [trigger.signingMode, replay].filter(Boolean).join(" · ");
   }
   return "API";
@@ -1029,13 +1035,17 @@ function collectWebhookTriggerDifferences(
   const currentIds = new Set(current.snapshot.triggers.map((t) => t.id));
   return target.snapshot.triggers
     .filter((trigger) => trigger.kind === "webhook" && !currentIds.has(trigger.id))
-    .map((trigger) => trigger.label ?? "webhook");
+    .map((trigger) => xoRoutineTriggerLabel(trigger.label, "webhook"));
 }
 
 function describeSnapshotField(value: unknown): string {
   if (value == null) return "—";
   if (typeof value === "string") return value;
   return JSON.stringify(value);
+}
+
+function describeSnapshotValueLabel(value: unknown): string {
+  return xoRoutineHistoryValueLabel(describeSnapshotField(value));
 }
 
 function computeFieldChanges(
@@ -1060,7 +1070,7 @@ function computeFieldChanges(
     }
   };
   compareScalar("title", "Title", oldRoutine.title, newRoutine.title);
-  compareScalar("priority", "Priority", oldRoutine.priority, newRoutine.priority);
+  compareScalar("priority", "Priority", oldRoutine.priority, newRoutine.priority, describeSnapshotValueLabel);
   compareScalar(
     "assigneeAgentId",
     "Default agent",
@@ -1073,9 +1083,9 @@ function computeFieldChanges(
     resolveProjectName(oldRoutine.projectId, projects),
     resolveProjectName(newRoutine.projectId, projects),
   );
-  compareScalar("concurrencyPolicy", "Concurrency", oldRoutine.concurrencyPolicy, newRoutine.concurrencyPolicy);
-  compareScalar("catchUpPolicy", "Catch-up", oldRoutine.catchUpPolicy, newRoutine.catchUpPolicy);
-  compareScalar("status", "Status", oldRoutine.status, newRoutine.status);
+  compareScalar("concurrencyPolicy", "Concurrency", oldRoutine.concurrencyPolicy, newRoutine.concurrencyPolicy, describeSnapshotValueLabel);
+  compareScalar("catchUpPolicy", "Catch-up", oldRoutine.catchUpPolicy, newRoutine.catchUpPolicy, describeSnapshotValueLabel);
+  compareScalar("status", "Status", oldRoutine.status, newRoutine.status, describeSnapshotValueLabel);
   if (JSON.stringify(oldRoutine.variables) !== JSON.stringify(newRoutine.variables)) {
     changes.push({
       field: xoRoutineHistoryFieldLabel("Variables"),
@@ -1285,13 +1295,13 @@ function compareTriggers(
   for (const [, pair] of byId) {
     if (pair.old && !pair.next) {
       changes.push({
-        field: tx("Trigger removed ({{name}})", { name: pair.old.label ?? pair.old.kind }),
+        field: tx("Trigger removed ({{name}})", { name: xoRoutineTriggerLabel(pair.old.label, pair.old.kind) }),
         oldValue: summarizeTriggerSnapshot(pair.old),
         newValue: null,
       });
     } else if (!pair.old && pair.next) {
       changes.push({
-        field: tx("Trigger added ({{name}})", { name: pair.next.label ?? pair.next.kind }),
+        field: tx("Trigger added ({{name}})", { name: xoRoutineTriggerLabel(pair.next.label, pair.next.kind) }),
         oldValue: null,
         newValue: summarizeTriggerSnapshot(pair.next),
       });
@@ -1300,7 +1310,7 @@ function compareTriggers(
       const newSummary = summarizeTriggerSnapshot(pair.next);
       if (oldSummary !== newSummary || pair.old.enabled !== pair.next.enabled) {
         changes.push({
-          field: tx("Trigger {{name}}", { name: pair.next.label ?? pair.next.kind }),
+          field: tx("Trigger {{name}}", { name: xoRoutineTriggerLabel(pair.next.label, pair.next.kind) }),
           oldValue: `${oldSummary} (${pair.old.enabled ? tx("enabled") : tx("disabled")})`,
           newValue: `${newSummary} (${pair.next.enabled ? tx("enabled") : tx("disabled")})`,
         });

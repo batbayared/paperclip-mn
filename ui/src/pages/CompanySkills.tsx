@@ -173,7 +173,12 @@ import { GithubIcon } from "../components/icons/github-icon";
 import type { FolderListItem, FolderListResult } from "@paperclipai/shared";
 import { tx } from "@/i18n/xo";
 import { XoTrans } from "@/xo/XoTrans";
-import { xoSkillDiscoverySortLabel, xoSkillSourceFilterLabel } from "@/xo/labels";
+import {
+  xoSkillDiscoverySortLabel,
+  xoSkillSourceFilterLabel,
+  xoSkillSourceLabel,
+  xoSkillVersionLabel,
+} from "@/xo/labels";
 
 type SkillTreeNode = {
   name: string;
@@ -267,22 +272,23 @@ function sourceMeta(sourceBadge: CompanySkillSourceBadge, sourceLabel: string | 
   const normalizedLabel = sourceLabel?.toLowerCase() ?? "";
   const isSkillsShManaged =
     normalizedLabel.includes("skills.sh") || normalizedLabel.includes("vercel-labs/skills");
+  const displayLabel = sourceLabel === null ? null : xoSkillSourceLabel(sourceLabel);
 
   switch (sourceBadge) {
     case "skills_sh":
-      return { icon: VercelMark, label: sourceLabel ?? "skills.sh", managedLabel: tx("skills.sh managed") };
+      return { icon: VercelMark, label: displayLabel ?? "skills.sh", managedLabel: tx("skills.sh managed") };
     case "github":
       return isSkillsShManaged
-        ? { icon: VercelMark, label: sourceLabel ?? "skills.sh", managedLabel: tx("skills.sh managed") }
-        : { icon: GithubIcon, label: sourceLabel ?? "GitHub", managedLabel: tx("GitHub managed") };
+        ? { icon: VercelMark, label: displayLabel ?? "skills.sh", managedLabel: tx("skills.sh managed") }
+        : { icon: GithubIcon, label: displayLabel ?? "GitHub", managedLabel: tx("GitHub managed") };
     case "url":
-      return { icon: Link2, label: sourceLabel ?? "URL", managedLabel: tx("URL managed") };
+      return { icon: Link2, label: displayLabel ?? "URL", managedLabel: tx("URL managed") };
     case "local":
-      return { icon: Folder, label: sourceLabel ?? "Folder", managedLabel: tx("Folder managed") };
+      return { icon: Folder, label: displayLabel ?? "Folder", managedLabel: tx("Folder managed") };
     case "paperclip":
-      return { icon: Paperclip, label: sourceLabel ?? "Paperclip", managedLabel: tx("{{brand}} managed") };
+      return { icon: Paperclip, label: displayLabel ?? "Paperclip", managedLabel: tx("{{brand}} managed") };
     default:
-      return { icon: Boxes, label: sourceLabel ?? "Catalog", managedLabel: tx("Catalog managed") };
+      return { icon: Boxes, label: displayLabel ?? "Catalog", managedLabel: tx("Catalog managed") };
   }
 }
 
@@ -705,7 +711,7 @@ export function buildDiscoveryCards(
       catalogRef: catalogMatch ? catalogMatch.id : null,
       name: skill.name,
       slug: skill.slug,
-      author: skill.authorName ?? skill.sourceLabel ?? "you",
+      author: skill.authorName ?? (skill.sourceLabel != null ? xoSkillSourceLabel(skill.sourceLabel) : null) ?? "you",
       version: discoveryVersionLabel(skill, required),
       tagline: skill.tagline ?? null,
       description: skill.description ?? null,
@@ -2192,13 +2198,13 @@ export function InstallPreviewDialog({
               {defaultAction === "update" ? (
                 <XoTrans
                   i18nKey="An existing skill with key <code>{{key}}</code> is installed ({{source}}). Installing will overwrite the catalog content."
-                  values={{ key: conflict.key, source: conflict.sourceLabel ?? conflict.sourceType }}
+                  values={{ key: conflict.key, source: (conflict.sourceLabel != null ? xoSkillSourceLabel(conflict.sourceLabel) : null) ?? conflict.sourceType }}
                   components={{ code: <span className="font-mono" /> }}
                 />
               ) : (
                 <XoTrans
                   i18nKey="An existing skill with key <code>{{key}}</code> is installed ({{source}}). Installing will replace the existing skill."
-                  values={{ key: conflict.key, source: conflict.sourceLabel ?? conflict.sourceType }}
+                  values={{ key: conflict.key, source: (conflict.sourceLabel != null ? xoSkillSourceLabel(conflict.sourceLabel) : null) ?? conflict.sourceType }}
                   components={{ code: <span className="font-mono" /> }}
                 />
               )}
@@ -2343,7 +2349,7 @@ function AttachAgentsPopover({
             <option value="__latest__">Latest</option>
             {sortedVersions.map((version) => (
               <option key={version.id} value={version.id}>
-                v{version.revisionNumber}{version.label ? ` · ${version.label}` : ""}
+                v{version.revisionNumber}{version.label ? ` · ${xoSkillVersionLabel(version.label)}` : ""}
               </option>
             ))}
           </select>
@@ -2606,7 +2612,7 @@ function currentVersionSelection(detail: CompanySkillDetail | null | undefined) 
 
 function versionLabel(version: CompanySkillVersion | null | undefined) {
   if (!version) return "Latest";
-  return `v${version.revisionNumber}${version.label ? ` · ${version.label}` : ""}`;
+  return `v${version.revisionNumber}${version.label ? ` · ${xoSkillVersionLabel(version.label)}` : ""}`;
 }
 
 export function getSkillVersionDiffSelection(versions: CompanySkillVersion[], targetVersionId?: string | null) {
@@ -3357,7 +3363,11 @@ export function SkillDetailPage({
                 {/* GitHub-style "by" attribution sits directly under the title. */}
                 {detail.authorName ? (
                   <p className="mt-0.5 text-sm text-muted-foreground">
-                    by <span className="text-foreground">{detail.authorName}</span>
+                    <XoTrans
+                      i18nKey="by <author>{{author}}</author>"
+                      values={{ author: detail.authorName }}
+                      components={{ author: <span className="text-foreground" /> }}
+                    />
                   </p>
                 ) : null}
                 {subtitleText ? (

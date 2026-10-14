@@ -1,5 +1,39 @@
 # XO ахицын бүртгэл
 
+## Ү6 7.10 Үлдэгдэл (2026-10-14)
+
+Зорилго: 7.8 ба 7.9-ийн «Үлдэгдэл»-ийг хаах: серверээс ирэх шошгыг клиент талд labels.ts helper-ээр орчуулах, routines / skills / secrets / pipeline / workspace хуудсын англи үлдэгдэл, «Updated <time>» маягийн холимог өгүүлбэр, InlineEntitySelector-ийн текст. Серверийн код хөндөгдөөгүй. en гаралт c76922936-тэй байт ижил (брэндийн baseline-ийн өөрчлөлтийг доор бичсэн).
+
+Төлөвлөгөө: docs/superpowers/plans/2026-10-14-xo-y6-7-10-leftovers.md. BASE c76922936 (5e9ee3084 + BootstrapPendingPage-ийн 7.10 commit).
+
+ED шийдвэр (2026-10-14): Х1 серверийн шошгыг клиент талд labels.ts helper-ээр буулгана (xoStatusLabel өргөтгөл, xoRoutineRunSourceLabel, xoRoutineTriggerLabel, xoRoutineHistoryValueLabel, xoSkillSourceLabel, xoSkillVersionLabel, xoSkillTestTemplateText, xoAttentionInteractionLabel, xoAttentionWhyNow, xoDecisionQueueSeedText); танигдаагүй утга англиар буцна, серверийн код хөндөхгүй. Х2 *.production.tsx хүрээнээс гадуур. Х3 техникийн утга латинаар (keep-en +17). Х4 брэнд baseline-д labels.ts-ийн 3 мөр нэмэгдэнэ (серверийн мөртэй харьцуулах түлхүүр, ED зөвшөөрсөн).
+
+Батлагдсан нэр томьёо: Board «Удирдах зөвлөл» (каталогийн утга), stage «үе шат». «New stage» анхдагч нэр англиар (хадгалагдах өгөгдөл).
+
+| Task | Commit |
+|---|---|
+| 0 BootstrapPendingPage (эхний админы дэлгэц) | c76922936 |
+| 1–10 labels.ts helper, tiers +10 файл, 13 файлын «Updated <time>», каталог, тест, SYNC.md ба бүртгэл | commit хийгээгүй |
+
+Түлхүүр: 5240 (7.9-ын төгсгөл 4706, 7.10-д +534). Нэгтгэсэн түлхүүр: t1 22, t3 179, t4 123, t5 24, t6 68, t7 14, t8 24, t11 54, t12 1.
+
+Төлөв: BootstrapPendingPage commit хийсэн, бусад нь working tree-д, commit ба push хийгээгүй.
+
+### Шалгалтын үр дүн
+
+- Gates (2026-10-14): xo:i18n:check OK keys=5240, xo:i18n:test 10 файл / 119, ui tsc 0 алдаа, vitest (VITE_XO_DEFAULT_LOCALE=en) ui/src 624 файл / 6571 тест passed (эхний ажиллуулалтад нэг flaky тест унаж, дахин ажиллуулахад давсан), xo:brand-scan OK 579 / 162.
+- keep-en.json +17 (техникийн утга латинаар).
+- Хөтчийн шалгалт (3110, mn, 2026-10-14): /YB/routines жагсаалт, дэлгэрэнгүй, түүх, /YB/skills ба студи (үндсэн хавтас; Frontmatter, YAML Латинаар), Нууц утгууд, Ирсэн, Шийдвэрүүд Монголоор. Жагсаалтын «All routines» (allLabel, FolderIconHeader) ба RoutineList-ийн archived/draft/paused шошгыг tx/xoStatusLabel-оор засав (en-д жижиг үсэг хэвээр). en-д нэг удаа харьцуулав: «All routines», «draft» англиар, кирилл зөвхөн өгөгдөлд. Pipeline тохиргоо (туршилтын gate унтраалттай) ба execution workspace (өгөгдөлгүй) хөтчөөр шалгагдаагүй, тестээр хамрагдсан. Шинэ үлдэгдэл: серверийн editableReason («Bundled Paperclip skills are read-only.» гэх мэт 4 утга), хянах самбарын «AGENTS / View all runs / Succeeded / Failed / Other», туршилтын бусад картын тайлбар.
+
+### Хязгаарлалт
+
+- relativeTime() өмнө нь mn-д орчуулагдсан байсан; «Updated <time>» маягийн холимог өгүүлбэрийг 13 файлд tx("Updated {{time}}", …) болгож засав.
+- *.production.tsx англиар (Х2).
+- InlineEntitySelector-ийн noneLabel / searchPlaceholder / emptyMessage / loadingMessage prop transform-ын allowlist-д байхгүй тул гар tx.
+- Secrets-ийн гар утасны таб tx("proposals"): en «proposals» хэвээр.
+- Брэнд baseline 577/161 → 579/162: labels.ts-д 3 мөр нэмэгдсэн (серверийн мөртэй харьцуулах түлхүүр, ED зөвшөөрсөн), 5 файлд буурсан.
+- Англиар үлдсэн (үлдэгдэл): ConnectionSetupFlow.tsx (4231 мөр, ~170 мөр текст, tiers-д ороогүй); *.production.tsx; InstanceExperimentalSettings-ийн бусад картын footnote / ariaLabel; жижиг хэллэг «Owner:», «revision N», «Remote revision N»; pipeline event-ийн actor «Paperclip»; серверийн error.message; агентад очих текст; «Plan approval - {title}» seed буулгагдаагүй.
+
 ## Ү6 7.9 — Skills (2026-10-14)
 
 Зорилго: чадварын (skill) Streamlined UI-г монгол болгох: /YB/skills (CompanySkills.tsx: Суулгасан / Олох / Бүтээх табууд, шүүлтүүр, эрэмбэ, суулгах ба импортын урсгал), хавтасны мод (SkillFolderTree.tsx, reservedRootLabel), хажуу самбар, Чадварын студи (SkillStudio.tsx, lib/skill-studio.ts), төслөөс импортлох цонх, агентын чадварын таб ба гаргалт сонгогч, skill-studio цонхнууд (Салаалах, чадвар ашигладаг агентууд, гарал үүсэл), lib/skill-policy-denial.ts-ийн клиент текст. en гаралт 9282a6b0c-тэй байт ижил (брэндийн үл хамаарах зүйлийг доор бичсэн).

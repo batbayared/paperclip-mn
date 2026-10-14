@@ -614,6 +614,46 @@ XO-ийн өмч: ui/src/xo/labels.ts (xoSkillSourceFilterLabel, xoSkillDiscover
 - en гаралтад брэнд солигдсон (T1 брэнд дүрэм): AgentSkillsTab-ийн мессежүүд, «Paperclip managed» → «XO managed» (agent-skill-source.ts, CompanySkills.tsx), «Paperclip workspace» → «XO workspace»; en байт ижил байх зарчмаас ухамсартай гажсан.
 - Browser шалгалт (2026-10-14, 3110, ED-ийн зөвшөөрлөөр нэг удаа асаасан, HMR): mn: /YB/skills (Суулгасан чадварууд, эрэмбэ «Хамгийн олон агенттай», «Шинэ хавтас», «8 чадвар», «Зохиогч:», «Ямар ч агентад идэвхжүүлээгүй»), Олох таб («Эх үүсвэр / Бүгд», «Суулгах боломжтой», «Заавал биш»), чадварын дэлгэрэнгүй («Чадварын студид нээх», «суулгалт / Од / Салаалах», Тойм / Файлууд / Хувилбарууд / Агентууд / Тухай, «Ангилаагүй», «Замыг хуулах / Шилжүүлэх»), салаалах хуудас («Чадвар салаалах», «Салаалж буй чадвар: …», «Салаа үүсгэх»), студи (сонгогч «Чадвар сонгох / САЯХАН ШИНЭЧИЛСЭН», засварлагч «Хувилбарын түүх», «Оролт болгон хадгалах», «ТУРШИЛТЫН АЖИЛЛАГААНУУД»), агентын чадварын таб («8-аас 0 идэвхтэй», «Зөвхөн хянагдана», «Сангаас авах боломжтой») Монголоор гарсан. en: дэлгэрэнгүй хуудас англиар хэвээр. Шалгалтын явцад олдож засагдсан: CompanySkills.tsx-ийн байршлын карт ба хавтасны тэмдэг «Unfiled» (ternary доторх мөр, T1 барьдаггүй) → tx("Unfiled"). Англиар үлдсэн (үлдэгдэл): серверийн sourceLabel «Paperclip bundled / Paperclip workspace», хувилбарын label «Initial version», туршилтын загварын нэр «Default test template» (серверийн өгөгдөл); FrontmatterPanel.tsx («Frontmatter», «Fields», «N issues», нийтлэг компонент, хүрээнээс гадуур); студийн хавтасны гарчиг «root» (SkillPaneTitle folder="root"); анхдагч салааны нэр «… Fork» (серверт хадгалагдах өгөгдөл). Release picker-ийг Process адаптер удирддаггүй тул browser-т харуулж чадаагүй; unit тестээр баталгаажсан.
 
+## Ү6 7.10-д хөндсөн upstream файлууд
+
+7.8 ба 7.9-ийн «Үлдэгдэл»-ийг хаасан: серверээс ирэх шошгыг клиент талд labels.ts helper-ээр буулгах, routines / skills / secrets / pipeline / workspace хуудсын англи үлдэгдэл, «Updated <time>» маягийн холимог өгүүлбэр (13 файл), InlineEntitySelector-ийн текст. tiers.ts-д 10 файл T1 болж нэмэгдсэн (BootstrapPendingPage өмнө нь c76922936-д). Тэмдэглэгээ 7.5-ын хүснэгттэй ижил. BASE c76922936. ED шийдвэр (2026-10-14): Х1 серверийн шошгыг клиент талд буулгана, танигдаагүй утга англиар буцна, серверийн код хөндөхгүй; Х2 *.production.tsx хүрээнээс гадуур; Х3 техникийн утга латинаар (keep-en +17); Х4 брэнд baseline-д labels.ts-ийн 3 мөр (ED зөвшөөрсөн). Нэр томьёо: Board «Удирдах зөвлөл» (каталогийн утга), stage «үе шат»; «New stage» анхдагч нэр англиар (хадгалагдах өгөгдөл).
+
+| Файл | Өөрчлөлт |
+|---|---|
+| ui/src/components/BootstrapPendingPage.tsx | T1 (c76922936) |
+| ui/src/pages/PipelineSettings.tsx | T1; «New stage» анхдагч нэр англиар (хадгалагдах өгөгдөл) |
+| ui/src/pages/ExecutionWorkspaceDetail.tsx | T1; routines таб |
+| ui/src/components/BuiltInBundlePanel.tsx | T1 |
+| ui/src/components/FrontmatterPanel.tsx | T1 |
+| ui/src/components/environment-variables-editor/index.tsx | T1 |
+| ui/src/components/environment-variables-editor/Row.tsx | T1 |
+| ui/src/components/environment-variables-editor/SecretPicker.tsx | T1 |
+| ui/src/components/environment-variables-editor/CreateSecretPopover.tsx | T1 |
+| ui/src/components/RepositoryEditor.tsx | T1; InlineEntitySelector-ийн prop гар tx |
+| ui/src/pages/Secrets.tsx | гар утасны таб tx("proposals"), en «proposals» хэвээр |
+| «Updated <time>» холимог өгүүлбэр (13 файл) | tx("Updated {{time}}", { time: relativeTime(…) }); relativeTime() өмнө нь mn-д орчуулагдсан |
+| InlineEntitySelector дуудагчид (CommentThread, IssueProperties, RepositoryEditor гэх мэт) | noneLabel / searchPlaceholder / emptyMessage / loadingMessage гар tx (transform-ын allowlist-д байхгүй) |
+| Routines / Skills / attention / decision queue файлууд | серверийн шошгыг labels.ts helper-ээр буулгасан, танигдаагүй утга англиар |
+
+Хөндөгдөөгүй: серверийн код, *.production.tsx (Х2).
+
+XO-ийн өмч: ui/src/xo/labels.ts (xoStatusLabel өргөтгөл; xoRoutineRunSourceLabel, xoRoutineTriggerLabel, xoRoutineHistoryValueLabel, xoSkillSourceLabel, xoSkillVersionLabel, xoSkillTestTemplateText, xoAttentionInteractionLabel, xoAttentionWhyNow, xoDecisionQueueSeedText шинэ), scripts/xo-i18n/tiers.ts (+10 файл T1), scripts/xo-brand/baseline.json (577/161 → 579/162: labels.ts-д 3 мөр нэмэгдсэн, серверийн мөртэй харьцуулах түлхүүр, ED зөвшөөрсөн; 5 файлд буурсан), ui/src/i18n/xo/* (keys=5240, +534; нэгтгэсэн t1 22, t3 179, t4 123, t5 24, t6 68, t7 14, t8 24, t11 54, t12 1; keep-en.json +17).
+
+XO-ийн тестүүд: scripts/xo-i18n/tiers-y6-7-10.test.ts (нэмэлт), ui/src/xo/labels.test.ts (шинэ helper-ийн describe).
+
+Gates (2026-10-14): xo:i18n:check OK 5240, xo:i18n:test 10 / 119, tsc 0, vitest (en) ui/src 624 файл / 6571 тест (эхний ажиллуулалтад нэг flaky тест унаж, дахин ажиллуулахад давсан), xo:brand-scan OK.
+
+Үлдэгдэл (Ү6 7.10):
+- ConnectionSetupFlow.tsx (4231 мөр, ~170 мөр текст) tiers-д ороогүй, англиар.
+- *.production.tsx англиар үлдэнэ (Х2).
+- InstanceExperimentalSettings-ийн бусад картын footnote / ariaLabel англиар.
+- Жижиг хэллэг «Owner:», «revision N», «Remote revision N» англиар.
+- Pipeline event-ийн actor «Paperclip» өөрчлөгдөөгүй.
+- Серверээс ирэх мессеж (error.message) англиар.
+- Агентад очих текст англиар.
+- «Plan approval - {title}» seed текст буулгагдаагүй.
+- Хөтчийн шалгалт (3110, mn, 2026-10-14): /YB/routines жагсаалт, дэлгэрэнгүй, түүх, /YB/skills ба студи (үндсэн хавтас; Frontmatter, YAML Латинаар), Нууц утгууд, Ирсэн, Шийдвэрүүд Монголоор. Жагсаалтын «All routines» (allLabel, FolderIconHeader) ба RoutineList-ийн archived/draft/paused шошгыг tx/xoStatusLabel-оор засав (en-д жижиг үсэг хэвээр). en-д нэг удаа харьцуулав: «All routines», «draft» англиар, кирилл зөвхөн өгөгдөлд. Pipeline тохиргоо (туршилтын gate унтраалттай) ба execution workspace (өгөгдөлгүй) хөтчөөр шалгагдаагүй, тестээр хамрагдсан. Шинэ үлдэгдэл: серверийн editableReason («Bundled Paperclip skills are read-only.» гэх мэт 4 утга), хянах самбарын «AGENTS / View all runs / Succeeded / Failed / Other», туршилтын бусад картын тайлбар.
+
 ## Lockfile
 
 `pnpm-lock.yaml` XO-ийн dependency өөрчлөлт (root `package.json`)-өөс болж sync-д ихэвчлэн зөрчилдөнө. Гараар merge хийхгүй:

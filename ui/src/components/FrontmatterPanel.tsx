@@ -17,6 +17,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { tx } from "@/i18n/xo";
 
 /**
  * Skill Studio frontmatter editor (PAP-13145 Option B / PAP-13155).
@@ -199,15 +200,15 @@ function collectValidation(form: FormModel, isSkillFile: boolean): ValidationIss
   const issues: ValidationIssue[] = [];
   const name = form.name.trim();
   const description = form.description.trim();
-  if (isSkillFile && !name) issues.push({ field: "name", message: "SKILL.md needs a name." });
+  if (isSkillFile && !name) issues.push({ field: "name", message: tx("SKILL.md needs a name.") });
   if (name && !SLUG_RE.test(name)) {
-    issues.push({ field: "name", message: "Use lowercase letters, numbers and hyphens." });
+    issues.push({ field: "name", message: tx("Use lowercase letters, numbers and hyphens.") });
   }
   if (isSkillFile && !description) {
-    issues.push({ field: "description", message: "SKILL.md needs a description." });
+    issues.push({ field: "description", message: tx("SKILL.md needs a description.") });
   }
   if (form.allowedToolsPresent && form.allowedTools === null) {
-    issues.push({ field: "allowed-tools", message: "Expected a list — edit in YAML." });
+    issues.push({ field: "allowed-tools", message: tx("Expected a list — edit in YAML.") });
   }
   return issues;
 }
@@ -394,7 +395,9 @@ export function FrontmatterPanel({
           {present && effectiveMode === "fields" && warningCount > 0 ? (
             <Badge variant="outline" className="gap-1 text-amber-500" data-testid="frontmatter-warning-chip">
               <AlertTriangle className="h-3.5 w-3.5" />
-              {warningCount} {warningCount === 1 ? "issue" : "issues"}
+              {warningCount === 1
+                ? tx("{{n}} issue", { n: warningCount })
+                : tx("{{n}} issues", { n: warningCount })}
             </Badge>
           ) : null}
         </div>
@@ -434,10 +437,14 @@ function buildSummary(parsed: Record<string, unknown>): string {
   const parts: string[] = [];
   if (typeof parsed.name === "string" && parsed.name.trim()) parts.push(parsed.name.trim());
   const tools = asStringArray(parsed["allowed-tools"]);
-  if (tools && tools.length > 0) parts.push(`${tools.length} ${tools.length === 1 ? "tool" : "tools"}`);
+  if (tools && tools.length > 0) parts.push(
+      tools.length === 1
+        ? tx("{{n}} tool", { n: tools.length })
+        : tx("{{n}} tools", { n: tools.length }),
+    );
   if (isFrontmatterPlainRecord(parsed.metadata)) {
     const count = Object.keys(parsed.metadata).length;
-    if (count > 0) parts.push(`${count} metadata`);
+    if (count > 0) parts.push(tx("{{n}} metadata", { n: count }));
   }
   return parts.join(" · ");
 }
@@ -597,7 +604,7 @@ function MetadataRows({
       {rows.map((row, index) => (
         <div key={row.id} className="flex items-center gap-1.5">
           <Input
-            aria-label={`Metadata key ${index + 1}`}
+            aria-label={tx("Metadata key {{n}}", { n: index + 1 })}
             value={row.key}
             readOnly={readOnly}
             placeholder="key"
@@ -605,7 +612,11 @@ function MetadataRows({
             className="h-8 flex-1 font-mono text-xs"
           />
           <Input
-            aria-label={`Value for ${row.key || `field ${index + 1}`}`}
+            aria-label={
+              row.key
+                ? tx("Value for {{key}}", { key: row.key })
+                : tx("Value for field {{n}}", { n: index + 1 })
+            }
             value={row.text}
             readOnly={readOnly}
             placeholder="value"
@@ -617,7 +628,11 @@ function MetadataRows({
               variant="ghost"
               size="icon"
               className="h-8 w-8 shrink-0"
-              aria-label={`Remove ${row.key || `field ${index + 1}`}`}
+              aria-label={
+                row.key
+                  ? tx("Remove {{value}}", { value: row.key })
+                  : tx("Remove field {{n}}", { n: index + 1 })
+              }
               onClick={() => remove(index)}
             >
               <Trash2 className="h-3.5 w-3.5" />

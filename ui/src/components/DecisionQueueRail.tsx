@@ -3,6 +3,7 @@ import { Link } from "@/lib/router";
 import { decisionQueuesApi } from "../api/decisionQueues";
 import { queryKeys } from "../lib/queryKeys";
 import { cn } from "../lib/utils";
+import { xoDecisionQueueSeedText } from "@/xo/labels";
 
 const RECENT_ACTIVITY_MS = 24 * 60 * 60 * 1000;
 
@@ -49,7 +50,7 @@ export function DecisionQueueRail({ companyId, activeQueueKey = null }: Decision
             key={queue.key}
             href={decisionsHref(queue.key)}
             active={activeQueueKey === queue.key}
-            label={queue.title}
+            label={xoDecisionQueueSeedText(queue.title)}
             count={queue.itemCount}
             recent={recent}
           />

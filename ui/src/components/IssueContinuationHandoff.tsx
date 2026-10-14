@@ -3,6 +3,7 @@ import type { IssueDocument } from "@paperclipai/shared";
 import { ISSUE_CONTINUATION_SUMMARY_DOCUMENT_KEY } from "@paperclipai/shared";
 import { Button } from "@/components/ui/button";
 import { cn, relativeTime } from "../lib/utils";
+import { tx } from "@/i18n/xo";
 import { MarkdownBody, type MarkdownExternalReferenceMap } from "./MarkdownBody";
 import { Check, ChevronDown, ChevronRight, Copy, History } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -88,7 +89,7 @@ export function IssueContinuationHandoff({
             </Badge>
           </div>
           <div className="text-(length:--text-micro) text-muted-foreground">
-            Updated {relativeTime(document.updatedAt)}
+            {tx("Updated {{time}}", { time: relativeTime(document.updatedAt) })}
             {document.latestRevisionNumber > 0 ? ` - revision ${document.latestRevisionNumber}` : ""}
           </div>
         </div>

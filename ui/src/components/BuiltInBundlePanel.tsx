@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { tx } from "@/i18n/xo";
 
 import { Link } from "@/lib/router";
 import { Button } from "@/components/ui/button";
@@ -77,24 +78,24 @@ function resourceActionCopy(
     return {
       title: `Update ${label} to the newest default?`,
       body: `You haven't edited this, so Paperclip will replace it with the newer shipped version. Nothing you customized is affected, and your adapter credentials and settings are not touched.`,
-      confirmLabel: "Update",
-      triggerLabel: "Update",
+      confirmLabel: tx("Update"),
+      triggerLabel: tx("Update"),
     };
   }
   if (resource.stockStatus === "operator_modified") {
     return {
       title: `Reset ${label} to the shipped default?`,
       body: `This replaces your edited version with Paperclip's current default. Your edits can't be recovered. Adapter credentials and settings are not touched.`,
-      confirmLabel: `Reset ${label}`,
-      triggerLabel: "Reset",
+      confirmLabel: tx("Reset {{label}}", { label }),
+      triggerLabel: tx("Reset"),
     };
   }
   if (resource.stockStatus === "missing") {
     return {
       title: `Recreate ${label}?`,
       body: `This resource is missing. Paperclip will recreate it from the shipped default. Adapter credentials and settings are not touched.`,
-      confirmLabel: "Recreate",
-      triggerLabel: "Recreate",
+      confirmLabel: tx("Recreate"),
+      triggerLabel: tx("Recreate"),
     };
   }
   return null;
@@ -209,11 +210,11 @@ function BundleRow({ label, secondary, chips, detail, detailTone = "muted", acti
 function driftDetail(resource: BuiltInManagedResourceState): string | undefined {
   switch (resource.stockStatus) {
     case "operator_modified":
-      return "You've edited this. Your changes are kept until you reset.";
+      return tx("You've edited this. Your changes are kept until you reset.");
     case "stock_update_available":
-      return "Paperclip shipped a newer default.";
+      return tx("Paperclip shipped a newer default.");
     case "missing":
-      return "Not materialized yet — recreate it from the shipped default.";
+      return tx("Not materialized yet — recreate it from the shipped default.");
     default:
       return undefined;
   }
@@ -262,10 +263,10 @@ export function BuiltInBundlePanel({
   let adapterDetail: string | undefined;
   if (status === "pending_approval") {
     adapterChip = "pending_approval";
-    adapterDetail = "Waiting on board hire approval before this coach can run.";
+    adapterDetail = tx("Waiting on board hire approval before this coach can run.");
   } else if (!adapterReady) {
     adapterChip = "needs_setup";
-    adapterDetail = "Pick an adapter this coach can run on.";
+    adapterDetail = tx("Pick an adapter this coach can run on.");
   }
 
   const skill = findResource(resources, "skill");
@@ -273,7 +274,7 @@ export function BuiltInBundlePanel({
   const routine = findResource(resources, "routine");
   const scheduleEnabled = routine?.scheduleEnabled === true;
   const routineKey = bundle.routine.routineKey;
-  const scheduleLabel = bundle.routine.scheduleLabel ?? "Weekly schedule";
+  const scheduleLabel = bundle.routine.scheduleLabel ?? tx("Weekly schedule");
   const proposalIssueRef = routine?.pendingUpdateIssueIdentifier ?? routine?.pendingUpdateIssueId ?? null;
   const proposalHref = proposalIssueRef && routine?.pendingUpdateInteractionId
     ? `/issues/${proposalIssueRef}#interaction-${routine.pendingUpdateInteractionId}`
@@ -336,7 +337,7 @@ export function BuiltInBundlePanel({
         {skill &&
           renderResourceRow(
             "skill",
-            "Skill",
+            tx("Skill"),
             bundle.skill.displayName || skill.resourceKey,
             `/agents/${agentRef}/skills`,
             skill,
@@ -345,7 +346,7 @@ export function BuiltInBundlePanel({
         {instructions &&
           renderResourceRow(
             "instructions",
-            "Instructions",
+            tx("Instructions"),
             bundle.instructions.entryFile,
             `/agents/${agentRef}/instructions`,
             instructions,
@@ -378,8 +379,8 @@ export function BuiltInBundlePanel({
                   <ConfirmActionButton
                     title="Run Reflection Coach once?"
                     body="Paperclip will create one routine task now. This does not enable the weekly schedule or turn on background work."
-                    triggerLabel="Run once"
-                    confirmLabel="Run once"
+                    triggerLabel={tx("Run once")}
+                    confirmLabel={tx("Run once")}
                     pending={routineActionPending === "run"}
                     onConfirm={() => onRunRoutine(routineKey)}
                   />
@@ -389,8 +390,8 @@ export function BuiltInBundlePanel({
                     <ConfirmActionButton
                       title="Disable the weekly schedule?"
                       body="Paperclip will stop future scheduled Reflection Coach runs. Manual Run once remains available."
-                      triggerLabel="Disable schedule"
-                      confirmLabel="Disable schedule"
+                      triggerLabel={tx("Disable schedule")}
+                      confirmLabel={tx("Disable schedule")}
                       pending={routineActionPending === "disable"}
                       onConfirm={() => onDisableSchedule(routineKey)}
                     />
@@ -399,8 +400,8 @@ export function BuiltInBundlePanel({
                     <ConfirmActionButton
                       title="Enable the weekly schedule?"
                       body="Paperclip will allow Reflection Coach to create routine tasks on the weekly schedule. It can spend tokens when those tasks run."
-                      triggerLabel="Enable weekly"
-                      confirmLabel="Enable weekly"
+                      triggerLabel={tx("Enable weekly")}
+                      confirmLabel={tx("Enable weekly")}
                       pending={routineActionPending === "enable"}
                       onConfirm={() => onEnableSchedule(routineKey)}
                     />
@@ -408,7 +409,7 @@ export function BuiltInBundlePanel({
                 {driftVariant(routine) && (
                   <ResourceActionButton
                     resource={routine}
-                    label="routine"
+                    label={tx("routine")}
                     onConfirm={() => onResetResource("routine")}
                     pending={resettingResource === "routine"}
                   />

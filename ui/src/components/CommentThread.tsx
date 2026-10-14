@@ -1045,9 +1045,9 @@ export function CommentThread({
                 value={reassignTarget}
                 options={reassignOptions}
                 placeholder="Responsible"
-                noneLabel="No responsible"
-                searchPlaceholder="Search responsible..."
-                emptyMessage="No responsible found."
+                noneLabel={tx("No responsible")}
+                searchPlaceholder={tx("Search responsible...")}
+                emptyMessage={tx("No responsible found.")}
                 onChange={setReassignTarget}
                 className="text-xs h-8"
                 renderTriggerValue={(option) => {

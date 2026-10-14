@@ -8,6 +8,7 @@ import type {
   PipelineStage,
 } from "../api/pipelines";
 import { assigneeValueFromSelection } from "./assignees";
+import { tx } from "@/i18n/xo";
 
 export const INTERNAL_FIELD_KEYS = new Set([
   "nextSuggestedStageId",
@@ -290,7 +291,7 @@ function readDecision(payload: Record<string, unknown>) {
 
 function actorName(event: PipelineCaseEvent) {
   if (event.actorAgent?.name) return event.actorAgent.name;
-  if (event.actorType === "user") return "Board";
+  if (event.actorType === "user") return tx("Board");
   if (event.actorType === "system") return "Paperclip";
   return null;
 }
@@ -298,7 +299,7 @@ function actorName(event: PipelineCaseEvent) {
 function movementReason(payload: Record<string, unknown>) {
   const reason = readString(payload.reason);
   if (!reason) return null;
-  if (reason === "children_terminal") return "all child items done";
+  if (reason === "children_terminal") return tx("all child items done");
   return reason;
 }
 
@@ -323,67 +324,82 @@ function humanizeReason(reason: string) {
 export function formatPipelineItemEvent(event: PipelineCaseEvent, stages?: StageLookup) {
   const kind = event.type.startsWith("case.") ? event.type.slice("case.".length) : event.type;
   const payload = event.payload ?? {};
-  if (kind === "ingested") return "Item added.";
+  if (kind === "ingested") return tx("Item added.");
   if (kind === "updated") {
-    if (payload.action === "stage_automation_rerun_requested") return "Stage automation re-run requested.";
-    return "Item details updated.";
+    if (payload.action === "stage_automation_rerun_requested") return tx("Stage automation re-run requested.");
+    return tx("Item details updated.");
   }
   if (kind === "transitioned") {
     const from = stageName(event, stages, "from");
     const to = stageName(event, stages, "to");
-    const movement = from && to ? `Moved from ${from} to ${to}` : to ? `Moved to ${to}` : "Moved to another stage";
+    const movement = from && to
+      ? tx("Moved from {{from}} to {{to}}", { from, to })
+      : to
+        ? tx("Moved to {{to}}", { to })
+        : tx("Moved to another stage");
     const reason = movementReason(payload);
     const transitionClass = movementClass(event, payload);
     if (transitionClass === "automatic") {
-      return `${movement} — automatic${reason ? ` (${reason})` : ""}.`;
+      return reason
+        ? tx("{{movement}} — automatic ({{reason}}).", { movement, reason })
+        : tx("{{movement}} — automatic.", { movement });
     }
     const actor = actorName(event);
-    if (reason && actor) return `${movement} — ${actor}: '${reason}'.`;
-    if (reason) return `${movement} — '${reason}'.`;
-    if (actor && event.actorType !== "system") return `${movement} — ${actor}.`;
-    return `${movement}.`;
+    if (reason && actor) return tx("{{movement}} — {{actor}}: '{{reason}}'.", { movement, actor, reason });
+    if (reason) return tx("{{movement}} — '{{reason}}'.", { movement, reason });
+    if (actor && event.actorType !== "system") return tx("{{movement}} — {{actor}}.", { movement, actor });
+    return tx("{{movement}}.", { movement });
   }
   if (kind === "suggested" || kind === "transition_suggested") {
     const suggestion = readRecord(payload.suggestion);
     const toStageKey = readString(suggestion?.toStageKey) ?? readString(payload.toStageKey);
-    const to = stageNameFromLookup(stages, toStageKey) ?? "the next stage";
-    return `Suggested moving to ${to}.`;
+    const to = stageNameFromLookup(stages, toStageKey);
+    return to != null ? tx("Suggested moving to {{to}}.", { to }) : tx("Suggested moving to the next stage.");
   }
   if (kind === "suggestion_resolved") {
     const decision = readDecision(payload);
-    if (decision === "accept") return "Suggestion approved.";
-    if (decision === "dismiss") return "Suggestion dismissed.";
-    return "Suggestion resolved.";
+    if (decision === "accept") return tx("Suggestion approved.");
+    if (decision === "dismiss") return tx("Suggestion dismissed.");
+    return tx("Suggestion resolved.");
   }
   if (kind === "reviewed" || kind === "review_decided") {
     const decision = readDecision(payload);
-    if (decision === "request_changes") return "Review requested changes.";
-    if (decision === "drop" || decision === "reject") return "Review removed this item.";
-    if (decision === "approve") return "Review approved this item.";
-    return "Review completed.";
+    if (decision === "request_changes") return tx("Review requested changes.");
+    if (decision === "drop" || decision === "reject") return tx("Review removed this item.");
+    if (decision === "approve") return tx("Review approved this item.");
+    return tx("Review completed.");
   }
-  if (kind === "conversation_opened") return "Conversation started.";
-  if (kind === "issue_linked") return "Linked to work.";
-  if (kind === "issue_unlinked") return "Work link removed.";
-  if (kind === "blockers_set") return "Waiting items updated.";
-  if (kind === "blockers_resolved") return "Waiting items cleared.";
-  if (kind === "children_terminal") return "Built-from items completed.";
+  if (kind === "conversation_opened") return tx("Conversation started.");
+  if (kind === "issue_linked") return tx("Linked to work.");
+  if (kind === "issue_unlinked") return tx("Work link removed.");
+  if (kind === "blockers_set") return tx("Waiting items updated.");
+  if (kind === "blockers_resolved") return tx("Waiting items cleared.");
+  if (kind === "children_terminal") return tx("Built-from items completed.");
   if (kind === "upstream_drift") {
     const upstreamCaseKey = readString(payload.upstreamCaseKey);
-    if (upstreamCaseKey) return `Upstream change detected from ${upstreamCaseKey}.`;
-    return "Upstream change detected.";
+    if (upstreamCaseKey) return tx("Upstream change detected from {{upstreamCaseKey}}.", { upstreamCaseKey });
+    return tx("Upstream change detected.");
   }
-  if (kind === "drift_acknowledged") return "Upstream change acknowledged.";
+  if (kind === "drift_acknowledged") return tx("Upstream change acknowledged.");
   if (kind === "automation_executed") {
-    const routineName = event.automation?.routine?.title ?? "the automation";
+    const routineName = event.automation?.routine?.title;
     const issueLabel = automationIssueLabel(event);
-    return `Automation completed — ran ${routineName}${issueLabel ? ` -> ${issueLabel}` : ""}.`;
+    if (routineName != null) {
+      return issueLabel
+        ? tx("Automation completed — ran {{routineName}} -> {{issueLabel}}.", { routineName, issueLabel })
+        : tx("Automation completed — ran {{routineName}}.", { routineName });
+    }
+    return issueLabel
+      ? tx("Automation completed — ran the automation -> {{issueLabel}}.", { issueLabel })
+      : tx("Automation completed — ran the automation.");
   }
   if (kind === "automation_failed") {
     const reason = readString(payload.error);
-    return `Automation needs attention${reason ? ` — ${humanizeReason(reason)}` : ""}.`;
+    return reason
+      ? tx("Automation needs attention — {{reason}}.", { reason: humanizeReason(reason) })
+      : tx("Automation needs attention.");
   }
-  if (kind === "claimed") return "Work started.";
-  if (kind === "lease_released" || kind === "lease_expired") return "Work handoff cleared.";
-  return "Activity recorded.";
+  if (kind === "claimed") return tx("Work started.");
+  if (kind === "lease_released" || kind === "lease_expired") return tx("Work handoff cleared.");
+  return tx("Activity recorded.");
 }

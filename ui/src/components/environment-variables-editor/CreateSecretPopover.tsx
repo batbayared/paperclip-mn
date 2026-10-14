@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { tx } from "@/i18n/xo";
+import { XoTrans } from "@/xo/XoTrans";
 import { PopoverTitle, PopoverDescription } from "@/components/ui/popover";
 
 const SECRET_NAME_RE = /^[a-z][a-z0-9_]*$/;
@@ -44,14 +46,14 @@ export function SecretPopoverForm({
 
   const trimmedName = name.trim();
   const nameError = (() => {
-    if (!trimmedName) return touched ? "Name is required" : null;
-    if (!SECRET_NAME_RE.test(trimmedName)) return "Use lowercase letters, digits and _";
+    if (!trimmedName) return touched ? tx("Name is required") : null;
+    if (!SECRET_NAME_RE.test(trimmedName)) return tx("Use lowercase letters, digits and _");
     if (existingSecretNames?.some((existing) => existing.toLowerCase() === trimmedName)) {
       return "A secret with this name already exists";
     }
     return null;
   })();
-  const valueError = value.length === 0 ? (touched ? "Value is required" : null) : null;
+  const valueError = value.length === 0 ? (touched ? tx("Value is required") : null) : null;
   const canSubmit = !submitting && trimmedName.length > 0 && value.length > 0 && !nameError;
 
   async function handleSubmit() {
@@ -62,13 +64,14 @@ export function SecretPopoverForm({
     try {
       await onSubmit(trimmedName, value);
     } catch (submitError) {
-      setError(submitError instanceof Error ? submitError.message : "Failed to create secret");
+      setError(submitError instanceof Error ? submitError.message : tx("Failed to create secret"));
       setSubmitting(false);
     }
   }
 
-  const ctaLabel = mode === "create" ? "Create & bind" : "Store & bind";
-  const heading = mode === "create" ? "Create secret" : "Store value as secret";
+  const ctaLabel = mode === "create" ? tx("Create & bind") : tx("Store & bind");
+  const heading = mode === "create" ? tx("Create secret") : tx("Store value as secret");
+  const boundName = initialName || tx("this variable");
 
   return (
     <div className="w-72 space-y-3">
@@ -76,8 +79,11 @@ export function SecretPopoverForm({
         <PopoverTitle className="text-sm font-medium">{heading}</PopoverTitle>
         {mode === "store" ? (
           <PopoverDescription className="text-(length:--text-micro) text-muted-foreground">
-            Moves the typed value into an encrypted organization secret and binds{" "}
-            <span className="font-mono">{initialName || "this variable"}</span> to it.
+            <XoTrans
+              i18nKey="Moves the typed value into an encrypted organization secret and binds <mono>{{name}}</mono> to it."
+              values={{ name: boundName }}
+              components={{ mono: <span className="font-mono" /> }}
+            />
           </PopoverDescription>
         ) : null}
       </div>

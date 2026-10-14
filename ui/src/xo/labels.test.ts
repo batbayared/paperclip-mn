@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, beforeAll, describe, expect, it } from "vitest";
 import { i18n } from "@/i18n";
 import {
   xoActivityLabel,
@@ -45,6 +45,15 @@ import {
   xoSkillReservedRootLabel,
   xoSkillPolicyDenialTitle,
   xoSkillPolicyDenialRemediation,
+  xoSkillSourceLabel,
+  xoSkillVersionLabel,
+  xoSkillTestTemplateText,
+  xoAttentionInteractionLabel,
+  xoAttentionWhyNow,
+  xoDecisionQueueSeedText,
+  xoRoutineRunSourceLabel,
+  xoRoutineTriggerLabel,
+  xoRoutineHistoryValueLabel,
 } from "./labels";
 
 afterEach(async () => {
@@ -611,5 +620,184 @@ describe("Ү6 7.9 helper-ууд (mn)", () => {
     expect(xoSkillPolicyDenialRemediation("skill_authentication_required", "x")).toBe("Нэвтэрч дахин оролдоно уу.");
     expect(xoSkillPolicyDenialTitle("unknown_code", "Fallback title.")).toBe("Fallback title.");
     expect(xoSkillPolicyDenialRemediation("unknown_code", "Fallback remediation.")).toBe("Fallback remediation.");
+  });
+});
+
+// Ү6 7.10: шинэ түлхүүрүүд Task 9-ийн merge хүртэл каталогт байхгүй тул mn тестэд
+// overwrite=false-оор нэмнэ (merge хийсний дараа каталогийн утга давамгайлна).
+const Y6_7_10_MN: Record<string, string> = {
+  "{{brand}} bundled": "{{brand}}-ийн багц",
+  "{{brand}} workspace": "{{brand}}-ийн ажлын талбар",
+  "Initial version": "Анхны хувилбар",
+  "{{brand}}'s read-only default harness instructions for Skills Studio runs.":
+    "Чадварын студийн ажиллагаанд зориулсан {{brand}}-ийн зөвхөн уншигдах анхдагч орчны заавар.",
+  "Selection confirmation requested": "Сонголтын баталгаажуулалт хүссэн",
+  "Questions need answers": "Асуултад хариулт хэрэгтэй",
+  "Suggested tasks need a decision": "Санал болгосон даалгаврууд шийдвэр хүлээж байна",
+  "Item verdicts need a decision": "Зүйл тус бүрд шийдвэр гаргах шаардлагатай",
+  "Interaction needs a decision": "Харилцан үйлдэл шийдвэр хүлээж байна",
+  "{{label}} on an issue thread.": "Даалгаврын сэдэвт: {{label}}.",
+  PRs: "Pull request-ууд",
+  Plans: "Төлөвлөгөөнүүд",
+  "Pull-request and merge decisions detected from issue work products.":
+    "Даалгаврын ажлын бүтээгдэхүүнээс илэрсэн pull request ба нэгтгэлийн шийдвэрүүд.",
+  "Plan revisions waiting for confirmation.": "Баталгаажуулалт хүлээж буй төлөвлөгөөний хувилбарууд.",
+  "Structured questions waiting for a board response.": "Удирдах зөвлөлийн хариу хүлээж буй бүтэцлэгдсэн асуултууд.",
+  "Attention items whose issue has a pull_request work product.":
+    "pull_request төрлийн ажлын бүтээгдэхүүнтэй даалгаврын анхаарах зүйлс.",
+  "Pending request_confirmation interactions bound to the issue's plan document.":
+    "Даалгаврын төлөвлөгөөний баримтад холбогдсон, хүлээгдэж буй request_confirmation харилцан үйлдлүүд.",
+  "Pending ask_user_questions interactions.": "Хүлээгдэж буй ask_user_questions харилцан үйлдлүүд.",
+  Received: "Хүлээн авсан",
+  Coalesced: "Нэгтгэсэн",
+  "Issue created": "Даалгавар үүссэн",
+  manual: "гараар",
+};
+
+const ATTENTION_LABELS = [
+  "Confirmation requested",
+  "Selection confirmation requested",
+  "Questions need answers",
+  "Suggested tasks need a decision",
+  "Item verdicts need a decision",
+  "Interaction needs a decision",
+];
+
+const QUEUE_SEED_TEXTS = [
+  "PRs",
+  "Plans",
+  "Questions",
+  "Pull-request and merge decisions detected from issue work products.",
+  "Attention items whose issue has a pull_request work product.",
+  "Plan revisions waiting for confirmation.",
+  "Pending request_confirmation interactions bound to the issue's plan document.",
+  "Structured questions waiting for a board response.",
+  "Pending ask_user_questions interactions.",
+];
+
+const HISTORY_VALUES = [
+  "low",
+  "medium",
+  "high",
+  "critical",
+  "active",
+  "paused",
+  "archived",
+  "coalesce if active",
+  "always enqueue",
+  "skip if active",
+  "skip missed",
+  "enqueue missed with cap",
+  "coalesce_if_active",
+  "enqueue_missed_with_cap",
+];
+
+describe("Ү6 7.10 helper-ууд (en)", () => {
+  it("en дээр серверийн англи утгыг байт ижлээр буцаана", () => {
+    expect(xoSkillSourceLabel("Paperclip bundled")).toBe("Paperclip bundled");
+    expect(xoSkillSourceLabel("Paperclip workspace")).toBe("Paperclip workspace");
+    expect(xoSkillSourceLabel("owner/repo")).toBe("owner/repo");
+    expect(xoSkillVersionLabel("Initial version")).toBe("Initial version");
+    expect(xoSkillVersionLabel("v2 tweaks")).toBe("v2 tweaks");
+    expect(xoSkillTestTemplateText("Default test template")).toBe("Default test template");
+    expect(xoSkillTestTemplateText("Paperclip's read-only default harness instructions for Skills Studio runs.")).toBe(
+      "Paperclip's read-only default harness instructions for Skills Studio runs.",
+    );
+    for (const v of [...ATTENTION_LABELS, "Plan approval - Ship it"]) {
+      expect(xoAttentionInteractionLabel(v)).toBe(v);
+      expect(xoAttentionWhyNow(`${v} on an issue thread.`)).toBe(`${v} on an issue thread.`);
+    }
+    expect(xoAttentionWhyNow("Something else.")).toBe("Something else.");
+    for (const v of [...QUEUE_SEED_TEXTS, "My queue"]) {
+      expect(xoDecisionQueueSeedText(v)).toBe(v);
+    }
+    for (const v of ["schedule", "manual", "api", "webhook"]) {
+      expect(xoRoutineRunSourceLabel(v)).toBe(v);
+    }
+    expect(xoRoutineTriggerLabel(null, "schedule")).toBe("schedule");
+    expect(xoRoutineTriggerLabel(undefined, "webhook")).toBe("webhook");
+    expect(xoRoutineTriggerLabel("schedule", "schedule")).toBe("schedule");
+    expect(xoRoutineTriggerLabel("", "schedule")).toBe("");
+    expect(xoRoutineTriggerLabel("Nightly", "schedule")).toBe("Nightly");
+    for (const v of [...HISTORY_VALUES, "something"]) {
+      expect(xoRoutineHistoryValueLabel(v)).toBe(v);
+    }
+    expect(xoStatusLabel("issue_created", "issue created")).toBe("issue created");
+    expect(xoStatusLabel("received", "received")).toBe("received");
+  });
+});
+
+describe("Ү6 7.10 helper-ууд (mn)", () => {
+  beforeAll(() => {
+    i18n.addResourceBundle("mn", "xo", Y6_7_10_MN, true, false);
+  });
+
+  it("mn дээр skill-ийн эх сурвалж, хувилбар, туршилтын загварыг орчуулна", async () => {
+    await i18n.changeLanguage("mn");
+    expect(xoSkillSourceLabel("Paperclip bundled")).toBe("XO-ийн багц");
+    expect(xoSkillSourceLabel("Paperclip workspace")).toBe("XO-ийн ажлын талбар");
+    expect(xoSkillSourceLabel("owner/repo")).toBe("owner/repo");
+    expect(xoSkillVersionLabel("Initial version")).toBe("Анхны хувилбар");
+    expect(xoSkillVersionLabel("v2 tweaks")).toBe("v2 tweaks");
+    expect(xoSkillTestTemplateText("Default test template")).toBe("Туршилтын анхдагч загвар");
+    expect(xoSkillTestTemplateText("Paperclip's read-only default harness instructions for Skills Studio runs.")).toBe(
+      "Чадварын студийн ажиллагаанд зориулсан XO-ийн зөвхөн уншигдах анхдагч орчны заавар.",
+    );
+    expect(xoSkillTestTemplateText("My template")).toBe("My template");
+  });
+
+  it("mn дээр attention-ийн харилцан үйлдлийн шошго ба whyNow-г орчуулна", async () => {
+    await i18n.changeLanguage("mn");
+    for (const v of ATTENTION_LABELS) {
+      expect(xoAttentionInteractionLabel(v), v).not.toBe(v);
+      expect(xoAttentionWhyNow(`${v} on an issue thread.`), v).toBe(
+        `Даалгаврын сэдэвт: ${xoAttentionInteractionLabel(v)}.`,
+      );
+    }
+    expect(xoAttentionInteractionLabel("Questions need answers")).toBe("Асуултад хариулт хэрэгтэй");
+    expect(xoAttentionInteractionLabel("Confirmation requested")).toBe("Баталгаажуулалт хүссэн");
+    expect(xoAttentionInteractionLabel("Custom title")).toBe("Custom title");
+    expect(xoAttentionWhyNow("Custom title on an issue thread.")).toBe("Custom title on an issue thread.");
+    expect(xoAttentionWhyNow("Something else.")).toBe("Something else.");
+  });
+
+  it("mn дээр шийдвэрийн дарааллын seed текстийг орчуулна", async () => {
+    await i18n.changeLanguage("mn");
+    for (const v of QUEUE_SEED_TEXTS) {
+      expect(xoDecisionQueueSeedText(v), v).not.toBe(v);
+    }
+    expect(xoDecisionQueueSeedText("Questions")).toBe("Асуултууд");
+    expect(xoDecisionQueueSeedText("Structured questions waiting for a board response.")).toBe(
+      "Удирдах зөвлөлийн хариу хүлээж буй бүтэцлэгдсэн асуултууд.",
+    );
+    expect(xoDecisionQueueSeedText("Pending ask_user_questions interactions.")).toBe(
+      "Хүлээгдэж буй ask_user_questions харилцан үйлдлүүд.",
+    );
+    expect(xoDecisionQueueSeedText("My queue")).toBe("My queue");
+  });
+
+  it("mn дээр тогтмол ажлын ажиллагааны эх сурвалж, төлөв, идэвхжүүлэгч, түүхийн утгыг орчуулна", async () => {
+    await i18n.changeLanguage("mn");
+    expect(xoRoutineRunSourceLabel("schedule")).toBe("хуваарь");
+    expect(xoRoutineRunSourceLabel("webhook")).toBe("вэбхүүк");
+    expect(xoRoutineRunSourceLabel("manual")).toBe("гараар");
+    expect(xoRoutineRunSourceLabel("api")).toBe("api");
+    expect(xoRoutineTriggerLabel(null, "schedule")).toBe("хуваарь");
+    expect(xoRoutineTriggerLabel("schedule", "schedule")).toBe("хуваарь");
+    expect(xoRoutineTriggerLabel("Nightly", "schedule")).toBe("Nightly");
+    expect(xoRoutineTriggerLabel("", "schedule")).toBe("");
+    expect(xoStatusLabel("received", "received")).toBe("Хүлээн авсан");
+    expect(xoStatusLabel("coalesced", "coalesced")).toBe("Нэгтгэсэн");
+    expect(xoStatusLabel("skipped", "skipped")).toBe("Алгассан");
+    expect(xoStatusLabel("issue_created", "issue created")).toBe("Даалгавар үүссэн");
+    for (const v of HISTORY_VALUES) {
+      expect(xoRoutineHistoryValueLabel(v), v).not.toBe(v);
+    }
+    expect(xoRoutineHistoryValueLabel("medium")).toBe("Дунд");
+    expect(xoRoutineHistoryValueLabel("paused")).toBe("Түр зогссон");
+    expect(xoRoutineHistoryValueLabel("coalesce if active")).toBe("Идэвхтэй бол нэгтгэх");
+    expect(xoRoutineHistoryValueLabel("coalesce_if_active")).toBe("Идэвхтэй бол нэгтгэх");
+    expect(xoRoutineHistoryValueLabel("skip missed")).toBe("Алдсаныг алгасах");
+    expect(xoRoutineHistoryValueLabel("something")).toBe("something");
   });
 });

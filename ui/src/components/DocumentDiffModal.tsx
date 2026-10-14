@@ -6,6 +6,7 @@ import { issuesApi } from "../api/issues";
 import { queryKeys } from "../lib/queryKeys";
 import { buildLineDiff, type DiffRow } from "../lib/line-diff";
 import { relativeTime } from "../lib/utils";
+import { tx } from "@/i18n/xo";
 import {
   Dialog,
   DialogContent,
@@ -23,11 +24,15 @@ import {
 
 function getRevisionLabel(revision: DocumentRevision) {
   const actor = revision.createdByUserId
-    ? "board"
+    ? tx("board")
     : revision.createdByAgentId
-      ? "agent"
-      : "system";
-  return `rev ${revision.revisionNumber} — ${relativeTime(revision.createdAt)} • ${actor}`;
+      ? tx("agent")
+      : tx("system");
+  return tx("rev {{revisionNumber}} — {{time}} • {{actor}}", {
+    revisionNumber: revision.revisionNumber,
+    time: relativeTime(revision.createdAt),
+    actor,
+  });
 }
 
 export function DocumentDiffModal({

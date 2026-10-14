@@ -12,6 +12,7 @@ import { flushSync } from "react-dom";
 import { AlertCircle, KeyRound, Plus, RotateCcw, Save, UserRound } from "lucide-react";
 import type { CompanySecret, EnvBinding, UserSecretDefinition } from "@paperclipai/shared";
 import { cn } from "@/lib/utils";
+import { tx } from "@/i18n/xo";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useOptionalToastActions } from "@/context/ToastContext";
 import { EnvironmentVariableRow } from "./Row";
@@ -31,8 +32,6 @@ import type { EnvironmentVariableDirtyFields } from "./Row";
 
 const DEFAULT_RESERVED_PREFIXES = ["PAPERCLIP_"];
 
-const DEFAULT_HINT =
-  "Set the KEY to the env var name the process expects, for example GH_TOKEN. Choose a secret to resolve a stored value at run start. PAPERCLIP_* variables are injected automatically.";
 
 // Canonical entries for dirty comparison. Must mirror the emit semantics of
 // valueFromRows (trimmed names, incomplete refs dropped, last-writer-wins on
@@ -83,7 +82,7 @@ const CHANGE_SUMMARY_MAX_NAMES = 3;
 function formatChangedNames(names: readonly string[]): string {
   const shown = names.slice(0, CHANGE_SUMMARY_MAX_NAMES).join(", ");
   return names.length > CHANGE_SUMMARY_MAX_NAMES
-    ? `${shown} +${names.length - CHANGE_SUMMARY_MAX_NAMES} more`
+    ? tx("{{shown}} +{{n}} more", { shown, n: names.length - CHANGE_SUMMARY_MAX_NAMES })
     : shown;
 }
 
@@ -264,9 +263,9 @@ export const EnvironmentVariablesEditor = forwardRef<EnvironmentVariablesEditorH
 
   const changeSummaryText = useMemo(() => {
     const parts: string[] = [];
-    if (changeSummary.added.length > 0) parts.push(`New: ${formatChangedNames(changeSummary.added)}`);
-    if (changeSummary.changed.length > 0) parts.push(`Edited: ${formatChangedNames(changeSummary.changed)}`);
-    if (changeSummary.removed.length > 0) parts.push(`Removed: ${formatChangedNames(changeSummary.removed)}`);
+    if (changeSummary.added.length > 0) parts.push(tx("New: {{names}}", { names: formatChangedNames(changeSummary.added) }));
+    if (changeSummary.changed.length > 0) parts.push(tx("Edited: {{names}}", { names: formatChangedNames(changeSummary.changed) }));
+    if (changeSummary.removed.length > 0) parts.push(tx("Removed: {{names}}", { names: formatChangedNames(changeSummary.removed) }));
     return parts.join(" · ");
   }, [changeSummary]);
 
@@ -430,7 +429,12 @@ export const EnvironmentVariablesEditor = forwardRef<EnvironmentVariablesEditorH
   }, [recentlyUsedSecrets, rows]);
 
   const hasRows = rows.length > 0;
-  const hint = footerHint === undefined ? DEFAULT_HINT : footerHint;
+  const hint =
+    footerHint === undefined
+      ? tx(
+          "Set the KEY to the env var name the process expects, for example GH_TOKEN. Choose a secret to resolve a stored value at run start. PAPERCLIP_* variables are injected automatically.",
+        )
+      : footerHint;
   const committedRowsById = useMemo(
     () => new Map(committedRows.map((row) => [row.id, row])),
     [committedRows],

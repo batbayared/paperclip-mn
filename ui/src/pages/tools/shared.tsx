@@ -1,4 +1,5 @@
 import { xoLocaleDateTime } from "@/xo/date-format";
+import { tx } from "@/i18n/xo";
 import type { ReactNode } from "react";
 import type {
   ToolRiskLevel,
@@ -117,7 +118,7 @@ export function DecisionBadge({ decision }: { decision: ToolPolicyDecision | str
 
 /** Compact relative time, falling back to absolute. */
 export function RelativeTime({ value }: { value: Date | string | null | undefined }) {
-  if (!value) return <span className="text-muted-foreground">never</span>;
+  if (!value) return <span className="text-muted-foreground">{tx("never")}</span>;
   const date = typeof value === "string" ? new Date(value) : value;
   if (Number.isNaN(date.getTime())) return <span className="text-muted-foreground">—</span>;
   const diffMs = Date.now() - date.getTime();
@@ -125,11 +126,14 @@ export function RelativeTime({ value }: { value: Date | string | null | undefine
   const mins = Math.round(abs / 60000);
   const isFuture = diffMs < 0;
   let text: string;
-  if (mins < 1) text = "just now";
-  else {
-    const value =
-      mins < 60 ? `${mins}m` : mins < 1440 ? `${Math.round(mins / 60)}h` : `${Math.round(mins / 1440)}d`;
-    text = isFuture ? `in ${value}` : `${value} ago`;
+  if (mins < 1) text = tx("just now");
+  else if (mins < 60) text = isFuture ? tx("in {{n}}m", { n: mins }) : tx("{{n}}m ago", { n: mins });
+  else if (mins < 1440) {
+    const n = Math.round(mins / 60);
+    text = isFuture ? tx("in {{n}}h", { n }) : tx("{{n}}h ago", { n });
+  } else {
+    const n = Math.round(mins / 1440);
+    text = isFuture ? tx("in {{n}}d", { n }) : tx("{{n}}d ago", { n });
   }
   return (
     <span title={xoLocaleDateTime(date)} className="text-muted-foreground">

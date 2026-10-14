@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { MarkdownBody } from "@/components/MarkdownBody";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn, relativeTime } from "@/lib/utils";
+import { tx } from "@/i18n/xo";
 import { Diff } from "lucide-react";
 
 /** Author + via-issue attribution line for a revision. */
@@ -37,8 +38,12 @@ function RevisionByline({ revision }: { revision: CaseDocumentRevision }) {
 }
 
 function getRevisionLabel(revision: CaseDocumentRevision) {
-  const actor = revision.actorAgentName ?? (revision.createdByUserId ? "board" : "system");
-  return `rev ${revision.revisionNumber} - ${relativeTime(revision.createdAt)} - ${actor}`;
+  const actor = revision.actorAgentName ?? (revision.createdByUserId ? tx("board") : tx("system"));
+  return tx("rev {{revisionNumber}} - {{time}} - {{actor}}", {
+    revisionNumber: revision.revisionNumber,
+    time: relativeTime(revision.createdAt),
+    actor,
+  });
 }
 
 function CaseDocumentDiffModal({

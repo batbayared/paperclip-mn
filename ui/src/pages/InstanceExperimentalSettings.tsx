@@ -520,13 +520,13 @@ export function InstanceExperimentalSettings() {
         <ExperimentalToggleCard
           title="Streamlined UI"
           description="Use the simplified main sidebar, shared Tasks and Inbox presentation, focused task detail layout, and contextual navigation across Agents, Routines, Skills, and Settings."
-          footnote="Turning this off restores the legacy shell and navigation. Task and page data are unchanged."
+          footnote={tx("Turning this off restores the legacy shell and navigation. Task and page data are unchanged.")}
           checked={enableStreamlinedUi}
           onCheckedChange={(checked) => toggleMutation.mutate({ enableStreamlinedUi: checked })}
           disabled={toggleMutation.isPending}
           settingKey="enableStreamlinedUi"
           managed={managedKeys.enableStreamlinedUi}
-          ariaLabel="Toggle Streamlined UI experimental setting"
+          ariaLabel={tx("Toggle Streamlined UI experimental setting")}
         />
 
         <ExperimentalToggleCard

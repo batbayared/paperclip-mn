@@ -19,7 +19,7 @@ import { RoutineActivityRow } from "../RoutineActivityRow";
 import { useRoutineDetail } from "./context";
 import { xoLocaleDate } from "@/xo/date-format";
 import { tx } from "@/i18n/xo";
-import { xoRunRowSubtitle } from "@/xo/labels";
+import { xoRoutineRunSourceLabel, xoRunRowSubtitle, xoStatusLabel } from "@/xo/labels";
 
 const DATE_WINDOW_OPTIONS: { value: string; label: string; ms: number | null }[] = [
   { value: "any", label: "Any time", ms: null },
@@ -59,9 +59,9 @@ export function RunsSection() {
 
   const activeFilters = useMemo<FilterValue[]>(() => {
     const list: FilterValue[] = [];
-    if (sourceFilter !== "any") list.push({ key: "source", label: "Source", value: sourceFilter });
+    if (sourceFilter !== "any") list.push({ key: "source", label: "Source", value: xoRoutineRunSourceLabel(sourceFilter) });
     if (statusFilter !== "any") {
-      list.push({ key: "status", label: "Status", value: statusFilter.replaceAll("_", " ") });
+      list.push({ key: "status", label: "Status", value: xoStatusLabel(statusFilter, statusFilter.replaceAll("_", " ")) });
     }
     if (dateFilter !== "any") {
       const label = DATE_WINDOW_OPTIONS.find((option) => option.value === dateFilter)?.label ?? dateFilter;
@@ -109,7 +109,7 @@ export function RunsSection() {
                   <SelectItem value="any">any</SelectItem>
                   {sourceOptions.map((source) => (
                     <SelectItem key={source} value={source}>
-                      {source}
+                      {xoRoutineRunSourceLabel(source)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -123,7 +123,7 @@ export function RunsSection() {
                   <SelectItem value="any">any</SelectItem>
                   {statusOptions.map((status) => (
                     <SelectItem key={status} value={status}>
-                      {status.replaceAll("_", " ")}
+                      {xoStatusLabel(status, status.replaceAll("_", " "))}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -163,13 +163,13 @@ export function RunsSection() {
                     leading={
                       <>
                         <Badge variant="outline" className="shrink-0">
-                          {run.source}
+                          {xoRoutineRunSourceLabel(run.source)}
                         </Badge>
                         <Badge
                           variant={run.status === "failed" ? "destructive" : "secondary"}
                           className="shrink-0"
                         >
-                          {run.status.replaceAll("_", " ")}
+                          {xoStatusLabel(run.status, run.status.replaceAll("_", " "))}
                         </Badge>
                       </>
                     }

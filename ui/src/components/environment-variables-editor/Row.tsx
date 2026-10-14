@@ -10,6 +10,9 @@ import {
 } from "lucide-react";
 import type { CompanySecret, UserSecretDefinition } from "@paperclipai/shared";
 import { cn } from "@/lib/utils";
+import { tx } from "@/i18n/xo";
+import { xoStatusLabel } from "@/xo/labels";
+import { XoTrans } from "@/xo/XoTrans";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -65,6 +68,24 @@ export interface EnvironmentVariableRowProps {
   /** Parent-driven focus request for this row (append flow, source switch). */
   focusRequest: "name" | "value" | null;
   onFocusConsumed: () => void;
+}
+
+// model.ts-ийн тогтмол мессежийг render үед орчуулна (model.ts хөндөхгүй).
+function envIssueMessage(message: string): string {
+  switch (message) {
+    case "Invalid name — use letters, digits and _": return tx("Invalid name — use letters, digits and _");
+    case "Duplicate name": return tx("Duplicate name");
+    case "Reserved prefix — provided automatically and may be overridden":
+      return tx("Reserved prefix — provided automatically and may be overridden");
+    case "This secret no longer exists — runs will fail until you rebind.":
+      return tx("This secret no longer exists — runs will fail until you rebind.");
+    case "Runs will fail until re-enabled or rebound.": return tx("Runs will fail until re-enabled or rebound.");
+    case "This user secret definition no longer exists — runs will fail until you rebind.":
+      return tx("This user secret definition no longer exists — runs will fail until you rebind.");
+    case "Runs will fail until this user secret definition is re-enabled or rebound.":
+      return tx("Runs will fail until this user secret definition is re-enabled or rebound.");
+    default: return message;
+  }
 }
 
 export function EnvironmentVariableRow({
@@ -172,7 +193,7 @@ export function EnvironmentVariableRow({
       version: "latest",
       textValue: "",
     });
-    onToast(`Secret ${created.name} created`);
+    onToast(tx("Secret {{name}} created", { name: created.name }));
     setSecretPopover(null);
   }
 
@@ -184,10 +205,10 @@ export function EnvironmentVariableRow({
 
   const sourceLabel =
     row.source === "text"
-      ? "Text value"
+      ? tx("Text value")
       : row.source === "secret"
-        ? "Organization secret reference"
-        : "User secret reference";
+        ? tx("Organization secret reference")
+        : tx("User secret reference");
   const nameErrorId = `${row.id}-name-error`;
   const healthId = `${row.id}-health`;
   const isDirty = dirtyFields.name || dirtyFields.value;
@@ -392,7 +413,10 @@ export function EnvironmentVariableRow({
                             row.version === "latest" && "font-medium",
                           )}
                         >
-                          latest <span className="text-(length:--text-micro) text-muted-foreground">(recommended)</span>
+                          <XoTrans
+                            i18nKey="latest <muted>(recommended)</muted>"
+                            components={{ muted: <span className="text-(length:--text-micro) text-muted-foreground" /> }}
+                          />
                         </button>
                         {Array.from({ length: versions }, (_, idx) => versions - idx)
                           .filter((v) => v > 0)
@@ -442,7 +466,7 @@ export function EnvironmentVariableRow({
                       {(userSecretDefinitions ?? []).map((definition) => (
                         <option key={definition.id} value={definition.key}>
                           {definition.name}
-                          {definition.status !== "active" ? ` (${definition.status})` : ""}
+                          {definition.status !== "active" ? ` (${xoStatusLabel(definition.status, definition.status)})` : ""}
                         </option>
                       ))}
                     </select>
@@ -526,24 +550,28 @@ export function EnvironmentVariableRow({
               health.level === "error" ? "text-destructive" : "text-amber-600 dark:text-amber-400",
             )}
           >
-            {health.message}
+            {envIssueMessage(health.message)}
           </p>
         ) : null}
 
         {/* 5s undo after Secret→Text */}
         {undoPrev ? (
           <p className="mt-0.5 inline-flex items-center gap-2 text-(length:--text-micro) text-muted-foreground">
-            Reverted to text —{" "}
-            <button
-              type="button"
-              className="font-medium text-foreground underline underline-offset-2 hover:text-primary"
-              onClick={() => {
-                onPatch({ source: "secret", secretId: undoPrev.secretId, version: undoPrev.version, textValue: "" });
-                setUndoPrev(null);
+            <XoTrans
+              i18nKey="Reverted to text — <undo>Undo</undo>"
+              components={{
+                undo: (
+                  <button
+                    type="button"
+                    className="font-medium text-foreground underline underline-offset-2 hover:text-primary"
+                    onClick={() => {
+                      onPatch({ source: "secret", secretId: undoPrev.secretId, version: undoPrev.version, textValue: "" });
+                      setUndoPrev(null);
+                    }}
+                  />
+                ),
               }}
-            >
-              Undo
-            </button>
+            />
           </p>
         ) : null}
       </div>
@@ -556,7 +584,7 @@ export function EnvironmentVariableRow({
             nameIssue.level === "error" ? "text-destructive" : "text-amber-600 dark:text-amber-400",
           )}
         >
-          {nameIssue.message}
+          {envIssueMessage(nameIssue.message)}
         </p>
       ) : null}
 
@@ -595,7 +623,7 @@ export function EnvironmentVariableRow({
           type="button"
           onClick={onRemove}
           disabled={disabled}
-          aria-label={`Remove ${row.name.trim() || "variable"}`}
+          aria-label={row.name.trim() ? tx("Remove {{name}}", { name: row.name.trim() }) : tx("Remove variable")}
           className="rounded p-1 text-muted-foreground opacity-100 hover:bg-destructive/10 hover:text-destructive @[40rem]/env:opacity-0 @[40rem]/env:group-hover/row:opacity-100 @[40rem]/env:group-focus-within/row:opacity-100"
         >
           <X className="size-4" />

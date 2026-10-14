@@ -696,12 +696,12 @@ export function RoutineDetail() {
   const automationToggleDisabled = updateRoutineStatus.isPending || routine.status === "archived";
   const automationLabel =
     routine.status === "archived"
-      ? "Archived"
+      ? tx("Archived")
       : !routine.assigneeAgentId
-        ? "Draft"
+        ? tx("Draft")
         : automationEnabled
-          ? "Active"
-          : "Paused";
+          ? tx("Active")
+          : tx("Paused");
   const automationLabelClassName =
     routine.status === "archived"
       ? "text-muted-foreground"

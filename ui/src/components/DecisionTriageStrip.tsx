@@ -23,7 +23,7 @@ import {
 } from "./ui/dropdown-menu";
 import { xoLocaleDateTime } from "@/xo/date-format";
 import { tx } from "@/i18n/xo";
-import { xoDecisionOptionLabel, xoSnoozePresetLabel } from "@/xo/labels";
+import { xoDecisionOptionLabel, xoDecisionQueueSeedText, xoSnoozePresetLabel } from "@/xo/labels";
 
 const HOUR_MS = 60 * 60 * 1000;
 const DAY_MS = 24 * HOUR_MS;
@@ -210,11 +210,11 @@ export function DecisionTriageStrip({ item, companyId, agents }: DecisionTriageS
             key={queue.key}
             className="inline-flex items-center gap-1 rounded-sm border border-border bg-background px-1.5 py-0.5 text-xs"
           >
-            {queue.title}
+            {xoDecisionQueueSeedText(queue.title)}
             <button
               type="button"
               className="text-muted-foreground hover:text-destructive disabled:opacity-50"
-              aria-label={tx("Remove from {{title}}", { title: queue.title })}
+              aria-label={tx("Remove from {{title}}", { title: xoDecisionQueueSeedText(queue.title) })}
               disabled={pending}
               onClick={() => removeFromQueue.mutate(queue.key)}
             >
@@ -393,7 +393,7 @@ function QueuePicker({
                   setOpen(false);
                 }}
               >
-                <span className="truncate">{queue.title}</span>
+                <span className="truncate">{xoDecisionQueueSeedText(queue.title)}</span>
                 {queue.itemCount > 0 && (
                   <span className="ml-2 shrink-0 text-(length:--text-nano) tabular-nums text-muted-foreground">
                     {queue.itemCount}

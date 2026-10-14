@@ -77,6 +77,7 @@ import { isProjectScanSkill } from "@/lib/skill-fork";
 import { cn, formatCents, relativeTime } from "@/lib/utils";
 import { tx } from "@/i18n/xo";
 import { XoTrans } from "@/xo/XoTrans";
+import { xoSkillTestTemplateText } from "@/xo/labels";
 import { SkillCardIcon, type DiscoveryCard } from "./CompanySkills";
 import {
   ResizableHandle,
@@ -877,7 +878,7 @@ function StudioLandingRow({
         ) : null}
       </span>
       <span className="shrink-0 text-xs text-muted-foreground">
-        updated {relativeTime(skill.updatedAt)}
+        {tx("updated {{time}}", { time: relativeTime(skill.updatedAt) })}
       </span>
       {editor ? (
         <Tooltip>
@@ -1399,7 +1400,7 @@ function SkillPane({
   if (paths.length === 0) {
     return (
       <PaneScaffold
-        title={<SkillPaneTitle skillName={skill.name} folder="root" />}
+        title={<SkillPaneTitle skillName={skill.name} folder="" />}
         action={
           <SkillFileActions
             readOnly={readOnly}
@@ -1435,7 +1436,7 @@ function SkillPane({
 
   return (
     <PaneScaffold
-      title={<SkillPaneTitle skillName={skill.name} folder={currentFolder || "root"} />}
+      title={<SkillPaneTitle skillName={skill.name} folder={currentFolder} />}
       action={
         <SkillFileActions
           readOnly={readOnly}
@@ -1625,7 +1626,7 @@ function SkillPaneTitle({ skillName, folder }: { skillName: string; folder: stri
     <span className="flex min-w-0 items-center gap-1.5">
       <span className="truncate">{skillName}</span>
       <ChevronRight className="h-3 w-3 shrink-0" />
-      <span className="truncate font-mono normal-case tracking-normal">{folder}</span>
+      <span className="truncate font-mono normal-case tracking-normal">{folder || tx("root")}</span>
     </span>
   );
 }
@@ -2407,7 +2408,7 @@ function RunsPane({
       toast?.pushToast({
         tone: "success",
         title: "Template saved",
-        body: `${template.name} is ready for Skills Studio runs.`,
+        body: tx("{{name}} is ready for Skills Studio runs.", { name: xoSkillTestTemplateText(template.name) }),
       });
     },
     onError: onError(tx("Couldn't save template")),
@@ -2427,7 +2428,7 @@ function RunsPane({
       toast?.pushToast({
         tone: "success",
         title: "Template updated",
-        body: `${template.name} is ready for Skills Studio runs.`,
+        body: tx("{{name}} is ready for Skills Studio runs.", { name: xoSkillTestTemplateText(template.name) }),
       });
     },
     onError: onError(tx("Couldn't update template")),
@@ -2446,7 +2447,7 @@ function RunsPane({
       toast?.pushToast({
         tone: "success",
         title: "Template deleted",
-        body: `${template.name} was removed from Skills Studio runs.`,
+        body: tx("{{name}} was removed from Skills Studio runs.", { name: xoSkillTestTemplateText(template.name) }),
       });
     },
     onError: onError(tx("Couldn't delete template")),
@@ -2457,7 +2458,7 @@ function RunsPane({
     : templates.find((template) => template.id === selectedTemplateId) ?? null;
   const selectedTemplateName = selectedTemplateId === null
     ? tx("No template")
-    : selectedTemplate?.name ?? tx("Default test template");
+    : (selectedTemplate ? xoSkillTestTemplateText(selectedTemplate.name) : tx("Default test template"));
   const runDisabledReason = gate.reason ?? templateGateReason;
 
   const createRunMutation = useMutation({
@@ -2662,9 +2663,9 @@ function RunTemplateAdvancedPanel({
     const toOption = (template: CompanySkillTestRunTemplate): RunTemplateOption => ({
       key: template.id,
       value: template.id,
-      label: template.name,
-      title: template.name,
-      description: template.description,
+      label: xoSkillTestTemplateText(template.name),
+      title: xoSkillTestTemplateText(template.name),
+      description: template.description ? xoSkillTestTemplateText(template.description) : template.description,
       builtIn: template.builtIn,
       searchText: [template.name, template.description ?? "", template.builtIn ? "built in" : "custom"].join(" "),
     });

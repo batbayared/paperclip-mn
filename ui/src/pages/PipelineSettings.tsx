@@ -1,4 +1,5 @@
 import { xoLocaleDateTime } from "@/xo/date-format";
+import { tx } from "@/i18n/xo";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -536,11 +537,22 @@ function readVariableField(variable: unknown): { key: string; label: string; req
   return { key, label, required: record.required === true };
 }
 
+function reviewOutcomeText(label: string) {
+  switch (label) {
+    case "Approved items move to": return tx("Approved items move to");
+    case "Declined items move to": return tx("Declined items move to");
+    case "Items needing changes move to": return tx("Items needing changes move to");
+    case "Choose a stage": return tx("Choose a stage");
+    case "Stay in review": return tx("Stay in review");
+    default: return label;
+  }
+}
+
 function fieldOriginLabel(depth: number, pipelineName: string) {
-  if (depth === 0) return "This item";
-  if (depth === 1) return `Parent: ${pipelineName}`;
-  if (depth === 2) return `Grandparent: ${pipelineName}`;
-  return `Ancestor ${depth}: ${pipelineName}`;
+  if (depth === 0) return tx("This item");
+  if (depth === 1) return tx("Parent: {{pipelineName}}", { pipelineName });
+  if (depth === 2) return tx("Grandparent: {{pipelineName}}", { pipelineName });
+  return tx("Ancestor {{depth}}: {{pipelineName}}", { depth, pipelineName });
 }
 
 function pipelineCarryOverFields(source: { pipeline: PipelineWithOptionalConnections; depth: number }): CarryOverFieldOption[] {
@@ -929,12 +941,14 @@ function automationVariableKind(value: unknown) {
 
 function automationVariablePreviewTitle(variable: AutomationVariableOption) {
   const preview = primitiveAutomationVariablePreview(variable.example);
-  const size = typeof variable.example === "string" ? `${variable.example.length} chars` : `${preview.length} chars`;
+  const size = typeof variable.example === "string"
+    ? tx("{{n}} chars", { n: variable.example.length })
+    : tx("{{n}} chars", { n: preview.length });
   const lines = [
     variable.description,
-    `Example: ${automationVariableKind(variable.example)}, ${size}`,
+    tx("Example: {{kind}}, {{size}}", { kind: automationVariableKind(variable.example), size }),
   ];
-  if (variable.exampleSource) lines.push(`From ${variable.exampleSource}`);
+  if (variable.exampleSource) lines.push(tx("From {{source}}", { source: variable.exampleSource }));
   if (preview) lines.push(preview.length > 500 ? `${preview.slice(0, 500)}...` : preview);
   return lines.join("\n");
 }
@@ -1111,8 +1125,8 @@ function CarriedFieldTokenHelper({
                   type="button"
                   onClick={() => onInsert(field.key)}
                   className="inline-flex h-7 items-center rounded-md border border-border bg-background px-2 font-mono text-xs text-foreground transition-colors hover:bg-accent"
-                  title={`Insert {{${field.key}}}`}
-                  aria-label={`Insert {{${field.key}}}`}
+                  title={tx("Insert {{open}}{{key}}{{close}}", { open: "{{", close: "}}", key: field.key })}
+                  aria-label={tx("Insert {{open}}{{key}}{{close}}", { open: "{{", close: "}}", key: field.key })}
                 >
                   {`{{${field.key}}}`}
                 </button>
@@ -1128,7 +1142,7 @@ function CarriedFieldTokenHelper({
 function AutomationVariableTokenHelper({
   groups,
   onInsert,
-  label = "Available variables",
+  label,
 }: {
   groups: AutomationVariableGroup[];
   onInsert: (fieldKey: string) => void;
@@ -1139,7 +1153,7 @@ function AutomationVariableTokenHelper({
     <div className="rounded-md border border-border bg-muted/20 px-3 py-2">
       <div className="mb-2 flex flex-wrap items-center gap-2">
         <span className="text-xs font-semibold uppercase text-muted-foreground">
-          {label}
+          {label ?? tx("Available variables")}
         </span>
       </div>
       <div className="space-y-2">
@@ -1154,7 +1168,7 @@ function AutomationVariableTokenHelper({
                   onClick={() => onInsert(variable.key)}
                   className="inline-flex h-7 items-center rounded-md border border-border bg-background px-2 font-mono text-xs text-foreground transition-colors hover:bg-accent"
                   title={automationVariablePreviewTitle(variable)}
-                  aria-label={`Insert {{${variable.key}}}`}
+                  aria-label={tx("Insert {{open}}{{key}}{{close}}", { open: "{{", close: "}}", key: variable.key })}
                 >
                   {`{{${variable.key}}}`}
                 </button>
@@ -1392,7 +1406,7 @@ export function PipelineSettings() {
 
   const createSecret = useMutation({
     mutationFn: (input: { name: string; value: string }) => {
-      if (!selectedCompanyId) throw new Error("Select an organization to create secrets");
+      if (!selectedCompanyId) throw new Error(tx("Select an organization to create secrets"));
       return secretsApi.create(selectedCompanyId, input);
     },
     onSuccess: () => {
@@ -1776,7 +1790,7 @@ export function PipelineSettings() {
         stageExecutionWorkspacePreference === "reuse_existing" &&
         !stageExecutionWorkspaceId
       ) {
-        throw new Error("Choose an existing workspace before saving this stage.");
+        throw new Error(tx("Choose an existing workspace before saving this stage."));
       }
       const parsedApproval = parseApprovalValue(selectedApproval);
       const nextRequiresApproval = stageKind === "review";
@@ -2345,8 +2359,8 @@ export function PipelineSettings() {
                 {breakdownTargetPipelineId ? (
                   <Link
                     to={`/pipelines/${breakdownTargetPipelineId}`}
-                    aria-label={`Open ${breakdownTargetPipeline?.name ?? "selected"} pipeline`}
-                    title={`Open ${breakdownTargetPipeline?.name ?? "selected"} pipeline`}
+                    aria-label={breakdownTargetPipeline?.name != null ? tx("Open {{name}} pipeline", { name: breakdownTargetPipeline.name }) : tx("Open selected pipeline")}
+                    title={breakdownTargetPipeline?.name != null ? tx("Open {{name}} pipeline", { name: breakdownTargetPipeline.name }) : tx("Open selected pipeline")}
                     className="ml-2 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
                     <ArrowUpRight className="h-4 w-4" />
@@ -2461,11 +2475,15 @@ export function PipelineSettings() {
                               <span className="flex-1">{field.label}</span>
                               {targetField?.required ? (
                                 <span className="text-xs text-muted-foreground">
-                                  Required by {breakdownTargetPipeline?.name ?? "destination"}
+                                  {breakdownTargetPipeline?.name != null
+                                    ? tx("Required by {{name}}", { name: breakdownTargetPipeline.name })
+                                    : tx("Required by destination")}
                                 </span>
                               ) : targetField ? (
                                 <span className="text-xs text-muted-foreground">
-                                  Validated by {breakdownTargetPipeline?.name ?? "destination"}
+                                  {breakdownTargetPipeline?.name != null
+                                    ? tx("Validated by {{name}}", { name: breakdownTargetPipeline.name })
+                                    : tx("Validated by destination")}
                                 </span>
                               ) : null}
                             </label>
@@ -2482,7 +2500,9 @@ export function PipelineSettings() {
                 </p>
               ) : null}
               <p className="text-xs text-muted-foreground">
-                Name and title fields are kept unique for each new {breakdownPieceNoun.trim() || "piece"}.
+                {breakdownPieceNoun.trim()
+                  ? tx("Name and title fields are kept unique for each new {{noun}}.", { noun: breakdownPieceNoun.trim() })
+                  : tx("Name and title fields are kept unique for each new piece.")}
               </p>
             </div>
           </FieldRow>
@@ -2817,9 +2837,9 @@ export function PipelineSettings() {
                               options={approvalOptions}
                               recentOptionIds={recentAssigneeOptionIds}
                               placeholder="Approver"
-                              noneLabel="Any human"
-                              searchPlaceholder="Search approvers..."
-                              emptyMessage="No approvers found."
+                              noneLabel={tx("Any human")}
+                              searchPlaceholder={tx("Search approvers...")}
+                              emptyMessage={tx("No approvers found.")}
                               onChange={(value) => setSelectedApproval(approverValueFromOption(value))}
                               renderTriggerValue={(option) => {
                                 if (!option) return <span className="text-muted-foreground">Any human</span>;
@@ -2857,14 +2877,14 @@ export function PipelineSettings() {
                                   key={label}
                                   className="grid grid-cols-1 items-center gap-2 sm:grid-cols-(--gtc-42)"
                                 >
-                                  <span className="text-sm font-medium">{label}</span>
+                                  <span className="text-sm font-medium">{reviewOutcomeText(label)}</span>
                                   <select
-                                    aria-label={label}
+                                    aria-label={reviewOutcomeText(label)}
                                     value={value}
                                     onChange={(event) => setValue(event.target.value)}
                                     className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
                                   >
-                                    <option value="">{emptyLabel}</option>
+                                    <option value="">{reviewOutcomeText(emptyLabel)}</option>
                                     {otherStages.map((stage) => (
                                       <option key={stage.id} value={stage.key}>{stage.name}</option>
                                     ))}
@@ -2906,9 +2926,9 @@ export function PipelineSettings() {
                             options={stageAssigneeOptions}
                             recentOptionIds={recentAssigneeOptionIds}
                             placeholder="Pick agent"
-                            noneLabel="No automation"
-                            searchPlaceholder="Search agents..."
-                            emptyMessage="No agents found."
+                            noneLabel={tx("No automation")}
+                            searchPlaceholder={tx("Search agents...")}
+                            emptyMessage={tx("No agents found.")}
                             onChange={(value) => setStageAssigneeAgentId(stageAssigneeIdFromOption(value))}
                             renderTriggerValue={(option) => {
                               if (!option) return <span className="text-muted-foreground">Pick agent</span>;
@@ -2948,9 +2968,9 @@ export function PipelineSettings() {
                                   options={projectOptions}
                                   recentOptionIds={recentProjectIds}
                                   placeholder="Project"
-                                  noneLabel="No project"
-                                  searchPlaceholder="Search projects..."
-                                  emptyMessage="No projects found."
+                                  noneLabel={tx("No project")}
+                                  searchPlaceholder={tx("Search projects...")}
+                                  emptyMessage={tx("No projects found.")}
                                   onChange={handleAutomationProjectChange}
                                   renderTriggerValue={(option) =>
                                     option && selectedAutomationProject ? (
@@ -3045,7 +3065,12 @@ export function PipelineSettings() {
                                 </div>
                                 {stageExecutionWorkspacePreference === "reuse_existing" && selectedReusableExecutionWorkspace ? (
                                   <p className="mt-2 text-xs text-muted-foreground">
-                                    Reusing {selectedReusableExecutionWorkspace.name} from {selectedReusableExecutionWorkspace.branchName ?? selectedReusableExecutionWorkspace.cwd ?? "existing workspace"}.
+                                    {(selectedReusableExecutionWorkspace.branchName ?? selectedReusableExecutionWorkspace.cwd) != null
+                                      ? tx("Reusing {{name}} from {{source}}.", {
+                                          name: selectedReusableExecutionWorkspace.name,
+                                          source: selectedReusableExecutionWorkspace.branchName ?? selectedReusableExecutionWorkspace.cwd,
+                                        })
+                                      : tx("Reusing {{name}} from existing workspace.", { name: selectedReusableExecutionWorkspace.name })}
                                   </p>
                                 ) : null}
                                 {!canSaveAutomationWorkspace ? (
@@ -3262,7 +3287,7 @@ export function PipelineSettings() {
                         <StageEventsList
                           events={stageEvents}
                           stages={stages}
-                          emptyMessage="No stage activity yet."
+                          emptyMessage={tx("No stage activity yet.")}
                         />
                       )}
                     </div>
@@ -3314,7 +3339,9 @@ export function PipelineSettings() {
           <DialogHeader>
             <DialogTitle>Delete stage</DialogTitle>
             <DialogDescription>
-              Delete {selectedStage?.name ?? "this stage"} from this pipeline. Connected stage transitions are removed.
+              {selectedStage?.name != null
+                ? tx("Delete {{name}} from this pipeline. Connected stage transitions are removed.", { name: selectedStage.name })
+                : tx("Delete this stage from this pipeline. Connected stage transitions are removed.")}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3">

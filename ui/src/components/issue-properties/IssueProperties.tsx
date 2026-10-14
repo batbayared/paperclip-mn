@@ -877,9 +877,9 @@ export function IssueProperties({
               options={modelOverrideOptions}
               placeholder="Default model"
               disablePortal
-              noneLabel="Default model"
-              searchPlaceholder="Search models..."
-              emptyMessage="No models found."
+              noneLabel={tx("Default model")}
+              searchPlaceholder={tx("Search models...")}
+              emptyMessage={tx("No models found.")}
               onChange={updateAssigneeOverrideModel}
             />
           </div>
@@ -1177,9 +1177,9 @@ export function IssueProperties({
           value={watchdogAgentInput}
           options={watchdogAgentOptions}
           placeholder="Select agent"
-          noneLabel="No watchdog agent"
-          searchPlaceholder="Search agents..."
-          emptyMessage="No agents found."
+          noneLabel={tx("No watchdog agent")}
+          searchPlaceholder={tx("Search agents...")}
+          emptyMessage={tx("No agents found.")}
           onChange={setWatchdogAgentInput}
           renderTriggerValue={(option) => {
             if (!option) return <span className="text-muted-foreground">Select agent</span>;

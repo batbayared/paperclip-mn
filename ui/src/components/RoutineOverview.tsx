@@ -20,6 +20,8 @@ import {
 } from "./RoutineContextualSidebar";
 import { useRoutineDetail } from "./routine-sections/context";
 import { xoLocaleDateTime } from "@/xo/date-format";
+import { tx } from "@/i18n/xo";
+import { xoRoutineTriggerLabel } from "@/xo/labels";
 
 export type RoutineScheduleSummary = {
   label: string;
@@ -50,7 +52,7 @@ export function summarizeRoutineSchedule(triggers: RoutineTrigger[]): RoutineSch
     label: schedules.length === 1 ? "1 active schedule" : `${schedules.length} active schedules`,
     detail: first.cronExpression
       ? `${first.cronExpression}${first.timezone ? ` · ${first.timezone}` : ""}`
-      : first.label ?? "Scheduled trigger",
+      : first.label != null ? xoRoutineTriggerLabel(first.label, first.kind) : "Scheduled trigger",
     nextRunAt,
   };
 }
@@ -169,13 +171,13 @@ export function RoutineOverview() {
         <OverviewFact
           icon={Clock3}
           label="Next run"
-          value={schedule.nextRunAt ? formatRoutineTimestamp(schedule.nextRunAt) : "Not scheduled"}
+          value={schedule.nextRunAt ? formatRoutineTimestamp(schedule.nextRunAt) : tx("Not scheduled")}
           detail={schedule.nextRunAt ? "Scheduled" : "Add or enable a schedule"}
         />
         <OverviewFact
           icon={Play}
           label="Last run"
-          value={lastRun ? <StatusBadge status={lastRun.status} /> : "No runs yet"}
+          value={lastRun ? <StatusBadge status={lastRun.status} /> : tx("No runs yet")}
           detail={lastRun ? formatRoutineTimestamp(lastRun.triggeredAt) : "Run manually or wait for the schedule"}
         />
       </div>
@@ -235,7 +237,7 @@ export function RoutineOverview() {
             ) : (
               <div key={run.id} className="flex min-w-0 items-center gap-2 rounded-lg px-2 py-2 text-sm">
                 <StatusBadge status={run.status} />
-                <span className="min-w-0 flex-1 truncate">{run.trigger?.label ?? "Routine run"}</span>
+                <span className="min-w-0 flex-1 truncate">{run.trigger?.label != null ? xoRoutineTriggerLabel(run.trigger.label, run.trigger.kind) : "Routine run"}</span>
                 <span className="shrink-0 font-mono text-xs text-muted-foreground">{formatRoutineTimestamp(run.triggeredAt)}</span>
               </div>
             ))}

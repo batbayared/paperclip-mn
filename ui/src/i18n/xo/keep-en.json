@@ -41,5 +41,22 @@
   "v{{packageVersion}}",
   "v{{revision}}",
   "v{{revisionNumber}}",
-  "v{{version}}"
+  "v{{version}}",
+  "Frontmatter",
+  "Frontmatter YAML",
+  "YAML",
+  "name",
+  "description",
+  "allowed-tools",
+  "metadata",
+  "{{n}} metadata",
+  "KEY",
+  "v{{v}}",
+  "PAP-946-workspace",
+  "bash ./scripts/provision-worktree.sh",
+  "bash ./scripts/provision-worktree-runtime.sh",
+  "bash ./scripts/teardown-worktree.sh",
+  "{{movement}} — {{actor}}.",
+  "{{movement}}.",
+  "{\n  \"commands\": [\n    {\n      \"id\": \"web\",\n      \"name\": \"web\",\n      \"kind\": \"service\",\n      \"command\": \"pnpm dev\",\n      \"cwd\": \".\",\n      \"port\": { \"type\": \"auto\" }\n    },\n    {\n      \"id\": \"db-migrate\",\n      \"name\": \"db:migrate\",\n      \"kind\": \"job\",\n      \"command\": \"pnpm db:migrate\",\n      \"cwd\": \".\"\n    }\n  ]\n}"
 ]

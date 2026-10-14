@@ -224,4 +224,14 @@ export const XO_TRANSFORM_FILES: readonly string[] = [
   "ui/src/components/skill-studio/SkillProvenance.tsx",
   // Ү6 7.10 — админгүй эхний тохиргооны дэлгэц
   "ui/src/components/BootstrapPendingPage.tsx",
+  // Ү6 7.10 — pipeline тохиргоо, workspace дэлгэрэнгүй, чадварын багц ба frontmatter, орчны хувьсагч, репозитор
+  "ui/src/pages/PipelineSettings.tsx",
+  "ui/src/pages/ExecutionWorkspaceDetail.tsx",
+  "ui/src/components/BuiltInBundlePanel.tsx",
+  "ui/src/components/FrontmatterPanel.tsx",
+  "ui/src/components/environment-variables-editor/index.tsx",
+  "ui/src/components/environment-variables-editor/Row.tsx",
+  "ui/src/components/environment-variables-editor/SecretPicker.tsx",
+  "ui/src/components/environment-variables-editor/CreateSecretPopover.tsx",
+  "ui/src/components/RepositoryEditor.tsx",
 ];

@@ -1,4 +1,5 @@
 import { AiConnectionCredentialStep } from "@/components/ai-connections/AiConnectionCredentialStep";
+import { tx } from "@/i18n/xo";
 import { ConnectionChoiceList } from "./ConnectionChoiceList";
 import { useCallback, useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -4108,7 +4109,7 @@ export function AccessStep({
                     grantKind === "agent" && next.size > 1 ? new Set([[...next].at(-1)!]) : next,
                   )}
                   loading={agentsQuery.isLoading}
-                  emptyMessage="You cannot edit any agents yet."
+                  emptyMessage={tx("You cannot edit any agents yet.")}
                   showSelectionPreview={false}
                 />
               </div>

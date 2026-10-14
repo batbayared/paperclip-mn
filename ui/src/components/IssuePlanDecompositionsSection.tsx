@@ -6,6 +6,7 @@ import { Link } from "@/lib/router";
 import { issuesApi } from "../api/issues";
 import { queryKeys } from "../lib/queryKeys";
 import { cn, formatDateTime, relativeTime } from "../lib/utils";
+import { tx } from "@/i18n/xo";
 
 interface IssuePlanDecompositionsSectionProps {
   issueId: string;
@@ -112,12 +113,12 @@ export function IssuePlanDecompositionsSection({
               <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-(length:--text-micro) text-muted-foreground">
                 {ownerName ? <span>Owner: {ownerName}</span> : null}
                 {startedAt ? (
-                  <span title={formatDateTime(startedAt)}>Started {relativeTime(startedAt)}</span>
+                  <span title={formatDateTime(startedAt)}>{tx("Started {{time}}", { time: relativeTime(startedAt) })}</span>
                 ) : null}
                 {completedAt ? (
-                  <span title={formatDateTime(completedAt)}>Completed {relativeTime(completedAt)}</span>
+                  <span title={formatDateTime(completedAt)}>{tx("Completed {{time}}", { time: relativeTime(completedAt) })}</span>
                 ) : updatedAt ? (
-                  <span title={formatDateTime(updatedAt)}>Updated {relativeTime(updatedAt)}</span>
+                  <span title={formatDateTime(updatedAt)}>{tx("Updated {{time}}", { time: relativeTime(updatedAt) })}</span>
                 ) : null}
                 {issueIdentifier ? (
                   <Link

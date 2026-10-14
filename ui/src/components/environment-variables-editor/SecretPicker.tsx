@@ -9,6 +9,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { normalizeSearchText } from "@/lib/searchable-select";
 import { cn } from "@/lib/utils";
+import { tx } from "@/i18n/xo";
+import { xoStatusLabel } from "@/xo/labels";
 
 interface SecretOption extends SearchableSelectOption {
   kind?: "secret" | "folder" | "back";
@@ -25,7 +27,7 @@ function statusBadge(status: SecretStatus | undefined) {
   if (!status || status === "active") return null;
   return (
     <Badge variant="outline" className="ml-auto text-(length:--text-nano) font-normal text-muted-foreground">
-      {status}
+      {xoStatusLabel(status, status)}
     </Badge>
   );
 }
@@ -176,7 +178,7 @@ export function SecretPicker({
           {
             key: `missing-${secretId}`,
             value: secretId,
-            label: `Missing secret (${secretId.slice(0, 8)}…)`,
+            label: tx("Missing secret ({{id}}…)", { id: secretId.slice(0, 8) }),
             title: `Missing secret (${secretId})`,
             missing: true,
             disabled: true,
@@ -254,8 +256,8 @@ export function SecretPicker({
       disabled={disabled}
       disablePortal={disablePortal}
       placeholder="Select secret…"
-      searchPlaceholder="Search secrets…"
-      emptyMessage="No matching secrets"
+      searchPlaceholder={tx("Search secrets…")}
+      emptyMessage={tx("No matching secrets")}
       triggerClassName={cn(
         "h-(--sz-34px) min-h-(--sz-34px) font-mono text-sm",
         boundMissing && "border-destructive text-destructive",
@@ -279,7 +281,7 @@ export function SecretPicker({
           <span className="flex w-full min-w-0 items-center gap-1.5" title={option.title}>
             <KeyRound className={cn("size-3.5 shrink-0", nonActive ? "text-amber-600" : "text-muted-foreground")} />
             <span className="min-w-0 flex-1 truncate">{option.label}</span>
-            {nonActive ? <span className="text-amber-600">({option.status})</span> : null}
+            {nonActive ? <span className="text-amber-600">({xoStatusLabel(option.status ?? "", option.status ?? "")})</span> : null}
           </span>
         );
       }}

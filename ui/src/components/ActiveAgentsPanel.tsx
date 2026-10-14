@@ -7,6 +7,7 @@ import type { TranscriptEntry } from "../adapters";
 import { issuesApi } from "../api/issues";
 import { queryKeys } from "../lib/queryKeys";
 import { cn, relativeTime } from "../lib/utils";
+import { tx } from "@/i18n/xo";
 import { Clock3 } from "lucide-react";
 import { Identity } from "./Identity";
 import { StatusGlyph } from "./StatusGlyph";
@@ -170,8 +171,10 @@ export const AgentRunCard = memo(function AgentRunCard({
   const statusLabel = runStatusLabels[run.status] ?? run.status.replace(/[_-]/g, " ");
   const runUrl = `/agents/${run.agentId}/runs/${run.id}`;
   const timestamp = run.finishedAt
-    ? `Finished ${relativeTime(run.finishedAt)}`
-    : run.startedAt ? `Started ${relativeTime(run.startedAt)}` : `Queued ${relativeTime(run.createdAt)}`;
+    ? tx("Finished {{time}}", { time: relativeTime(run.finishedAt) })
+    : run.startedAt
+      ? tx("Started {{time}}", { time: relativeTime(run.startedAt) })
+      : tx("Queued {{time}}", { time: relativeTime(run.createdAt) });
   const taskTitle = issue?.title ?? (issueLoadFailed ? "Task unavailable" : "Loading task…");
 
   return (

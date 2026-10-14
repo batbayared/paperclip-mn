@@ -13,6 +13,7 @@ import {
 import { ToggleSwitch } from "@/components/ui/toggle-switch";
 import { xoLocaleDateTime } from "@/xo/date-format";
 import { tx } from "@/i18n/xo";
+import { xoStatusLabel } from "@/xo/labels";
 
 export type RoutineListProjectSummary = {
   name: string;
@@ -134,7 +135,7 @@ export function RoutineListRow<TRoutine extends RoutineListRowItem>({
           <span className="truncate text-sm font-medium">{routine.title}</span>
           {(isArchived || routine.status === "paused" || isDraft) ? (
             <span className="text-xs text-muted-foreground">
-              {isArchived ? "archived" : isDraft ? "draft" : "paused"}
+              {isArchived ? xoStatusLabel("archived", "archived") : isDraft ? xoStatusLabel("draft", "draft") : xoStatusLabel("paused", "paused")}
             </span>
           ) : null}
           {managedByLabel ? (

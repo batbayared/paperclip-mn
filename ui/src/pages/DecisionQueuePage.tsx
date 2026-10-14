@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Check, Loader2, Settings2, X } from "lucide-react";
 import type { Agent, AttentionItem } from "@paperclipai/shared";
 import { useParams } from "@/lib/router";
-import { xoLabel } from "@/xo/labels";
+import { xoDecisionQueueSeedText, xoLabel } from "@/xo/labels";
 import { attentionApi } from "../api/attention";
 import { agentsApi } from "../api/agents";
 import { authApi } from "../api/auth";
@@ -127,7 +127,7 @@ export function DecisionQueuePage() {
   }, [agents]);
 
   useEffect(() => {
-    setBreadcrumbs([{ label: "Decisions", href: "/decisions" }, { label: queue?.title ?? queueKey }]);
+    setBreadcrumbs([{ label: "Decisions", href: "/decisions" }, { label: queue?.title != null ? xoDecisionQueueSeedText(queue.title) : queueKey }]);
   }, [setBreadcrumbs, queue?.title, queueKey]);
 
   // Re-hydrate per-company preferences when the company changes.
@@ -225,8 +225,8 @@ export function DecisionQueuePage() {
     <div className="max-w-3xl space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="min-w-0">
-          <h1 className="text-xl font-bold">{queue?.title ?? queueKey}</h1>
-          {queue?.description && <p className="mt-0.5 text-sm text-muted-foreground">{queue.description}</p>}
+          <h1 className="text-xl font-bold">{queue?.title != null ? xoDecisionQueueSeedText(queue.title) : queueKey}</h1>
+          {queue?.description && <p className="mt-0.5 text-sm text-muted-foreground">{xoDecisionQueueSeedText(queue.description)}</p>}
         </div>
         <DecisionsToolbar
           visibleCount={visibleCount}
@@ -387,7 +387,7 @@ function SeedRulesCard({
               {rules.map((rule) => (
                 <li key={rule} className="flex items-start gap-1.5 text-xs text-muted-foreground">
                   <Check className="mt-0.5 h-3 w-3 shrink-0" />
-                  {rule}
+                  {xoDecisionQueueSeedText(rule)}
                 </li>
               ))}
             </ul>
