@@ -1,5 +1,25 @@
 # XO ахицын бүртгэл
 
+## Ү6 7.16 7.15-ын үлдэгдэл: хяналтын хугацаа, frontmatter шошго (2026-10-14)
+
+Зорилго: 7.15-ын дараа үлдсэн хяналтын (monitor) хугацааны бичвэр ба импорт/экспортын frontmatter шошгыг орчуулах.
+
+BASE 69d230b2e.
+
+| Хэсэг | Агуулга |
+|---|---|
+| Хүрээ | tiers.ts «// Ү6 7.16» блокт lib/issue-monitor.ts; scripts/xo-i18n/tiers-y6-7-16.test.ts |
+| issue-monitor | хугацааны нэгж, «in/overdue by/ago/now» tx-ээр; monitorEtaPhase() нэмсэн. Орчуулсан мөрийг англи литералтай харьцуулдаг 3 газар (IssueProperties, IssueBlockedNotice, IssueScheduledRetryCard) засагдсан |
+| IssueProperties | хяналт/дахин оролдлогын мөрүүд (Cleared, checking momentarily…, Pending schedule, Retry/Continuation …) tx |
+| frontmatter | CompanyImport, CompanyExport FrontmatterCard → frontmatterFieldLabel(); PackageFileTree дахин экспортолсон |
+| Каталог | +15 түлхүүр; «due now» mn → «одоо» (баннерын өгүүлбэрт тохируулсан) |
+| Шалгалт | xo:i18n check OK (10845), xo:i18n:test 417, UI 6585, tsc цэвэр, brand 505/152; 3110 mn/en хоёуланд функцийн гаралт шалгасан |
+
+Үлдэгдэл (шийдвэргүй, мэдээллийн чанартай):
+- ExternallyConnectedTaskBanner: «Unnamed attachment» дэлгэц дээр tx-тэй; сервер рүү очих payload-ын утга англиар үлдэнэ.
+- ui/src/lib/tool-installs.ts INSTALLED_HINT ашиглагдаагүй код, устгаагүй.
+- Пайплайны {{noun}} хэрэглэгчийн өгөгдөл; TEAMS_*_COMMAND_DESCRIPTION англиар (ED шийдвэр).
+
 ## Ү6 7.15 Tier-гүй үлдэгдэл, 2-р шат: пайплайн, агент, plugin, ажлын талбар, issue/case (2026-10-14)
 
 Зорилго: 7.14-ийн дараа tier-гүй үлдсэн pages, components, adapters-ийг орчуулах.

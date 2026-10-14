@@ -259,6 +259,18 @@ Gates (2026-10-14): xo:i18n:check OK 5894, xo:i18n:test 11 / 129, tsc 0, vitest 
 - company-members.ts-ийн «Board» шошго.
 - en-д ConnectionSetupFlow-ийн брэнд «XO» гэж гарна (en байт ижил зарчмаас ухамсартай гажсан).
 
+## Ү6 7.16-д хөндсөн upstream файлууд
+
+7.15-ын үлдэгдэл. BASE 69d230b2e.
+
+| Файл | Өөрчлөлт |
+|---|---|
+| ui/src/lib/issue-monitor.ts | T1; хугацааны мөр tx; monitorEtaPhase() нэмсэн; formatMonitorOffset англи мөр харьцуулахаа больсон |
+| ui/src/components/issue-properties/IssueProperties.tsx | monitorEtaPhase ашиглана; хяналт/дахин оролдлогын мөр tx |
+| ui/src/components/{IssueBlockedNotice, IssueScheduledRetryCard}.tsx | relative === tx("now") |
+| ui/src/pages/{CompanyImport, CompanyExport}.tsx | FrontmatterCard → frontmatterFieldLabel() |
+| ui/src/components/PackageFileTree.tsx | frontmatterFieldLabel дахин экспорт |
+
 ## Ү6 7.15-д хөндсөн upstream файлууд
 
 Tier-гүй үлдэгдлийн 2-р шат. BASE 2c6c90260. ED шийдвэр (2026-10-14): анхдагч холболтын нэр, AI_PROVIDERS subscription нэрийг орчуулна; TEAMS_*_COMMAND_DESCRIPTION англиар.

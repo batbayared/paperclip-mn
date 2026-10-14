@@ -535,4 +535,6 @@ export const XO_TRANSFORM_FILES: readonly string[] = [
   "ui/src/pages/NewAgent.tsx",
   "ui/src/pages/PluginPage.tsx",
   "ui/src/components/access/CompanySettingsNav.tsx",
+  // Ү6 7.16 — 7.15-ын үлдэгдэл: issue-monitor хугацааны бичвэр
+  "ui/src/lib/issue-monitor.ts",
 ];

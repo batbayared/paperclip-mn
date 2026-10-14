@@ -84,7 +84,7 @@ function SuccessfulRunRetryNowControl({
     ? new Date(scheduledRetry.scheduledRetryAt).toISOString()
     : null;
   const relative = dueAtIso ? formatMonitorOffset(dueAtIso) : null;
-  const scheduleLabel = relative === "now"
+  const scheduleLabel = relative === tx("now")
     ? tx("due now")
     : relative
       ? tx("scheduled {{relative}}", { relative })

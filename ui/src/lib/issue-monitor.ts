@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { mnDate, mnDateTime, mnShortDate, mnTime } from "@/xo/date-format";
 import { localeTag } from "@/xo/locale";
+import { tx } from "@/i18n/xo";
 
 const SECOND_MS = 1_000;
 const MINUTE_MS = 60 * SECOND_MS;
@@ -66,27 +67,35 @@ function toTimestamp(value: MonitorDate): number {
 
 function formatDuration(durationMs: number): string {
   if (durationMs < MINUTE_MS) {
-    return `${Math.max(1, Math.ceil(durationMs / SECOND_MS))}s`;
+    return tx("{{n}}s", { n: Math.max(1, Math.ceil(durationMs / SECOND_MS)) });
   }
   if (durationMs < HOUR_MS) {
-    return `${Math.floor(durationMs / MINUTE_MS)}m`;
+    return tx("{{n}}m", { n: Math.floor(durationMs / MINUTE_MS) });
   }
   if (durationMs < DAY_MS) {
     const hours = Math.floor(durationMs / HOUR_MS);
     const minutes = Math.floor((durationMs % HOUR_MS) / MINUTE_MS);
-    return minutes > 0 ? `${hours}h ${minutes}m` : `${hours}h`;
+    return minutes > 0 ? tx("{{h}}h {{m}}m", { h: hours, m: minutes }) : tx("{{n}}h", { n: hours });
   }
 
   const days = Math.floor(durationMs / DAY_MS);
   const hours = Math.floor((durationMs % DAY_MS) / HOUR_MS);
-  return hours > 0 ? `${days}d ${hours}h` : `${days}d`;
+  return hours > 0 ? tx("{{d}}d {{h}}h", { d: days, h: hours }) : tx("{{n}}d", { n: days });
+}
+
+/** XO: орчуулсан ETA мөрийг харьцуулахгүйн тулд төлөвийг тусад нь буцаана. */
+export function monitorEtaPhase(nextCheckAt: MonitorDate, now: MonitorDate = new Date()): "pending" | "due-now" | "overdue" {
+  const deltaMs = toTimestamp(nextCheckAt) - toTimestamp(now);
+  if (deltaMs > 0) return "pending";
+  if (deltaMs > -DUE_NOW_GRACE_MS) return "due-now";
+  return "overdue";
 }
 
 export function formatMonitorEta(nextCheckAt: MonitorDate, now: MonitorDate = new Date()): string {
   const deltaMs = toTimestamp(nextCheckAt) - toTimestamp(now);
-  if (deltaMs > 0) return `in ${formatDuration(deltaMs)}`;
-  if (deltaMs > -DUE_NOW_GRACE_MS) return "due now";
-  return `overdue by ${formatDuration(Math.abs(deltaMs))}`;
+  if (deltaMs > 0) return tx("in {{duration}}", { duration: formatDuration(deltaMs) });
+  if (deltaMs > -DUE_NOW_GRACE_MS) return tx("due now");
+  return tx("overdue by {{duration}}", { duration: formatDuration(Math.abs(deltaMs)) });
 }
 
 export function formatMonitorEtaLabel(nextCheckAt: MonitorDate, now: MonitorDate = new Date()): string {
@@ -276,9 +285,9 @@ export function useMonitorCountdown(nextCheckAt: MonitorDate | null | undefined)
 export function formatMonitorOffset(nextCheckAt: MonitorDate): string {
   const now = new Date(Date.now());
   const deltaMs = toTimestamp(nextCheckAt) - now.getTime();
-  if (Math.round(Math.abs(deltaMs) / MINUTE_MS) === 0) return "now";
-  const eta = formatMonitorEta(nextCheckAt, now);
-  if (eta === "due now") return "now";
-  if (eta.startsWith("overdue by ")) return `${eta.slice("overdue by ".length)} ago`;
-  return eta;
+  if (Math.round(Math.abs(deltaMs) / MINUTE_MS) === 0) return tx("now");
+  if (deltaMs > 0) return formatMonitorEta(nextCheckAt, now);
+  // XO: англи мөрийг харьцуулахын оронд утгаар нь салгав (mn-д мөр өөр).
+  if (deltaMs > -DUE_NOW_GRACE_MS) return tx("now");
+  return tx("{{duration}} ago", { duration: formatDuration(Math.abs(deltaMs)) });
 }

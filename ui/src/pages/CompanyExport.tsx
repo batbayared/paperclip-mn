@@ -56,7 +56,7 @@ import {
   countFiles,
   collectAllPaths,
   parseFrontmatter,
-  FRONTMATTER_FIELD_LABELS,
+  frontmatterFieldLabel,
   FileTree,
 } from "../components/FileTree";
 
@@ -372,7 +372,7 @@ function FrontmatterCard({
         {Object.entries(data).map(([key, value]) => (
           <div key={key} className="contents">
             <dt className="text-muted-foreground whitespace-nowrap py-0.5">
-              {FRONTMATTER_FIELD_LABELS[key] ?? key}
+              {frontmatterFieldLabel(key)}
             </dt>
             <dd className="py-0.5">
               {Array.isArray(value) ? (

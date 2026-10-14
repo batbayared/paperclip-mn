@@ -62,7 +62,7 @@ export function IssueScheduledRetryCard({
   const badgeLabel = continuation ? tx("Continuation scheduled") : tx("Retry scheduled");
   const titleAction = continuation ? tx("Automatic continuation") : tx("Automatic retry");
   let titleSuffix: string;
-  if (relative === "now") {
+  if (relative === tx("now")) {
     titleSuffix = tx("due now");
   } else if (relative) {
     titleSuffix = relative;

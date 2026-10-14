@@ -46,6 +46,7 @@ import {
   formatMonitorEta,
   formatMonitorEtaLabel,
   formatMonitorOffset,
+  monitorEtaPhase,
   useMonitorCountdown,
 } from "../../lib/issue-monitor";
 import { extractProviderIdWithFallback } from "../../lib/model-utils";
@@ -1299,17 +1300,18 @@ export function IssueProperties({
   const monitorNotes = issue.executionPolicy?.monitor?.notes ?? monitorState?.notes ?? null;
   const monitorNow = useMonitorCountdown(monitorNextCheckAt);
   const monitorRelative = monitorNextCheckAt ? formatMonitorEta(monitorNextCheckAt, monitorNow) : null;
-  const monitorIsDueNow = monitorRelative === "due now";
-  const monitorIsOverdue = Boolean(monitorRelative?.startsWith("overdue by "));
+  const monitorPhase = monitorNextCheckAt ? monitorEtaPhase(monitorNextCheckAt, monitorNow) : null;
+  const monitorIsDueNow = monitorPhase === "due-now";
+  const monitorIsOverdue = monitorPhase === "overdue";
   const monitorPrimary = monitorNextCheckAt
     ? formatMonitorEtaLabel(monitorNextCheckAt, monitorNow)
     : monitorState?.status === "cleared"
-      ? "Cleared"
+      ? tx("Cleared")
       : tx("None");
   const monitorSecondary = monitorNextCheckAt
     ? monitorIsDueNow
-      ? "checking momentarily…"
-      : `${formatMonitorAbsolute(monitorNextCheckAt, {}, monitorNow)}${monitorIsOverdue ? " · fires on next tick" : monitorAttemptCount > 0 ? ` · Attempt ${monitorAttemptCount}` : ""}`
+      ? tx("checking momentarily…")
+      : `${formatMonitorAbsolute(monitorNextCheckAt, {}, monitorNow)}${monitorIsOverdue ? tx(" · fires on next tick") : monitorAttemptCount > 0 ? tx(" · Attempt {{n}}", { n: monitorAttemptCount }) : ""}`
     : monitorState?.status === "cleared"
       ? [
           monitorLastTriggeredAt ? `last checked ${timeAgo(monitorLastTriggeredAt)}` : null,
@@ -1405,10 +1407,10 @@ export function IssueProperties({
   const scheduledRetryIsContinuation =
     scheduledRetry?.scheduledRetryReason === "max_turns_continuation";
   const scheduledRetryRelativeLabel = (() => {
-    if (!scheduledRetryRelative) return "Pending schedule";
-    const action = scheduledRetryIsContinuation ? "Continuation" : "Retry";
-    if (scheduledRetryRelative === "now") return `${action} due now`;
-    return `${action} ${scheduledRetryRelative}`;
+    if (!scheduledRetryRelative) return tx("Pending schedule");
+    const relative = scheduledRetryRelative;
+    if (relative === tx("now")) return scheduledRetryIsContinuation ? tx("Continuation due now") : tx("Retry due now");
+    return scheduledRetryIsContinuation ? tx("Continuation {{relative}}", { relative }) : tx("Retry {{relative}}", { relative });
   })();
   const scheduledRetryRetryNowSuccess = retryNow.isSuccess
     && (retryNow.data?.outcome === "promoted" || retryNow.data?.outcome === "already_promoted");
