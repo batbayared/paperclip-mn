@@ -259,6 +259,14 @@ Gates (2026-10-14): xo:i18n:check OK 5894, xo:i18n:test 11 / 129, tsc 0, vitest 
 - company-members.ts-ийн «Board» шошго.
 - en-д ConnectionSetupFlow-ийн брэнд «XO» гэж гарна (en байт ижил зарчмаас ухамсартай гажсан).
 
+## Ү6 7.23-д хөндсөн upstream файлууд
+
+Transcript-ын эцсийн төлөвийн enum. BASE 008db712f.
+
+| Файл | Өөрчлөлт |
+|---|---|
+| ui/src/components/transcript/RunTranscriptView.tsx | runStateText(), dispositionText() helper; run_result шошго tx("result · {{disposition}}"), run_terminal текст орчуулагдсан enum-аар |
+
 ## Ү6 7.22-д хөндсөн upstream файлууд
 
 RunTranscriptView-ийн үйл явдлын шошго. BASE 3231a8480.

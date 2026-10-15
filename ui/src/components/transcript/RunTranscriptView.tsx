@@ -24,6 +24,21 @@ function eventLabelText(label: string): string {
   return label;
 }
 
+function runStateText(state: string): string {
+  if (state === "succeeded") return tx("succeeded");
+  if (state === "failed") return tx("failed");
+  if (state === "cancelled") return tx("cancelled");
+  return state;
+}
+
+function dispositionText(disposition: string): string {
+  if (disposition === "done") return tx("done");
+  if (disposition === "blocked") return tx("blocked");
+  if (disposition === "needs_review") return tx("needs review");
+  if (disposition === "yielded") return tx("yielded");
+  return disposition;
+}
+
 /** Family glyph for a tool block/row; the taxonomy falls back to Wrench. */
 function ToolFamilyIcon({ name, className }: { name: string; className?: string }) {
   const Icon = toolTaxonomy(name).icon;
@@ -631,12 +646,12 @@ export function normalizeTranscript(entries: TranscriptEntry[], streaming: boole
     }
 
     if (entry.kind === "run_result") {
-      blocks.push({ type: "event", ts: entry.ts, label: `result · ${entry.disposition}`, tone: entry.disposition === "blocked" ? "warn" : "info", text: entry.summary });
+      blocks.push({ type: "event", ts: entry.ts, label: tx("result · {{disposition}}", { disposition: dispositionText(entry.disposition) }), tone: entry.disposition === "blocked" ? "warn" : "info", text: entry.summary });
       continue;
     }
 
     if (entry.kind === "run_terminal") {
-      blocks.push({ type: "event", ts: entry.ts, label: "terminal", tone: entry.runState === "failed" ? "error" : "info", text: `${entry.runState} · ${entry.disposition}`, detail: entry.stopReason });
+      blocks.push({ type: "event", ts: entry.ts, label: "terminal", tone: entry.runState === "failed" ? "error" : "info", text: `${runStateText(entry.runState)} · ${dispositionText(entry.disposition)}`, detail: entry.stopReason });
       continue;
     }
 

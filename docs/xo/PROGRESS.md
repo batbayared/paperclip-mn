@@ -1,5 +1,25 @@
 # XO ахицын бүртгэл
 
+## Ү6 7.23 Transcript-ын эцсийн төлөвийн enum (2026-10-15)
+
+Зорилго: 7.22-т бүртгэсэн «runState · disposition» текстийг орчуулах.
+
+BASE 008db712f.
+
+| Хэсэг | Агуулга |
+|---|---|
+| Утгууд | adapter-utils types.ts run_terminal: runState succeeded/failed/cancelled, disposition done/blocked/needs_review/yielded (хаалттай жагсаалт) |
+| Засвар | runStateText(), dispositionText() render үед tx(); run_result шошго «result · {{disposition}}» түлхүүрийг хадгалж, disposition-ыг орчуулсан утгаар дамжуулна. tone-ын харьцуулалт түүхий утгаар хэвээр |
+| Шинэ орчуулга | succeeded «амжилттай», failed «амжилтгүй», needs review «хяналт шаардсан», yielded «ээлж шилжүүлсэн»; done/blocked/cancelled өмнө нь байсан |
+| Англиар үлдээсэн | stopReason (серверийн чөлөөт текст); хуулах текст (transcript copy, 1767-1768 мөр) |
+| Каталог | +4 түлхүүр (11575) |
+| Хөтчийн шалгалт | хийгээгүй: 3110 сервер унтарсан хэвээр |
+| Шалгалт | xo:i18n check OK (11575), xo:i18n:test 440, UI 625/6585, tsc цэвэр, brand 477/147 |
+
+Үлдэгдэл (мэдээллийн чанартай):
+- 7.22, 7.23-ын хөтчийн шалгалт сервер асаасны дараа.
+- Transcript хуулах текст англи enum-тай.
+
 ## Ү6 7.22 RunTranscriptView-ийн үйл явдлын шошго (2026-10-15)
 
 Зорилго: 7.21-д бүртгэсэн «terminal», «init», «result» шошгыг орчуулах.
