@@ -50,6 +50,7 @@ import { useLocation } from "../lib/router";
 import { agentRouteRef } from "../lib/utils";
 import { buildSameOriginWebSocketUrl } from "../lib/websocket-url";
 import { tx } from "@/i18n/xo";
+import { xoHumanizeValue } from "@/xo/labels";
 
 const TOAST_COOLDOWN_WINDOW_MS = 10_000;
 const TOAST_COOLDOWN_MAX = 3;
@@ -880,7 +881,7 @@ function describeIssueUpdate(
   if (!details) return null;
   const changes: string[] = [];
   if (typeof details.status === "string")
-    changes.push(tx("status -> {{status}}", { status: details.status.replace(/_/g, " ") }));
+    changes.push(tx("status -> {{status}}", { status: xoHumanizeValue(details.status) }));
   if (typeof details.priority === "string")
     changes.push(tx("priority -> {{priority}}", { priority: details.priority }));
   if (
@@ -897,7 +898,7 @@ function describeIssueUpdate(
   if (details.reopened === true) {
     const from = readString(details.reopenedFrom);
     changes.push(
-      from ? tx("reopened from {{from}}", { from: from.replace(/_/g, " ") }) : tx("reopened"),
+      from ? tx("reopened from {{from}}", { from: xoHumanizeValue(from) }) : tx("reopened"),
     );
   }
   if (typeof details.title === "string") changes.push(tx("title changed"));
@@ -984,7 +985,7 @@ function buildActivityToast(
   const reopenedFrom = readString(details?.reopenedFrom);
   const reopenedLabel = reopened
     ? reopenedFrom
-      ? tx("reopened from {{from}}", { from: reopenedFrom.replace(/_/g, " ") })
+      ? tx("reopened from {{from}}", { from: xoHumanizeValue(reopenedFrom) })
       : tx("reopened")
     : null;
   const title = reopened

@@ -259,6 +259,20 @@ Gates (2026-10-14): xo:i18n:check OK 5894, xo:i18n:test 11 / 129, tsc 0, vitest 
 - company-members.ts-ийн «Board» шошго.
 - en-д ConnectionSetupFlow-ийн брэнд «XO» гэж гарна (en байт ижил зарчмаас ухамсартай гажсан).
 
+## Ү6 7.26-д хөндсөн upstream файлууд
+
+Inbox, Secrets, live update-ийн түүхий enum. BASE 3125feae8.
+
+| Файл | Өөрчлөлт |
+|---|---|
+| ui/src/pages/Inbox.tsx, ui/src/pages/LegacyInbox.tsx | approvalStatusLabel → xoHumanizeValue |
+| ui/src/pages/AgentDetail.tsx | workspace operation төлөвийн badge → xoStatusLabel |
+| ui/src/pages/JoinRequestQueue.tsx | request.status → xoStatusLabel |
+| ui/src/pages/apps/Browse.tsx | endpoint.status → xoHumanizeValue |
+| ui/src/pages/Secrets.tsx | config.status (2 газар), healthStatus → xoStatusLabel; binding.target.status → xoHumanizeValue |
+| ui/src/context/LiveUpdatesProvider.tsx | status ->, reopened from-ийн утга → xoHumanizeValue |
+| ui/src/lib/issue-chat-messages.ts | formatStatusLabel → xoHumanizeValue |
+
 ## Ү6 7.25-д хөндсөн upstream файлууд
 
 Төлөвийн badge-ийн түүхий enum. BASE e7db1bae9.

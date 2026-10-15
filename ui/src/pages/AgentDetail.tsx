@@ -1,4 +1,4 @@
-import { xoNavLabel, xoRoleLabel, xoRunSourceLabel } from "@/xo/labels";
+import { xoNavLabel, xoRoleLabel, xoRunSourceLabel, xoStatusLabel } from "@/xo/labels";
 import { xoLocaleTime } from "@/xo/date-format";
 import { tx } from "@/i18n/xo";
 import { XoTrans } from "@/xo/XoTrans";
@@ -586,7 +586,7 @@ function WorkspaceOperationStatusBadge({ status }: { status: WorkspaceOperation[
         workspaceOperationStatusTone(status),
       )}
     >
-      {status.replace("_", " ")}
+      {xoStatusLabel(status, status.replace("_", " "))}
     </Badge>
   );
 }

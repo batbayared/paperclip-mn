@@ -26,6 +26,7 @@ import { useNavigate } from "@/lib/router";
 import { useChatConnectorsEnabled } from "@/hooks/useChatConnectorsEnabled";
 import { appCopyFor, localizedAppDescription } from "@/lib/app-gallery-copy";
 import { tx } from "@/i18n/xo";
+import { xoHumanizeValue } from "@/xo/labels";
 import { useCompany } from "@/context/CompanyContext";
 import { useBreadcrumbs } from "@/context/BreadcrumbContext";
 import { useToast } from "@/context/ToastContext";
@@ -870,7 +871,7 @@ export function ConnectorCard({
                 </p>
               </div>
               <span className="text-xs text-muted-foreground">
-                {endpoint.status.replace(/_/g, " ")}
+                {xoHumanizeValue(endpoint.status)}
               </span>
               <Button
                 size="sm"

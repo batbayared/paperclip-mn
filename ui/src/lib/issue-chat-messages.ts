@@ -25,7 +25,7 @@ import {
 } from "./transcriptPresentation";
 import { hoursWords, minutesWords, secondsWords } from "@/xo/run-text";
 import { tx } from "@/i18n/xo";
-import { xoBrandVars } from "@/xo/labels";
+import { xoBrandVars, xoHumanizeValue } from "@/xo/labels";
 
 type JsonValue = null | string | number | boolean | JsonValue[] | { [key: string]: JsonValue };
 type JsonObject = { [key: string]: JsonValue };
@@ -554,7 +554,7 @@ function authorNameForComment(
 }
 
 function formatStatusLabel(status: string) {
-  return status.replace(/_/g, " ");
+  return xoHumanizeValue(status);
 }
 
 function createCommentMessage(args: {

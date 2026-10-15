@@ -183,6 +183,7 @@ import {
   type InboxOrderPin,
 } from "../lib/inboxOrderPin";
 import { tx } from "@/i18n/xo";
+import { xoHumanizeValue } from "@/xo/labels";
 import { XoTrans } from "@/xo/XoTrans";
 
 const INBOX_HEARTBEAT_RUN_LIMIT = 200;
@@ -226,7 +227,7 @@ function runFailureMessage(run: HeartbeatRun): string {
 }
 
 function approvalStatusLabel(status: Approval["status"]): string {
-  return status.replaceAll("_", " ");
+  return xoHumanizeValue(status);
 }
 
 function readIssueIdFromRun(run: HeartbeatRun): string | null {

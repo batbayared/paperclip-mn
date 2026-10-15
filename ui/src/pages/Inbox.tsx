@@ -1,5 +1,5 @@
 import { tx } from "@/i18n/xo";
-import { xoDateGroupLabel } from "@/xo/labels";
+import { xoDateGroupLabel, xoHumanizeValue } from "@/xo/labels";
 import { XoTrans } from "@/xo/XoTrans";
 import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "@/lib/router";
@@ -294,7 +294,7 @@ function runFailureMessage(run: HeartbeatRun): string {
 }
 
 function approvalStatusLabel(status: Approval["status"]): string {
-  return status.replaceAll("_", " ");
+  return xoHumanizeValue(status);
 }
 
 function readIssueIdFromRun(run: HeartbeatRun): string | null {

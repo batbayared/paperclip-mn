@@ -1,7 +1,7 @@
 import { xoLocaleDate, xoLocaleDateTime } from "@/xo/date-format";
 import { tx } from "@/i18n/xo";
 import { XoTrans } from "@/xo/XoTrans";
-import { xoStatusLabel } from "@/xo/labels";
+import { xoHumanizeValue, xoStatusLabel } from "@/xo/labels";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -3504,7 +3504,7 @@ function ProviderVaultInlineWarning({ config }: { config: CompanySecretProviderC
   if (!message) {
     return (
       <p className="mt-1 text-(length:--text-micro) text-muted-foreground">
-        {config.isDefault ? "Default vault" : "Vault"} · {config.status.replace("_", " ")}
+        {config.isDefault ? "Default vault" : "Vault"} · {xoStatusLabel(config.status, config.status.replace("_", " "))}
       </p>
     );
   }
@@ -3725,11 +3725,11 @@ function ProviderVaultCard({
           </div>
           <div className="mt-1 flex flex-wrap items-center gap-2">
             <Badge variant="outline" className={cn("font-medium", providerConfigStatusTone(config.status))}>
-              {config.status.replace("_", " ")}
+              {xoStatusLabel(config.status, config.status.replace("_", " "))}
             </Badge>
             {config.healthStatus ? (
               <span className="text-xs text-muted-foreground">
-                Health {config.healthStatus.replace("_", " ")} · {formatRelative(config.healthCheckedAt)}
+                Health {xoStatusLabel(config.healthStatus, config.healthStatus.replace("_", " "))} · {formatRelative(config.healthCheckedAt)}
               </span>
             ) : (
               <span className="text-xs text-muted-foreground">Health not checked</span>
@@ -4804,7 +4804,7 @@ export function SecretUsageTab({ loading, bindings }: { loading: boolean; bindin
               )}
               {binding.target.status ? (
                 <Badge variant="outline" className="h-5 px-1.5 text-(length:--text-nano) font-normal">
-                  {binding.target.status.replaceAll("_", " ")}
+                  {xoHumanizeValue(binding.target.status)}
                 </Badge>
               ) : null}
             </div>

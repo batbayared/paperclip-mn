@@ -85,6 +85,12 @@ export function xoStatusLabel(status: string, english: string): string {
     case "limited": return tx("Limited");
     case "usage_limited": return tx("Usage limited");
     case "complete": return tx("Complete");
+    case "ready": return tx("Ready");
+    case "warning": return tx("Warning");
+    case "coming_soon": return tx("Coming soon");
+    case "verifying": return tx("Verifying");
+    case "attention": return tx("Needs attention");
+    case "revoked": return tx("Revoked");
     default: return english;
   }
 }

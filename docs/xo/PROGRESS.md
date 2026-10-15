@@ -1,5 +1,24 @@
 # XO ахицын бүртгэл
 
+## Ү6 7.26 Inbox, Secrets, live update-ийн түүхий enum (2026-10-15)
+
+Зорилго: 7.25-ын үлдэгдлээс төлөв харуулдаг газруудыг xoStatusLabel / xoHumanizeValue-ээр дамжуулах. en гаралт хуучнаараа.
+
+BASE 3125feae8.
+
+| Хэсэг | Агуулга |
+|---|---|
+| Засвар | Inbox ба LegacyInbox (approvalStatusLabel), AgentDetail (workspace operation төлөв), JoinRequestQueue, apps/Browse (endpoint төлөв), Secrets (vault төлөв, health, binding target), LiveUpdatesProvider (status ->, reopened from), lib/issue-chat-messages (formatStatusLabel) |
+| Helper | xoStatusLabel-д ready, warning, coming_soon, verifying, attention («Needs attention»), revoked нэмсэн |
+| Шинэ орчуулга | Verifying «Шалгаж байна» |
+| Каталог | +1 түлхүүр (11587) |
+| Хөтчийн шалгалт | хийгээгүй: 3110 сервер унтарсан хэвээр |
+| Шалгалт | xo:i18n check OK (11587), xo:i18n:test 440, UI 625/6585 (эхний ажиллуулалтад NewIssueDialog 1 тест ачааллаас унаж, ганцаар болон бүтэн дахин ажиллуулахад PASS), tsc цэвэр, brand 477/147 |
+
+Үлдэгдэл:
+- ChatEndpointDetail файл дамжуулалтын phase, Routines SelectItem (concurrency/catch-up бодлого), UserProfile event.action, ArtifactsPanel ба TaskChatThread-ийн work product төрөл, lib/external-objects, FeedCard, SidebarAgents «Built-in agent …», search/issue filter-ийн titleCase helper, activity-format, issue-change-receipt, attention, review-policy, AuditRuns, Pipelines, StatusCardDetailDrawer түүхий enum хэвээр.
+- 7.22–7.26-ын хөтчийн шалгалт сервер асаасны дараа.
+
 ## Ү6 7.25 Төлөвийн badge-ийн түүхий enum (2026-10-15)
 
 Зорилго: status.replace("_", " ")-ээр түүхий enum харуулдаг газруудыг xoStatusLabel / xoHumanizeValue-ээр дамжуулах. en гаралт хуучнаараа: helper-ийн fallback нь өмнөх англи илэрхийлэл.

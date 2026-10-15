@@ -1,5 +1,6 @@
 import { xoLocaleDateTime } from "@/xo/date-format";
 import { tx } from "@/i18n/xo";
+import { xoStatusLabel } from "@/xo/labels";
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { UserPlus2 } from "lucide-react";
@@ -131,7 +132,7 @@ export function JoinRequestQueue() {
                 <div className="space-y-2">
                   <div className="flex flex-wrap items-center gap-2">
                     <Badge variant={request.status === "pending_approval" ? "secondary" : request.status === "approved" ? "outline" : "destructive"}>
-                      {request.status.replace("_", " ")}
+                      {xoStatusLabel(request.status, request.status.replace("_", " "))}
                     </Badge>
                     <Badge variant="outline">{request.requestType}</Badge>
                     {request.adapterType ? <Badge variant="outline">{request.adapterType}</Badge> : null}
