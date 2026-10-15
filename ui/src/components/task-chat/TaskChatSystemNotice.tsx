@@ -19,6 +19,7 @@ import { humanizeSystemNotice } from "@/lib/system-notice-humanizer";
 import { mapCommentMetadataToSystemNoticeSections } from "@/lib/system-notice-comment";
 import { timeAgo } from "@/lib/timeAgo";
 import type { TaskChatMessageItem } from "./task-chat-model";
+import { tx } from "@/i18n/xo";
 
 const TONE_ICON: Record<SystemNoticeTone, LucideIcon> = {
   neutral: Info,
@@ -88,7 +89,7 @@ export function TaskChatSystemNotice({
       data-testid="task-chat-system-notice"
       data-tone={streamlined ? tone : undefined}
       role={streamlined ? "group" : undefined}
-      aria-label={streamlined ? `System update: ${title}` : undefined}
+      aria-label={streamlined ? tx("System update: {{title}}", { title }) : undefined}
     >
       <div className="flex max-w-(--pct-85) items-center gap-1.5">
         <button

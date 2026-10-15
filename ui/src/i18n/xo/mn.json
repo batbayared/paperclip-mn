@@ -7019,6 +7019,8 @@
   "Pause external override": "Гадаад дарж тохируулгыг түр зогсоох",
   "Pause goal": "Зорилгыг түр зогсоох",
   "Pause new entries": "Шинэ орох зүйлсийг түр зогсоох",
+  "Pause released, but {{count}} task could not start. {{message}} Check the affected agents and try starting them again.": "Түр зогсолтыг цуцаллаа, гэвч {{count}} даалгавар эхэлж чадсангүй. {{message}} Холбогдох агентуудыг шалгаад дахин эхлүүлж үзнэ үү.",
+  "Pause released, but {{count}} tasks could not start. {{message}} Check the affected agents and try starting them again.": "Түр зогсолтыг цуцаллаа, гэвч {{count}} даалгавар эхэлж чадсангүй. {{message}} Холбогдох агентуудыг шалгаад дахин эхлүүлж үзнэ үү.",
   "Pause subtree": "Дэд даалгавруудыг түр зогсоох",
   "Pause the {{displayName}}?": "{{displayName}}-г түр зогсоох уу?",
   "Pause work": "Ажлыг түр зогсоох",

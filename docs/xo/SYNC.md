@@ -259,6 +259,17 @@ Gates (2026-10-14): xo:i18n:check OK 5894, xo:i18n:test 11 / 129, tsc 0, vitest 
 - company-members.ts-ийн «Board» шошго.
 - en-д ConnectionSetupFlow-ийн брэнд «XO» гэж гарна (en байт ижил зарчмаас ухамсартай гажсан).
 
+## Ү6 7.19-д хөндсөн upstream файлууд
+
+7.18-ийн үлдэгдэл. BASE 6eacdef8d.
+
+| Файл | Өөрчлөлт |
+|---|---|
+| ui/src/components/{CommentThread, IssuesList, IssueFieldChangeReceipt}.tsx, ui/src/pages/{Inbox, LegacyInbox, Pipelines, IssueDetail}.tsx | fallback шошго tx(); IssueDetail wake warning тоогоор 2 түлхүүр |
+| ui/src/components/BlockedReasonChip.tsx | aria tx(), severityWord() helper |
+| ui/src/components/task-chat/TaskChatSystemNotice.tsx | aria tx() |
+| ui/src/xo/labels.ts | xoBrandVars() нэмсэн (XO-ийн файл) |
+
 ## Ү6 7.18-д хөндсөн upstream файлууд
 
 Tier-гүй .ts helper, 7.17-ийн үлдэгдэл. BASE 3446eee56.

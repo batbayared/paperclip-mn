@@ -1,5 +1,26 @@
 # XO ахицын бүртгэл
 
+## Ү6 7.19 7.18-ийн үлдэгдэл: fallback шошго, aria, брэнд (2026-10-15)
+
+Зорилго: 7.18-д бүртгэсэн «You»/«Board»/«Me» fallback, aria label, xoBrandVars-гүй дуудлагыг засах.
+
+BASE 6eacdef8d.
+
+| Хэсэг | Агуулга |
+|---|---|
+| Fallback шошго | CommentThread («Board», «You»), Inbox, LegacyInbox, IssuesList («Board»/«Me», «Unassigned», «User»), Pipelines («Me»), IssueDetail («Me», «Board», «System», «User») — tx() |
+| aria, preview | IssueFieldChangeReceipt «preview»; TaskChatSystemNotice aria «System update: {{title}}»; BlockedReasonChip aria «Reason: {{label}}, severity {{severity}}», severityWord() ноцтой байдлыг орчуулна |
+| IssueDetail | «Pause released, but … could not start» тоогоор хоёр литерал түлхүүрт салсан, mn орчуулгатай |
+| Брэнд | xo/labels.ts:715 tx(«…{{brand}} workspace…», xoBrandVars()) |
+| SearchFilterBar | tier-т байгаа, label талбарыг transform ороодог тул засвар шаардлагагүй |
+| Каталог | +2 түлхүүр (11562) |
+| Хөтчийн шалгалт | /YB/inbox/blocked chip aria: mn «Шалтгаан: Шийдвэр шаардлагатай, ноцтой байдал өндөр», en «Reason: Needs decision, severity high». /YB/issues mn-д англи мөр 0 |
+| Шалгалт | xo:i18n check OK (11562), xo:i18n:test 440, UI 6585 (FileViewerSheet.copy ганцаараа PASS), tsc цэвэр, brand 477/147 |
+
+Үлдэгдэл (мэдээллийн чанартай):
+- process adapter-ийн «Shell Process» UI-д харагддаггүй (registry «Process» шошгыг харуулдаг), хөндөөгүй.
+- Харьцуулалт, загварт очих текст англиар хэвээр (7.18-ийн жагсаалт).
+
 ## Ү6 7.18 Tier-гүй .ts helper-ийн англи UI мөр, 7.17-ийн үлдэгдэл (2026-10-15)
 
 Зорилго: tier-гүй .ts helper, hook, api, pages/*.ts-ээс хэрэглэгчид харагдах англи мөрийг орчуулах.

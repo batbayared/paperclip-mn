@@ -180,7 +180,7 @@ function formatTimelineAssigneeLabel(
     return agentMap?.get(assignee.agentId)?.name ?? assignee.agentId.slice(0, 8);
   }
   if (assignee.userId) {
-    return formatAssigneeUserLabel(assignee.userId, currentUserId) ?? "Board";
+    return formatAssigneeUserLabel(assignee.userId, currentUserId) ?? tx("Board");
   }
   return "Unassigned";
 }
@@ -197,7 +197,7 @@ function formatTimelineActorName(
   if (actorType === "system") {
     return "System";
   }
-  return formatAssigneeUserLabel(actorId, currentUserId) ?? "Board";
+  return formatAssigneeUserLabel(actorId, currentUserId) ?? tx("Board");
 }
 
 function initialsForName(name: string) {
@@ -347,7 +347,7 @@ function CommentCard({
             />
           </Link>
         ) : (
-          <Identity name="You" size="sm" />
+          <Identity name={tx("You")} size="sm" />
         )}
         <span className="flex items-center gap-1.5">
           {isQueued ? (

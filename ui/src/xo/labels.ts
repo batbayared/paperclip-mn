@@ -712,7 +712,7 @@ export function xoSkillPolicyDenialRemediation(code: string, fallback: string): 
   switch (code) {
     case "skill_authentication_required": return tx("Sign in and try again.");
     case "skill_company_boundary_denied": return tx("Open the skill from the organization that owns it.");
-    case "skill_workspace_boundary_denied": return tx("Import from a configured {{brand}} workspace or the organization managed-skill directory.");
+    case "skill_workspace_boundary_denied": return tx("Import from a configured {{brand}} workspace or the organization managed-skill directory.", xoBrandVars());
     case "skill_source_validation_failed": return tx("Fix the flagged source and retry.");
     case "skill_unsafe_content_blocked": return tx("Remove the fetch-and-execute or unsafe pattern before saving.");
     case "skill_secret_handling_blocked": return tx("Remove the secret value before saving.");

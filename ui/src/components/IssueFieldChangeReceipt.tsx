@@ -6,6 +6,7 @@ import {
 } from "../lib/issue-change-receipt";
 import { cn } from "../lib/utils";
 import { XoTrans } from "@/xo/XoTrans";
+import { tx } from "@/i18n/xo";
 
 /**
  * Field-level audit receipt under an `issue.updated` row in the activity stream
@@ -67,7 +68,7 @@ export function IssueFieldChangeReceipt({
                     rather than implying the whole value is shown. */}
                 {row.truncated ? (
                   <span className="text-(length:--text-nano) uppercase tracking-(--tracking-eyebrow) text-muted-foreground">
-                    preview
+                    {tx("preview")}
                   </span>
                 ) : null}
               </dd>

@@ -7019,6 +7019,8 @@
   "Pause external override": "Pause external override",
   "Pause goal": "Pause goal",
   "Pause new entries": "Pause new entries",
+  "Pause released, but {{count}} task could not start. {{message}} Check the affected agents and try starting them again.": "Pause released, but {{count}} task could not start. {{message}} Check the affected agents and try starting them again.",
+  "Pause released, but {{count}} tasks could not start. {{message}} Check the affected agents and try starting them again.": "Pause released, but {{count}} tasks could not start. {{message}} Check the affected agents and try starting them again.",
   "Pause subtree": "Pause subtree",
   "Pause the {{displayName}}?": "Pause the {{displayName}}?",
   "Pause work": "Pause work",

@@ -8,6 +8,7 @@ import {
   type BlockedReasonVariant,
 } from "../lib/blockedInbox";
 import type { IssueBlockedInboxReason } from "@paperclipai/shared";
+import { tx } from "@/i18n/xo";
 
 interface BlockedReasonChipProps {
   reason: IssueBlockedInboxReason;
@@ -47,6 +48,15 @@ const SEVERITY_DOT: Partial<Record<IssueBlockedInboxSeverity, string>> = {
   high: "bg-orange-500",
 };
 
+function severityWord(severity: IssueBlockedInboxSeverity): string {
+  switch (severity) {
+    case "critical": return tx("critical");
+    case "high": return tx("high");
+    case "medium": return tx("medium");
+    case "low": return tx("low");
+  }
+}
+
 export function BlockedReasonChip({
   reason,
   severity,
@@ -62,7 +72,7 @@ export function BlockedReasonChip({
       data-testid="blocked-reason-chip"
       data-variant={variant}
       data-severity={severity}
-      aria-label={`Reason: ${label}, severity ${severity}`}
+      aria-label={tx("Reason: {{label}}, severity {{severity}}", { label, severity: severityWord(severity) })}
       className={cn(
         "inline-flex shrink-0 items-center gap-1 rounded-md border px-2 py-0.5 text-(length:--text-nano) font-medium leading-tight sm:text-(length:--text-micro)",
         VARIANT_STYLES[variant],

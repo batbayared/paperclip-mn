@@ -665,12 +665,12 @@ function ActorIdentity({
     const agent = agentMap.get(id);
     return <Identity name={agent?.name ?? id.slice(0, 8)} size="sm" />;
   }
-  if (evt.actorType === "system") return <Identity name="System" size="sm" />;
+  if (evt.actorType === "system") return <Identity name={tx("System")} size="sm" />;
   if (evt.actorType === "user") {
     const profile = userProfileMap?.get(id);
     return (
       <Identity
-        name={profile?.label ?? "Board"}
+        name={profile?.label ?? tx("Board")}
         avatarUrl={profile?.image}
         size="sm"
       />
@@ -788,7 +788,7 @@ function IssueAttributionByline({
           name:
             formatUserLabel(issue.assigneeUserId, userLabelMap) ??
             userProfileMap.get(issue.assigneeUserId)?.label ??
-            "User",
+            tx("User"),
           avatarUrl: userProfileMap.get(issue.assigneeUserId)?.image ?? null,
         }
       : null;
@@ -808,7 +808,7 @@ function IssueAttributionByline({
           name:
             formatUserLabel(originatingActor.id, userLabelMap) ??
             userProfileMap.get(originatingActor.id)?.label ??
-            "User",
+            tx("User"),
           avatarUrl: userProfileMap.get(originatingActor.id)?.image ?? null,
         }
     : null;
@@ -3687,7 +3687,7 @@ export function TaskDetailSurface({ conversation, tasksTab }: { tasksTab?: TaskS
       options.push({ id: `agent:${agent.id}`, label: agent.name });
     }
     if (currentUserId) {
-      options.push({ id: `user:${currentUserId}`, label: "Me" });
+      options.push({ id: `user:${currentUserId}`, label: tx("Me") });
     }
     return options;
   }, [agents, companyMembers?.users, currentUserId]);
@@ -4176,7 +4176,9 @@ export function TaskDetailSurface({ conversation, tasksTab }: { tasksTab?: TaskS
     onSuccess: (result) => {
       if (result.kind === "release" && result.hold.wakeFailures?.length) {
         setTreeControlWakeWarning(
-          `Pause released, but ${result.hold.wakeFailures.length} ${result.hold.wakeFailures.length === 1 ? "task" : "tasks"} could not start. ${result.hold.wakeFailures[0].message} Check the affected agents and try starting them again.`,
+          result.hold.wakeFailures.length === 1
+            ? tx("Pause released, but {{count}} task could not start. {{message}} Check the affected agents and try starting them again.", { count: result.hold.wakeFailures.length, message: result.hold.wakeFailures[0].message })
+            : tx("Pause released, but {{count}} tasks could not start. {{message}} Check the affected agents and try starting them again.", { count: result.hold.wakeFailures.length, message: result.hold.wakeFailures[0].message }),
         );
       }
       setTreeControlOpen(false);
