@@ -259,6 +259,14 @@ Gates (2026-10-14): xo:i18n:check OK 5894, xo:i18n:test 11 / 129, tsc 0, vitest 
 - company-members.ts-ийн «Board» шошго.
 - en-д ConnectionSetupFlow-ийн брэнд «XO» гэж гарна (en байт ижил зарчмаас ухамсартай гажсан).
 
+## Ү6 7.22-д хөндсөн upstream файлууд
+
+RunTranscriptView-ийн үйл явдлын шошго. BASE 3231a8480.
+
+| Файл | Өөрчлөлт |
+|---|---|
+| ui/src/components/transcript/RunTranscriptView.tsx | eventLabelText() helper: render үед terminal/init/result шошгыг tx(); block.label-ийн түүхий утга харьцуулалт, React key-д хэвээр |
+
 ## Ү6 7.21-д хөндсөн upstream файлууд
 
 Жижиг үсгийн ганц үгт шошго. BASE e364db727.

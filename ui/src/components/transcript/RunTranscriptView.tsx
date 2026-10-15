@@ -16,6 +16,14 @@ import {
 import { toolTaxonomy } from "../task-chat/tool-taxonomy";
 import { tx } from "@/i18n/xo";
 
+// Raw event labels are also compared ("result") and used in React keys, so translate only at render.
+function eventLabelText(label: string): string {
+  if (label === "terminal") return tx("terminal");
+  if (label === "init") return tx("init");
+  if (label === "result") return tx("result");
+  return label;
+}
+
 /** Family glyph for a tool block/row; the taxonomy falls back to Wrench. */
 function ToolFamilyIcon({ name, className }: { name: string; className?: string }) {
   const Icon = toolTaxonomy(name).icon;
@@ -1500,7 +1508,7 @@ function TranscriptEventRow({
           ) : (
             <div className={cn("whitespace-pre-wrap break-words", compact ? "text-(length:--text-micro)" : "text-xs")}>
               <span className="text-(length:--text-nano) font-semibold uppercase tracking-(--tracking-label) text-muted-foreground/70">
-                {block.label}
+                {eventLabelText(block.label)}
               </span>
               {block.text ? <span className="ml-2">{block.text}</span> : null}
             </div>
