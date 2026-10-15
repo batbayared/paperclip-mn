@@ -53,6 +53,7 @@ import type { RoutineListItem, RoutineVariable } from "@paperclipai/shared";
 import type { FolderListItem } from "@paperclipai/shared";
 import { Tabs } from "@/components/ui/tabs";
 import { tx } from "@/i18n/xo";
+import { xoRoutineHistoryValueLabel } from "@/xo/labels";
 import {
   AllUnfiledBanner,
   BulkBar,
@@ -1202,7 +1203,7 @@ export function Routines() {
                         </SelectTrigger>
                         <SelectContent>
                           {concurrencyPolicies.map((value) => (
-                            <SelectItem key={value} value={value}>{value.replaceAll("_", " ")}</SelectItem>
+                            <SelectItem key={value} value={value}>{xoRoutineHistoryValueLabel(value.replaceAll("_", " "))}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
@@ -1219,7 +1220,7 @@ export function Routines() {
                         </SelectTrigger>
                         <SelectContent>
                           {catchUpPolicies.map((value) => (
-                            <SelectItem key={value} value={value}>{value.replaceAll("_", " ")}</SelectItem>
+                            <SelectItem key={value} value={value}>{xoRoutineHistoryValueLabel(value.replaceAll("_", " "))}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>

@@ -42,7 +42,7 @@ import { copyTextToClipboard } from "@/lib/clipboard";
 import { Link, Navigate, useNavigate, useParams } from "@/lib/router";
 import { tx } from "@/i18n/xo";
 import { XoTrans } from "@/xo/XoTrans";
-import { xoBrandVars } from "@/xo/labels";
+import { xoBrandVars, xoFileTransferPhaseLabel } from "@/xo/labels";
 
 const tabs = ["settings", "access", "conversations", "activity"] as const;
 type ChatTab = (typeof tabs)[number];
@@ -1123,7 +1123,7 @@ function Activity({
                   {item.fileTransfer && (
                     <p className="mt-1 text-xs text-muted-foreground">
                       {item.fileTransfer.filename} —{" "}
-                      {item.fileTransfer.phase.replaceAll("_", " ")}
+                      {xoFileTransferPhaseLabel(item.fileTransfer.phase)}
                     </p>
                   )}
                   {item.detail && (

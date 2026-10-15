@@ -19,7 +19,7 @@ import { queryKeys } from "@/lib/queryKeys";
 import { Link, useSearchParams } from "@/lib/router";
 import { relativeTime } from "@/lib/utils";
 import { tx } from "@/i18n/xo";
-import { xoRunSourceLabel } from "@/xo/labels";
+import { xoRoutineRunSourceLabel, xoRunSourceLabel, xoStatusLabel } from "@/xo/labels";
 
 const ALL = "__all";
 const RUN_LIMIT = 200;
@@ -98,11 +98,11 @@ function RoutineScopedRuns({
                   <StatusBadge status={run.status} />
                 </div>
                 <p className="mt-1 truncate text-sm text-muted-foreground">
-                  {run.trigger?.label ?? readableSource(run.source)}
+                  {run.trigger?.label ?? xoRoutineRunSourceLabel(readableSource(run.source))}
                 </p>
               </div>
               <div className="flex shrink-0 items-center gap-2 text-xs text-muted-foreground sm:justify-end">
-                <span className="capitalize">{readableSource(run.source)}</span>
+                <span className="capitalize">{xoRoutineRunSourceLabel(readableSource(run.source))}</span>
                 <time dateTime={new Date(run.triggeredAt).toISOString()}>
                   {relativeTime(run.triggeredAt)}
                 </time>
@@ -237,7 +237,7 @@ export function AuditRuns({ companyId, routineId }: { companyId: string; routine
               <SelectItem value={ALL}>All statuses</SelectItem>
               {statuses.map((value) => (
                 <SelectItem key={value} value={value}>
-                  {readableSource(value)}
+                  {xoStatusLabel(value, readableSource(value))}
                 </SelectItem>
               ))}
             </SelectContent>

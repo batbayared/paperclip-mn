@@ -913,3 +913,43 @@ export function xoFileOperationLabel(operation: string): string {
     default: return operation.replaceAll("_", " ");
   }
 }
+
+// IssueWorkProductType-ийн жижиг үсгийн шошго (ArtifactsPanel, TaskChatThread). en дээр түүхий утга.
+export function xoWorkProductTypeLabel(type: string): string {
+  const english = type.replaceAll("_", " ");
+  if (!xoIsMn()) return english;
+  switch (type) {
+    case "preview_url": return tx("preview url");
+    case "runtime_service": return tx("runtime service");
+    case "pull_request": return tx("pull request");
+    case "branch": return tx("branch");
+    case "commit": return tx("commit");
+    case "artifact": return tx("artifact");
+    case "document": return tx("document");
+    default: return english;
+  }
+}
+
+// ChatFileTransferPhase (ChatEndpointDetail). en дээр түүхий утга.
+export function xoFileTransferPhaseLabel(phase: string): string {
+  const english = phase.replaceAll("_", " ");
+  if (!xoIsMn()) return english;
+  switch (phase) {
+    case "consent_pending": return tx("consent pending");
+    case "consent_sending": return tx("consent sending");
+    case "consent_unknown": return tx("consent unknown");
+    case "awaiting_consent": return tx("awaiting consent");
+    case "upload_pending": return tx("upload pending");
+    case "uploading": return tx("uploading");
+    case "upload_unknown": return tx("upload unknown");
+    case "file_info_pending": return tx("file info pending");
+    case "file_info_sending": return tx("file info sending");
+    case "file_info_unknown": return tx("file info unknown");
+    case "delivered": return tx("delivered");
+    case "declined": return tx("declined");
+    case "expired": return tx("expired");
+    case "cancelled": return tx("cancelled");
+    case "conflict": return tx("conflict");
+    default: return english;
+  }
+}

@@ -1,5 +1,24 @@
 # XO ахицын бүртгэл
 
+## Ү6 7.27 Шүүлтүүр, routine, файл дамжуулалт, work product-ийн түүхий enum (2026-10-15)
+
+Зорилго: 7.26-ын үлдэгдлээс сонголтын жагсаалт, audit, chat-ын файл дамжуулалт, work product-ийн төрлийг орчуулах. en гаралт хуучнаараа.
+
+BASE 3d1c9feb8.
+
+| Хэсэг | Агуулга |
+|---|---|
+| Засвар | search/SearchFilterBar (төлөв ба зэрэглэлийн сонголт), Routines (concurrency ба catch-up бодлогын SelectItem), audit/AuditRuns (routine run эх сурвалж, heartbeat run төлөвийн шүүлтүүр), apps/chat/ChatEndpointDetail (файл дамжуулалтын phase), ArtifactsPanel ба TaskChatThread (work product төрөл, төлөв, review төлөв) |
+| Helper | labels.ts-д xoWorkProductTypeLabel ба xoFileTransferPhaseLabel нэмсэн; SearchFilterBar-ийн ашиглагдахаа больсон humanize-ийг устгасан (issueFilterLabel-тэй ижил байсан) |
+| Шинэ орчуулга | 16 түлхүүр: work product төрөл (урьдчилан харах холбоос, ажиллах үйлчилгээ, салбар, бүтээгдэхүүн), файл дамжуулалтын 12 phase; «commit»-ийг keep-en.json-д нэмсэн |
+| Каталог | +17 түлхүүр (11604) |
+| Хөтчийн шалгалт | хийгээгүй: 3110 сервер унтарсан хэвээр |
+| Шалгалт | xo:i18n check OK (11604), xo:i18n:test 440, UI 625/6585, tsc цэвэр, brand 477/147 |
+
+Үлдэгдэл:
+- UserProfile event.action, lib/external-objects, FeedCard, SidebarAgents «Built-in agent …», activity-format, issue-change-receipt, attention, review-policy, Pipelines, StatusCardDetailDrawer, RoutineActivityRow, SecretBindingPicker provider, IssueRecoveryActionCard, TaskChatCompactInteractionCard expirationReason, TaskChatBubble reasonCode түүхий enum хэвээр.
+- 7.22–7.27-ын хөтчийн шалгалт сервер асаасны дараа.
+
 ## Ү6 7.26 Inbox, Secrets, live update-ийн түүхий enum (2026-10-15)
 
 Зорилго: 7.25-ын үлдэгдлээс төлөв харуулдаг газруудыг xoStatusLabel / xoHumanizeValue-ээр дамжуулах. en гаралт хуучнаараа.

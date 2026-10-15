@@ -116,6 +116,7 @@ import { queryKeys } from "@/lib/queryKeys";
 import { useQueryClient } from "@tanstack/react-query";
 import { TaskChatPresentationProvider } from "@/components/task-chat/presentation-mode";
 import { tx } from "@/i18n/xo";
+import { xoStatusLabel, xoWorkProductTypeLabel } from "@/xo/labels";
 
 function toMs(value: Date | string | null | undefined): number {
   if (!value) return 0;
@@ -1259,9 +1260,9 @@ export function TaskChatThread(props: TaskChatThreadProps) {
           resourceKind: "deliverable",
           title: workProduct.title,
           subtitle: [
-            workProduct.type.replaceAll("_", " "),
-            workProduct.status,
-            workProduct.reviewState !== "none" ? workProduct.reviewState : null,
+            xoWorkProductTypeLabel(workProduct.type),
+            xoStatusLabel(workProduct.status, workProduct.status),
+            workProduct.reviewState !== "none" ? xoStatusLabel(workProduct.reviewState, workProduct.reviewState) : null,
           ]
             .filter(Boolean)
             .join(" · "),

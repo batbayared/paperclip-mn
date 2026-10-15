@@ -259,6 +259,19 @@ Gates (2026-10-14): xo:i18n:check OK 5894, xo:i18n:test 11 / 129, tsc 0, vitest 
 - company-members.ts-ийн «Board» шошго.
 - en-д ConnectionSetupFlow-ийн брэнд «XO» гэж гарна (en байт ижил зарчмаас ухамсартай гажсан).
 
+## Ү6 7.27-д хөндсөн upstream файлууд
+
+Шүүлтүүр, routine, файл дамжуулалт, work product-ийн түүхий enum. BASE 3d1c9feb8.
+
+| Файл | Өөрчлөлт |
+|---|---|
+| ui/src/components/search/SearchFilterBar.tsx | төлөв ба зэрэглэлийн шошго → xoIssueFilterLabel; humanize устгасан |
+| ui/src/pages/Routines.tsx | concurrency ба catch-up SelectItem → xoRoutineHistoryValueLabel |
+| ui/src/pages/audit/AuditRuns.tsx | run.source → xoRoutineRunSourceLabel; төлөвийн шүүлтүүр → xoStatusLabel |
+| ui/src/pages/apps/chat/ChatEndpointDetail.tsx | fileTransfer.phase → xoFileTransferPhaseLabel |
+| ui/src/components/ArtifactsPanel.tsx | wp.type → xoWorkProductTypeLabel |
+| ui/src/components/TaskChatThread.tsx | work product type → xoWorkProductTypeLabel; status ба reviewState → xoStatusLabel |
+
 ## Ү6 7.26-д хөндсөн upstream файлууд
 
 Inbox, Secrets, live update-ийн түүхий enum. BASE 3125feae8.

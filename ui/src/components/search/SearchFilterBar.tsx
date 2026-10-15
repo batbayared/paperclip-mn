@@ -20,6 +20,7 @@ import {
   type SearchFilters,
 } from "@/lib/search-filters";
 import { tx } from "@/i18n/xo";
+import { xoIssueFilterLabel } from "@/xo/labels";
 
 export interface SearchFilterAgent {
   id: string;
@@ -48,10 +49,6 @@ const OPEN_STATUS_PRESET: IssueStatus[] = ISSUE_STATUSES.filter(
   (status) => status !== "done" && status !== "cancelled",
 );
 
-function humanize(value: string): string {
-  return value.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
-}
-
 function count(record: Record<string, number> | undefined, key: string): number | undefined {
   return record?.[key];
 }
@@ -75,14 +72,14 @@ export function buildSearchFilterOptions({
 }: SearchFilterDataProps): SearchFilterOptionGroups {
   const status: FilterMenuOption[] = ISSUE_STATUSES.map((value) => ({
     value,
-    label: humanize(value),
+    label: xoIssueFilterLabel(value),
     icon: <StatusIcon status={value} />,
     count: count(counts?.status as Record<string, number> | undefined, value),
   }));
 
   const priority: FilterMenuOption[] = ISSUE_PRIORITIES.map((value) => ({
     value,
-    label: humanize(value),
+    label: xoIssueFilterLabel(value),
     icon: <PriorityIcon priority={value} />,
     count: count(counts?.priority as Record<string, number> | undefined, value),
   }));

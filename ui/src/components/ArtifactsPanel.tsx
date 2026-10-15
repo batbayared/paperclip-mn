@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { xoWorkProductTypeLabel } from "@/xo/labels";
 
 interface ArtifactsPanelProps {
   taskId: string;
@@ -212,7 +213,7 @@ export function ArtifactsPanel({ taskId, isAgentWorking, openDocKey, openDocTitl
                       </div>
                       <div className="flex items-center gap-2 mt-1">
                         <span className="text-(length:--text-nano) text-muted-foreground capitalize">
-                          {wp.type.replace(/_/g, " ")}
+                          {xoWorkProductTypeLabel(wp.type)}
                         </span>
                         {showGenerating ? (
                           <Badge variant="ghost" className="[&>svg]:size-2.5 text-(length:--text-nano) px-1.5 bg-blue-500/10 text-blue-600 dark:text-blue-400">
