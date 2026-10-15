@@ -5,6 +5,7 @@ import type {
   ConnectionGrantStatus,
   ToolConnectionCredentialPolicy,
 } from "@paperclipai/shared";
+import { tx } from "@/i18n/xo";
 
 /**
  * Canonical user-facing vocabulary for connection identity (PAP-17835).
@@ -26,6 +27,18 @@ export function connectionTypeLabel(
     : credentialPolicy === "per_agent"
       ? "Dedicated agent"
       : "Company";
+}
+
+/** XO: localized display form of connectionTypeLabel (comparisons keep the English label). */
+export function connectionTypeDisplayLabel(credentialPolicy: ToolConnectionCredentialPolicy): string {
+  switch (connectionTypeLabel(credentialPolicy)) {
+    case "Personal":
+      return tx("Personal");
+    case "Dedicated agent":
+      return tx("Dedicated agent");
+    default:
+      return tx("Company");
+  }
 }
 
 const COMPANY_NAME_SUFFIX = " for the company";
@@ -57,15 +70,15 @@ export function connectionNameForCredentialPolicy(
 export function grantStatusLabel(status: ConnectionGrantStatus | null): string {
   switch (status) {
     case "active":
-      return "Connected";
+      return tx("Connected");
     case "needs_reauthorization":
-      return "Needs attention";
+      return tx("Needs attention");
     case "expired":
-      return "Expired";
+      return tx("Expired");
     case "revoked":
-      return "Revoked";
+      return tx("Revoked");
     default:
-      return "Not connected";
+      return tx("Not connected");
   }
 }
 
@@ -96,9 +109,9 @@ export function grantAccountLabel(
 ): string {
   const tenantName = grant?.providerTenant?.name?.trim();
   if (tenantName) return tenantName;
-  if (grant?.kind === "user") return options.subjectLabel?.trim() || "Connected account";
-  if (grant?.kind === "agent") return options.subjectLabel?.trim() || "Dedicated account";
-  return "Shared credential";
+  if (grant?.kind === "user") return options.subjectLabel?.trim() || tx("Connected account");
+  if (grant?.kind === "agent") return options.subjectLabel?.trim() || tx("Dedicated account");
+  return tx("Shared credential");
 }
 
 /**
@@ -108,8 +121,10 @@ export function grantAccountLabel(
  */
 export function audienceSummary(grant: Pick<ConnectionGrant, "members"> | null): string {
   const count = grant?.members?.length ?? 0;
-  if (count === 0) return "All organization members";
-  return `${count} selected ${count === 1 ? "member" : "members"}`;
+  if (count === 0) return tx("All organization members");
+  return count === 1
+    ? tx("{{n}} selected member", { n: count })
+    : tx("{{n}} selected members", { n: count });
 }
 
 export function audienceUserIds(grant: Pick<ConnectionGrant, "members"> | null): Set<string> {

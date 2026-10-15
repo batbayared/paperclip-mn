@@ -9,6 +9,7 @@ import {
   writeFolderViewerStateToSearch,
   writeFileViewerStateToSearch,
 } from "@/context/FileViewerContext";
+import { tx } from "@/i18n/xo";
 
 export interface WorkspaceFileLinkProps {
   workspaceFileRef: ParsedWorkspaceFileRef;
@@ -34,15 +35,19 @@ export function WorkspaceFileLink({
   const display = typeof label !== "undefined" ? label : formatWorkspaceFileRefDisplay(workspaceFileRef);
   const canOpen = !!(onOpen || viewer);
   const isDirectory = workspaceFileRef.resourceKind === "directory" || workspaceFileRef.path.endsWith("/");
-  const lineSuffix = workspaceFileRef.line
-    ? ` line ${workspaceFileRef.line}${workspaceFileRef.column ? ` column ${workspaceFileRef.column}` : ""}`
-    : "";
+  const fileLocation = workspaceFileRef.line
+    ? workspaceFileRef.column
+      ? tx("{{path}} line {{line}} column {{column}}", { path: workspaceFileRef.path, line: workspaceFileRef.line, column: workspaceFileRef.column })
+      : tx("{{path}} line {{line}}", { path: workspaceFileRef.path, line: workspaceFileRef.line })
+    : workspaceFileRef.path;
   const ariaLabel = canOpen
-    ? `Open ${workspaceFileRef.path}${lineSuffix} in the ${isDirectory ? "workspace browser" : "file viewer"}`
-    : `Workspace ${isDirectory ? "folder" : "file"} ${workspaceFileRef.path}${lineSuffix}`;
-  const tooltip = title ?? (canOpen
-    ? `Open ${workspaceFileRef.path}${lineSuffix} in the ${isDirectory ? "workspace browser" : "file viewer"}`
-    : `Workspace ${isDirectory ? "folder" : "file"} ${workspaceFileRef.path}${lineSuffix}`);
+    ? isDirectory
+      ? tx("Open {{location}} in the workspace browser", { location: fileLocation })
+      : tx("Open {{location}} in the file viewer", { location: fileLocation })
+    : isDirectory
+      ? tx("Workspace folder {{location}}", { location: fileLocation })
+      : tx("Workspace file {{location}}", { location: fileLocation });
+  const tooltip = title ?? ariaLabel;
 
   const deepLinkSearch = isDirectory
     ? writeFolderViewerStateToSearch(location.search, {

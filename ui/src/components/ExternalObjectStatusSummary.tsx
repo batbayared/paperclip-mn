@@ -1,4 +1,5 @@
 import type { ExternalObjectSummary } from "@paperclipai/shared";
+import { tx } from "@/i18n/xo";
 import {
   dominantExternalObjectTone,
   externalObjectCategoryLabel,
@@ -34,9 +35,9 @@ function buildBreakdownTitle(summary: ExternalObjectSummary): string {
     if (!count) continue;
     parts.push(`${count} ${externalObjectCategoryLabel(category).toLowerCase()}`);
   }
-  if (summary.staleCount > 0) parts.push(`${summary.staleCount} stale`);
-  parts.push(`${summary.total} total`);
-  return `External objects: ${parts.join(", ")}`;
+  if (summary.staleCount > 0) parts.push(tx("{{n}} stale", { n: summary.staleCount }));
+  parts.push(tx("{{n}} total", { n: summary.total }));
+  return tx("External objects: {{list}}", { list: parts.join(", ") });
 }
 
 /**

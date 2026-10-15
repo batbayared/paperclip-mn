@@ -2,26 +2,39 @@ import {
   codexLocalReasoningEffortsForModel,
   type CodexLocalReasoningEffort,
 } from "@paperclipai/adapter-codex-local";
+import { tx } from "@/i18n/xo";
 
-const CODEX_REASONING_EFFORT_LABELS: Record<CodexLocalReasoningEffort, string> = {
-  minimal: "Minimal",
-  low: "Low",
-  medium: "Medium",
-  high: "High",
-  xhigh: "X-High",
-  max: "Max",
-  ultra: "Ultra",
-};
+// XO: labels resolve at call time so they follow the active locale (en output unchanged).
+function codexReasoningEffortLabel(effort: CodexLocalReasoningEffort): string {
+  switch (effort) {
+    case "minimal":
+      return tx("Minimal");
+    case "low":
+      return tx("Low");
+    case "medium":
+      return tx("Medium");
+    case "high":
+      return tx("High");
+    case "xhigh":
+      return tx("X-High");
+    case "max":
+      return tx("Max");
+    case "ultra":
+      return tx("Ultra");
+    default:
+      return effort;
+  }
+}
 
 export function codexReasoningEffortOptions(
   model: string | null | undefined,
-  defaultLabel = "Default",
+  defaultLabel = tx("Default"),
 ) {
   return [
     { value: "", label: defaultLabel },
     ...codexLocalReasoningEffortsForModel(model).map((value) => ({
       value,
-      label: CODEX_REASONING_EFFORT_LABELS[value],
+      label: codexReasoningEffortLabel(value),
     })),
   ];
 }

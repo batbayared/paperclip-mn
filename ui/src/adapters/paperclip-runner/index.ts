@@ -551,7 +551,7 @@ function parseQuestionSet(value: unknown): PaperclipQuestionSet | null {
     const parsedQuestion: PaperclipQuestion = {
       id: text(question.id, `question-${questionIndex + 1}`).slice(0, 160),
       ...(nullableText(question.header) ? { header: text(question.header).slice(0, 1_000) } : {}),
-      prompt: text(question.prompt, `Question ${questionIndex + 1}`).slice(0, 4_000),
+      prompt: text(question.prompt, tx("Question {{n}}", { n: questionIndex + 1 })).slice(0, 4_000),
       ...(nullableText(question.helpText) ? { helpText: text(question.helpText).slice(0, 4_000) } : {}),
       required: question.required === true,
       answerMode,
@@ -749,7 +749,7 @@ function parsePrpEvent(
   }
   if (eventType === "run.terminal") return [runTerminalEntry(payload, ts)];
   if (eventType === "harness.diagnostic" || eventType === "runner.diagnostic" || eventType === "session.failed" || eventType === "mcp_app.failed") {
-    return [{ kind: "system", ts, text: `Runner: ${text(payload.message, text(payload.code, eventType))}` }];
+    return [{ kind: "system", ts, text: tx("Runner: {{message}}", { message: text(payload.message, text(payload.code, eventType)) }) }];
   }
   return [];
 }

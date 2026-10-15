@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { MarkdownBody } from "@/components/MarkdownBody";
 import type { TaskChatThinkingItem } from "./task-chat-model";
 import { flattenSelfTalk } from "./transcript-adapter";
+import { tx } from "@/i18n/xo";
 
 /** Provider-authored reasoning summaries and deltas; never reconstructed hidden reasoning. */
 export function TaskChatThinking({
@@ -23,10 +24,11 @@ export function TaskChatThinking({
   const [open, setOpen] = useState(defaultOpen ?? false);
   const body = item.lines.join("\n").trim();
   const preview = flattenSelfTalk(body);
-  const baseLabel = item.channel === "detail" ? "Reasoning detail" : "Reasoning";
+  const isDetail = item.channel === "detail";
+  const baseLabel = isDetail ? tx("Reasoning detail") : tx("Reasoning");
   const label = active
-    ? body ? `${baseLabel}…` : "Thinking…"
-    : item.summaryLabel ?? (body ? baseLabel : "Thought");
+    ? body ? (isDetail ? tx("Reasoning detail…") : tx("Reasoning…")) : tx("Thinking…")
+    : item.summaryLabel ?? (body ? baseLabel : tx("Thought"));
 
   if (body && !active) {
     return (
@@ -68,7 +70,9 @@ export function TaskChatThinking({
       <button
         type="button"
         aria-expanded={open}
-        aria-label={`${open ? "Collapse" : "Expand"} ${baseLabel.toLowerCase()}: ${preview}`}
+        aria-label={isDetail
+          ? open ? tx("Collapse reasoning detail: {{preview}}", { preview }) : tx("Expand reasoning detail: {{preview}}", { preview })
+          : open ? tx("Collapse reasoning: {{preview}}", { preview }) : tx("Expand reasoning: {{preview}}", { preview })}
         onClick={() => setOpen((value) => !value)}
         className={cn("group/thinking -mx-1.5 flex w-full min-w-0 max-w-full items-center gap-2 overflow-hidden rounded-sm px-1.5 py-0.5 text-left font-normal text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring", rowClassName)}
       >

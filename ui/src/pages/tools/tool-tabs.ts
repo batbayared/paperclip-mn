@@ -4,6 +4,7 @@ import {
   Layers,
   Network,
 } from "lucide-react";
+import { tx } from "@/i18n/xo";
 
 /**
  * The Advanced door is mounted under `/apps/advanced` (PAP-10862, plan D8).
@@ -44,4 +45,20 @@ export function isAdvancedSetupTab(tab: ToolTabKey): boolean {
 /** Developer tabs hidden behind an experimental flag (gated in the sidebar). */
 export function isExperimentalToolTab(tab: ToolTabKey): boolean {
   return tab === "smoke-lab";
+}
+
+/** XO: localized label for any Advanced/developer tab (the tab arrays stay English). */
+export function toolTabDisplayLabel(tab: ToolTabKey): string {
+  switch (tab) {
+    case "paste-config":
+      return tx("Paste a config");
+    case "gateways":
+      return tx("Gateways");
+    case "profiles":
+      return tx("Profiles");
+    case "smoke-lab":
+      return tx("Smoke Lab");
+    default:
+      return tab;
+  }
 }

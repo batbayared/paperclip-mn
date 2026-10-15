@@ -1,3 +1,4 @@
+import { tx } from "@/i18n/xo";
 import type { ExecutionReconciliation } from "@paperclipai/shared";
 import type {
   AcceptedPlanDecompositionSummary,
@@ -391,7 +392,7 @@ export const issuesApi = {
   interruptLatestQueuedComments: async (id: string, expectedTargetRunId: string | null): Promise<IssueQueuedCommentQueue> => {
     const queue = await issuesApi.getQueuedComments(id);
     if (!queue.queueId || (queue.targetRunId && queue.targetRunId !== expectedTargetRunId)) {
-      throw new Error("The queued messages changed. Refresh and try again.");
+      throw new Error(tx("The queued messages changed. Refresh and try again."));
     }
     return issuesApi.interruptQueuedComments(id, {
       queueId: queue.queueId, revision: queue.revision, targetRunId: queue.targetRunId,

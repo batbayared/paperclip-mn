@@ -49,23 +49,39 @@ interface SourceMeta {
   label: string;
 }
 
-const SOURCE_META: Record<AttentionSourceKind, SourceMeta> = {
-  approval: { label: "Approval" },
-  decision: { label: "Decision" },
-  issue_thread_interaction: { label: "Decision requested" },
-  join_request: { label: "Join request" },
-  recovery_action: { label: "Recovery" },
-  // Read compatibility for persisted decisions from the retired feature.
-  productivity_review: { label: "Task" },
-  blocker_attention: { label: "Blocked dependency" },
-  review: { label: "Review" },
-  failed_run: { label: "Failed run" },
-  budget_alert: { label: "Budget" },
-  agent_error_alert: { label: "Agent error" },
-};
+/** XO: source labels resolved at call time (never tx at module level). */
+function sourceLabel(kind: AttentionSourceKind): string | null {
+  switch (kind) {
+    case "approval":
+      return tx("Approval");
+    case "decision":
+      return tx("Decision");
+    case "issue_thread_interaction":
+      return tx("Decision requested");
+    case "join_request":
+      return tx("Join request");
+    case "recovery_action":
+      return tx("Recovery");
+    // Read compatibility for persisted decisions from the retired feature.
+    case "productivity_review":
+      return tx("Task");
+    case "blocker_attention":
+      return tx("Blocked dependency");
+    case "review":
+      return tx("Review");
+    case "failed_run":
+      return tx("Failed run");
+    case "budget_alert":
+      return tx("Budget");
+    case "agent_error_alert":
+      return tx("Agent error");
+    default:
+      return null;
+  }
+}
 
 export function sourceMeta(kind: AttentionSourceKind): SourceMeta {
-  return SOURCE_META[kind] ?? { label: kind.replaceAll("_", " ") };
+  return { label: sourceLabel(kind) ?? kind.replaceAll("_", " ") };
 }
 
 interface SeverityStyle {
@@ -75,15 +91,30 @@ interface SeverityStyle {
   label: string;
 }
 
-const SEVERITY_STYLE: Record<AttentionSeverity, SeverityStyle> = {
-  critical: { accent: "bg-red-500", dot: "bg-red-500", label: "Critical" },
-  high: { accent: "bg-orange-500", dot: "bg-orange-500", label: "High" },
-  medium: { accent: "bg-yellow-500", dot: "bg-yellow-500", label: "Medium" },
-  low: { accent: "bg-blue-500", dot: "bg-blue-500", label: "Low" },
+const SEVERITY_STYLE: Record<AttentionSeverity, Omit<SeverityStyle, "label">> = {
+  critical: { accent: "bg-red-500", dot: "bg-red-500" },
+  high: { accent: "bg-orange-500", dot: "bg-orange-500" },
+  medium: { accent: "bg-yellow-500", dot: "bg-yellow-500" },
+  low: { accent: "bg-blue-500", dot: "bg-blue-500" },
 };
 
+/** XO: localized severity label (resolved at call time). */
+function severityLabel(severity: AttentionSeverity): string {
+  switch (severity) {
+    case "critical":
+      return tx("Critical");
+    case "high":
+      return tx("High");
+    case "medium":
+      return tx("Medium");
+    default:
+      return tx("Low");
+  }
+}
+
 export function severityStyle(severity: AttentionSeverity): SeverityStyle {
-  return SEVERITY_STYLE[severity] ?? SEVERITY_STYLE.low;
+  if (SEVERITY_STYLE[severity]) return { ...SEVERITY_STYLE[severity], label: severityLabel(severity) };
+  return { ...SEVERITY_STYLE.low, label: severityLabel("low") };
 }
 
 // ---------------------------------------------------------------------------
@@ -384,9 +415,9 @@ export function buildDeskShelves(items: AttentionItem[], now: number): DeskShelf
   const earlier = rest.filter((item) => !attentionIsNewToday(item, now));
 
   const shelves: DeskShelf[] = [];
-  if (decideNow.length > 0) shelves.push({ key: "desk:decide-now", label: "Decide now", items: decideNow });
-  if (newToday.length > 0) shelves.push({ key: "desk:new-today", label: "New today", items: newToday });
-  if (earlier.length > 0) shelves.push({ key: "desk:earlier", label: "Earlier", items: earlier });
+  if (decideNow.length > 0) shelves.push({ key: "desk:decide-now", label: tx("Decide now"), items: decideNow });
+  if (newToday.length > 0) shelves.push({ key: "desk:new-today", label: tx("New today"), items: newToday });
+  if (earlier.length > 0) shelves.push({ key: "desk:earlier", label: tx("Earlier"), items: earlier });
   return shelves;
 }
 
@@ -823,12 +854,18 @@ export function planAttentionRenderRows(options: {
 const DATE_BUCKET_ORDER = ["today", "yesterday", "this_week", "earlier"] as const;
 type DateBucket = (typeof DATE_BUCKET_ORDER)[number];
 
-const DATE_BUCKET_LABELS: Record<DateBucket, string> = {
-  today: "Today",
-  yesterday: "Yesterday",
-  this_week: "This week",
-  earlier: "Earlier",
-};
+function dateBucketLabel(bucket: DateBucket): string {
+  switch (bucket) {
+    case "today":
+      return tx("Today");
+    case "yesterday":
+      return tx("Yesterday");
+    case "this_week":
+      return tx("This week");
+    default:
+      return tx("Earlier");
+  }
+}
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
@@ -845,13 +882,6 @@ export function attentionDateBucket(activityAt: string, now: number): DateBucket
   if (ts >= todayStart - 6 * MS_PER_DAY) return "this_week";
   return "earlier";
 }
-
-const SEVERITY_LABEL: Record<AttentionSeverity, string> = {
-  critical: "Critical",
-  high: "High",
-  medium: "Medium",
-  low: "Low",
-};
 
 /**
  * Bucket items into ordered sections. Item order *within* each group is
@@ -881,7 +911,7 @@ export function groupAttentionItems(
     }
     return DATE_BUCKET_ORDER.filter((bucket) => buckets.has(bucket)).map((bucket) => ({
       key: `date:${bucket}`,
-      label: DATE_BUCKET_LABELS[bucket],
+      label: dateBucketLabel(bucket),
       items: buckets.get(bucket)!,
     }));
   }
@@ -895,7 +925,7 @@ export function groupAttentionItems(
     }
     return ALL_SEVERITIES.filter((s) => buckets.has(s)).map((severity) => ({
       key: `severity:${severity}`,
-      label: SEVERITY_LABEL[severity],
+      label: severityLabel(severity),
       items: buckets.get(severity)!,
     }));
   }
@@ -909,7 +939,7 @@ export function groupAttentionItems(
         ? { key: `type:${item.sourceKind}`, label: sourceMeta(item.sourceKind).label }
         : item.project
           ? { key: `project:${item.project.id}`, label: item.project.name }
-          : { key: `project:${NO_GROUP_SENTINEL}`, label: "No project" };
+          : { key: `project:${NO_GROUP_SENTINEL}`, label: tx("No project") };
     const existing = groups.get(resolved.key);
     const ts = attentionActivityTimestamp(item);
     if (existing) {

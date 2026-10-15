@@ -9,6 +9,7 @@ import {
   type TrustAuthorizationPolicy,
   type TrustPreset,
 } from "@paperclipai/shared";
+import { tx } from "@/i18n/xo";
 
 export type LowTrustBoundaryTarget =
   | { type: "project"; id: string }
@@ -163,11 +164,11 @@ export function summarizeLowTrustBoundaryTarget(
   boundary: LowTrustBoundary | null | undefined,
 ) {
   const target = getSingleLowTrustBoundaryTarget(boundary);
-  if (target?.type === "project") return `Project ${target.id.slice(0, 8)}`;
-  if (target?.type === "root_issue") return `Root issue ${target.id.slice(0, 8)}`;
-  if (target?.type === "issue") return `Issue ${target.id.slice(0, 8)}`;
-  if (!boundary || countBoundaryTargets(boundary) === 0) return "No boundary selected";
-  return `${countBoundaryTargets(boundary)} boundaries`;
+  if (target?.type === "project") return tx("Project {{id}}", { id: target.id.slice(0, 8) });
+  if (target?.type === "root_issue") return tx("Root issue {{id}}", { id: target.id.slice(0, 8) });
+  if (target?.type === "issue") return tx("Issue {{id}}", { id: target.id.slice(0, 8) });
+  if (!boundary || countBoundaryTargets(boundary) === 0) return tx("No boundary selected");
+  return tx("{{n}} boundaries", { n: countBoundaryTargets(boundary) });
 }
 
 export function lowTrustBoundaryHasScope(boundary: LowTrustBoundary | null | undefined) {
@@ -176,6 +177,6 @@ export function lowTrustBoundaryHasScope(boundary: LowTrustBoundary | null | und
 
 export function sourceTrustLabel(sourceTrust: SourceTrustMetadata | null | undefined) {
   if (!sourceTrust || sourceTrust.preset !== LOW_TRUST_REVIEW_PRESET) return null;
-  if (sourceTrust.disposition === "promoted") return "Promoted from low-trust";
-  return "Low-trust source";
+  if (sourceTrust.disposition === "promoted") return tx("Promoted from low-trust");
+  return tx("Low-trust source");
 }

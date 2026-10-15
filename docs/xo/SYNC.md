@@ -259,6 +259,24 @@ Gates (2026-10-14): xo:i18n:check OK 5894, xo:i18n:test 11 / 129, tsc 0, vitest 
 - company-members.ts-ийн «Board» шошго.
 - en-д ConnectionSetupFlow-ийн брэнд «XO» гэж гарна (en байт ижил зарчмаас ухамсартай гажсан).
 
+## Ү6 7.18-д хөндсөн upstream файлууд
+
+Tier-гүй .ts helper, 7.17-ийн үлдэгдэл. BASE 3446eee56.
+
+| Файл | Өөрчлөлт |
+|---|---|
+| ui/src/components/{ExternalObjectPill, ExternalObjectStatusSummary}.tsx | T1; шошго helper |
+| ui/src/components/task-chat/{status-whimsy.ts, TaskChatThinking.tsx}, ui/src/components/transcript/native-run-events.ts, ui/src/adapters/{paperclip-runner/index.ts, transcript.ts} | tx, switch helper |
+| ui/src/lib/{attention, blockedInbox, external-objects, issue-change-receipt, issue-chat-messages, system-notice-comment, system-notice-humanizer, pipeline-learnings, pipeline-references, routine-run-display, runRetryState, wait-for-stopped-runs, comment-submit-result, issue-timeline-events}.ts | Record → switch helper; tx |
+| ui/src/lib/{utils, assignees, reusable-execution-workspaces, activity-format, issueDetailBreadcrumb, interaction-audience}.ts | thunk Record, tx; «You» харьцуулалт |
+| ui/src/lib/{trust-policy-ui, oauthHandoff, secret-delivery, codex-reasoning-effort, company-export-selection, tool-installs, adapter-test-environment, saved-provider-credentials}.ts | tx; INSTALL_ALL_WARNING → installAllWarning() |
+| ui/src/api/{agents, issues}.ts | client мессеж tx |
+| ui/src/pages/apps/{connection-identity, gateways/gateway-tabs, chat/chat-setup-error, chat/github-private-key-file}.ts, ui/src/pages/tools/{tool-tabs, profiles/profile-model}.ts, ui/src/pages/StatusCards/format.ts, ui/src/plugins/bridge-init.ts | шошго helper; tx |
+| ui/src/pages/{Inbox, CompanyExport, apps/Connections}.tsx, ui/src/components/{AppsSidebar, AppConnectionSidebar}(.production).tsx, ui/src/features/connections/ConnectionSetupFlow.tsx | шинэ helper-ийг дуудна |
+| ui/src/components/{SidePanelTabs, SidePanelTab, ArtifactFileChip, WorkspaceFileLink, BudgetSidebarMarker, FoldCurtain, RunChatSurface, CollectionToolbar, CopyText, SearchableSelect, ReusableExecutionWorkspaceSelect}.tsx, environment-variables-editor/model.ts, ai-connections/useLocalAiLogin.ts | tx |
+| ui/src/components/BlockedInboxView.tsx | board эзэмшигчийн «Board» шошго tx |
+| ui/src/hooks/{useDocumentAnnotationMutations, useResourceMemberships, useRetryNowMutation, useIssueExternalObjects}.ts | toast, мессеж tx |
+
 ## Ү6 7.17-д хөндсөн upstream файлууд
 
 Tier-гүй үлдсэн .tsx, .ts. BASE e42211749.

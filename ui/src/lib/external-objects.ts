@@ -15,6 +15,8 @@ import {
   XCircle,
   type LucideIcon,
 } from "lucide-react";
+import { tx } from "@/i18n/xo";
+import { resolveLocale } from "@/xo/locale";
 import { GithubIcon } from "@/components/icons/github-icon";
 import type {
   ExternalObjectLivenessState,
@@ -74,34 +76,51 @@ export function externalObjectIconForLiveness(liveness: string): LucideIcon | nu
   return null;
 }
 
-const CATEGORY_LABELS: Record<string, string> = {
-  unknown: "Not yet resolved",
-  open: "Open",
-  waiting: "Waiting",
-  running: "Running",
-  succeeded: "Succeeded",
-  failed: "Failed",
-  blocked: "Blocked",
-  closed: "Closed",
-  archived: "Archived",
-  auth_required: "Authorization required",
-  unreachable: "Unreachable",
-};
-
 export function externalObjectCategoryLabel(category: string): string {
-  return CATEGORY_LABELS[category] ?? category.replace(/_/g, " ");
+  switch (category) {
+    case "unknown":
+      return tx("Not yet resolved");
+    case "open":
+      // XO: "Open" is the «Нээх» verb key; the status adjective uses its own key.
+      return resolveLocale() === "mn" ? tx("Open (item status)") : "Open";
+    case "waiting":
+      return tx("Waiting");
+    case "running":
+      return tx("Running");
+    case "succeeded":
+      return tx("Succeeded");
+    case "failed":
+      return tx("Failed");
+    case "blocked":
+      return tx("Blocked");
+    case "closed":
+      return tx("Closed");
+    case "archived":
+      return tx("Archived");
+    case "auth_required":
+      return tx("Authorization required");
+    case "unreachable":
+      return tx("Unreachable");
+    default:
+      return category.replace(/_/g, " ");
+  }
 }
 
-const LIVENESS_LABELS: Record<string, string> = {
-  unknown: "Not yet refreshed",
-  fresh: "Fresh",
-  stale: "Stale",
-  auth_required: "Requires auth",
-  unreachable: "Unreachable",
-};
-
 export function externalObjectLivenessLabel(liveness: string): string {
-  return LIVENESS_LABELS[liveness] ?? liveness.replace(/_/g, " ");
+  switch (liveness) {
+    case "unknown":
+      return tx("Not yet refreshed");
+    case "fresh":
+      return tx("Fresh");
+    case "stale":
+      return tx("Stale");
+    case "auth_required":
+      return tx("Requires auth");
+    case "unreachable":
+      return tx("Unreachable");
+    default:
+      return liveness.replace(/_/g, " ");
+  }
 }
 
 export function externalObjectDisplayStatusLabel(input: {
@@ -116,7 +135,7 @@ export function externalObjectDisplayStatusLabel(input: {
   const isGenericUrl = input.providerKey === "url" && input.objectType === "link";
   const hasKnownObjectType = Boolean(input.providerKey && input.objectType);
   if (input.statusCategory === "unknown" && hasKnownObjectType && !isGenericUrl) {
-    if (input.liveness === "fresh") return "Status unavailable";
+    if (input.liveness === "fresh") return tx("Status unavailable");
     return externalObjectLivenessLabel(input.liveness);
   }
   return externalObjectCategoryLabel(input.statusCategory);
@@ -172,7 +191,7 @@ const PROVIDER_LABELS: Record<string, string> = {
 };
 
 export function externalObjectProviderLabel(providerKey: string | null | undefined): string {
-  if (!providerKey) return "External";
+  if (!providerKey) return tx("External");
   const lookup = PROVIDER_LABELS[providerKey];
   if (lookup) return lookup;
   return providerKey
@@ -181,19 +200,29 @@ export function externalObjectProviderLabel(providerKey: string | null | undefin
     .join(" ");
 }
 
-const OBJECT_TYPE_LABELS: Record<string, string> = {
-  pull_request: "pull request",
-  issue: "issue",
-  deployment: "deployment",
-  workflow_run: "workflow run",
-  ticket: "ticket",
-  lead: "lead",
-  url_link: "URL",
-};
-
 export function externalObjectTypeLabel(objectType: string | null | undefined): string {
-  if (!objectType) return "object";
-  return OBJECT_TYPE_LABELS[objectType] ?? objectType.replace(/_/g, " ");
+  switch (objectType) {
+    case null:
+    case undefined:
+    case "":
+      return tx("object");
+    case "pull_request":
+      return tx("pull request");
+    case "issue":
+      return tx("issue");
+    case "deployment":
+      return tx("deployment");
+    case "workflow_run":
+      return tx("workflow run");
+    case "ticket":
+      return tx("ticket");
+    case "lead":
+      return tx("lead");
+    case "url_link":
+      return "URL";
+    default:
+      return objectType.replace(/_/g, " ");
+  }
 }
 
 export function externalObjectDisplayLabel(

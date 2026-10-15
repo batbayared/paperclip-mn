@@ -1,4 +1,5 @@
 import type { Issue } from "@paperclipai/shared";
+import { tx } from "@/i18n/xo";
 
 type IssueDetailSource = "issues" | "inbox";
 
@@ -263,7 +264,16 @@ export function readIssueDetailBreadcrumb(
   state: unknown,
   search?: string,
 ): IssueDetailBreadcrumb | null {
-  return readIssueDetailLocationState(issuePathId, state, search)?.issueDetailBreadcrumb ?? null;
+  const breadcrumb = readIssueDetailLocationState(issuePathId, state, search)?.issueDetailBreadcrumb ?? null;
+  return breadcrumb ? { ...breadcrumb, label: displayIssueDetailBreadcrumbLabel(breadcrumb.label) } : null;
+}
+
+// Stored labels stay English ("Inbox"/"Tasks") because inferIssueDetailSource
+// compares them; translate only for display.
+function displayIssueDetailBreadcrumbLabel(label: string): string {
+  if (label === "Inbox") return tx("Inbox");
+  if (label === "Tasks") return tx("Tasks");
+  return label;
 }
 
 export function shouldArmIssueDetailInboxQuickArchive(state: unknown): boolean {

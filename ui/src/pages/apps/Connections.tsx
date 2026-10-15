@@ -46,7 +46,7 @@ import {
   type AppGalleryDisplayEntry,
 } from "./app-definition-display";
 import { useReviewCount } from "./useReviewCount";
-import { connectionNameForCredentialPolicy, connectionTypeLabel } from "./connection-identity";
+import { connectionNameForCredentialPolicy, connectionTypeDisplayLabel, connectionTypeLabel } from "./connection-identity";
 import {
   ConnectionOwnerIdentity,
   connectionDisplayNameForOwner,
@@ -465,7 +465,7 @@ export function Connections() {
                       </td>
                       <td className="px-4 py-3">
                         <span className="text-xs font-medium text-foreground">
-                          {connection ? connectionTypeLabel(connection.credentialPolicy) : "—"}
+                          {connection ? connectionTypeDisplayLabel(connection.credentialPolicy) : "—"}
                         </span>
                       </td>
                       <td className="px-4 py-3">

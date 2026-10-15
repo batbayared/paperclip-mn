@@ -5,6 +5,7 @@ import { authApi } from "@/api/auth";
 import { documentAnnotationsApi, type DocumentAnnotationTarget } from "@/api/document-annotations";
 import { queryKeys } from "@/lib/queryKeys";
 import type { PendingAnchor } from "@/components/DocumentAnnotationLayer";
+import { tx } from "@/i18n/xo";
 
 interface MutationOptions {
   target: DocumentAnnotationTarget;
@@ -26,7 +27,7 @@ export function useDocumentAnnotationMutations(options: MutationOptions) {
   });
   const currentUser = useMemo(() => ({
     id: session?.user?.id ?? null,
-    name: session?.user?.name?.trim() || session?.user?.email?.trim() || "You",
+    name: session?.user?.name?.trim() || session?.user?.email?.trim() || tx("You"),
     image: session?.user?.image ?? null,
   }), [session]);
   const queryKey = useMemo(() => options.target.kind === "routine"
@@ -43,8 +44,8 @@ export function useDocumentAnnotationMutations(options: MutationOptions) {
 
   const createThread = useMutation({
     mutationFn: async (body: string) => {
-      if (!options.pendingAnchor) throw new Error("No selection to anchor to.");
-      if (!options.baseRevisionId) throw new Error("Document has no revision yet.");
+      if (!options.pendingAnchor) throw new Error(tx("No selection to anchor to."));
+      if (!options.baseRevisionId) throw new Error(tx("Document has no revision yet."));
       return documentAnnotationsApi.createForTarget(options.target, {
         baseRevisionId: options.baseRevisionId,
         baseRevisionNumber: options.baseRevisionNumber,
@@ -64,7 +65,7 @@ export function useDocumentAnnotationMutations(options: MutationOptions) {
     },
     onError: (error, _body, context) => {
       if (context?.previous) queryClient.setQueryData(queryKey, context.previous);
-      setMutationError(messageFor(error, "Failed to create comment."));
+      setMutationError(messageFor(error, tx("Failed to create comment.")));
     },
     onSuccess: (thread, _body, context) => {
       queryClient.setQueryData<DocumentAnnotationThreadWithComments[]>(queryKey, (current) =>
@@ -89,7 +90,7 @@ export function useDocumentAnnotationMutations(options: MutationOptions) {
     },
     onError: (error, _variables, context) => {
       if (context?.previous) queryClient.setQueryData(queryKey, context.previous);
-      setMutationError(messageFor(error, "Failed to add reply."));
+      setMutationError(messageFor(error, tx("Failed to add reply.")));
     },
     onSuccess: (_comment, variables) => {
       setMutationError(null);
@@ -109,7 +110,7 @@ export function useDocumentAnnotationMutations(options: MutationOptions) {
     },
     onError: (error, _variables, context) => {
       if (context?.previous) queryClient.setQueryData(queryKey, context.previous);
-      setMutationError(messageFor(error, "Failed to update comment status."));
+      setMutationError(messageFor(error, tx("Failed to update comment status.")));
     },
     onSuccess: () => setMutationError(null),
     onSettled: invalidateAll,

@@ -1,4 +1,5 @@
 import { DollarSign } from "lucide-react";
+import { tx } from "@/i18n/xo";
 
 export type BudgetSidebarMarkerLevel = "healthy" | "warning" | "critical";
 
@@ -8,11 +9,16 @@ const levelClasses: Record<BudgetSidebarMarkerLevel, string> = {
   critical: "bg-red-500/90 text-white",
 };
 
-const defaultTitles: Record<BudgetSidebarMarkerLevel, string> = {
-  healthy: "Budget healthy",
-  warning: "Budget warning",
-  critical: "Paused by budget",
-};
+function defaultTitle(level: BudgetSidebarMarkerLevel): string {
+  switch (level) {
+    case "healthy":
+      return tx("Budget healthy");
+    case "warning":
+      return tx("Budget warning");
+    case "critical":
+      return tx("Paused by budget");
+  }
+}
 
 export function BudgetSidebarMarker({
   title,
@@ -21,7 +27,7 @@ export function BudgetSidebarMarker({
   title?: string;
   level?: BudgetSidebarMarkerLevel;
 }) {
-  const accessibleTitle = title ?? defaultTitles[level];
+  const accessibleTitle = title ?? defaultTitle(level);
 
   return (
     <span

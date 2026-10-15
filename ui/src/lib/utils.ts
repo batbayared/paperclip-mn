@@ -3,6 +3,7 @@ import { twMerge } from "tailwind-merge";
 import { deriveAgentUrlKey, deriveProjectUrlKey, normalizeProjectUrlKey, hasNonAsciiContent } from "@paperclipai/shared";
 import type { BillingType, FinanceDirection, FinanceEventKind } from "@paperclipai/shared";
 import { localeTag } from "@/xo/locale";
+import { tx } from "@/i18n/xo";
 import { mnDate, mnDateTime, mnRelative, mnShortDate } from "@/xo/date-format";
 
 export function cn(...inputs: ClassValue[]) {
@@ -163,15 +164,16 @@ export function providerDisplayName(provider: string): string {
 }
 
 export function billingTypeDisplayName(billingType: BillingType): string {
-  const map: Record<BillingType, string> = {
-    metered_api: "Metered API",
-    subscription_included: "Subscription",
-    subscription_overage: "Subscription overage",
-    credits: "Credits",
-    fixed: "Fixed",
-    unknown: "Unknown",
+  const map: Record<BillingType, () => string> = {
+    metered_api: () => tx("Metered API"),
+    subscription_included: () => tx("Subscription"),
+    subscription_overage: () => tx("Subscription overage"),
+    credits: () => tx("Credits"),
+    fixed: () => tx("Fixed"),
+    unknown: () => tx("Unknown"),
   };
-  return map[billingType];
+  // XO: thunk-ууд — tx модулийн түвшинд дуудагдахгүй.
+  return map[billingType]?.();
 }
 
 export function quotaSourceDisplayName(source: string): string {
@@ -179,7 +181,7 @@ export function quotaSourceDisplayName(source: string): string {
     "anthropic-oauth": "Anthropic OAuth",
     "claude-cli": "Claude CLI",
     "bedrock": "AWS Bedrock",
-    "codex-rpc": "Codex app server",
+    "codex-rpc": tx("Codex app server"),
     "codex-wham": "ChatGPT WHAM",
   };
   return map[source] ?? source;
@@ -218,27 +220,27 @@ export function visibleRunCostUsd(
 }
 
 export function financeEventKindDisplayName(eventKind: FinanceEventKind): string {
-  const map: Record<FinanceEventKind, string> = {
-    inference_charge: "Inference charge",
-    platform_fee: "Platform fee",
-    credit_purchase: "Credit purchase",
-    credit_refund: "Credit refund",
-    credit_expiry: "Credit expiry",
-    byok_fee: "BYOK fee",
-    gateway_overhead: "Gateway overhead",
-    log_storage_charge: "Log storage",
-    logpush_charge: "Logpush",
-    provisioned_capacity_charge: "Provisioned capacity",
-    training_charge: "Training",
-    custom_model_import_charge: "Custom model import",
-    custom_model_storage_charge: "Custom model storage",
-    manual_adjustment: "Manual adjustment",
+  const map: Record<FinanceEventKind, () => string> = {
+    inference_charge: () => tx("Inference charge"),
+    platform_fee: () => tx("Platform fee"),
+    credit_purchase: () => tx("Credit purchase"),
+    credit_refund: () => tx("Credit refund"),
+    credit_expiry: () => tx("Credit expiry"),
+    byok_fee: () => tx("BYOK fee"),
+    gateway_overhead: () => tx("Gateway overhead"),
+    log_storage_charge: () => tx("Log storage"),
+    logpush_charge: () => "Logpush",
+    provisioned_capacity_charge: () => tx("Provisioned capacity"),
+    training_charge: () => tx("Training"),
+    custom_model_import_charge: () => tx("Custom model import"),
+    custom_model_storage_charge: () => tx("Custom model storage"),
+    manual_adjustment: () => tx("Manual adjustment"),
   };
-  return map[eventKind];
+  return map[eventKind]?.();
 }
 
 export function financeDirectionDisplayName(direction: FinanceDirection): string {
-  return direction === "credit" ? "Credit" : "Debit";
+  return direction === "credit" ? tx("Credit") : tx("Debit");
 }
 
 /** Build an issue URL using the human-readable identifier when available. */

@@ -39,7 +39,7 @@ export function useRetryNowMutation(
 
   const mutation = useMutation({
     mutationFn: () => {
-      if (!issueId) throw new Error("Missing issue id");
+      if (!issueId) throw new Error(tx("Missing issue id"));
       return issuesApi.retryScheduledRetryNow(issueId);
     },
     onSuccess: (response) => {

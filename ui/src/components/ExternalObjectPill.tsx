@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { tx } from "@/i18n/xo";
 import type {
   ExternalObjectLivenessState,
   ExternalObjectStatusCategory,
@@ -40,7 +41,7 @@ function githubObjectLabel(url: string | null | undefined): string | null {
     const [, owner, repo, kind, number] = parsed.pathname.split("/");
     if (!owner || !repo || !number) return null;
     if (kind === "pull") return `PR ${number}`;
-    if (kind === "issues") return `Issue ${number}`;
+    if (kind === "issues") return tx("Issue {{number}}", { number });
     return null;
   } catch {
     return null;

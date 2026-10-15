@@ -12,6 +12,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { fuzzyTextMatchesQuery, normalizeSearchText, scoreFuzzyTextFields } from "@/lib/searchable-select";
 import { cn } from "@/lib/utils";
+import { tx } from "@/i18n/xo";
 
 export interface SearchableSelectOption<TValue extends string = string> {
   key: string;
@@ -91,9 +92,9 @@ export function SearchableSelect<
   groups,
   onValueChange,
   placeholder,
-  searchPlaceholder = "Search...",
-  emptyMessage = "No options found.",
-  loadingMessage = "Loading...",
+  searchPlaceholder = tx("Search..."),
+  emptyMessage = tx("No options found."),
+  loadingMessage = tx("Loading..."),
   loading = false,
   disabled = false,
   className,

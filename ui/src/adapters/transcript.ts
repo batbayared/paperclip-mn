@@ -1,5 +1,6 @@
 import { redactHomePathUserSegments, redactTranscriptEntryPaths } from "@paperclipai/adapter-utils";
 import type { TranscriptEntry, StdoutLineParser, TranscriptParserSource } from "./types";
+import { tx } from "@/i18n/xo";
 
 export type RunLogChunk = { ts: string; stream: "stdout" | "stderr" | "system"; chunk: string; seq?: number };
 type TranscriptBuildOptions = { censorUsernameInLogs?: boolean };
@@ -66,7 +67,7 @@ function createTranscriptParseErrorEntry(
     kind: "result",
     ts,
     text: redactHomePathUserSegments(
-      `Chat transcript error: ${errorText}. Falling back for line: ${preview}`,
+      tx("Chat transcript error: {{error}}. Falling back for line: {{line}}", { error: errorText, line: preview }),
       redactionOptions,
     ),
     inputTokens: 0,

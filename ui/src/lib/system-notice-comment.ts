@@ -9,14 +9,18 @@ import type {
   SystemNoticeProps,
   SystemNoticeTone,
 } from "../components/SystemNotice";
+import { tx } from "@/i18n/xo";
 
-const TONE_LABEL: Record<SystemNoticeTone, string> = {
-  neutral: "System notice",
-  info: "System notice",
-  success: "System notice",
-  warning: "System warning",
-  danger: "System alert",
-};
+function toneLabel(tone: SystemNoticeTone): string {
+  switch (tone) {
+    case "warning":
+      return tx("System warning");
+    case "danger":
+      return tx("System alert");
+    default:
+      return tx("System notice");
+  }
+}
 
 function metadataRowText(row: { label?: string | null }, fallback: string) {
   const label = row.label?.trim();
@@ -29,19 +33,19 @@ function mapMetadataRow(
 ): SystemNoticeMetadataRow | null {
   switch (row.type) {
     case "text":
-      return { kind: "text", label: metadataRowText(row, "Detail"), value: row.text };
+      return { kind: "text", label: metadataRowText(row, tx("Detail")), value: row.text };
     case "code":
-      return { kind: "code", label: metadataRowText(row, "Code"), value: row.code };
+      return { kind: "code", label: metadataRowText(row, tx("Code")), value: row.code };
     case "key_value":
       return { kind: "text", label: row.label, value: row.value };
     case "issue_link": {
       const identifier = row.identifier ?? null;
       if (!identifier) {
-        return { kind: "text", label: metadataRowText(row, "Task"), value: row.title ?? "unknown" };
+        return { kind: "text", label: metadataRowText(row, tx("Task")), value: row.title ?? tx("unknown") };
       }
       return {
         kind: "issue",
-        label: metadataRowText(row, "Task"),
+        label: metadataRowText(row, tx("Task")),
         identifier,
         href: `/issues/${identifier}`,
         title: row.title ?? undefined,
@@ -51,7 +55,7 @@ function mapMetadataRow(
       const name = row.name?.trim() || row.agentId.slice(0, 8);
       return {
         kind: "agent",
-        label: metadataRowText(row, "Agent"),
+        label: metadataRowText(row, tx("Agent")),
         name,
         href: `/agents/${row.agentId}`,
       };
@@ -61,7 +65,7 @@ function mapMetadataRow(
       const href = runAgentId ? `/agents/${runAgentId}/runs/${row.runId}` : undefined;
       return {
         kind: "run",
-        label: metadataRowText(row, "Run"),
+        label: metadataRowText(row, tx("Run")),
         runId: row.runId,
         href,
         status: row.title ?? undefined,
@@ -96,7 +100,7 @@ export function systemNoticeLabelForTone(
 ): string {
   const trimmed = presentationTitle?.trim();
   if (trimmed && trimmed.length > 0) return trimmed;
-  return TONE_LABEL[tone];
+  return toneLabel(tone);
 }
 
 export function buildSystemNoticeProps(input: {

@@ -1,3 +1,4 @@
+import { tx } from "@/i18n/xo";
 export const chatSetupErrorFallback =
   "Check the required values and provider access, then try again.";
 
@@ -16,7 +17,7 @@ export function sanitizedSetupErrorMessage(
   submittedValues: Record<string, string> | undefined,
 ): string {
   let message = error instanceof Error ? error.message.trim() : "";
-  if (!message) return chatSetupErrorFallback;
+  if (!message) return tx("Check the required values and provider access, then try again.");
 
   const submittedSecrets = Object.values(submittedValues ?? {})
     .flatMap((value) => {
@@ -36,5 +37,5 @@ export function sanitizedSetupErrorMessage(
   }
 
   const normalized = message.replace(/\s+/g, " ").trim();
-  return normalized ? normalized.slice(0, 500) : chatSetupErrorFallback;
+  return normalized ? normalized.slice(0, 500) : tx("Check the required values and provider access, then try again.");
 }

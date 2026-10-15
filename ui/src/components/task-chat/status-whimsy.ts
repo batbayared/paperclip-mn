@@ -9,6 +9,7 @@
  * re-render never reshuffles the word, and it rotates to the next word every
  * ~10s of elapsed run time.
  */
+import { tx } from "@/i18n/xo";
 
 /** Paperclip / analog-office pool — "Clipping" is the guaranteed brand nod.
  * Board-curated round 2 (PAP-349): dropped Cataloguing / Carbon-copying /
@@ -86,6 +87,44 @@ function fnv1a(str: string): number {
   return h >>> 0;
 }
 
+// XO: үгсийн сан (модулийн массив) англиар үлдэнэ; харуулах үед орчуулна. en дээр tx англи түлхүүрээ буцаана.
+function xoWhimsyLabel(english: string): string {
+  switch (english) {
+    case "Clipping": return tx("Clipping");
+    case "Organizing": return tx("Organizing");
+    case "Sorting": return tx("Sorting");
+    case "Synthesizing": return tx("Synthesizing");
+    case "Analyzing": return tx("Analyzing");
+    case "Filing": return tx("Filing");
+    case "Collating": return tx("Collating");
+    case "Stapling": return tx("Stapling");
+    case "Indexing": return tx("Indexing");
+    case "Annotating": return tx("Annotating");
+    case "Drafting": return tx("Drafting");
+    case "Proofreading": return tx("Proofreading");
+    case "Alphabetizing": return tx("Alphabetizing");
+    case "Photocopying": return tx("Photocopying");
+    case "Laminating": return tx("Laminating");
+    case "Hole-punching": return tx("Hole-punching");
+    case "Bookmarking": return tx("Bookmarking");
+    case "Highlighting": return tx("Highlighting");
+    case "Typing": return tx("Typing");
+    case "Trimming": return tx("Trimming");
+    case "Aligning": return tx("Aligning");
+    case "Combining": return tx("Combining");
+    case "Whiteboarding": return tx("Whiteboarding");
+    case "Diagramming": return tx("Diagramming");
+    case "Sketching": return tx("Sketching");
+    case "Labeling": return tx("Labeling");
+    case "Sticky-noting": return tx("Sticky-noting");
+    case "Brewing": return tx("Brewing");
+    case "Tinkering": return tx("Tinkering");
+    case "Distilling": return tx("Distilling");
+    case "Deliberating": return tx("Deliberating");
+    default: return english;
+  }
+}
+
 /**
  * Deterministic whimsical word: the seed fixes the starting offset into the
  * pool and each elapsed `WHIMSY_ROTATE_MS` advances one word. Same seed and
@@ -93,5 +132,5 @@ function fnv1a(str: string): number {
  */
 export function whimsyWord(seed: string, elapsedMs = 0): string {
   const tick = Math.floor(Math.max(0, elapsedMs) / WHIMSY_ROTATE_MS);
-  return WHIMSY_WORDS[(fnv1a(seed) + tick) % WHIMSY_WORDS.length];
+  return xoWhimsyLabel(WHIMSY_WORDS[(fnv1a(seed) + tick) % WHIMSY_WORDS.length]);
 }

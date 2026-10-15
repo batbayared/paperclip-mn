@@ -2,6 +2,7 @@ import type {
   CompanyPortabilityEmbeddedAssetManifestEntry,
   CompanyPortabilityIssueManifestEntry,
 } from "@paperclipai/shared";
+import { tx } from "@/i18n/xo";
 
 /**
  * Export selection is category-driven: instead of per-file checkboxes the
@@ -46,6 +47,26 @@ export const EXPORT_CATEGORY_LABELS: Record<ExportCategoryKey, string> = {
   tasks: "Tasks",
   attachments: "Attachments",
 };
+
+/** XO: localized display label; EXPORT_CATEGORY_LABELS stays the English source map. */
+export function exportCategoryLabel(key: ExportCategoryKey): string {
+  switch (key) {
+    case "agents":
+      return tx("Agents");
+    case "projects":
+      return tx("Projects");
+    case "skills":
+      return tx("Skills");
+    case "routines":
+      return tx("Routines");
+    case "tasks":
+      return tx("Tasks");
+    case "attachments":
+      return tx("Attachments");
+    default:
+      return EXPORT_CATEGORY_LABELS[key] ?? key;
+  }
+}
 
 /** Everything exports by default. */
 export function buildDefaultExportCategorySelection(): ExportCategorySelection {

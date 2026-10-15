@@ -8,6 +8,7 @@ import {
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { tx } from "@/i18n/xo";
 
 interface FoldCurtainProps {
   children: ReactNode;
@@ -62,8 +63,8 @@ export function FoldCurtain({
   children,
   collapsedHeight: explicitCollapsedHeight,
   activationBuffer = 120,
-  moreLabel = "Show more",
-  lessLabel = "Show less",
+  moreLabel = tx("Show more"),
+  lessLabel = tx("Show less"),
   className,
   contentClassName,
   toggleClassName,

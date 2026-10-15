@@ -768,7 +768,7 @@ function readIssueReferences(details: ActivityDetails, key: string): ActivityIss
 
 function formatUserLabel(userId: string | null | undefined, options: ActivityFormatOptions = {}): string {
   if (!userId || userId === "local-board") return tx("Board");
-  if (options.currentUserId && userId === options.currentUserId) return "You";
+  if (options.currentUserId && userId === options.currentUserId) return tx("You");
   const profile = options.userProfileMap?.get(userId);
   if (profile) return profile.label;
   return `user ${userId.slice(0, 5)}`;

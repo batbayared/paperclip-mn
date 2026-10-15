@@ -25,6 +25,7 @@ import { Component, createElement, useEffect, useMemo, useState, type ComponentT
 import * as ReactJsxRuntimeModule from "react/jsx-runtime";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { User } from "lucide-react";
+import { tx } from "@/i18n/xo";
 import {
   FileTree,
   type FileTreeProps as HostFileTreeProps,
@@ -324,7 +325,7 @@ function PluginSdkIssuesList({
   });
 
   if (!companyId) {
-    return createElement("div", { className: "text-sm text-muted-foreground" }, "Select an organization to view tasks.");
+    return createElement("div", { className: "text-sm text-muted-foreground" }, tx("Select an organization to view tasks."));
   }
 
   return createElement(HostIssuesList, {
@@ -347,10 +348,10 @@ function PluginSdkAssigneePicker({
   companyId,
   value,
   onChange,
-  placeholder = "Responsible",
-  noneLabel = "No responsible",
-  searchPlaceholder = "Search responsible...",
-  emptyMessage = "No responsible found.",
+  placeholder = tx("Responsible"),
+  noneLabel = tx("No responsible"),
+  searchPlaceholder = tx("Search responsible..."),
+  emptyMessage = tx("No responsible found."),
   includeUsers = true,
   includeTerminatedAgents = false,
   className,
@@ -457,10 +458,10 @@ function PluginSdkProjectPicker({
   companyId,
   value,
   onChange,
-  placeholder = "Project",
-  noneLabel = "No project",
-  searchPlaceholder = "Search projects...",
-  emptyMessage = "No projects found.",
+  placeholder = tx("Project"),
+  noneLabel = tx("No project"),
+  searchPlaceholder = tx("Search projects..."),
+  emptyMessage = tx("No projects found."),
   includeArchived = false,
   className,
   onConfirm,
@@ -579,8 +580,8 @@ type PluginDataTableProps = {
   emptyMessage?: string;
 };
 
-function PluginSdkDataTable({ columns, rows, loading, emptyMessage = "No rows." }: PluginDataTableProps) {
-  if (loading) return createElement("div", { className: "text-sm text-muted-foreground" }, "Loading...");
+function PluginSdkDataTable({ columns, rows, loading, emptyMessage = tx("No rows.") }: PluginDataTableProps) {
+  if (loading) return createElement("div", { className: "text-sm text-muted-foreground" }, tx("Loading..."));
   if (!rows.length) return createElement("div", { className: "text-sm text-muted-foreground" }, emptyMessage);
   const gridColumns = columns.map((column) => column.width ?? "minmax(0, 1fr)").join(" ");
   return createElement(
@@ -643,7 +644,7 @@ function PluginSdkJsonTree({ data }: { data: unknown }) {
   return createElement("pre", { className: "max-h-80 overflow-auto rounded-md border bg-muted/30 p-2 text-xs" }, JSON.stringify(data, null, 2));
 }
 
-function PluginSdkSpinner({ label = "Loading" }: { size?: "sm" | "md" | "lg"; label?: string }) {
+function PluginSdkSpinner({ label = tx("Loading") }: { size?: "sm" | "md" | "lg"; label?: string }) {
   return createElement("span", {
     className: "inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-muted-foreground/30 border-t-foreground align-middle",
     role: "status",
@@ -660,7 +661,7 @@ class PluginSdkErrorBoundary extends Component<{ children: ReactNode; fallback?:
 
   override render() {
     if (this.state.hasError) {
-      return this.props.fallback ?? createElement("div", { className: "rounded-md border border-destructive/30 p-3 text-sm text-destructive" }, "Plugin UI failed to render.");
+      return this.props.fallback ?? createElement("div", { className: "rounded-md border border-destructive/30 p-3 text-sm text-destructive" }, tx("Plugin UI failed to render."));
     }
     return this.props.children;
   }

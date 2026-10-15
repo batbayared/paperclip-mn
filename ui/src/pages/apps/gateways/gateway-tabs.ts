@@ -1,4 +1,5 @@
 import { Activity, LayoutGrid, KeyRound, Wrench, Boxes } from "lucide-react";
+import { tx } from "@/i18n/xo";
 
 /**
  * Gateway detail tabs (PAP-11200). Terminology is locked by the approved
@@ -24,5 +25,16 @@ export function isGatewayTabKey(value: string | undefined): value is GatewayTabK
 }
 
 export function gatewayTabLabel(tabKey: GatewayTabKey): string {
-  return GATEWAY_TABS.find((tab) => tab.key === tabKey)?.label ?? "Overview";
+  switch (tabKey) {
+    case "apps":
+      return tx("Apps & tools");
+    case "tokens":
+      return tx("Tokens");
+    case "activity":
+      return tx("Activity");
+    case "advanced":
+      return tx("Advanced");
+    default:
+      return tx("Overview");
+  }
 }

@@ -1058,7 +1058,7 @@ export function nativeRunEventsToTranscript(events: readonly HeartbeatRunEvent[]
     entries.push({
       kind: "result",
       ...cumulativeUsageSummary,
-      text: "Provider-reported session-cumulative usage; a per-run delta was unavailable.",
+      text: tx("Provider-reported session-cumulative usage; a per-run delta was unavailable."),
       subtype: "paperclip_runner_session_usage",
       isError: false,
       errors: [],

@@ -9,6 +9,7 @@ import { useSidebar } from "@/context/SidebarContext";
 import { queryKeys } from "@/lib/queryKeys";
 import {
   APP_TABS,
+  appTabLabel,
   BROKER_ONLY_APP_TABS,
   CONNECTED_ONLY_APP_TABS,
   appApplicationTabHref,
@@ -121,7 +122,7 @@ export function AppDetailSidebar(props: AppDetailSidebarProps) {
             <SidebarNavItem
               key={tab.key}
               to={tabHref(props, tab.key)}
-              label={tab.label}
+              label={appTabLabel(tab.key)}
               icon={tab.icon}
               end
               badge={tab.key === "review" && reviewCount > 0 ? reviewCount : undefined}

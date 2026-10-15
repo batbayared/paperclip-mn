@@ -81,7 +81,7 @@ export function groupCatalogByApp(
       const name =
         (tool.applicationId ? applicationsById.get(tool.applicationId) : null) ??
         connectionsById.get(tool.connectionId) ??
-        "Tools";
+        tx("Tools");
       group = {
         appKey,
         applicationId: tool.applicationId,

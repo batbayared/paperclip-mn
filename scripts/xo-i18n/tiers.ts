@@ -559,4 +559,7 @@ export const XO_TRANSFORM_FILES: readonly string[] = [
   "ui/src/components/SwipeToArchive.tsx",
   "ui/src/components/issue-properties/property-picker.tsx",
   "ui/src/components/ProjectRepositoryInput.tsx",
+  // Ү6 7.18 — lib үлдэгдлийн дагалдах .tsx
+  "ui/src/components/ExternalObjectPill.tsx",
+  "ui/src/components/ExternalObjectStatusSummary.tsx",
 ];

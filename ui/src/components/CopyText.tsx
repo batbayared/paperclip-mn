@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { copyTextToClipboard } from "@/lib/clipboard";
+import { tx } from "@/i18n/xo";
 
 interface CopyTextProps {
   text: string;
@@ -21,7 +22,7 @@ export function CopyText({
   className,
   ariaLabel,
   title,
-  copiedLabel = "Copied!",
+  copiedLabel = tx("Copied!"),
 }: CopyTextProps) {
   const [visible, setVisible] = useState(false);
   const [label, setLabel] = useState(copiedLabel);
@@ -35,7 +36,7 @@ export function CopyText({
       await copyTextToClipboard(text);
       setLabel(copiedLabel);
     } catch {
-      setLabel("Copy failed");
+      setLabel(tx("Copy failed"));
     }
     clearTimeout(timerRef.current);
     setVisible(true);

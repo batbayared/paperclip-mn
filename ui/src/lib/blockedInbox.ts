@@ -4,6 +4,7 @@ import type {
   IssueBlockedInboxReason,
   IssueBlockedInboxSeverity,
 } from "@paperclipai/shared";
+import { tx } from "@/i18n/xo";
 
 export type BlockedReasonVariant =
   | "needs_decision"
@@ -46,21 +47,6 @@ export const BLOCKED_VARIANT_LABELS: Record<BlockedReasonVariant, string> = {
   owner_paused: "Owner paused",
 };
 
-const REASON_LABELS: Record<IssueBlockedInboxReason, string> = {
-  pending_board_decision: "Pending board decision",
-  pending_user_decision: "Pending user decision",
-  missing_successful_run_disposition: "Pick disposition",
-  blocked_chain_stalled: "Blocked chain stalled",
-  blocked_by_unassigned_issue: "Unassigned blocker",
-  blocked_by_assigned_backlog_issue: "Parked blocker",
-  blocked_by_cancelled_issue: "Cancelled blocker",
-  in_review_without_action_path: "Review without action path",
-  invalid_review_participant: "Invalid review participant",
-  open_recovery_issue: "Recovery in progress",
-  external_owner_action: "External owner action",
-  blocked_by_uninvokable_assignee: "Owner paused",
-};
-
 const SEVERITY_RANK: Record<IssueBlockedInboxSeverity, number> = {
   critical: 0,
   high: 1,
@@ -75,11 +61,54 @@ export function blockedReasonVariant(reason: IssueBlockedInboxReason): BlockedRe
 }
 
 export function blockedReasonLabel(reason: IssueBlockedInboxReason): string {
-  return REASON_LABELS[reason] ?? "Stopped";
+  switch (reason) {
+    case "pending_board_decision":
+      return tx("Pending board decision");
+    case "pending_user_decision":
+      return tx("Pending user decision");
+    case "missing_successful_run_disposition":
+      return tx("Pick disposition");
+    case "blocked_chain_stalled":
+      return tx("Blocked chain stalled");
+    case "blocked_by_unassigned_issue":
+      return tx("Unassigned blocker");
+    case "blocked_by_assigned_backlog_issue":
+      return tx("Parked blocker");
+    case "blocked_by_cancelled_issue":
+      return tx("Cancelled blocker");
+    case "in_review_without_action_path":
+      return tx("Review without action path");
+    case "invalid_review_participant":
+      return tx("Invalid review participant");
+    case "open_recovery_issue":
+      return tx("Recovery in progress");
+    case "external_owner_action":
+      return tx("External owner action");
+    case "blocked_by_uninvokable_assignee":
+      return tx("Owner paused");
+    default:
+      return tx("Stopped");
+  }
 }
 
+/** XO: localized variant label; BLOCKED_VARIANT_LABELS stays English. */
 export function blockedVariantLabel(variant: BlockedReasonVariant): string {
-  return BLOCKED_VARIANT_LABELS[variant];
+  switch (variant) {
+    case "needs_decision":
+      return tx("Needs decision");
+    case "stalled":
+      return tx("Blocked chain stalled");
+    case "needs_attention":
+      return tx("Needs attention");
+    case "recovery_required":
+      return tx("Recovery required");
+    case "external_wait":
+      return tx("External wait");
+    case "owner_paused":
+      return tx("Owner paused");
+    default:
+      return BLOCKED_VARIANT_LABELS[variant];
+  }
 }
 
 export function blockedSeverityRank(severity: IssueBlockedInboxSeverity): number {
@@ -119,6 +148,23 @@ export const BLOCKED_SORT_OPTIONS: readonly [BlockedInboxSort, string][] = [
   ["most_recent", "Most recent"],
   ["longest_stopped", "Longest stopped"],
 ];
+
+/** XO: localized BLOCKED_GROUP_OPTIONS label (the option array stays English). */
+export function blockedGroupOptionLabel(value: BlockedInboxGroupBy): string {
+  return value === "blocker_type" ? tx("Blocker type") : tx("None");
+}
+
+/** XO: localized BLOCKED_SORT_OPTIONS label (the option array stays English). */
+export function blockedSortOptionLabel(value: BlockedInboxSort): string {
+  switch (value) {
+    case "most_recent":
+      return tx("Most recent");
+    case "longest_stopped":
+      return tx("Longest stopped");
+    default:
+      return tx("Most urgent");
+  }
+}
 
 export interface BlockedInboxGroup {
   variant: BlockedReasonVariant;
@@ -210,7 +256,7 @@ export function groupBlockedInboxRows(
     const list = buckets.get(variant);
     if (!list || list.length === 0) continue;
     const sorted = sortBlockedInboxRows(list, sort);
-    groups.push({ variant, label: BLOCKED_VARIANT_LABELS[variant], rows: sorted });
+    groups.push({ variant, label: blockedVariantLabel(variant), rows: sorted });
   }
   return groups;
 }

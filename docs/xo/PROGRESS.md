@@ -1,5 +1,30 @@
 # XO ахицын бүртгэл
 
+## Ү6 7.18 Tier-гүй .ts helper-ийн англи UI мөр, 7.17-ийн үлдэгдэл (2026-10-15)
+
+Зорилго: tier-гүй .ts helper, hook, api, pages/*.ts-ээс хэрэглэгчид харагдах англи мөрийг орчуулах.
+
+BASE 3446eee56.
+
+| Хэсэг | Агуулга |
+|---|---|
+| Хүрээ | ~70 файл, 5 зэрэгцээ task. tiers.ts «// Ү6 7.18» блокт 2 .tsx (ExternalObjectPill, ExternalObjectStatusSummary); scripts/xo-i18n/tiers-y6-7-18.test.ts. .ts файлд tx-ийг гараар тавьсан |
+| task-chat, adapter | status-whimsy xoWhimsyLabel(), TaskChatThinking, paperclip-runner, transcript fallback |
+| Issue, attention | attention SOURCE_META, blockedInbox (blockedGroupOptionLabel, blockedSortOptionLabel), external-objects, issue-change-receipt, issue-chat-messages, system-notice-*, pipeline-learnings, runRetryState |
+| Apps, tools, api | connection-identity connectionTypeDisplayLabel(), tool-tabs toolTabDisplayLabel(), gateway-tabs, codex-reasoning-effort, tool-installs installAllWarning(), secret-delivery, saved-provider-credentials, oauthHandoff ({{brand}}), api/agents, api/issues |
+| utils, бүрэлдэхүүн | utils (billing, finance thunk), assignees, SidePanelTabs, ArtifactFileChip, WorkspaceFileLink, useResourceMemberships, BudgetSidebarMarker, issueDetailBreadcrumb (хадгалах шошго англиар, харуулахдаа орчуулна) |
+| interaction-audience | «You» харьцуулалтад tx("You")-г нэмсэн (mn-д formatAssigneeUserLabel «Та» буцаадаг) |
+| Хөтчийн шалгалт | /YB/inbox/blocked-д серверээс ирсэн board эзэмшигчийн «Board» шошгыг BlockedInboxView resolveOwnerName() дэлгэцлэхдээ орчуулна (en хэвээр) |
+| Каталог | +251 түлхүүр (11560); «Codex app server», «pull request» keep-en |
+| Шалгалт | xo:i18n check OK (11560), xo:i18n:test 440, UI 6585, tsc цэвэр, brand 477/147 |
+
+Үлдэгдэл (шийдвэргүй, мэдээллийн чанартай):
+- CommentThread, IssuesList, Inbox, LegacyInbox, IssueDetail, Pipelines, SearchFilterBar-д «You»/«Board»/«Me» fallback англиар.
+- IssueFieldChangeReceipt «preview», BlockedReasonChip aria «Reason: …», TaskChatSystemNotice aria «System update: …», IssueDetail «Pause released, but … could not start».
+- xo/labels.ts:715 tx("Import from a configured {{brand}} workspace…") xoBrandVars()-гүй дуудагддаг (defaultVariables-аар ажилладаг).
+- Харьцуулалт, загварт очих текст тул англиар: «Configuration incomplete», «Manual intervention required», successful-run-handoff, agent-onboarding-prompt, skill-create, «No answer»/«Answered questions».
+- process adapter-ийн «Shell Process» шошго англиар.
+
 ## Ү6 7.17 Tier-гүй үлдсэн .tsx ба .ts-ийн англи UI мөр (2026-10-14)
 
 Зорилго: tier-д ороогүй 21 .tsx бүрэлдэхүүн болон tier-гүй .ts helper-үүдийн хэрэглэгчид харагдах англи мөрийг орчуулах.

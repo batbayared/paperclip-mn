@@ -1,4 +1,5 @@
 import { xoLocaleDateTime } from "@/xo/date-format";
+import { tx } from "@/i18n/xo";
 import type { IssueChangeReceiptEntry } from "@paperclipai/shared";
 import { formatReviewPolicyValue } from "./review-policy";
 
@@ -17,34 +18,61 @@ import { formatReviewPolicyValue } from "./review-policy";
  */
 
 /** Field names whose raw ids carry no meaning in a scannable summary. */
-const FIELD_LABELS: Record<string, string> = {
-  assigneeAgentId: "Assignee",
-  assigneeUserId: "Assignee (user)",
-  responsibleUserId: "Responsible user",
-  blockedByIssueIds: "Blockers",
-  labelIds: "Labels",
-  parentId: "Parent",
-  projectId: "Project",
-  goalId: "Goal",
-  workMode: "Work mode",
-  reviewPolicy: "Who can approve",
-  billingCode: "Billing code",
-  checkoutRunId: "Checkout run",
-  executionRunId: "Execution run",
-  hiddenAt: "Hidden",
-  startedAt: "Started",
-  completedAt: "Completed",
-  cancelledAt: "Cancelled",
-  requestDepth: "Request depth",
-  sourceTrust: "Source trust",
-  executionPolicy: "Execution policy",
-  executionWorkspaceId: "Execution workspace",
-  projectWorkspaceId: "Project workspace",
-};
+/** XO: field labels resolved at call time (never tx at module level). */
+function knownFieldLabel(field: string): string | null {
+  switch (field) {
+    case "assigneeAgentId":
+      return tx("Assignee");
+    case "assigneeUserId":
+      return tx("Assignee (user)");
+    case "responsibleUserId":
+      return tx("Responsible user");
+    case "blockedByIssueIds":
+      return tx("Blockers");
+    case "labelIds":
+      return tx("Labels");
+    case "parentId":
+      return tx("Parent");
+    case "projectId":
+      return tx("Project");
+    case "goalId":
+      return tx("Goal");
+    case "workMode":
+      return tx("Work mode");
+    case "reviewPolicy":
+      return tx("Who can approve");
+    case "billingCode":
+      return tx("Billing code");
+    case "checkoutRunId":
+      return tx("Checkout run");
+    case "executionRunId":
+      return tx("Execution run");
+    case "hiddenAt":
+      return tx("Hidden");
+    case "startedAt":
+      return tx("Started");
+    case "completedAt":
+      return tx("Completed");
+    case "cancelledAt":
+      return tx("Cancelled");
+    case "requestDepth":
+      return tx("Request depth");
+    case "sourceTrust":
+      return tx("Source trust");
+    case "executionPolicy":
+      return tx("Execution policy");
+    case "executionWorkspaceId":
+      return tx("Execution workspace");
+    case "projectWorkspaceId":
+      return tx("Project workspace");
+    default:
+      return null;
+  }
+}
 
 /** Human label for a changed field, e.g. `assigneeAgentId` → "Assignee". */
 export function issueChangeFieldLabel(field: string): string {
-  const known = FIELD_LABELS[field];
+  const known = knownFieldLabel(field);
   if (known) return known;
   // camelCase / snake_case → "Sentence case".
   const spaced = field
@@ -70,24 +98,24 @@ export function formatIssueChangeValue(
   // `reviewPolicy` is nullable-by-default: a cleared column means "anyone can
   // approve", not "no value" (PAP-16506), so it resolves before the null branch.
   if (options.field === "reviewPolicy") return formatReviewPolicyValue(value);
-  if (value === null || value === undefined || value === "") return "none";
-  if (typeof value === "boolean") return value ? "yes" : "no";
+  if (value === null || value === undefined || value === "") return tx("none");
+  if (typeof value === "boolean") return value ? tx("yes") : tx("no");
   if (typeof value === "number") return String(value);
 
   if (Array.isArray(value)) {
-    if (value.length === 0) return "none";
+    if (value.length === 0) return tx("none");
     const strings = value.filter((entry): entry is string => typeof entry === "string");
-    if (strings.length !== value.length) return `${value.length} items`;
+    if (strings.length !== value.length) return tx("{{n}} items", { n: value.length });
     return strings.length <= 3
       ? strings.map((id) => shortenId(id)).join(", ")
-      : `${strings.length} items`;
+      : tx("{{n}} items", { n: strings.length });
   }
 
   if (value instanceof Date) return xoLocaleDateTime(value);
 
   if (typeof value === "string") {
     const trimmed = value.trim();
-    if (!trimmed) return "none";
+    if (!trimmed) return tx("none");
     // Ids resolve to names when the directory is loaded; otherwise they shorten.
     const resolved = options.field?.toLowerCase().includes("agent")
       ? options.resolveAgentLabel?.(trimmed)
@@ -103,7 +131,7 @@ export function formatIssueChangeValue(
 
   // Objects (execution policy, workspace settings) are structural — the receipt
   // records that they moved, and the audit log holds the full value.
-  return "updated";
+  return tx("updated");
 }
 
 function truncate(value: string): string {
@@ -165,19 +193,34 @@ export function readIssueChangeReceipt(
 }
 
 /** Authorization reasons, as recorded by the server's write-policy decision. */
-const AUTHORIZATION_REASON_LABELS: Record<string, string> = {
-  allow_visible_issue_write: "default-open write on a visible task",
-  allow_scoped_agent_write: "scoped agent write",
-  allow_board_actor: "board actor",
-  allow_self: "own task",
-  allow_issue_mention_grant: "mention grant",
-  allow_direct_parent_report: "direct parent report",
-  allow_low_trust_boundary: "low-trust boundary allowance",
-  allow_explicit_grant: "explicit permission grant",
-  allow_instance_admin: "instance admin",
-  allow_local_board: "local board",
-  internal_agent_write: "internal agent write",
-};
+function authorizationReasonLabel(reason: string): string | null {
+  switch (reason) {
+    case "allow_visible_issue_write":
+      return tx("default-open write on a visible task");
+    case "allow_scoped_agent_write":
+      return tx("scoped agent write");
+    case "allow_board_actor":
+      return tx("board actor");
+    case "allow_self":
+      return tx("own task");
+    case "allow_issue_mention_grant":
+      return tx("mention grant");
+    case "allow_direct_parent_report":
+      return tx("direct parent report");
+    case "allow_low_trust_boundary":
+      return tx("low-trust boundary allowance");
+    case "allow_explicit_grant":
+      return tx("explicit permission grant");
+    case "allow_instance_admin":
+      return tx("instance admin");
+    case "allow_local_board":
+      return tx("local board");
+    case "internal_agent_write":
+      return tx("internal agent write");
+    default:
+      return null;
+  }
+}
 
 /**
  * Human phrasing for the authorization reason on a write receipt. Unknown
@@ -187,5 +230,5 @@ const AUTHORIZATION_REASON_LABELS: Record<string, string> = {
 export function issueAuthorizationReasonLabel(reason: string | null | undefined): string | null {
   const trimmed = reason?.trim();
   if (!trimmed) return null;
-  return AUTHORIZATION_REASON_LABELS[trimmed] ?? trimmed.replace(/_/g, " ");
+  return authorizationReasonLabel(trimmed) ?? trimmed.replace(/_/g, " ");
 }

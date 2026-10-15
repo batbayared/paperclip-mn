@@ -288,7 +288,10 @@ function resolveOwnerName(
   userLabelById?: ReadonlyMap<string, string>,
 ): { label: string | null; isAgent: boolean } {
   const owner = row.attention.owner;
-  if (owner.label) return { label: owner.label, isAgent: owner.type === "agent" };
+  if (owner.label) {
+    const label = owner.type === "board" && owner.label === "Board" ? tx("Board") : owner.label;
+    return { label, isAgent: owner.type === "agent" };
+  }
   if (owner.agentId) {
     return { label: agentNameById.get(owner.agentId) ?? null, isAgent: true };
   }

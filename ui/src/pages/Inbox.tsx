@@ -20,6 +20,8 @@ import { projectsApi } from "../api/projects";
 import {
   BLOCKED_GROUP_OPTIONS,
   BLOCKED_SORT_OPTIONS,
+  blockedGroupOptionLabel,
+  blockedSortOptionLabel,
   type BlockedInboxGroupBy,
   type BlockedInboxSort,
 } from "../lib/blockedInbox";
@@ -2486,7 +2488,7 @@ function StreamlinedInbox() {
                 </PopoverTrigger>
                 <PopoverContent align="end" className="w-44 p-0">
                   <div className="space-y-0.5 p-2">
-                    {BLOCKED_GROUP_OPTIONS.map(([value, label]) => (
+                    {BLOCKED_GROUP_OPTIONS.map(([value]) => (
                       <button
                         key={value}
                         type="button"
@@ -2496,7 +2498,7 @@ function StreamlinedInbox() {
                         )}
                         onClick={() => setBlockedGroupBy(value)}
                       >
-                        <span>{label}</span>
+                        <span>{blockedGroupOptionLabel(value)}</span>
                         {blockedGroupBy === value ? <Check className="h-3.5 w-3.5" /> : null}
                       </button>
                     ))}
@@ -2532,7 +2534,7 @@ function StreamlinedInbox() {
                 </PopoverTrigger>
                 <PopoverContent align="end" className="w-48 p-0">
                   <div className="space-y-0.5 p-2">
-                    {BLOCKED_SORT_OPTIONS.map(([value, label]) => (
+                    {BLOCKED_SORT_OPTIONS.map(([value]) => (
                       <button
                         key={value}
                         type="button"
@@ -2542,7 +2544,7 @@ function StreamlinedInbox() {
                         )}
                         onClick={() => setBlockedSortBy(value)}
                       >
-                        <span>{label}</span>
+                        <span>{blockedSortOptionLabel(value)}</span>
                         {blockedSortBy === value ? <Check className="h-3.5 w-3.5" /> : null}
                       </button>
                     ))}

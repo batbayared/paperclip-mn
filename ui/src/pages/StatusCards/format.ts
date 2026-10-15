@@ -1,4 +1,5 @@
 import type { StatusCardRefreshPolicy, StatusCardUpdate } from "@paperclipai/shared";
+import { tx } from "@/i18n/xo";
 
 /** "1.1k tok" / "940 tok" — compact token count for footers and chips. */
 export function formatTokens(tokens: number | null | undefined): string | null {
@@ -98,8 +99,8 @@ export function estimateStatusCardCost(policy: StatusCardRefreshPolicy): StatusC
     const cost = `${formatCents(EST_FULL_CENTS)} · ${formatTokens(EST_FULL_TOKENS)}`;
     return {
       cost,
-      primary: `~1 rebuild per refresh ≈ ${cost}`,
-      note: "Manual cards only cost tokens when you press Refresh.",
+      primary: tx("~1 rebuild per refresh ≈ {{cost}}", { cost }),
+      note: tx("Manual cards only cost tokens when you press Refresh."),
     };
   }
 
@@ -109,11 +110,11 @@ export function estimateStatusCardCost(policy: StatusCardRefreshPolicy): StatusC
   if (policy.mode === "interval") {
     const interval = policy.intervalMinutes ?? 15;
     maxPerDay = Math.floor(windowMinutes / interval);
-    cadence = `every ${interval} min`;
+    cadence = tx("every {{n}} min", { n: interval });
   } else {
     const perHour = policy.maxUpdatesPerHour ?? 6;
     maxPerDay = Math.round((windowMinutes / 60) * perHour);
-    cadence = `up to ${perHour}/hour`;
+    cadence = tx("up to {{n}}/hour", { n: perHour });
   }
 
   const cap = policy.dailyTokenCap ?? null;
@@ -123,15 +124,16 @@ export function estimateStatusCardCost(policy: StatusCardRefreshPolicy): StatusC
 
   const tokens = effective * EST_INCREMENTAL_TOKENS;
   const cents = effective * EST_INCREMENTAL_CENTS;
-  const withinHours = policy.activeHours ? " during active hours" : "";
   const cost = `${formatCents(cents)} · ${formatTokens(tokens)}`;
 
   return {
     cost,
-    primary: `Up to ~${effective} updates/day (${cadence}${withinHours}) ≈ ${cost}`,
+    primary: policy.activeHours
+      ? tx("Up to ~{{n}} updates/day ({{cadence}} during active hours) ≈ {{cost}}", { n: effective, cadence, cost })
+      : tx("Up to ~{{n}} updates/day ({{cadence}}) ≈ {{cost}}", { n: effective, cadence, cost }),
     note: cappedByTokenCap
-      ? `Capped by your ${formatTokens(cap!)} daily token cap — the card pauses when it's hit.`
-      : "Only runs when something changed; a cheap no-op check otherwise.",
+      ? tx("Capped by your {{cap}} daily token cap — the card pauses when it's hit.", { cap: formatTokens(cap!) })
+      : tx("Only runs when something changed; a cheap no-op check otherwise."),
   };
 }
 

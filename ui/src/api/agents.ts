@@ -1,3 +1,4 @@
+import { tx } from "@/i18n/xo";
 import type {
   Agent,
   AgentDesiredSkillEntry,
@@ -263,12 +264,12 @@ export const agentsApi = {
     if ("actionId" in result) {
       if (result.status === "failed" || result.status === "cancelled") {
         throw new Error(
-          "This retry could not start. Open the task to review its current access and recovery state.",
+          tx("This retry could not start. Open the task to review its current access and recovery state."),
         );
       }
       return { runId: result.runId, issueId: result.issueId };
     }
-    throw new Error(result.message ?? "Retry was skipped.");
+    throw new Error(result.message ?? tx("Retry was skipped."));
   },
   loginWithClaude: (id: string, companyId?: string) =>
     api.post<ClaudeLoginResult>(agentPath(id, companyId, "/claude-login"), {}),

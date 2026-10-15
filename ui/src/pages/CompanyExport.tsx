@@ -29,7 +29,7 @@ import { createZipArchive, estimateZipArchiveSize } from "../lib/zip";
 import {
   type ExportCategoryKey,
   type ExportCategorySelection,
-  EXPORT_CATEGORY_LABELS,
+  exportCategoryLabel,
   EXPORT_CATEGORY_ORDER,
   buildDefaultExportCategorySelection,
   buildExportCheckedFiles,
@@ -1190,7 +1190,7 @@ export function CompanyExport() {
                       className="accent-foreground"
                       data-export-category={key}
                     />
-                    <span className="min-w-0 truncate">{EXPORT_CATEGORY_LABELS[key]}</span>
+                    <span className="min-w-0 truncate">{exportCategoryLabel(key)}</span>
                     <span className="text-xs text-muted-foreground">
                       {countLoaded ? count.toLocaleString() : "—"}
                     </span>

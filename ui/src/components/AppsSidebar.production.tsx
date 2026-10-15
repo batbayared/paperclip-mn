@@ -2,7 +2,7 @@ import { ChevronLeft, AppWindow, Store, ShieldQuestion } from "lucide-react";
 import { Link } from "@/lib/router";
 import { useCompany } from "@/context/CompanyContext";
 import { useSidebar } from "@/context/SidebarContext";
-import { DEVELOPER_TABS, advancedTabHref, isExperimentalToolTab } from "@/pages/tools/tool-tabs";
+import { DEVELOPER_TABS, advancedTabHref, isExperimentalToolTab, toolTabDisplayLabel } from "@/pages/tools/tool-tabs";
 import { useSmokeLabEnabled } from "@/hooks/useSmokeLabEnabled";
 import { useReviewCount } from "@/pages/apps/useReviewCount";
 import { SidebarNavItem } from "./SidebarNavItem.production";
@@ -80,7 +80,7 @@ export function AppsSidebar() {
             <SidebarNavItem
               key={tab.key}
               to={advancedTabHref(tab.key)}
-              label={tab.label}
+              label={toolTabDisplayLabel(tab.key)}
               icon={tab.icon}
               end
             />
