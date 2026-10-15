@@ -1,5 +1,22 @@
 # XO ахицын бүртгэл
 
+## Ү6 7.20 Хөтчийн бүрэн шүүрдлэгээр олдсон aria үлдэгдэл (2026-10-15)
+
+Зорилго: 7.19-ийн үлдэгдэл засах шаардлагагүй тул 3110 дээр mn горимд 19 гол хуудас ба даалгавар, агентын дэлгэрэнгүй хуудсыг (innerText, aria-label, title, placeholder) шүүрдэж англи мөр хайв.
+
+BASE 238fd1e6a.
+
+| Хэсэг | Агуулга |
+|---|---|
+| Шүүрдлэг | dashboard, inbox, issues, agents, projects, pipelines, routines, apps, tools, skills, goals, costs, activity, settings, org, search, approvals, secrets, даалгавар 4, агент 3. Харагдах текстэд англи мөр 0; aria-д 2 |
+| breadcrumb | components/ui/breadcrumb.tsx aria «breadcrumb» (transform жижиг үсгийн ганц үгийг алгасдаг) → tx("breadcrumb") |
+| editable markdown | MDXEditor-ийн өгөгдмөл aria; MarkdownEditor-т translation={mdxEditorTranslation} (contentArea.editableMarkdown-ыг орчуулна, бусад нь өгөгдмөл) |
+| Каталог | +2 түлхүүр (11564) |
+| Хөтчийн шалгалт | /YB/issues/YB-14: mn «Замын мөр», «Текст засварлах талбар»; en «breadcrumb», «editable markdown» |
+| Шалгалт | xo:i18n check OK (11564), xo:i18n:test 440, UI 625/6585, tsc цэвэр, brand 477/147 |
+
+Үлдэгдэл: олдсонгүй. «Дахин эхлүүлэх шаардлагатай» самбарын «backend файлууд» нь техникийн нэр томьёо.
+
 ## Ү6 7.19 7.18-ийн үлдэгдэл: fallback шошго, aria, брэнд (2026-10-15)
 
 Зорилго: 7.18-д бүртгэсэн «You»/«Board»/«Me» fallback, aria label, xoBrandVars-гүй дуудлагыг засах.

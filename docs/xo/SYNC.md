@@ -259,6 +259,15 @@ Gates (2026-10-14): xo:i18n:check OK 5894, xo:i18n:test 11 / 129, tsc 0, vitest 
 - company-members.ts-ийн «Board» шошго.
 - en-д ConnectionSetupFlow-ийн брэнд «XO» гэж гарна (en байт ижил зарчмаас ухамсартай гажсан).
 
+## Ү6 7.20-д хөндсөн upstream файлууд
+
+Хөтчийн шүүрдлэгийн aria үлдэгдэл. BASE 238fd1e6a.
+
+| Файл | Өөрчлөлт |
+|---|---|
+| ui/src/components/ui/breadcrumb.tsx | aria tx("breadcrumb") |
+| ui/src/components/MarkdownEditor.tsx | mdxEditorTranslation(), MDXEditor translation prop |
+
 ## Ү6 7.19-д хөндсөн upstream файлууд
 
 7.18-ийн үлдэгдэл. BASE 6eacdef8d.

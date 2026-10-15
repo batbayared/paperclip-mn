@@ -61,6 +61,14 @@ import { cn } from "../lib/utils";
 import { useEditorAutocomplete, type SlashCommandOption } from "../context/EditorAutocompleteContext";
 import { tx } from "@/i18n/xo";
 
+// MDXEditor-ийн өгөгдмөл бичвэрээс хэрэглэгчид хүрэх aria шошгыг орчуулна; бусад нь өгөгдмөлөөрөө.
+function mdxEditorTranslation(key: string, defaultValue: string, interpolations: Record<string, unknown> = {}): string {
+  if (key === "contentArea.editableMarkdown") return tx("editable markdown");
+  let value = defaultValue;
+  for (const [k, v] of Object.entries(interpolations)) value = value.replaceAll(`{{${k}}}`, String(v));
+  return value;
+}
+
 /* ---- Mention types ---- */
 
 export interface MentionOption {
@@ -1473,6 +1481,7 @@ export const MarkdownEditor = forwardRef<MarkdownEditorRef, MarkdownEditorProps>
           markdown={editorValue}
           iconComponentFor={editorIconFor}
           suppressHtmlProcessing
+          translation={mdxEditorTranslation}
           placeholder={placeholder}
           readOnly={readOnly}
           onChange={(rawNext) => {
