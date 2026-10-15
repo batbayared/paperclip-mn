@@ -56,9 +56,9 @@ function serviceTone(status: string): "success" | "warn" | "error" | "muted" {
 }
 
 function CellGlyph({ status }: { status: CellStatus }) {
-  if (status === "pass") return <Check className="mx-auto h-4 w-4 text-emerald-600 dark:text-emerald-400" aria-label="pass" />;
-  if (status === "fail") return <X className="mx-auto h-4 w-4 text-destructive" aria-label="fail" />;
-  if (status === "skipped") return <Minus className="mx-auto h-4 w-4 text-amber-500" aria-label="skipped" />;
+  if (status === "pass") return <Check className="mx-auto h-4 w-4 text-emerald-600 dark:text-emerald-400" aria-label={tx("pass")} />;
+  if (status === "fail") return <X className="mx-auto h-4 w-4 text-destructive" aria-label={tx("fail")} />;
+  if (status === "skipped") return <Minus className="mx-auto h-4 w-4 text-amber-500" aria-label={tx("skipped")} />;
   return <span className="mx-auto block h-1.5 w-1.5 rounded-full bg-muted-foreground/30" aria-label="not run" />;
 }
 

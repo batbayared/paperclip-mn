@@ -2395,7 +2395,7 @@ export function PipelineSettings() {
                 aria-label="Call each piece a"
                 value={breakdownPieceNoun}
                 onChange={(event) => setBreakdownPieceNoun(event.target.value)}
-                placeholder="piece"
+                placeholder={tx("piece")}
                 className="h-10 w-full max-w-sm"
               />
               <p className="text-xs text-muted-foreground">

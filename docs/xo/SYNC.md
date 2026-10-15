@@ -259,6 +259,15 @@ Gates (2026-10-14): xo:i18n:check OK 5894, xo:i18n:test 11 / 129, tsc 0, vitest 
 - company-members.ts-ийн «Board» шошго.
 - en-д ConnectionSetupFlow-ийн брэнд «XO» гэж гарна (en байт ижил зарчмаас ухамсартай гажсан).
 
+## Ү6 7.21-д хөндсөн upstream файлууд
+
+Жижиг үсгийн ганц үгт шошго. BASE e364db727.
+
+| Файл | Өөрчлөлт |
+|---|---|
+| ui/src/components/{CaseFieldsPanel, FrontmatterPanel}.tsx, ui/src/components/environment-variables-editor/Row.tsx | aria/placeholder tx(); CaseFieldsPanel tx import |
+| ui/src/pages/{BoardChat, PipelineSettings}.tsx, ui/src/pages/tools/SmokeLabTab.tsx | aria/placeholder tx() |
+
 ## Ү6 7.20-д хөндсөн upstream файлууд
 
 Хөтчийн шүүрдлэгийн aria үлдэгдэл. BASE 238fd1e6a.

@@ -91,7 +91,7 @@ function TypingBubble() {
           "bg-card border border-border text-foreground [border-radius:14px_14px_14px_4px]",
         )}
       >
-        <span className="typing-dots" aria-label="typing">
+        <span className="typing-dots" aria-label={tx("typing")}>
           <span />
           <span />
           <span />

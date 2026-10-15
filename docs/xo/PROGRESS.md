@@ -1,5 +1,24 @@
 # XO ахицын бүртгэл
 
+## Ү6 7.21 Transform-ын алгасдаг жижиг үсгийн ганц үгт шошго (2026-10-15)
+
+Зорилго: 7.20-ийн «breadcrumb» тохиолдлоос илэрсэн ангиллыг эх кодоор бүрэн хайх. looksLikeCopy() жижиг үсгээр эхэлсэн, зайгүй ганц үгийг (жишээ «value») алгасдаг.
+
+BASE e364db727.
+
+| Хэсэг | Агуулга |
+|---|---|
+| Хайлт | allowlist attribute/prop дээрх жижиг үсгийн ганц үгт литерал: attr 35, prop 6 (action enum-ийг тооцоогүй) |
+| Орчуулсан | CaseFieldsPanel aria «true», BoardChat aria «typing», SmokeLabTab aria «pass»/«fail»/«skipped», PipelineSettings placeholder «piece», FrontmatterPanel placeholder «key»/«value», environment-variables-editor/Row placeholder «value» |
+| Англиар үлдээсэн | adapter, Secrets, SkillStudio, ProjectWorkspaceDetail, AdapterManager, NewAgentSetup-ийн жишээ утга (тохиргооны нэр, slug); RunTranscriptView-ийн «terminal»/«init»/«result» бүртгэлийн шошго; motion-tokens; SidePanelTab data-* enum |
+| Каталог | +4 түлхүүр (11568); pass/fail/skipped/piece өмнө нь орчуулгатай байсан |
+| Хөтчийн шалгалт | агентын runtime-д «Хувьсагч нэмэх» → value placeholder mn «утга», en «value» (хадгалаагүй) |
+| Шалгалт | xo:i18n check OK (11568), xo:i18n:test 440, UI 625/6585, tsc цэвэр, brand 477/147 |
+
+Үлдэгдэл (мэдээллийн чанартай):
+- RunTranscriptView-ийн үйл явдлын шошго (terminal, init, result · …) англиар.
+- Бусад гадаргуу (CaseFields, BoardChat typing, SmokeLab, PipelineSettings) seed өгөгдөлгүй тул хөтчөөр шалгаагүй; тест ба tsc-ээр баталсан.
+
 ## Ү6 7.20 Хөтчийн бүрэн шүүрдлэгээр олдсон aria үлдэгдэл (2026-10-15)
 
 Зорилго: 7.19-ийн үлдэгдэл засах шаардлагагүй тул 3110 дээр mn горимд 19 гол хуудас ба даалгавар, агентын дэлгэрэнгүй хуудсыг (innerText, aria-label, title, placeholder) шүүрдэж англи мөр хайв.

@@ -607,7 +607,7 @@ function MetadataRows({
             aria-label={tx("Metadata key {{n}}", { n: index + 1 })}
             value={row.key}
             readOnly={readOnly}
-            placeholder="key"
+            placeholder={tx("key")}
             onChange={(event) => update(index, { key: event.target.value })}
             className="h-8 flex-1 font-mono text-xs"
           />
@@ -619,7 +619,7 @@ function MetadataRows({
             }
             value={row.text}
             readOnly={readOnly}
-            placeholder="value"
+            placeholder={tx("value")}
             onChange={(event) => update(index, { text: event.target.value })}
             className="h-8 flex-1 text-xs"
           />

@@ -6,6 +6,7 @@ import { IssueReferencePill } from "@/components/IssueReferencePill";
 import { Link, useCaseHref } from "@/lib/router";
 import { copyTextToClipboard } from "@/lib/clipboard";
 import { cn } from "@/lib/utils";
+import { tx } from "@/i18n/xo";
 
 // -----------------------------------------------------------------------------
 // CaseFieldsPanel (PAP-12968 §3) — the generic key-value renderer for a case's
@@ -185,7 +186,7 @@ export function CaseFieldValue({
 
   if (typeof value === "boolean") {
     return value ? (
-      <Check className="h-4 w-4 text-green-600 dark:text-green-400" aria-label="true" />
+      <Check className="h-4 w-4 text-green-600 dark:text-green-400" aria-label={tx("true")} />
     ) : (
       <EmptyValue />
     );
