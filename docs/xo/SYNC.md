@@ -259,6 +259,14 @@ Gates (2026-10-14): xo:i18n:check OK 5894, xo:i18n:test 11 / 129, tsc 0, vitest 
 - company-members.ts-ийн «Board» шошго.
 - en-д ConnectionSetupFlow-ийн брэнд «XO» гэж гарна (en байт ижил зарчмаас ухамсартай гажсан).
 
+## Ү6 7.24-д хөндсөн upstream файлууд
+
+Task chat протокол картын төлөв, файлын шошго. BASE aa65da4e7.
+
+| Файл | Өөрчлөлт |
+|---|---|
+| ui/src/components/task-chat/TaskChatProtocolCard.tsx | statusText(), fileOperationText() helper; CardShell төлөв, run ended summary, файлын картын төрөл (File/Document/Code/Image), binary шошго tx() |
+
 ## Ү6 7.23-д хөндсөн upstream файлууд
 
 Transcript-ын эцсийн төлөвийн enum. BASE 008db712f.

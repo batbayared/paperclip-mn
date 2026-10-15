@@ -78,6 +78,30 @@ const FAMILY_ICON = {
   provider_notice: AlertTriangle,
 } as const;
 
+// Protocol statuses are closed enums except child rows; unknown values fall back to the humanized raw value.
+function statusText(status: string): string {
+  switch (status) {
+    case "pending": return tx("pending");
+    case "in_progress": return tx("in progress");
+    case "running": return tx("running");
+    case "completed": return tx("completed");
+    case "done": return tx("done");
+    case "succeeded": return tx("succeeded");
+    case "passed": return tx("passed");
+    case "resolved": return tx("resolved");
+    case "failed": return tx("failed");
+    case "blocked": return tx("blocked");
+    case "cancelled": return tx("cancelled");
+    case "interrupted": return tx("interrupted");
+    case "expired": return tx("expired");
+    case "informational": return tx("informational");
+    case "not_run": return tx("not run");
+    case "needs_review": return tx("needs review");
+    case "yielded": return tx("yielded");
+    default: return status.replaceAll("_", " ");
+  }
+}
+
 function statusTone(status: string): string {
   if (
     ["failed", "blocked", "denied", "cancelled", "interrupted"].includes(status)
@@ -161,7 +185,7 @@ function CardShell({
           )}
         >
           <StatusIcon status={status} className="h-3.5 w-3.5" />
-          {status.replaceAll("_", " ")}
+          {statusText(status)}
         </span>
       ) : null}
     </div>
@@ -215,7 +239,7 @@ function CardShell({
                 )}
               >
                 <StatusIcon status={status} className="h-3.5 w-3.5" />
-                {status.replaceAll("_", " ")}
+                {statusText(status)}
               </span>
             ) : null}
           </div>
@@ -427,8 +451,8 @@ function WorkspaceChangeCard({ item }: { item: TaskChatWorkspaceChangeItem }) {
                     : file.path}
                 </span>
                 <span className="text-xs capitalize text-muted-foreground">
-                  {file.binary ? "binary · " : ""}
-                  {file.operation.replaceAll("_", " ")}
+                  {file.binary ? `${tx("binary")} · ` : ""}
+                  {fileOperationText(file.operation)}
                 </span>
               </span>
               {diffStats(file)}
@@ -515,7 +539,15 @@ function WorkspaceFileCard({ item }: { item: TaskChatWorkspaceFileItem }) {
     ? item.displayName.split(".").at(-1)?.toUpperCase()
     : "FILE";
   const label =
-    item.presentation === "generic" ? "File" : titleCaseKey(item.presentation);
+    item.presentation === "generic"
+      ? tx("File")
+      : item.presentation === "document"
+        ? tx("Document")
+        : item.presentation === "code"
+          ? tx("Code")
+          : item.presentation === "image"
+            ? tx("Image")
+            : titleCaseKey(item.presentation);
   const workspaceFileRef = useMemo(
     () => ({
       path: item.path,
@@ -590,6 +622,17 @@ function WorkspaceFileCard({ item }: { item: TaskChatWorkspaceFileItem }) {
       </Dialog>
     </>
   );
+}
+
+function fileOperationText(operation: string): string {
+  switch (operation) {
+    case "create": return tx("create");
+    case "modify": return tx("modify");
+    case "delete": return tx("delete");
+    case "rename": return tx("rename");
+    case "mode_change": return tx("mode change");
+    default: return operation.replaceAll("_", " ");
+  }
 }
 
 function titleCaseKey(value: string): string {
@@ -1012,7 +1055,7 @@ function TerminalCard({
       icon={TerminalSquare}
       title="Run ended"
       status={item.runState}
-      summary={[item.disposition.replaceAll("_", " "), item.stopReason]
+      summary={[statusText(item.disposition), item.stopReason]
         .filter(Boolean)
         .join(" · ")}
       testId="task-chat-run-terminal"

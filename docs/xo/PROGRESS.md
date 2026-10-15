@@ -1,5 +1,24 @@
 # XO ахицын бүртгэл
 
+## Ү6 7.24 Task chat протокол картын төлөв (2026-10-15)
+
+Зорилго: 7.23-ын enum ангиллыг бусад гадаргуу дээр хайх. Transcript-ын raw горим (rawEntryContent) нь эх өгөгдлийг санаатай харуулдаг тул хөндөөгүй.
+
+BASE aa65da4e7.
+
+| Хэсэг | Агуулга |
+|---|---|
+| Олдсон | TaskChatProtocolCard CardShell төлөвийг status.replaceAll("_", " ")-ээр түүхийгээр нь харуулдаг; run ended summary disposition; файлын картын «binary · », file.operation, presentation-ийн titleCaseKey |
+| Засвар | statusText(): task-chat-model-ийн хаалттай enum (pending, in_progress, running, completed, done, succeeded, passed, resolved, failed, blocked, cancelled, interrupted, expired, informational, not_run, needs_review, yielded) tx(); үл мэдэгдэх утга (child status) хуучнаар. fileOperationText(): create/modify/delete/rename/mode_change. presentation → File/Document/Code/Image |
+| Шинэ орчуулга | interrupted «тасалдсан», informational «мэдээлэл», passed «тэнцсэн», binary «хоёртын», create «үүсгэсэн», modify «өөрчилсөн», delete «устгасан», rename «нэр сольсон», mode change «эрх өөрчилсөн» |
+| Каталог | +9 түлхүүр, 1 orphan («binary · ») арилсан (11583) |
+| Хөтчийн шалгалт | хийгээгүй: 3110 сервер унтарсан хэвээр |
+| Шалгалт | xo:i18n check OK (11583), xo:i18n:test 440, UI 625/6585 (эхний ажиллуулалтад CompanySettings 2 тест ачааллаас унаж, ганцаар болон бүтэн дахин ажиллуулахад PASS), tsc цэвэр, brand 477/147 |
+
+Үлдэгдэл (мэдээллийн чанартай):
+- CardShell-ийн CSS capitalize монгол төлөвийн үг бүрийг томоор эхлүүлнэ (en-тэй ижил дүрэм, хөндөөгүй).
+- 7.22–7.24-ын хөтчийн шалгалт сервер асаасны дараа.
+
 ## Ү6 7.23 Transcript-ын эцсийн төлөвийн enum (2026-10-15)
 
 Зорилго: 7.22-т бүртгэсэн «runState · disposition» текстийг орчуулах.
