@@ -81,6 +81,10 @@ export function xoStatusLabel(status: string, english: string): string {
     case "coalesced": return tx("Coalesced");
     case "skipped": return tx("Skipped");
     case "issue_created": return tx("Issue created");
+    case "suspended": return tx("Suspended");
+    case "limited": return tx("Limited");
+    case "usage_limited": return tx("Usage limited");
+    case "complete": return tx("Complete");
     default: return english;
   }
 }
@@ -890,4 +894,16 @@ export function xoAttentionTitle(title: string): string {
     return tx("Plan approval - {{title}}", { title: title.slice(ATTENTION_PLAN_APPROVAL_PREFIX.length) });
   }
   return xoAttentionInteractionLabel(title);
+}
+
+// Task chat-ийн файлын үйлдэл (TaskChatProtocolCard, TaskChatProtocolActivityRow).
+export function xoFileOperationLabel(operation: string): string {
+  switch (operation) {
+    case "create": return tx("create");
+    case "modify": return tx("modify");
+    case "delete": return tx("delete");
+    case "rename": return tx("rename");
+    case "mode_change": return tx("mode change");
+    default: return operation.replaceAll("_", " ");
+  }
 }

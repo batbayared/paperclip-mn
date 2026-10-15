@@ -48,6 +48,7 @@ import { QuestionForm, QuestionResponseSummary } from "./QuestionForm";
 import { TaskChatComposerTakeoverHeader } from "./TaskChatComposerTakeoverContext";
 import { RichWorkProductCard } from "./RichWorkProductCard";
 import { tx } from "@/i18n/xo";
+import { xoFileOperationLabel } from "@/xo/labels";
 
 export interface TaskChatProtocolCardProps {
   item: TaskChatProtocolItem;
@@ -452,7 +453,7 @@ function WorkspaceChangeCard({ item }: { item: TaskChatWorkspaceChangeItem }) {
                 </span>
                 <span className="text-xs capitalize text-muted-foreground">
                   {file.binary ? `${tx("binary")} · ` : ""}
-                  {fileOperationText(file.operation)}
+                  {xoFileOperationLabel(file.operation)}
                 </span>
               </span>
               {diffStats(file)}
@@ -622,17 +623,6 @@ function WorkspaceFileCard({ item }: { item: TaskChatWorkspaceFileItem }) {
       </Dialog>
     </>
   );
-}
-
-function fileOperationText(operation: string): string {
-  switch (operation) {
-    case "create": return tx("create");
-    case "modify": return tx("modify");
-    case "delete": return tx("delete");
-    case "rename": return tx("rename");
-    case "mode_change": return tx("mode change");
-    default: return operation.replaceAll("_", " ");
-  }
 }
 
 function titleCaseKey(value: string): string {

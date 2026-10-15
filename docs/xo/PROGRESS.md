@@ -1,5 +1,25 @@
 # XO ахицын бүртгэл
 
+## Ү6 7.25 Төлөвийн badge-ийн түүхий enum (2026-10-15)
+
+Зорилго: status.replace("_", " ")-ээр түүхий enum харуулдаг газруудыг xoStatusLabel / xoHumanizeValue-ээр дамжуулах. en гаралт хуучнаараа: helper-ийн fallback нь өмнөх англи илэрхийлэл.
+
+BASE e7db1bae9.
+
+| Хэсэг | Агуулга |
+|---|---|
+| Олдсон | replace(/_/g," ") / replaceAll("_"," ")-тэй 90 газар; ихэнх нь аль хэдийн xoStatusLabel-ээр дамждаг |
+| Засвар | ApprovalCard, IssueWorkspaceCard, ProjectWorkspaceSummaryCard, CommentThread (run төлөв), IssueBlockedNotice (хүлээж буй ба reopen-ийн төлөв), IssueLinkQuicklook, GoalProperties (зорилгын төлөв ба түвшин), CompanyAccess (гишүүний төлөв), RunnerGoalWidget (session goal), TaskChatProtocolActivityRow (файлын үйлдэл) |
+| Helper | xoStatusLabel-д suspended, limited, usage_limited, complete нэмсэн; fileOperationText-ийг xo/labels.ts руу xoFileOperationLabel болгон зөөж хоёр компонент хуваалцана |
+| Шинэ орчуулга | Complete «Дууссан», Limited «Хязгаарлагдсан», Usage limited «Хэрэглээ хязгаарлагдсан» |
+| Каталог | +3 түлхүүр (11586) |
+| Хөтчийн шалгалт | хийгээгүй: 3110 сервер унтарсан хэвээр |
+| Шалгалт | xo:i18n check OK (11586), xo:i18n:test 440, UI 625/6585, tsc цэвэр, brand 477/147 |
+
+Үлдэгдэл:
+- Inbox, LegacyInbox, AgentDetail, JoinRequestQueue, apps/Browse, ChatEndpointDetail, Secrets (config/health/binding), Routines SelectItem, UserProfile event.action, ArtifactsPanel, TaskChatThread, lib/issue-chat-messages, lib/external-objects, LiveUpdatesProvider, FeedCard, search/issue filter-ийн titleCase helper-үүд түүхий enum хэвээр.
+- 7.22–7.25-ын хөтчийн шалгалт сервер асаасны дараа.
+
 ## Ү6 7.24 Task chat протокол картын төлөв (2026-10-15)
 
 Зорилго: 7.23-ын enum ангиллыг бусад гадаргуу дээр хайх. Transcript-ын raw горим (rawEntryContent) нь эх өгөгдлийг санаатай харуулдаг тул хөндөөгүй.

@@ -1,5 +1,6 @@
 import { xoLocaleDateTime } from "@/xo/date-format";
 import { tx } from "@/i18n/xo";
+import { xoStatusLabel } from "@/xo/labels";
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -377,7 +378,7 @@ export function CompanyAccess() {
                     </td>
                     <td className="px-3 py-3">
                       <Badge variant={member.status === "active" ? "secondary" : member.status === "suspended" ? "destructive" : "outline"}>
-                        {member.status.replace("_", " ")}
+                        {xoStatusLabel(member.status, member.status.replace("_", " "))}
                       </Badge>
                     </td>
                     <td className="px-3 py-3 text-right">

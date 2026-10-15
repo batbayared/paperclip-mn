@@ -27,7 +27,7 @@ import { restoreSubmittedCommentDraft } from "../lib/comment-submit-draft";
 import { copyTextToClipboard } from "../lib/clipboard";
 import { PluginSlotOutlet } from "@/plugins/slots";
 import { tx } from "@/i18n/xo";
-import { xoHumanizeValue } from "@/xo/labels";
+import { xoHumanizeValue, xoStatusLabel } from "@/xo/labels";
 
 interface CommentWithRunMeta extends IssueComment {
   runId?: string | null;
@@ -211,9 +211,9 @@ function initialsForName(name: string) {
 function formatRunStatusLabel(status: string) {
   switch (status) {
     case "timed_out":
-      return "timed out";
+      return xoStatusLabel(status, "timed out");
     default:
-      return status.replace(/_/g, " ");
+      return xoHumanizeValue(status);
   }
 }
 

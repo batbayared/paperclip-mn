@@ -33,6 +33,7 @@ import {
 } from "../lib/recovery-lineage";
 import { StatusGlyph } from "./StatusGlyph";
 import { tx } from "@/i18n/xo";
+import { xoHumanizeValue, xoStatusLabel } from "@/xo/labels";
 import { XoTrans } from "@/xo/XoTrans";
 
 function BlockerRecoveryIndicator({
@@ -140,7 +141,7 @@ function SuccessfulRunRetryNowControl({
 const EMPTY_LIVE_IDS: ReadonlySet<string> = new Set<string>();
 
 function waitingTaskStatusLabel(status: string): string {
-  return status.replace(/_/g, " ").replace(/\b\w/g, (character) => character.toUpperCase());
+  return xoStatusLabel(status, status.replace(/_/g, " ").replace(/\b\w/g, (character) => character.toUpperCase()));
 }
 
 function WaitingChipLink({
@@ -541,7 +542,7 @@ export function IssueBlockedNotice({
     ? reopenSuppressedLeaf.identifier ?? reopenSuppressedLeaf.id.slice(0, 8)
     : null;
   const reopenSuppressedLeafStatus = reopenSuppressedLeaf
-    ? reopenSuppressedLeaf.status.replace(/_/g, " ")
+    ? xoHumanizeValue(reopenSuppressedLeaf.status)
     : null;
   const reopenSuppressedOtherCount = Math.max(unresolvedLeafBlockers.length - 1, 0);
 

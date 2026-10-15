@@ -10,6 +10,7 @@ import { timeAgo } from "../lib/timeAgo";
 import { Copy, ExternalLink, FolderOpen, GitBranch, Loader2, Play, Square } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { tx } from "@/i18n/xo";
+import { xoHumanizeValue } from "@/xo/labels";
 
 function workspaceKindLabel(kind: ProjectWorkspaceSummary["kind"]) {
   return kind === "execution_workspace" ? tx("Execution workspace") : tx("Project workspace");
@@ -89,7 +90,7 @@ export function ProjectWorkspaceSummaryCard({
               ) : null}
               {summary.executionWorkspaceStatus ? (
                 <Badge variant="outline" className="border-border/70 bg-background px-2.5 py-1 text-muted-foreground">
-                  {summary.executionWorkspaceStatus.replace(/_/g, " ")}
+                  {xoHumanizeValue(summary.executionWorkspaceStatus)}
                 </Badge>
               ) : null}
             </div>

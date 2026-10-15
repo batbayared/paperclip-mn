@@ -13,6 +13,7 @@ import {
 import { timeAgo } from "../lib/timeAgo";
 import type { Approval, Agent } from "@paperclipai/shared";
 import { cn } from "@/lib/utils";
+import { xoHumanizeValue } from "@/xo/labels";
 import { Card } from "@/components/ui/card";
 
 function statusIcon(status: string) {
@@ -89,7 +90,7 @@ export function ApprovalCard({
         <div className="shrink-0">
           <div className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-background/80 px-2.5 py-1 text-xs text-muted-foreground">
             {statusIcon(approval.status)}
-            <span className="capitalize">{approval.status.replace(/_/g, " ")}</span>
+            <span className="capitalize">{xoHumanizeValue(approval.status)}</span>
           </div>
         </div>
       </div>

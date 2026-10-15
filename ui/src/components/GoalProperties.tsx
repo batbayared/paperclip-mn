@@ -9,6 +9,8 @@ import { useCompany } from "../context/CompanyContext";
 import { queryKeys } from "../lib/queryKeys";
 import { StatusBadge } from "./StatusBadge";
 import { formatDate, cn, agentUrl } from "../lib/utils";
+import { tx } from "@/i18n/xo";
+import { xoStatusLabel } from "@/xo/labels";
 import { Separator } from "@/components/ui/separator";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
@@ -27,8 +29,15 @@ function PropertyRow({ label, children }: { label: string; children: React.React
   );
 }
 
+// GOAL_STATUSES ба GOAL_LEVELS-ийн утга; en дээр гарчигласан түүхий утга хэвээр.
 function label(s: string): string {
-  return s.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  switch (s) {
+    case "company": return tx("Company");
+    case "team": return tx("Team");
+    case "agent": return tx("Agent");
+    case "task": return tx("Task");
+  }
+  return xoStatusLabel(s, s.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()));
 }
 
 function PickerButton({

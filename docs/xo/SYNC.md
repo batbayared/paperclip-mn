@@ -259,6 +259,24 @@ Gates (2026-10-14): xo:i18n:check OK 5894, xo:i18n:test 11 / 129, tsc 0, vitest 
 - company-members.ts-ийн «Board» шошго.
 - en-д ConnectionSetupFlow-ийн брэнд «XO» гэж гарна (en байт ижил зарчмаас ухамсартай гажсан).
 
+## Ү6 7.25-д хөндсөн upstream файлууд
+
+Төлөвийн badge-ийн түүхий enum. BASE e7db1bae9.
+
+| Файл | Өөрчлөлт |
+|---|---|
+| ui/src/components/ApprovalCard.tsx | approval.status → xoHumanizeValue |
+| ui/src/components/IssueWorkspaceCard.tsx | statusBadge → xoHumanizeValue |
+| ui/src/components/ProjectWorkspaceSummaryCard.tsx | executionWorkspaceStatus → xoHumanizeValue |
+| ui/src/components/CommentThread.tsx | formatRunStatusLabel → xoStatusLabel / xoHumanizeValue |
+| ui/src/components/IssueBlockedNotice.tsx | waitingTaskStatusLabel, reopenSuppressedLeafStatus |
+| ui/src/components/IssueLinkQuicklook.tsx | statusLabel → xoStatusLabel |
+| ui/src/components/GoalProperties.tsx | label(): түвшин tx(), төлөв xoStatusLabel |
+| ui/src/pages/CompanyAccess.tsx | member.status → xoStatusLabel |
+| ui/src/components/task-chat/RunnerGoalWidget.tsx | goal.status → xoStatusLabel |
+| ui/src/components/task-chat/TaskChatProtocolActivityRow.tsx | file.operation → xoFileOperationLabel |
+| ui/src/components/task-chat/TaskChatProtocolCard.tsx | fileOperationText-ийг xo/labels.ts руу зөөсөн |
+
 ## Ү6 7.24-д хөндсөн upstream файлууд
 
 Task chat протокол картын төлөв, файлын шошго. BASE aa65da4e7.

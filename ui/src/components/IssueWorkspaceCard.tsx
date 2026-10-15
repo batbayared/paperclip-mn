@@ -22,6 +22,7 @@ import { Check, Copy, FileSearch, FolderOpen, FolderSearch, GitBranch, Pencil, X
 import { ReusableExecutionWorkspaceSelect } from "./ReusableExecutionWorkspaceSelect";
 import { Badge } from "@/components/ui/badge";
 import { tx } from "@/i18n/xo";
+import { xoHumanizeValue } from "@/xo/labels";
 import { XoTrans } from "@/xo/XoTrans";
 
 /* -------------------------------------------------------------------------- */
@@ -140,7 +141,7 @@ function statusBadge(status: string) {
   };
   return (
     <Badge variant="ghost" className={cn("text-(length:--text-nano) px-1.5", colors[status] ?? colors.idle)}>
-      {status.replace(/_/g, " ")}
+      {xoHumanizeValue(status)}
     </Badge>
   );
 }

@@ -10,6 +10,7 @@ import { issuesApi } from "@/api/issues";
 import { useCompanyLiveEvent } from "@/context/LiveUpdatesProvider";
 import { queryKeys } from "@/lib/queryKeys";
 import { cn } from "@/lib/utils";
+import { xoStatusLabel } from "@/xo/labels";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
@@ -210,7 +211,7 @@ export function RunnerGoalWidget({ control }: { control: RunnerGoalControl }) {
             <span className="text-xs font-semibold">Session goal</span>
             {goal ? (
               <span className="rounded-full bg-muted px-1.5 py-0.5 text-xs font-medium capitalize" role="status">
-                {goal.status.replaceAll("_", " ")}
+                {xoStatusLabel(goal.status, goal.status.replaceAll("_", " "))}
               </span>
             ) : null}
             {goal?.workingNow ? (

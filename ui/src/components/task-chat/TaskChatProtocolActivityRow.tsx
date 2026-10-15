@@ -11,6 +11,7 @@ import {
 import { MarkdownBody } from "@/components/MarkdownBody";
 import { WorkspaceFileLink } from "@/components/WorkspaceFileLink";
 import { cn } from "@/lib/utils";
+import { xoFileOperationLabel } from "@/xo/labels";
 import type {
   TaskChatProtocolDetail,
   TaskChatProtocolItem,
@@ -190,7 +191,7 @@ function WorkspaceChangeDetails({ item }: { item: TaskChatWorkspaceChangeItem })
             <span className="min-w-0 flex-1 truncate font-mono text-foreground" title={file.previousPath ? `${file.previousPath} → ${file.path}` : file.path}>
               {file.previousPath ? `${file.previousPath} → ${file.path}` : file.path}
             </span>
-            <span className="shrink-0 capitalize text-muted-foreground">{file.operation.replaceAll("_", " ")}</span>
+            <span className="shrink-0 capitalize text-muted-foreground">{xoFileOperationLabel(file.operation)}</span>
             {file.additions != null || file.deletions != null ? (
               <span className="shrink-0 font-mono text-(length:--text-micro) text-muted-foreground">
                 {file.additions == null ? "" : `+${file.additions}`} {file.deletions == null ? "" : `−${file.deletions}`}

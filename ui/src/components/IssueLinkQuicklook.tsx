@@ -12,6 +12,7 @@ import {
 } from "@/lib/issueDetailCache";
 import { queryKeys } from "@/lib/queryKeys";
 import { cn } from "@/lib/utils";
+import { xoStatusLabel } from "@/xo/labels";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { StatusGlyph } from "@/components/StatusGlyph";
 import { ProjectTile } from "@/components/ProjectTile";
@@ -130,7 +131,7 @@ function QuicklookSeparator({ className }: { className?: string }) {
 /** "in_review" -> "In review". The card states the status as a word, not a chip. */
 function statusLabel(status: string): string {
   const words = status.replace(/_/g, " ");
-  return words.charAt(0).toUpperCase() + words.slice(1);
+  return xoStatusLabel(status, words.charAt(0).toUpperCase() + words.slice(1));
 }
 
 /**
