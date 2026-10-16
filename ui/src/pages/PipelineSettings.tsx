@@ -186,13 +186,16 @@ const STAGE_NAV_GROUPS: Array<{
   },
 ];
 
-const STAGE_SECTION_TITLES: Record<StageSectionKey, string> = {
-  instructions: "Automation",
-  secrets: "Secrets",
-  activity: "Activity",
-  history: "History",
-  advanced: "Advanced",
-};
+// XO: render-time title so the active locale applies (a module-level map would freeze English).
+function stageSectionTitle(key: StageSectionKey): string {
+  switch (key) {
+    case "instructions": return tx("Automation");
+    case "secrets": return tx("Secrets");
+    case "activity": return tx("Activity");
+    case "history": return tx("History");
+    case "advanced": return tx("Advanced");
+  }
+}
 
 function parseStageSectionKey(value: string | null): StageSectionKey | null {
   switch (value) {
@@ -1979,7 +1982,7 @@ export function PipelineSettings() {
       const autoAdvanceTarget = nextStageForInsert(stages, insertPosition);
       const created = await pipelinesApi.createStage(pipelineId, {
         key: nextStageKey("New stage", existingKeys),
-        name: "New stage",
+        name: tx("New stage"),
         kind: "working",
         position: insertPosition,
         config: {
@@ -2748,7 +2751,7 @@ export function PipelineSettings() {
                 <div className="min-w-0 flex-1 md:px-8">
                   <div className="mb-4 flex items-center justify-between gap-3">
                     <h2 className="text-lg font-semibold text-foreground">
-                      {STAGE_SECTION_TITLES[activeStageSection]}
+                      {stageSectionTitle(activeStageSection)}
                     </h2>
                     {activeStageSection === "instructions" ? (
                       <div className="flex items-center gap-2">

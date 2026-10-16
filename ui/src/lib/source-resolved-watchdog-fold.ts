@@ -1,4 +1,6 @@
 import type { HeartbeatRun } from "@paperclipai/shared";
+import { tx } from "@/i18n/xo";
+import { resolveLocale } from "@/xo/locale";
 
 export type SourceResolvedFoldCleanupOutcome =
   | "terminated"
@@ -113,8 +115,24 @@ const CLEANUP_OUTCOME_LABELS: Record<string, string> = {
   skipped_non_local_adapter: "skipped (non-local adapter)",
 };
 
+// XO: орчуулгыг дуудах үед хийнэ (module түвшинд биш); en дээр дээрх англи утга хэвээр.
+// "terminated"-ийн mn.json орчуулга ажилтныг чөлөөлөх утгатай тул процессын утгад тусдаа түлхүүр.
+function cleanupOutcomeLabel(outcome: string): string | undefined {
+  const english = CLEANUP_OUTCOME_LABELS[outcome];
+  if (english === undefined || resolveLocale() !== "mn") return english;
+  switch (outcome) {
+    case "terminated": return tx("process terminated");
+    case "termination_sent_still_running": return tx("termination sent (still running)");
+    case "failed": return tx("failed");
+    case "not_running": return tx("not running");
+    case "no_process_metadata": return tx("no process metadata");
+    case "skipped_non_local_adapter": return tx("skipped (non-local adapter)");
+    default: return english;
+  }
+}
+
 export function formatCleanupOutcome(outcome: string): string {
-  return CLEANUP_OUTCOME_LABELS[outcome] ?? outcome.replace(/_/g, " ");
+  return cleanupOutcomeLabel(outcome) ?? outcome.replace(/_/g, " ");
 }
 
 export function formatSilenceAgeMs(ms: number | null | undefined): string | null {

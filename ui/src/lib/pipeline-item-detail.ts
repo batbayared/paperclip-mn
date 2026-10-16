@@ -333,7 +333,15 @@ function automationIssueLabel(event: PipelineCaseEvent) {
 }
 
 function humanizeReason(reason: string) {
-  return humanizeKey(reason).replace(/^./, (char) => char.toLowerCase());
+  const english = humanizeKey(reason).replace(/^./, (char) => char.toLowerCase());
+  if (resolveLocale() !== "mn") return english;
+  // XO: the only fixed error code the server writes for automation_failed; other errors are free text.
+  switch (reason) {
+    case "automation_not_configured":
+      return tx("automation not configured");
+    default:
+      return english;
+  }
 }
 
 export function formatPipelineItemEvent(event: PipelineCaseEvent, stages?: StageLookup) {

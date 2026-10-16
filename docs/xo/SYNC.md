@@ -259,6 +259,19 @@ Gates (2026-10-14): xo:i18n:check OK 5894, xo:i18n:test 11 / 129, tsc 0, vitest 
 - company-members.ts-ийн «Board» шошго.
 - en-д ConnectionSetupFlow-ийн брэнд «XO» гэж гарна (en байт ижил зарчмаас ухамсартай гажсан).
 
+## Ү6 7.30-д хөндсөн upstream файлууд
+
+Pipelines, routine жагсаалт, watchdog-ийн үлдэгдэл. BASE 6ac57e009.
+
+| Файл | Өөрчлөлт |
+|---|---|
+| ui/src/pages/PipelineSettings.tsx | STAGE_SECTION_TITLES → stageSectionTitle(); шинэ stage-ийн нэр → tx |
+| ui/src/pages/Pipelines.tsx | зураг upload-ын алдаа → tx |
+| ui/src/lib/pipeline-item-detail.ts | humanizeReason: mn үед automation_not_configured |
+| ui/src/pages/Routines.production.tsx | SelectItem → xoRoutineHistoryValueLabel |
+| ui/src/components/RoutineList.tsx | formatRoutineRunStatus: mn үед ROUTINE_RUN_STATUSES |
+| ui/src/lib/source-resolved-watchdog-fold.ts | cleanupOutcomeLabel(); en map хэвээр |
+
 ## Ү6 7.29-д хөндсөн upstream файлууд
 
 Activity, change receipt, UserProfile, routine/secret/recovery-ийн түүхий enum. BASE 7ab43397b.

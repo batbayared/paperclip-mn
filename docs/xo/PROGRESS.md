@@ -1,5 +1,28 @@
 # XO ахицын бүртгэл
 
+## Ү6 7.30 Pipelines, routine жагсаалт, watchdog-ийн үлдэгдэл (2026-10-16)
+
+Зорилго: 7.29-ийн үлдэгдлээс Pipelines-ийн transform хамардаггүй текст, routine жагсаалтын төлөв, watchdog-ийн цэвэрлэгээний үр дүнг орчуулах. en гаралт хуучнаараа.
+
+BASE 6ac57e009.
+
+| Хэсэг | Агуулга |
+|---|---|
+| Засвар | PipelineSettings (STAGE_SECTION_TITLES map → render үеийн stageSectionTitle, «New stage» нэр), Pipelines (зураг upload-ын 2 алдаа), pipeline-item-detail (automation_not_configured), Routines.production (concurrency/catch-up SelectItem), RoutineList (ROUTINE_RUN_STATUSES), source-resolved-watchdog-fold (cleanupOutcomeLabel) |
+| Шинэ орчуулга | 8 түлхүүр; процессын «terminated»-д ажилтан чөлөөлөх утгатай одоогийн түлхүүрээс тусдаа «process terminated» |
+| Каталог | +8 түлхүүр (11665) |
+| Хөтчийн шалгалт | хийгээгүй: 3110 сервер унтарсан хэвээр |
+| Шалгалт | xo:i18n check OK (11665), xo:i18n:test 440, UI 626/6591, tsc цэвэр, brand 477/147 |
+
+Шалгаад өөрчлөөгүй:
+- Pipelines-ийн 744-748, 860-883, 2921-3046, 4640-4670 мөр: xo-i18n transform (tiers.ts) бүрэн хамардгийг гаралтаас баталсан. humanizeOutputStatus аль хэдийн хамрагдсан.
+- TaskChatProtocolCard, IssueLinkQuicklook, StatusBadge, runRetryState, AuditRuns: зөвхөн үл мэдэгдэх утгын fallback.
+- DB-д хадгалагддаг reason текст, хэрэглэгчийн тодорхойлсон field түлхүүр, stage key: өгөгдөл.
+
+Үлдэгдэл:
+- transcript-adapter titleCaseKey: provider activity-ийн detail шошго ба scalarValue Yes/No mn горимд англиар. TaskChatProtocolActivityRow шошгыг англиар харьцуулдаг тул render үед (TaskChatProtocolCard :375, TaskChatProtocolActivityRow :53) орчуулах хэрэгтэй.
+- 7.22–7.30-ын хөтчийн шалгалт сервер асаасны дараа.
+
 ## Ү6 7.29 Activity, change receipt, UserProfile, routine/secret/recovery-ийн түүхий enum (2026-10-16)
 
 Зорилго: 7.28-ын үлдэгдлээс activity-ийн тайлбар, асуудлын өөрчлөлтийн баримт, профайлын үйл явдал, routine/нууц/сэргээлтийн түүхий enum-ийг орчуулах. en гаралт хуучнаараа.

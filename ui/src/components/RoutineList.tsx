@@ -14,6 +14,7 @@ import { ToggleSwitch } from "@/components/ui/toggle-switch";
 import { xoLocaleDateTime } from "@/xo/date-format";
 import { tx } from "@/i18n/xo";
 import { xoStatusLabel } from "@/xo/labels";
+import { resolveLocale } from "@/xo/locale";
 
 export type RoutineListProjectSummary = {
   name: string;
@@ -44,7 +45,17 @@ export function formatLastRunTimestamp(value: Date | string | null | undefined) 
 
 export function formatRoutineRunStatus(value: string | null | undefined) {
   if (!value) return null;
-  return value.replaceAll("_", " ");
+  const english = value.replaceAll("_", " ");
+  if (resolveLocale() !== "mn") return english;
+  switch (value) {
+    case "received": return tx("Received");
+    case "coalesced": return tx("Coalesced");
+    case "skipped": return tx("Skipped");
+    case "issue_created": return tx("Issue created");
+    case "completed": return tx("Completed");
+    case "failed": return tx("Failed");
+    default: return english;
+  }
 }
 
 export function nextRoutineStatus(currentStatus: string, enabled: boolean) {
