@@ -287,7 +287,7 @@ function sourceMeta(sourceBadge: CompanySkillSourceBadge, sourceLabel: string | 
     case "local":
       return { icon: Folder, label: displayLabel ?? "Folder", managedLabel: tx("Folder managed") };
     case "paperclip":
-      return { icon: Paperclip, label: displayLabel ?? "Paperclip", managedLabel: tx("{{brand}} managed") };
+      return { icon: Paperclip, label: displayLabel ?? "XO", managedLabel: tx("{{brand}} managed") };
     default:
       return { icon: Boxes, label: displayLabel ?? "Catalog", managedLabel: tx("Catalog managed") };
   }
@@ -520,7 +520,7 @@ function CompatChip({ compatibility }: { compatibility: CompanySkillCompatibilit
     unknown: {
       icon: HelpCircle,
       label: "Unknown format",
-      tooltip: "Paperclip could not validate this skill as Agent Skills markdown. Install at your own risk.",
+      tooltip: "XO could not validate this skill as Agent Skills markdown. Install at your own risk.",
       className: "border-yellow-500/40 bg-yellow-500/10 text-yellow-800 dark:text-yellow-200",
     },
     invalid: {
@@ -742,7 +742,7 @@ export function buildDiscoveryCards(
       catalogRef: entry.id,
       name: entry.name,
       slug: entry.slug,
-      author: entry.packageName ?? "Paperclip",
+      author: entry.packageName ?? "XO",
       version: discoveryVersionLabel({ packageVersion: entry.packageVersion ?? null, sourceRef: null }, required),
       tagline: null,
       description: entry.description,
@@ -4510,7 +4510,7 @@ export function CompanySkills() {
       pushToast({
         tone: "success",
         title: skill.forkedFromSkillId ? "Skill fork created" : "Skill created",
-        body: `${skill.name} is now editable in the Paperclip workspace.`,
+        body: `${skill.name} is now editable in the XO workspace.`,
       });
     },
     onError: (error) => {

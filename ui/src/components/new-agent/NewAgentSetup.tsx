@@ -639,7 +639,7 @@ function Setup({
                   ·{" "}
                   {runnerProvider === "codex"
                     ? "Native app server runner"
-                    : "Paperclip Runner"}
+                    : "XO Runner"}
                 </span>
               )}
             </div>

@@ -307,7 +307,7 @@ function actorName(event: PipelineCaseEvent) {
   if (event.actorAgent?.name) return event.actorAgent.name;
   if (event.actorType === "user") return tx("Board");
   // XO: mn-д брэнд XO; en гаралт upstream-тэй ижил үлдэнэ.
-  if (event.actorType === "system") return resolveLocale() === "mn" ? BRAND.name : "Paperclip";
+  if (event.actorType === "system") return resolveLocale() === "mn" ? BRAND.name : "XO";
   return null;
 }
 

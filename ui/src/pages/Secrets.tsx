@@ -357,16 +357,16 @@ function normalizeUserSecretKeyForPreview(input: string) {
 
 
 function modeLabel(managedMode: SecretManagedMode) {
-  return managedMode === "paperclip_managed" ? tx("Paperclip-managed") : tx("Linked external");
+  return managedMode === "paperclip_managed" ? tx("XO-managed") : tx("Linked external");
 }
 
 function modeDescription(managedMode: SecretManagedMode, canWriteExternalValue = false) {
   if (managedMode === "paperclip_managed") {
-    return tx("Paperclip owns create and rotation writes for this provider secret.");
+    return tx("XO owns create and rotation writes for this provider secret.");
   }
   return canWriteExternalValue
-    ? tx("Paperclip resolves this provider reference and can write new values to it via Update value.")
-    : tx("Paperclip resolves this provider reference but does not rotate the provider value.");
+    ? tx("XO resolves this provider reference and can write new values to it via Update value.")
+    : tx("XO resolves this provider reference but does not rotate the provider value.");
 }
 
 function statusLabel(status: SecretStatus) {
@@ -485,7 +485,7 @@ export function getCreateProviderBlockReason(
 ) {
   if (!provider) return tx("Select a provider.");
   if (mode === "managed" && provider.supportsManagedValues === false) {
-    return tx("{{label}} does not support Paperclip-managed secret values.", { label: provider.label });
+    return tx("{{label}} does not support XO-managed secret values.", { label: provider.label });
   }
   if (mode === "external" && provider.supportsExternalReferences === false) {
     return tx("{{label}} does not support linked external references.", { label: provider.label });
@@ -1346,7 +1346,7 @@ export function Secrets() {
     onSuccess: (removed) => {
       pushToast({
         title: "Provider vault removed",
-        body: `${removed.displayName} was removed from Paperclip only.`,
+        body: `${removed.displayName} was removed from XO only.`,
         tone: "info",
       });
       setRemoveVaultConfirm(null);
@@ -2750,7 +2750,7 @@ export function Secrets() {
                   className="font-mono text-xs"
                 />
                 <p className="text-(length:--text-micro) text-muted-foreground mt-1">
-                  Existing provider secrets are resolve-only in Paperclip. Rotate the value in the provider,
+                  Existing provider secrets are resolve-only in XO. Rotate the value in the provider,
                   then update this reference only if the path, ARN, or version changes.
                 </p>
               </div>
@@ -2916,8 +2916,8 @@ export function Secrets() {
                 </div>
                 {createMode === "managed" ? (
                   <div className="rounded-md border border-emerald-500/30 bg-emerald-500/5 p-2 text-(length:--text-micro) text-emerald-700 dark:text-emerald-300">
-                    Paperclip-managed secrets are created in the selected provider and future rotations
-                    write a new provider version through Paperclip.
+                    XO-managed secrets are created in the selected provider and future rotations
+                    write a new provider version through XO.
                     {awsManagedPathPreview ? (
                       <div className="mt-1">
                         AWS managed path:{" "}
@@ -3110,8 +3110,8 @@ export function Secrets() {
               {selectedSecret?.managedMode !== "external_reference"
                 ? "Creates a new provider-backed version. Consumers pinned to latest pick up the new value on the next run."
                 : rotateMode === "reference"
-                  ? "Creates a new Paperclip metadata version that points at an existing provider secret. Paperclip does not write a new provider value."
-                  : "Writes a new version of the referenced provider secret. The new value becomes current for every consumer of that secret, in and outside Paperclip."}
+                  ? "Creates a new XO metadata version that points at an existing provider secret. XO does not write a new provider value."
+                  : "Writes a new version of the referenced provider secret. The new value becomes current for every consumer of that secret, in and outside XO."}
             </DialogDescription>
           </DialogHeader>
           {selectedSecret && secretSupportsExternalValueWrite(selectedSecret) ? (
@@ -3161,7 +3161,7 @@ export function Secrets() {
                 className="font-mono text-xs"
               />
               <p className="mt-1 text-(length:--text-micro) text-muted-foreground">
-                Rotate the actual value in the provider before changing this Paperclip reference.
+                Rotate the actual value in the provider before changing this XO reference.
               </p>
             </div>
           ) : (
@@ -3286,7 +3286,7 @@ export function Secrets() {
             <DialogTitle>Remove provider vault</DialogTitle>
             <DialogDescription>
               <XoTrans
-                i18nKey="Removes <b>{{name}}</b> from Paperclip only."
+                i18nKey="Removes <b>{{name}}</b> from XO only."
                 values={{ name: removeVaultConfirm?.displayName ?? "" }}
                 components={{ b: <strong /> }}
               />{" "}
@@ -3304,7 +3304,7 @@ export function Secrets() {
               disabled={removeVaultMutation.isPending}
             >
               {removeVaultMutation.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" /> : null}
-              Remove from Paperclip
+              Remove from XO
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -3329,7 +3329,7 @@ function SecretsHowToUse() {
           />
         </p>
         <p>
-          Paperclip resolves the value server-side when the run starts and injects it as that env var. Project env
+          XO resolves the value server-side when the run starts and injects it as that env var. Project env
           applies to every task in the project and overrides agent env on matching keys.
         </p>
       </div>
@@ -4018,7 +4018,7 @@ function AwsProviderVaultDiscoveryError({
             <p className="mt-1 leading-relaxed text-destructive/85">
               {isAccessDenied
                 ? details?.actionableMessage ??
-                  "Discovery needs secretsmanager:ListSecrets in the selected region for the Paperclip server runtime/provider credential path."
+                  "Discovery needs secretsmanager:ListSecrets in the selected region for the XO server runtime/provider credential path."
                 : message}
             </p>
           </div>
@@ -4740,7 +4740,7 @@ function SecretDetailsTab({
               providers.find((provider) => provider.id === secret.provider)?.supportsExternalValueWrites,
           ),
         )}{" "}
-        Paperclip never re-displays stored values.
+        XO never re-displays stored values.
       </div>
     </dl>
   );

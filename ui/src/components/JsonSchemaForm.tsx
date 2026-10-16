@@ -700,7 +700,7 @@ const SecretField = React.memo(({
       label={label}
       description={
         description ||
-        "Pick an existing organization secret, or paste a raw value (Paperclip will store it as a secret on save)."
+        "Pick an existing organization secret, or paste a raw value (XO will store it as a secret on save)."
       }
       required={isRequired}
       error={error}

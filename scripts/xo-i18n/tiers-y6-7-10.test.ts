@@ -38,7 +38,7 @@ const CASES: Array<{ file: string; keys: string[] }> = [
   },
   {
     file: "ui/src/components/BuiltInBundlePanel.tsx",
-    keys: ["Update {{label}} to the newest default?", "Reset {{label}} to the shipped default?", "Paperclip shipped a newer default."],
+    keys: ["Update {{label}} to the newest default?", "Reset {{label}} to the shipped default?", "XO shipped a newer default."],
   },
   {
     file: "ui/src/components/FrontmatterPanel.tsx",

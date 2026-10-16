@@ -567,7 +567,8 @@ export function transformSource(code: string, filePath: string, options: Transfo
     edits: 0,
     attrAllow: new Set(options.attrAllowlist ?? DEFAULT_ATTR_ALLOWLIST),
     propAllow: new Set(options.propAllowlist ?? DEFAULT_PROP_ALLOWLIST),
-    brandRe: new RegExp(`\\b${escapeRegExp(options.brandName ?? "Paperclip")}\\b`, "g"),
+    // Upstream "Paperclip" ба XO-д нэрлэсэн "XO" хоёулаа {{brand}} түлхүүр болно.
+    brandRe: new RegExp(`\\b(?:${escapeRegExp(options.brandName ?? "Paperclip")}|XO)\\b`, "g"),
   };
   let lastImportEnd = 0;
   let hasTxImport = false;

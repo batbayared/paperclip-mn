@@ -572,7 +572,7 @@ export function IssueRunLedger({
         body:
           error instanceof Error
             ? error.message
-            : "Paperclip could not start the trace re-run.",
+            : "XO could not start the trace re-run.",
         tone: "error",
         dedupeKey: `provider-trace-rerun:${issueId}`,
       }),
@@ -788,8 +788,8 @@ export function IssueRunLedgerContent({
           </p>
           <p className="mt-1">
             {latestSilentRun.outputSilence.evaluationIssueIdentifier
-              ? "This signal is informational. Paperclip did not create new delegated recovery work."
-              : "This signal is informational. Paperclip did not create or assign a recovery task."}
+              ? "This signal is informational. XO did not create new delegated recovery work."
+              : "This signal is informational. XO did not create or assign a recovery task."}
           </p>
           {onWatchdogDecision && canRecordWatchdogDecisions ? (
             <div className="mt-2 flex flex-wrap gap-1.5">

@@ -698,14 +698,14 @@ const HISTORY_VALUES = [
 
 describe("Ү6 7.10 helper-ууд (en)", () => {
   it("en дээр серверийн англи утгыг байт ижлээр буцаана", () => {
-    expect(xoSkillSourceLabel("Paperclip bundled")).toBe("Paperclip bundled");
-    expect(xoSkillSourceLabel("Paperclip workspace")).toBe("Paperclip workspace");
+    expect(xoSkillSourceLabel("Paperclip bundled")).toBe("XO bundled");
+    expect(xoSkillSourceLabel("Paperclip workspace")).toBe("XO workspace");
     expect(xoSkillSourceLabel("owner/repo")).toBe("owner/repo");
     expect(xoSkillVersionLabel("Initial version")).toBe("Initial version");
     expect(xoSkillVersionLabel("v2 tweaks")).toBe("v2 tweaks");
     expect(xoSkillTestTemplateText("Default test template")).toBe("Default test template");
     expect(xoSkillTestTemplateText("Paperclip's read-only default harness instructions for Skills Studio runs.")).toBe(
-      "Paperclip's read-only default harness instructions for Skills Studio runs.",
+      "XO's read-only default harness instructions for Skills Studio runs.",
     );
     for (const v of [...ATTENTION_LABELS, "Plan approval - Ship it"]) {
       expect(xoAttentionInteractionLabel(v)).toBe(v);
@@ -852,7 +852,8 @@ describe("Ү6 7.11 helper-ууд (en)", () => {
       expect(xoRoutineChangeSummary(v)).toBe(v);
     }
     for (const v of [...SKILL_EDITABLE_REASONS, "Something else."]) {
-      expect(xoSkillEditableReason(v)).toBe(v);
+      const expected = v === "Bundled Paperclip skills are read-only." ? "Bundled XO skills are read-only." : v;
+      expect(xoSkillEditableReason(v)).toBe(expected);
     }
     for (const v of ["Plan approval - Ship it", "Confirmation requested", "Custom title"]) {
       expect(xoAttentionTitle(v)).toBe(v);
@@ -900,7 +901,7 @@ describe("Ү6 7.11 helper-ууд (mn)", () => {
 
 describe("xoBrandVars", () => {
   it("en дээр BASE-ийн «Paperclip»-ийг буцааж, mn дээр XO брэнд өгнө", async () => {
-    expect(xoBrandVars()).toEqual({ brand: "Paperclip" });
+    expect(xoBrandVars()).toEqual({ brand: "XO" });
     await i18n.changeLanguage("mn");
     expect(xoBrandVars()).toEqual({ brand: "XO" });
   });

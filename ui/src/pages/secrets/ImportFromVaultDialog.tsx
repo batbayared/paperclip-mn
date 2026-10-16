@@ -286,10 +286,10 @@ function validateDraftRow(
 
   for (const existingSecret of existing) {
     if (existingSecret.name.trim().toLowerCase() === lowerName) {
-      return tx("A Paperclip secret already uses this name.");
+      return tx("An XO secret already uses this name.");
     }
     if (existingSecret.key.trim().toLowerCase() === lowerKey) {
-      return tx("A Paperclip secret already uses this key.");
+      return tx("An XO secret already uses this key.");
     }
   }
 
@@ -662,7 +662,7 @@ export function ImportFromVaultDialog({
               Import from AWS Secrets Manager
             </DialogTitle>
             <DialogDescription className="text-xs text-muted-foreground">
-              Bring AWS-managed secrets into Paperclip as external references.
+              Bring AWS-managed secrets into XO as external references.
             </DialogDescription>
             <Stepper step={step} />
           </div>
@@ -1249,7 +1249,7 @@ function ReviewStep({ drafts, reviewErrors, updateDraft, removeDraft, importing 
                   </div>
                   <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
                     <label className="flex flex-col gap-1 text-xs">
-                      <span className="text-muted-foreground">Paperclip name</span>
+                      <span className="text-muted-foreground">XO name</span>
                       <Input
                         value={draft.name}
                         onChange={(e) =>

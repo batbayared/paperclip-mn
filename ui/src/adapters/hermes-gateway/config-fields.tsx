@@ -166,7 +166,7 @@ export function HermesGatewayConfigFields({
       />
 
       <Field
-        label="Paperclip API URL"
+        label="XO API URL"
         hint={tx("Optional {{brand}} API URL reachable by the Hermes host. This is not a credential.", xoBrandVars())}
       >
         <DraftInput

@@ -70,8 +70,8 @@ interface EnvironmentDescriptor {
 
 const localEnvironmentDescriptor: EnvironmentDescriptor = {
   label: "Local",
-  detail: "Paperclip host",
-  title: "Local - Paperclip host",
+  detail: "XO host",
+  title: "Local - XO host",
 };
 
 const loadingEnvironmentDescriptor: EnvironmentDescriptor = {

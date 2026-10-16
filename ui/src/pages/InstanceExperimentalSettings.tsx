@@ -66,7 +66,7 @@ function ManagedByCloudBadge() {
   return (
     <Badge variant="outline" className="text-muted-foreground">
       <Lock aria-hidden="true" />
-      Managed by Paperclip Cloud
+      Managed by XO Cloud
     </Badge>
   );
 }
@@ -315,7 +315,7 @@ export function InstanceExperimentalSettings() {
 
         <ExperimentalToggleCard
           title="Beta skills"
-          description="Allow agents to pin beta releases of the Paperclip core skill. Disabling this returns every agent to the default live skill without removing saved pins."
+          description="Allow agents to pin beta releases of the XO core skill. Disabling this returns every agent to the default live skill without removing saved pins."
           checked={enableBetaSkills}
           onCheckedChange={(checked) => toggleMutation.mutate({ enableBetaSkills: checked })}
           disabled={toggleMutation.isPending}
@@ -326,7 +326,7 @@ export function InstanceExperimentalSettings() {
 
         <ExperimentalToggleCard
           title="Built-in Agents"
-          description="Show Paperclip-managed built-in agent surfaces, including built-in roster badges, the Built-in agents tab, and built-in agent setup controls."
+          description="Show XO-managed built-in agent surfaces, including built-in roster badges, the Built-in agents tab, and built-in agent setup controls."
           checked={enableBuiltInAgents}
           onCheckedChange={(checked) => toggleMutation.mutate({ enableBuiltInAgents: checked })}
           disabled={toggleMutation.isPending}
@@ -454,8 +454,8 @@ export function InstanceExperimentalSettings() {
         />
 
         <ExperimentalToggleCard
-          title="Paperclip Runner"
-          description="Allow new Codex agents to select the experimental Rust Paperclip Runner, including authenticated runner ingress when a sandbox requires it. Onboarding continues to use legacy adapters. Turning this off hides the choice without affecting existing native runs."
+          title="XO Runner"
+          description="Allow new Codex agents to select the experimental Rust XO Runner, including authenticated runner ingress when a sandbox requires it. Onboarding continues to use legacy adapters. Turning this off hides the choice without affecting existing native runs."
           checked={enableNativeRunner}
           onCheckedChange={(checked) =>
             toggleMutation.mutate({ enableNativeRunner: checked })
@@ -466,7 +466,7 @@ export function InstanceExperimentalSettings() {
           ariaLabel={resolveLocale() === "mn"
             ? tx("Toggle {{brand}} Runner experimental setting")
             // XO: en aria-label upstream-тэй ижил үлдэнэ (тест сонгогч үүгээр хайдаг).
-            : "Toggle Paperclip Runner experimental setting"}
+            : "Toggle XO Runner experimental setting"}
         />
 
         <InteractionLanguageCard
@@ -556,16 +556,16 @@ export function InstanceExperimentalSettings() {
       <section className="space-y-3" aria-labelledby="developer-mode-heading">
         <div className="space-y-1">
           <h2 id="developer-mode-heading" className="text-sm font-semibold">
-            Paperclip Developer Mode
+            XO Developer Mode
           </h2>
           <p className="text-sm text-muted-foreground">
-            Internal tools for developing, testing, and debugging Paperclip.
+            Internal tools for developing, testing, and debugging XO.
           </p>
         </div>
 
         <ExperimentalToggleCard
-          title="Paperclip Developer Mode"
-          description="Show internal Paperclip maintainer tools and observability links, including Honeycomb trace queries on run pages."
+          title="XO Developer Mode"
+          description="Show internal XO maintainer tools and observability links, including Honeycomb trace queries on run pages."
           checked={enablePaperclipDeveloperMode}
           onCheckedChange={(checked) =>
             toggleMutation.mutate({ enablePaperclipDeveloperMode: checked })
@@ -576,7 +576,7 @@ export function InstanceExperimentalSettings() {
           ariaLabel={resolveLocale() === "mn"
             ? tx("Toggle {{brand}} developer mode experimental setting")
             // XO: en aria-label upstream-тэй ижил үлдэнэ (тест сонгогч үүгээр хайдаг).
-            : "Toggle Paperclip developer mode experimental setting"}
+            : "Toggle XO developer mode experimental setting"}
         />
 
         <ExperimentalToggleCard

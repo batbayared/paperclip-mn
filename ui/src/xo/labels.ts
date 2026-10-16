@@ -737,12 +737,11 @@ function xoIsMn(): boolean {
 
 /** Функц доторх брэндийг {{brand}} болгосон tx-д: en горимд BASE-ийн upstream нэр хэвээр. */
 export function xoBrandVars(): { brand: string } {
-  return { brand: xoIsMn() ? BRAND.name : "Paperclip" };
+  return { brand: xoIsMn() ? BRAND.name : "XO" };
 }
 
 /** company-skills sourceLabel — зөвхөн серверийн тогтмол хоёр утга; бусад (owner/repo, зам) хэвээр. */
 export function xoSkillSourceLabel(english: string): string {
-  if (!xoIsMn()) return english;
   switch (english) {
     case "Paperclip bundled": return tx("{{brand}} bundled");
     case "Paperclip workspace": return tx("{{brand}} workspace");
@@ -761,11 +760,12 @@ export function xoSkillVersionLabel(english: string): string {
 
 /** Skills Studio анхдагч туршилтын загварын нэр ба тайлбар (сервер seed). */
 export function xoSkillTestTemplateText(english: string): string {
+  if (english === "Paperclip's read-only default harness instructions for Skills Studio runs.") {
+    return tx("{{brand}}'s read-only default harness instructions for Skills Studio runs.");
+  }
   if (!xoIsMn()) return english;
   switch (english) {
     case "Default test template": return tx("Default test template");
-    case "Paperclip's read-only default harness instructions for Skills Studio runs.":
-      return tx("{{brand}}'s read-only default harness instructions for Skills Studio runs.");
     default: return english;
   }
 }
@@ -878,9 +878,9 @@ export function xoRoutineChangeSummary(summary: string): string {
 
 /** company-skills.ts editableReason — серверийн тогтмол утгууд. */
 export function xoSkillEditableReason(reason: string): string {
+  if (reason === "Bundled Paperclip skills are read-only.") return tx("Bundled {{brand}} skills are read-only.");
   if (!xoIsMn()) return reason;
   switch (reason) {
-    case "Bundled Paperclip skills are read-only.": return tx("Bundled {{brand}} skills are read-only.");
     case "Skills.sh-managed skills are read-only.": return tx("Skills.sh-managed skills are read-only.");
     case "Remote GitHub skills are read-only. Fork or import locally to edit them.":
       return tx("Remote GitHub skills are read-only. Fork or import locally to edit them.");

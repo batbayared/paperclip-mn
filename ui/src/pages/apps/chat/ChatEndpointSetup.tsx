@@ -36,8 +36,8 @@ import { XoTrans } from "@/xo/XoTrans";
 import { xoBrandVars } from "@/xo/labels";
 
 // Teams app manifest content copied into Developer Portal: keep it untranslated.
-const TEAMS_STATUS_COMMAND_DESCRIPTION = "Show the active Paperclip task status";
-const TEAMS_NEW_COMMAND_DESCRIPTION = "Start a new Paperclip task in this chat";
+const TEAMS_STATUS_COMMAND_DESCRIPTION = "Show the active XO task status";
+const TEAMS_NEW_COMMAND_DESCRIPTION = "Start a new XO task in this chat";
 const TEAMS_CLOSE_COMMAND_DESCRIPTION = "Close the active chat conversation";
 import {
   createGitHubPrivateKeyReadGuard,
@@ -654,7 +654,7 @@ features:
     messages_tab_enabled: true
     messages_tab_read_only_enabled: false
   agent_view:
-    agent_description: "Work with a Paperclip agent in a task-backed conversation."
+    agent_description: "Work with an XO agent in a task-backed conversation."
   bot_user:
     display_name: ${JSON.stringify(slackBotName)}
   slash_commands:
@@ -775,7 +775,7 @@ settings:
           <p className="mt-1 text-sm text-muted-foreground">
             {repairing
               ? "Reconnect verifies this same Discord application and server installation. It does not add or remove the bot from the server. Leave fields blank to reuse saved credentials."
-              : "Create one dedicated Discord application and bot for this Paperclip agent."}
+              : "Create one dedicated Discord application and bot for this XO agent."}
           </p>
         </div>
       <ol className="list-decimal space-y-2 pl-5 text-sm">
@@ -817,7 +817,7 @@ settings:
         <p className="text-sm text-muted-foreground">
           The install link grants only View Channels, Send Messages, Create
           Public Threads, Send Messages in Threads, Read Message History, Add
-          Reactions, Embed Links, and Attach Files. Paperclip still requires
+          Reactions, Embed Links, and Attach Files. XO still requires
           each discovered channel to be enabled in Access.
         </p>
         <Button
@@ -845,7 +845,7 @@ settings:
           <h1 className="text-xl font-bold">Create {agentName} in Telegram</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {repairing
-              ? "Reconnect verifies this same BotFather bot and automatically refreshes its Paperclip webhook and command menu. It does not recreate the bot or change its chat memberships. Leave the token blank to reuse the saved credential."
+              ? "Reconnect verifies this same BotFather bot and automatically refreshes its XO webhook and command menu. It does not recreate the bot or change its chat memberships. Leave the token blank to reuse the saved credential."
               : "Create a bot with BotFather, then paste the token it gives you."}
           </p>
         </div>
@@ -859,7 +859,7 @@ settings:
           </li>
         </ol>
         <p className="rounded-md border border-border bg-muted/40 p-3 text-sm text-muted-foreground">
-          Paperclip works with Telegram&apos;s default bot privacy mode and
+          XO works with Telegram&apos;s default bot privacy mode and
           registers its command menu automatically. In a group, ordinary
           mentions are not delivered to bots:{" "}
           <XoTrans
@@ -876,7 +876,7 @@ settings:
         {field("botToken", tx("Bot token"))}
         {!endpoint.setup?.webhookUrl && (
           <p className="text-sm text-destructive">
-            Configure a public HTTPS URL for this Paperclip instance before
+            Configure a public HTTPS URL for this XO instance before
             connecting Telegram.
           </p>
         )}
@@ -924,7 +924,7 @@ settings:
           </li>
           <li>
             In Azure, create an Azure Bot. Choose Single Tenant, use that
-            Application ID, set its messaging endpoint to the Paperclip URL
+            Application ID, set its messaging endpoint to the XO URL
             below, and add the Microsoft Teams channel.
           </li>
           <li>
@@ -1039,7 +1039,7 @@ settings:
         <p className="text-sm text-muted-foreground">
           Enter the Application / Client ID above before copying so the block
           contains the real bot identity. This block contains the
-          Paperclip-specific fields to verify in Developer Portal or merge into
+          XO-specific fields to verify in Developer Portal or merge into
           a complete Teams app manifest. It is not a complete app package;
           Developer Portal supplies the remaining required metadata and packages
           the manifest with your app icons.
@@ -1054,7 +1054,7 @@ settings:
         <p className="text-sm text-muted-foreground">
           The two application RSC permissions let the bot receive every message,
           without an @mention, in each team or group chat where it is installed.
-          Paperclip retains and acts only on messages admitted by your Paperclip
+          XO retains and acts only on messages admitted by your XO
           reach and access rules. Make this provider access clear in the app
           description shown to installers.
         </p>
@@ -1066,7 +1066,7 @@ settings:
         </p>
         {!endpoint.setup?.messagingEndpoint && (
           <p className="text-sm text-destructive">
-            Configure a public HTTPS URL for this Paperclip instance before
+            Configure a public HTTPS URL for this XO instance before
             connecting Microsoft Teams.
           </p>
         )}
@@ -1102,7 +1102,7 @@ settings:
           <p className="mt-1 text-sm text-muted-foreground">
             {repairing
               ? "Reconnect verifies this same App and installation, then updates its webhook URL, secret, and secure delivery settings. It does not reinstall the App or change repository access. Leave App ID and private key blank to reuse saved credentials. Keep Webhooks · Active enabled in GitHub; send a test conversation after reconnecting."
-              : "Configure its webhook and permissions, then verify the App with Paperclip."}
+              : "Configure its webhook and permissions, then verify the App with XO."}
           </p>
         </div>
         {!repairing && (
@@ -1110,7 +1110,7 @@ settings:
             <li>
               Under the target user or organization, create a new GitHub App.
               Give it a globally unique name (34 characters or fewer), use the
-              Paperclip homepage URL below, and leave user authorization off.
+              XO homepage URL below, and leave user authorization off.
             </li>
             <li>
               <XoTrans
@@ -1261,14 +1261,14 @@ settings:
                 </Button>
               </div>
               <p className="text-sm text-muted-foreground">
-                Copy this value now. Paperclip will not show it again.
+                Copy this value now. XO will not show it again.
               </p>
             </>
           ) : (
             <p className="text-sm text-muted-foreground">
               {endpoint.setup?.webhookSecretConfigured
                 ? "A webhook secret is configured and cannot be shown again."
-                : "Generate the secret in Paperclip, then paste it into the GitHub App."}
+                : "Generate the secret in XO, then paste it into the GitHub App."}
             </p>
           )}
           <div>
@@ -1305,7 +1305,7 @@ settings:
         </div>
         {!endpoint.setup?.webhookUrl && (
           <p className="text-sm text-destructive">
-            Configure a public HTTPS URL for this Paperclip instance before
+            Configure a public HTTPS URL for this XO instance before
             connecting GitHub.
           </p>
         )}
@@ -1334,7 +1334,7 @@ settings:
         <div>
           <h1 className="text-xl font-bold">Finish Slack setup</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Point the Slack app at Paperclip now that its signing secret is
+            Point the Slack app at XO now that its signing secret is
             connected.
           </p>
         </div>
@@ -1344,7 +1344,7 @@ settings:
           <p className="font-medium">Use the registered command</p>
           <p className="mt-1 text-muted-foreground">
             <XoTrans
-              i18nKey="Start work with <investigate/>. In a direct message, use <status/>, <new/>, or <close/>. Slack's bare <code>/status</code> command is not a {{brand}} control."
+              i18nKey="Start work with <investigate/>. In a direct message, use <status/>, <new/>, or <close/>. Slack's bare <code>/status</code> command is not an {{brand}} control."
               values={xoBrandVars()}
               components={{
                 investigate: <code>{`${slackCommand} investigate this`}</code>,
@@ -1359,7 +1359,7 @@ settings:
         <ol className="list-decimal space-y-2 pl-5 text-sm">
           <li>
             <XoTrans
-              i18nKey="Return to <strong>App Manifest</strong> in Slack and click <strong>Save Changes</strong>. The copied manifest already contains the event, interaction, and slash-command URLs. Slack verifies the Events URL when you save; Paperclip records Interactivity and slash command health only after each signed callback is observed."
+              i18nKey="Return to <strong>App Manifest</strong> in Slack and click <strong>Save Changes</strong>. The copied manifest already contains the event, interaction, and slash-command URLs. Slack verifies the Events URL when you save; XO records Interactivity and slash command health only after each signed callback is observed."
               values={xoBrandVars()}
               components={{ strong: <strong /> }}
             />
@@ -1386,7 +1386,7 @@ settings:
         <p className="mt-1 text-sm text-muted-foreground">
           {repairing
             ? "Reconnect verifies or replaces credentials for this same Slack app. It does not reinstall the app or change its workspace or channel membership. Leave credentials blank to reuse the saved values."
-            : "Bring your own Slack app. The manifest requests the scopes Paperclip needs; credentials remain write-only."}
+            : "Bring your own Slack app. The manifest requests the scopes XO needs; credentials remain write-only."}
         </p>
       </div>
       <ol className="list-decimal space-y-2 pl-5 text-sm">
@@ -1454,7 +1454,7 @@ settings:
       {field("signingSecret", tx("Signing Secret"))}
       {!endpoint.setup?.webhookUrl && (
         <p className="text-sm text-destructive">
-          Configure a public HTTPS URL for this Paperclip instance before
+          Configure a public HTTPS URL for this XO instance before
           connecting Slack.
         </p>
       )}
@@ -1553,7 +1553,7 @@ function TryStep({
             ? {
                 tone: "warning" as const,
                 title: "Link the account you’re testing",
-                body: `An observed external account is unlinked, and isolated guest work is off, so it cannot safely start ${agentName}. Link the account in Access, then ${freshConversationInstruction}; Paperclip does not replay the refused request.`,
+                body: `An observed external account is unlinked, and isolated guest work is off, so it cannot safely start ${agentName}. Link the account in Access, then ${freshConversationInstruction}; XO does not replay the refused request.`,
               }
             : {
                 tone: "info" as const,
@@ -1572,7 +1572,7 @@ function TryStep({
   const instructions =
     provider === "imessage-photon" ? [
       photonAllocation === "shared" ? tx("In your Photon project, enroll your sender in Users and find its assigned number in Get started. Send a fresh message to that number from Apple Messages.") : tx("Open Apple Messages and send a fresh message to {{target}}.", { target: botUsername ?? botLabel ?? tx("the dedicated number") }),
-      tx("Link the discovered sender to a {{brand}} person in Access, then send a fresh request.", xoBrandVars()),
+      tx("Link the discovered sender to an {{brand}} person in Access, then send a fresh request.", xoBrandVars()),
       tx("Wait for the agent’s actual reply. Setup completes after that reply is delivered."),
       ...(photonAllocation === "shared" ? [tx("This Pro-compatible channel supports DMs only. Group messages cannot start work.")] : [tx("For a group: add the number in Messages, send a message, enable the discovered group in Settings, then send a fresh request.")]),
     ] : provider === "discord"

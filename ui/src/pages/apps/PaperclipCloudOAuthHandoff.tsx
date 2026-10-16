@@ -40,15 +40,15 @@ export function ManagedOAuthHandoffState({
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {failed
-              ? error ?? "Paperclip couldn’t prepare the provider sign-in. Try again."
+              ? error ?? "XO couldn’t prepare the provider sign-in. Try again."
               : phase === "reauthenticating"
-                ? "Your Paperclip sign-in is being refreshed."
-                : "Paperclip is opening the provider securely."}
+                ? "Your XO sign-in is being refreshed."
+                : "XO is opening the provider securely."}
           </p>
           {failed ? (
             <div className="mt-6 flex items-center gap-2">
               <Button type="button" onClick={onRetry}>Try again</Button>
-              <Button type="button" variant="ghost" onClick={onCancel}>Return to Paperclip</Button>
+              <Button type="button" variant="ghost" onClick={onCancel}>Return to XO</Button>
             </div>
           ) : null}
         </div>

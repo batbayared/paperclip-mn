@@ -183,7 +183,7 @@ export function localizedAppDescription(text: string): string {
   m = /^Let people start and continue \S+ work with an agent from (.+)\.$/.exec(text);
   if (m) return tx("Let people start and continue {{brand}} work with an agent from {{name}}.", { ...xoBrandVars(), name: m[1] });
   if (/^Message a \S+ agent from Apple Messages using Photon Cloud\. Pro supports DMs; dedicated lines also support groups\.$/.test(text)) {
-    return tx("Message a {{brand}} agent from Apple Messages using Photon Cloud. Pro supports DMs; dedicated lines also support groups.", xoBrandVars());
+    return tx("Message an {{brand}} agent from Apple Messages using Photon Cloud. Pro supports DMs; dedicated lines also support groups.", xoBrandVars());
   }
   if (/^Give agents Slack tools or let people start and continue \S+ work from Slack\.$/.test(text)) {
     return tx("Give agents Slack tools or let people start and continue {{brand}} work from Slack.", xoBrandVars());

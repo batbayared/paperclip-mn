@@ -126,11 +126,11 @@ function providerLifecycleGuidance(
     case "telegram":
       return {
         reconnect: tx(
-          "Reconnect verifies this same BotFather bot and automatically refreshes its Paperclip webhook and command menu.",
+          "Reconnect verifies this same BotFather bot and automatically refreshes its XO webhook and command menu.",
           brand,
         ),
         remove: tx(
-          "Paperclip archives the endpoint and queues durable removal of its Telegram webhook and command menu. After Telegram confirms that cleanup, Paperclip retires the saved token. The BotFather bot and its chat memberships remain until you remove them in Telegram.",
+          "XO archives the endpoint and queues durable removal of its Telegram webhook and command menu. After Telegram confirms that cleanup, XO retires the saved token. The BotFather bot and its chat memberships remain until you remove them in Telegram.",
           brand,
         ),
       };
@@ -446,7 +446,7 @@ function Settings({
             <code>{endpoint.setup.command}</code>
             <p className="mt-2 text-muted-foreground">
               <XoTrans
-                i18nKey="Start work with <investigate/>. In a direct message, use <status/>, <new/>, or <close/>. Slack's bare <code>/status</code> command is not a {{brand}} control."
+                i18nKey="Start work with <investigate/>. In a direct message, use <status/>, <new/>, or <close/>. Slack's bare <code>/status</code> command is not an {{brand}} control."
                 values={xoBrandVars()}
                 components={{
                   investigate: <code>{`${endpoint.setup.command} investigate this`}</code>,
@@ -480,7 +480,7 @@ function Settings({
       <div>
         <h2 className="text-lg font-semibold">Where this agent can work</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Provider membership makes a destination available. Paperclip responds
+          Provider membership makes a destination available. XO responds
           only where you enable it.
         </p>
       </div>
@@ -643,13 +643,13 @@ function Access({
       <div>
         <h2 className="text-lg font-semibold">External identity access</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Linked identities act as their current Paperclip user. Unlinked
+          Linked identities act as their current XO user. Unlinked
           people, when allowed, receive a fixed restricted profile.
         </p>
       </div>
       <SettingToggle
         label="Allow unlinked people"
-        detail="They are restricted guests. Their tasks run only with an isolated workspace and sandbox environment; otherwise Paperclip safely refuses the request. They cannot approve, hire, spend, manage access, or reassign agents."
+        detail="They are restricted guests. Their tasks run only with an isolated workspace and sandbox environment; otherwise XO safely refuses the request. They cannot approve, hire, spend, manage access, or reassign agents."
         checked={allowUnlinked}
         pending={updatePolicy.isPending}
         onChange={(value) => updatePolicy.mutate(value)}
@@ -970,7 +970,7 @@ function Activity({
           <p className="mt-1 text-xs text-muted-foreground">
             {endpoint.setup?.callbacksNeedUpdate
               ? "Slack callback URLs need an update. Save the current App Manifest, then exercise Events, Interactivity, and the registered command again."
-              : "Paperclip records each callback surface independently after Slack successfully calls it."}
+              : "XO records each callback surface independently after Slack successfully calls it."}
           </p>
           <div className="mt-3 grid gap-2 sm:grid-cols-3">
             {callbackSurfaceRows.map(([label, surface]) => (
@@ -1184,9 +1184,9 @@ function Activity({
             </AlertDialogTitle>
             <AlertDialogDescription>
               {resolutionItem?.actionType === "slash_task_start"
-                ? "Paperclip lost confirmation after asking Slack to start the task. Check Slack first. Retrying can create a duplicate starter message and task."
+                ? "XO lost confirmation after asking Slack to start the task. Check Slack first. Retrying can create a duplicate starter message and task."
                 : resolutionItem?.actionType === "provider_effect"
-                  ? "Paperclip lost confirmation after sending this provider reply. Check the provider first. Marking it delivered applies any pending Paperclip state change; retrying can create a duplicate message."
+                  ? "XO lost confirmation after sending this provider reply. Check the provider first. Marking it delivered applies any pending XO state change; retrying can create a duplicate message."
                   : resolutionItem
                     ? activityResolutionDescription(resolutionItem)
                     : ""}

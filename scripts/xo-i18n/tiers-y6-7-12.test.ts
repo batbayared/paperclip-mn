@@ -13,7 +13,7 @@ const CASES: Array<{ file: string; keys: string[] }> = [
     file: "ui/src/components/DevRestartBanner.tsx",
     keys: [
       "Restart Required",
-      "Restart Paperclip now?",
+      "Restart XO now?",
       "{{n}} live runs",
       "Restart <code>pnpm dev:once</code> after the active work is safe to interrupt",
     ],

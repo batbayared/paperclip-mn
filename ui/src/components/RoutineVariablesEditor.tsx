@@ -299,7 +299,7 @@ export function RoutineVariablesHint() {
           <DialogHeader>
             <DialogTitle>Routine variables</DialogTitle>
             <DialogDescription>
-              How to prompt for inputs and which variables Paperclip fills in automatically.
+              How to prompt for inputs and which variables XO fills in automatically.
             </DialogDescription>
           </DialogHeader>
 

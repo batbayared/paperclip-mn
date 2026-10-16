@@ -25,7 +25,7 @@ const Y6_7_10_KEYS: string[] = [
   "Reset {{label}} to the shipped default?",
   "Reset {{label}}",
   "You've edited this. Your changes are kept until you reset.",
-  "Paperclip shipped a newer default.",
+  "XO shipped a newer default.",
   // Task 5: frontmatter
   "{{n}} issue",
   "{{n}} issues",
