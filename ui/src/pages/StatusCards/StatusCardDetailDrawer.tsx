@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { tx } from "@/i18n/xo";
+import { xoStatusCardChangeKindLabel } from "@/xo/labels";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { CompanySearchIssueSummary, StatusCardUpdate, SummarySlotIssueRef } from "@paperclipai/shared";
 import { AlertTriangle, ChevronDown, ExternalLink, History, Loader2, RefreshCw, Wand2 } from "lucide-react";
@@ -622,5 +623,5 @@ function ChangeRow({ change }: { change: StatusCardUpdate["changes"][number] }) 
 function describeChangeKind(changeKind: string): string {
   if (changeKind === "entered_query" || changeKind === "new") return tx("new issue matched the query");
   if (changeKind === "left_query") return tx("left the query");
-  return changeKind.replace(/_/g, " ");
+  return xoStatusCardChangeKindLabel(changeKind);
 }

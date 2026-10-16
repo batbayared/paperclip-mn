@@ -953,3 +953,17 @@ export function xoFileTransferPhaseLabel(phase: string): string {
     default: return english;
   }
 }
+
+// StatusCardDetailDrawer-ийн changeKind (status-card-update-engine). en дээр түүхий утга.
+export function xoStatusCardChangeKindLabel(changeKind: string): string {
+  const english = changeKind.replace(/_/g, " ");
+  if (!xoIsMn()) return english;
+  switch (changeKind) {
+    case "removed": return tx("removed from the query");
+    case "status": return tx("status changed");
+    case "assignee": return tx("assignee changed");
+    case "human_comment": return tx("new human comment");
+    case "updated": return tx("updated");
+    default: return english;
+  }
+}

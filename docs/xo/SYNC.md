@@ -259,6 +259,17 @@ Gates (2026-10-14): xo:i18n:check OK 5894, xo:i18n:test 11 / 129, tsc 0, vitest 
 - company-members.ts-ийн «Board» шошго.
 - en-д ConnectionSetupFlow-ийн брэнд «XO» гэж гарна (en байт ижил зарчмаас ухамсартай гажсан).
 
+## Ү6 7.28-д хөндсөн upstream файлууд
+
+BoardChat feed, sidebar, status card-ын үлдэгдэл. BASE e31a08ecc.
+
+| Файл | Өөрчлөлт |
+|---|---|
+| ui/src/components/FeedCard.tsx | үйл үг, actor нэр, approval тодорхойлогч → tx; status → xoHumanizeValue, priority → xoRoutineHistoryValueLabel |
+| ui/src/components/SidebarAgents.tsx | «Built-in agent …» template → tx-тэй хоёр бүтэн өгүүлбэр |
+| ui/src/pages/StatusCards/StatusCardDetailDrawer.tsx | describeChangeKind fallback → xoStatusCardChangeKindLabel |
+| ui/src/components/task-chat/TaskChatCompactInteractionCard.tsx | expirationReason → tx |
+
 ## Ү6 7.27-д хөндсөн upstream файлууд
 
 Шүүлтүүр, routine, файл дамжуулалт, work product-ийн түүхий enum. BASE 3d1c9feb8.

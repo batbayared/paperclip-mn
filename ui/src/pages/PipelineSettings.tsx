@@ -1,5 +1,6 @@
 import { xoLocaleDateTime } from "@/xo/date-format";
 import { tx } from "@/i18n/xo";
+import { xoIsMn, xoStatusLabel } from "@/xo/labels";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -203,6 +204,13 @@ function parseStageSectionKey(value: string | null): StageSectionKey | null {
     default:
       return null;
   }
+}
+
+/** XO: execution-workspace status in the reuse picker; English stays the raw value. */
+function executionWorkspaceStatusLabel(status: string): string {
+  if (!xoIsMn()) return status;
+  if (status === "cleanup_failed") return tx("Cleanup failed");
+  return xoStatusLabel(status, status);
 }
 
 export function resolvePipelineSettingsFallbackStageId(
@@ -3051,7 +3059,7 @@ export function PipelineSettings() {
                                       <option value="">Choose an existing workspace</option>
                                       {deduplicatedReusableWorkspaces.map((workspace) => (
                                         <option key={workspace.id} value={workspace.id}>
-                                          {workspace.name} · {workspace.status} · {workspace.branchName ?? workspace.cwd ?? workspace.id.slice(0, 8)}
+                                          {workspace.name} · {executionWorkspaceStatusLabel(workspace.status)} · {workspace.branchName ?? workspace.cwd ?? workspace.id.slice(0, 8)}
                                         </option>
                                       ))}
                                     </select>

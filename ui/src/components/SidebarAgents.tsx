@@ -27,6 +27,7 @@ import { SIDEBAR_SCROLL_RESET_STATE } from "../lib/navigation-scroll";
 import { queryKeys } from "../lib/queryKeys";
 import { cn, agentRouteRef, agentUrl, SIDEBAR_RAIL_HIDDEN_LABEL } from "../lib/utils";
 import { useAgentOrder } from "../hooks/useAgentOrder";
+import { tx } from "@/i18n/xo";
 import {
   isStarred,
   resourceMembershipState,
@@ -156,7 +157,11 @@ function SidebarAgentItem({
       : pauseResumeLabel;
   const showBuiltInLifecycle = builtInStatus === "needs_setup" || builtInStatus === "pending_approval";
   const trailingLabel = [
-    showBuiltInLifecycle ? `Built-in agent ${builtInStatus.replace(/_/g, " ")}` : null,
+    showBuiltInLifecycle
+      ? builtInStatus === "needs_setup"
+        ? tx("Built-in agent needs setup")
+        : tx("Built-in agent pending approval")
+      : null,
     hasInvalidOrgChain ? "Invalid reporting chain" : null,
   ].filter(Boolean).join(", ") || undefined;
 

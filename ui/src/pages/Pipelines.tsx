@@ -1,5 +1,6 @@
 import { xoLocaleDate, xoLocaleDateTime } from "@/xo/date-format";
 import { tx } from "@/i18n/xo";
+import { xoStatusLabel } from "@/xo/labels";
 import { XoTrans } from "@/xo/XoTrans";
 import { useCallback, useEffect, useMemo, useState, type FormEvent, type ReactNode } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -3835,6 +3836,11 @@ function humanizeOutputStatus(status: string) {
   return normalized.charAt(0).toUpperCase() + normalized.slice(1).replace(/_/g, " ");
 }
 
+/** XO: issue-status chip; English stays the sentence-cased humanized value. */
+function outputIssueStatusLabel(status: string) {
+  return xoStatusLabel(status.trim().toLowerCase(), humanizeOutputStatus(status));
+}
+
 function isLowTrustOutput(item: PipelineCaseOutputItem) {
   const trust = item.sourceTrust;
   return trust?.preset === LOW_TRUST_REVIEW_PRESET && trust.disposition === "quarantined";
@@ -3887,7 +3893,7 @@ function OutputDeliverableTag({ label }: { label: string }) {
 function OutputUnverifiedTag() {
   return (
     <Badge variant="outline" className="border-border px-1.5 text-(length:--text-nano) font-semibold uppercase text-muted-foreground">
-      Unverified
+      {tx("Unverified")}
     </Badge>
   );
 }
@@ -3910,14 +3916,14 @@ function ItemOutputMeta({ item, children }: { item: PipelineCaseOutputItem; chil
         className="font-mono text-(length:--text-micro) text-muted-foreground hover:text-foreground hover:underline"
         title={item.sourceIssueTitle}
       >
-        {item.sourceIssueIdentifier ?? "Source task"}
+        {item.sourceIssueIdentifier ?? tx("Source task")}
       </Link>
       <OutputMetaDot />
       <span>{roleLabel}</span>
       <OutputMetaDot />
       <span className={cn("inline-flex items-center gap-1", statusClass)}>
         <span className="inline-block h-1.5 w-1.5 rounded-full bg-current" />
-        {humanizeOutputStatus(item.sourceIssueStatus)}
+        {outputIssueStatusLabel(item.sourceIssueStatus)}
       </span>
       <OutputMetaDot />
       <span>{relativeTime(item.updatedAt)}</span>

@@ -1,4 +1,6 @@
 import { Link } from "@/lib/router";
+import { tx } from "@/i18n/xo";
+import { xoHumanizeValue, xoRoutineHistoryValueLabel } from "@/xo/labels";
 import { AgentIcon } from "./AgentIconPicker";
 import { timeAgo } from "../lib/timeAgo";
 import { cn } from "../lib/utils";
@@ -43,85 +45,85 @@ function formatVerb(
 ): string {
   switch (action) {
     case "issue.created":
-      return "opened";
+      return tx("opened");
     case "issue.updated": {
       const status = details?.status;
-      if (typeof status === "string") return `moved to ${humanize(status)}`;
+      if (typeof status === "string") return tx("moved to {{status}}", { status: xoHumanizeValue(status) });
       const priority = details?.priority;
-      if (typeof priority === "string") return `set priority to ${humanize(priority)} on`;
-      return "updated";
+      if (typeof priority === "string") return tx("set priority to {{priority}} on", { priority: xoRoutineHistoryValueLabel(humanize(priority)) });
+      return tx("updated");
     }
     case "issue.document_created":
-      return "wrote doc on";
+      return tx("wrote doc on");
     case "issue.document_updated":
-      return "edited doc on";
+      return tx("edited doc on");
     case "issue.document_deleted":
-      return "deleted doc from";
+      return tx("deleted doc from");
     case "issue.work_product_created":
-      return "delivered work on";
+      return tx("delivered work on");
     case "issue.work_product_updated":
-      return "updated work on";
+      return tx("updated work on");
     case "issue.work_product_deleted":
-      return "removed work from";
+      return tx("removed work from");
     case "issue.checked_out":
-      return "picked up";
+      return tx("picked up");
     case "issue.released":
-      return "released";
+      return tx("released");
     case "issue.commented":
     case "issue.comment_added":
-      return "commented on";
+      return tx("commented on");
     case "issue.attachment_added":
-      return "attached a file to";
+      return tx("attached a file to");
     case "issue.attachment_removed":
-      return "removed attachment from";
+      return tx("removed attachment from");
     case "issue.deleted":
-      return "deleted";
+      return tx("deleted");
 
     case "approval.created":
-      return context === "pinned" ? "needs approval on" : "requested approval on";
+      return context === "pinned" ? tx("needs approval on") : tx("requested approval on");
     case "approval.approved":
-      return "approved";
+      return tx("approved");
     case "approval.rejected":
-      return "rejected";
+      return tx("rejected");
     case "approval.revision_requested":
-      return "requested changes on";
+      return tx("requested changes on");
 
     case "agent.created":
-      return context === "pinned" ? "wants to hire" : "hired";
+      return context === "pinned" ? tx("wants to hire") : tx("hired");
     case "agent.paused":
-      return "paused";
+      return tx("paused");
     case "agent.resumed":
-      return "resumed";
+      return tx("resumed");
     case "agent.updated":
-      return "updated";
+      return tx("updated");
     case "agent.terminated":
-      return "terminated";
+      return tx("terminated");
 
     case "heartbeat.invoked":
-      return "started a run on";
+      return tx("started a run on");
     case "heartbeat.cancelled":
-      return "cancelled a run on";
+      return tx("cancelled a run on");
 
     case "project.created":
-      return "created project";
+      return tx("created project");
     case "project.updated":
-      return "updated project";
+      return tx("updated project");
     case "project.deleted":
-      return "deleted project";
+      return tx("deleted project");
     case "goal.created":
-      return "created goal";
+      return tx("created goal");
     case "goal.updated":
-      return "updated goal";
+      return tx("updated goal");
     case "goal.deleted":
-      return "deleted goal";
+      return tx("deleted goal");
     case "company.created":
-      return "created organization";
+      return tx("created organization");
     case "company.updated":
-      return "updated organization";
+      return tx("updated organization");
     case "company.archived":
-      return "archived organization";
+      return tx("archived organization");
     case "company.budget_updated":
-      return "updated organization budget";
+      return tx("updated organization budget");
 
     default:
       return action.replace(/[._]/g, " ");
@@ -293,10 +295,10 @@ function resolveContent(
   const actorName =
     actor?.name ??
     (event.actorType === "system"
-      ? "System"
+      ? tx("System")
       : event.actorType === "user"
-        ? "Board"
-        : event.actorId || "Unknown");
+        ? tx("Board")
+        : event.actorId || tx("Unknown"));
 
   const entityTitle = entityTitleMap?.get(`${event.entityType}:${event.entityId}`) ?? null;
 
@@ -351,7 +353,7 @@ function resolveContent(
     if (approvalAgentName) {
       identifier = approvalAgentName;
     } else {
-      identifier = approvalType ? humanize(approvalType) : "approval";
+      identifier = approvalType ? xoHumanizeValue(approvalType) : tx("approval");
       identifierMono = false;
     }
     title = entityTitle;

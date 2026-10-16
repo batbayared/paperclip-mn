@@ -364,7 +364,11 @@ function receiptReason(interaction: IssueThreadInteraction): string | null {
   if (interaction.kind === "ask_user_questions") {
     return (
       interaction.result?.cancellationReason ??
-      interaction.result?.expirationReason?.replaceAll("_", " ") ??
+      (interaction.result?.expirationReason === "superseded_by_comment"
+        ? tx("superseded by comment")
+        : interaction.result?.expirationReason === "superseded_by_newer_interaction"
+          ? tx("superseded by newer interaction")
+          : (interaction.result?.expirationReason as string | undefined)?.replaceAll("_", " ")) ??
       null
     );
   }

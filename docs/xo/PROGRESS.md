@@ -1,5 +1,28 @@
 # XO ахицын бүртгэл
 
+## Ү6 7.28 BoardChat feed, sidebar, status card-ын үлдэгдэл (2026-10-16)
+
+Зорилго: 7.27-ын үлдэгдлээс бүтнээрээ англи үлдсэн FeedCard ба цөөн тооны түүхий enum-ийг орчуулах. en гаралт хуучнаараа.
+
+BASE e31a08ecc.
+
+| Хэсэг | Агуулга |
+|---|---|
+| Засвар | FeedCard (BoardChat-ын ActivityFeed: 35 үйл үг, «moved to», «set priority to», actor System/Board/Unknown, approval тодорхойлогч), SidebarAgents (Built-in agent needs setup / pending approval, catalog-д байсан түлхүүр), StatusCardDetailDrawer (changeKind), TaskChatCompactInteractionCard (expirationReason) |
+| Helper | labels.ts-д xoStatusCardChangeKindLabel нэмсэн (зөвхөн mn үед орчуулна, en дээр түүхий утга) |
+| Шинэ орчуулга | 33 түлхүүр; үйл үгийг одоогийн хэв маягаар «үйл үг + :» хэлбэрээр |
+| Каталог | +33 түлхүүр (11637) |
+| Хөтчийн шалгалт | хийгээгүй: 3110 сервер унтарсан хэвээр |
+| Шалгалт | xo:i18n check OK (11637), xo:i18n:test 440, UI 625/6585, tsc цэвэр, brand 477/147 |
+
+Санаатай орхисон:
+- UserProfile event.action: formatActivityVerb «… on» хэлбэрийн үйл үг буцаадаг тул бие даасан шошгонд тохирохгүй; тусдаа шийдэл хэрэгтэй.
+- TaskChatBubble caveat.reasonCode, IssueRecoveryActionCard-ийн fallback type, RoutineActivityRow-ийн detail key: техникийн код, мэдэгдэх утгуудыг аль хэдийн орчуулсан.
+
+Үлдэгдэл:
+- lib/external-objects, activity-format, issue-change-receipt, attention, review-policy, Pipelines, SecretBindingPicker provider түүхий enum хэвээр.
+- 7.22–7.28-ын хөтчийн шалгалт сервер асаасны дараа.
+
 ## Ү6 7.27 Шүүлтүүр, routine, файл дамжуулалт, work product-ийн түүхий enum (2026-10-15)
 
 Зорилго: 7.26-ын үлдэгдлээс сонголтын жагсаалт, audit, chat-ын файл дамжуулалт, work product-ийн төрлийг орчуулах. en гаралт хуучнаараа.
