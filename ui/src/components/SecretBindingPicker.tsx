@@ -11,6 +11,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "../lib/utils";
 import { tx } from "@/i18n/xo";
+import { i18n } from "@/i18n";
+import { xoStatusLabel } from "@/xo/labels";
 
 export interface SecretBindingValue {
   secretId: string;
@@ -61,8 +63,21 @@ interface SecretBindingPickerProps {
 
 const VERSION_LATEST: SecretVersionSelector = "latest";
 
+// SECRET_PROVIDERS (packages/shared/src/constants.ts). AWS/GCP/Vault брэнд нэр тул хэвээр.
+function secretProviderLabel(provider: string): string {
+  const english = provider.replaceAll("_", " ");
+  if (!(i18n.resolvedLanguage ?? i18n.language ?? "").startsWith("mn")) return english;
+  switch (provider) {
+    case "local_encrypted": return tx("Local encrypted");
+    case "aws_secrets_manager": return "AWS Secrets Manager";
+    case "gcp_secret_manager": return "GCP Secret Manager";
+    case "vault": return "Vault";
+    default: return english;
+  }
+}
+
 function describeSecret(secret: CompanySecret): string {
-  const provider = secret.provider.replaceAll("_", " ");
+  const provider = secretProviderLabel(secret.provider);
   if (secret.managedMode === "external_reference") {
     return tx("External · {{provider}}", { provider });
   }
@@ -252,7 +267,7 @@ export function SecretBindingPicker({
 
       {selectedSecret ? (
         <p className={cn("text-(length:--text-micro) text-muted-foreground", statusTone(selectedSecret.status))}>
-          {selectedSecret.status !== "active" ? tx("Status: {{status}}. ", { status: selectedSecret.status }) : null}
+          {selectedSecret.status !== "active" ? tx("Status: {{status}}. ", { status: xoStatusLabel(selectedSecret.status, selectedSecret.status) }) : null}
           {tx("Bound to {{version}} · {{key}}", { version: versionDisplay(value?.version), key: selectedSecret.key })}
         </p>
       ) : crossCompanyHint ? (
@@ -267,7 +282,7 @@ export function SecretBindingPicker({
           <AlertCircle className="h-3 w-3" />
           {missingHint.status === "deleted"
             ? "The previously selected secret was deleted. Pick another or remove the binding."
-            : tx("This secret is {{status}}; runs cannot resolve it until it is active again.", { status: missingHint.status })}
+            : tx("This secret is {{status}}; runs cannot resolve it until it is active again.", { status: xoStatusLabel(missingHint.status, missingHint.status).toLowerCase() })}
         </p>
       ) : hintsPending ? (
         <p className="text-(length:--text-micro) text-muted-foreground flex items-center gap-1">

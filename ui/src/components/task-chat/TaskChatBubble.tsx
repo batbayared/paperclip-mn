@@ -33,7 +33,26 @@ import {
 import { TaskChatSystemNotice } from "./TaskChatSystemNotice";
 import type { TaskChatMessageItem } from "./task-chat-model";
 import { tx } from "@/i18n/xo";
+import { i18n } from "@/i18n";
 import { xoFileKindLabel } from "@/xo/labels";
+
+// PRP_VERIFICATION_REASON_CODES (packages/paperclip-runner/src/contracts/completion-result.ts).
+function verificationReasonLabel(reasonCode: string): string {
+  const english = reasonCode.replaceAll("_", " ");
+  if (!(i18n.resolvedLanguage ?? i18n.language ?? "").startsWith("mn")) return english;
+  switch (reasonCode) {
+    case "environment_unavailable": return tx("Environment unavailable");
+    case "tool_unavailable": return tx("Tool unavailable");
+    case "dependency_missing": return tx("Dependency missing");
+    case "permission_denied": return tx("Permission denied");
+    case "credential_missing": return tx("Credential missing");
+    case "policy_restricted": return tx("Policy restricted");
+    case "external_service_unavailable": return tx("External service unavailable");
+    case "budget_exhausted": return tx("Budget exhausted");
+    case "other": return tx("Other");
+    default: return english;
+  }
+}
 
 interface TaskChatBubbleProps {
   item: TaskChatMessageItem;
@@ -355,7 +374,7 @@ function TaskChatBubbleContent({
           data-testid="task-chat-verification-caveats"
         >
           <p className="font-medium text-amber-800 dark:text-amber-200">
-            Verification caveat
+            {tx("Verification caveat")}
           </p>
           <ul className="mt-1 space-y-1 text-muted-foreground">
             {item.verificationCaveats.map((caveat, index) => (
@@ -364,7 +383,7 @@ function TaskChatBubbleContent({
                   {caveat.commandOrCheck}
                 </span>
                 {caveat.reasonCode
-                  ? ` · ${caveat.reasonCode.replaceAll("_", " ")}`
+                  ? ` · ${verificationReasonLabel(caveat.reasonCode)}`
                   : ""}
                 {caveat.detail ? (
                   <span className="block">{caveat.detail}</span>

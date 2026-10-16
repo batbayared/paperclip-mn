@@ -1,6 +1,7 @@
 import type { Agent } from "@paperclipai/shared";
 import { i18n } from "@/i18n";
 import { tx } from "@/i18n/xo";
+import { xoRoutineHistoryValueLabel, xoStatusLabel } from "@/xo/labels";
 import type { CompanyUserProfile } from "./company-members";
 import { formatReviewPolicyValue } from "./review-policy";
 
@@ -739,9 +740,15 @@ function asRecord(value: unknown): Record<string, unknown> | null {
   return value as Record<string, unknown>;
 }
 
-function humanizeValue(value: unknown): string {
-  if (typeof value !== "string") return String(value ?? "none");
-  return value.replace(/_/g, " ");
+function humanizeValue(value: unknown, kind?: "status" | "priority"): string {
+  // XO: mn-д ISSUE_STATUSES / ISSUE_PRIORITIES утгыг орчуулна; en байт ижил.
+  const mn = (i18n.resolvedLanguage ?? i18n.language ?? "").startsWith("mn");
+  if (typeof value !== "string") return mn && value == null ? tx("none") : String(value ?? "none");
+  const english = value.replace(/_/g, " ");
+  if (!mn) return english;
+  if (kind === "status") return xoStatusLabel(value, english);
+  if (kind === "priority") return xoRoutineHistoryValueLabel(value);
+  return english;
 }
 
 function isActivityParticipant(value: unknown): value is ActivityParticipant {
@@ -771,7 +778,7 @@ function formatUserLabel(userId: string | null | undefined, options: ActivityFor
   if (options.currentUserId && userId === options.currentUserId) return tx("You");
   const profile = options.userProfileMap?.get(userId);
   if (profile) return profile.label;
-  return `user ${userId.slice(0, 5)}`;
+  return tx("user {{id}}", { id: userId.slice(0, 5) });
 }
 
 function formatParticipantLabel(participant: ActivityParticipant, options: ActivityFormatOptions): string {
@@ -842,14 +849,14 @@ function formatIssueUpdatedVerb(details: ActivityDetails): string | null {
   if (details.status !== undefined) {
     const from = previous.status;
     return from
-      ? tx("changed status from {{from}} to {{to}} on", { from: humanizeValue(from), to: humanizeValue(details.status) })
-      : tx("changed status to {{to}} on", { to: humanizeValue(details.status) });
+      ? tx("changed status from {{from}} to {{to}} on", { from: humanizeValue(from, "status"), to: humanizeValue(details.status, "status") })
+      : tx("changed status to {{to}} on", { to: humanizeValue(details.status, "status") });
   }
   if (details.priority !== undefined) {
     const from = previous.priority;
     return from
-      ? tx("changed priority from {{from}} to {{to}} on", { from: humanizeValue(from), to: humanizeValue(details.priority) })
-      : tx("changed priority to {{to}} on", { to: humanizeValue(details.priority) });
+      ? tx("changed priority from {{from}} to {{to}} on", { from: humanizeValue(from, "priority"), to: humanizeValue(details.priority, "priority") })
+      : tx("changed priority to {{to}} on", { to: humanizeValue(details.priority, "priority") });
   }
   return null;
 }
@@ -876,16 +883,16 @@ function formatIssueUpdatedAction(details: ActivityDetails, options: ActivityFor
     const from = previous.status;
     parts.push(
       from
-        ? tx("changed the status from {{from}} to {{to}}", { from: humanizeValue(from), to: humanizeValue(details.status) })
-        : tx("changed the status to {{to}}", { to: humanizeValue(details.status) }),
+        ? tx("changed the status from {{from}} to {{to}}", { from: humanizeValue(from, "status"), to: humanizeValue(details.status, "status") })
+        : tx("changed the status to {{to}}", { to: humanizeValue(details.status, "status") }),
     );
   }
   if (details.priority !== undefined) {
     const from = previous.priority;
     parts.push(
       from
-        ? tx("changed the priority from {{from}} to {{to}}", { from: humanizeValue(from), to: humanizeValue(details.priority) })
-        : tx("changed the priority to {{to}}", { to: humanizeValue(details.priority) }),
+        ? tx("changed the priority from {{from}} to {{to}}", { from: humanizeValue(from, "priority"), to: humanizeValue(details.priority, "priority") })
+        : tx("changed the priority to {{to}}", { to: humanizeValue(details.priority, "priority") }),
     );
   }
   if (details.assigneeAgentId !== undefined || details.assigneeUserId !== undefined) {

@@ -47,6 +47,7 @@ import {
 } from "@/lib/recovery-lineage";
 import { xoLocaleDateTime } from "@/xo/date-format";
 import { tx } from "@/i18n/xo";
+import { i18n } from "@/i18n";
 
 export type RecoveryCardCardState = RecoveryDisplayState;
 export const deriveRecoveryCardState = deriveRecoveryDisplayState;
@@ -794,7 +795,13 @@ function readWakePolicySummary(action: IssueRecoveryAction): string | null {
     const interval = readEvidenceString(policy.intervalLabel);
     return interval ? tx("Check scheduled · {{interval}}", { interval }) : tx("Check scheduled");
   }
-  return type.replaceAll("_", " ");
+  const english = type.replaceAll("_", " ");
+  if (!(i18n.resolvedLanguage ?? i18n.language ?? "").startsWith("mn")) return english;
+  // server/src/services/recovery/service.ts: provider quota хүлээлтийн wakePolicy.
+  switch (type) {
+    case "monitor_only": return tx("Monitoring only");
+    default: return english;
+  }
 }
 
 function formatTimeShort(value: string | Date | null | undefined): string | null {

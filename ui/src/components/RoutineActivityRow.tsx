@@ -4,6 +4,9 @@ import type { ActivityEvent } from "@paperclipai/shared";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { xoLocaleTime } from "@/xo/date-format";
+import { i18n } from "@/i18n";
+import { tx } from "@/i18n/xo";
+import { xoRoutineRunSourceLabel, xoStatusLabel, xoTriggerKindLabel } from "@/xo/labels";
 
 export type RoutineActivityEvent = Pick<ActivityEvent, "id" | "action" | "details" | "createdAt">;
 
@@ -19,8 +22,46 @@ function summarizeDetails(details: Record<string, unknown> | null | undefined): 
   if (!details) return "";
   const entries = Object.entries(details).slice(0, 3);
   return entries
-    .map(([key, value]) => `${key.replaceAll("_", " ")}: ${formatDetailValue(value)}`)
+    .map(([key, value]) => `${detailKeyLabel(key)}: ${detailValueLabel(key, value)}`)
     .join(" · ");
+}
+
+function isMn(): boolean {
+  return (i18n.resolvedLanguage ?? i18n.language ?? "").startsWith("mn");
+}
+
+// routine.* activity details-ийн мэдэгдэж буй түлхүүр (server/src/routes/routines.ts, services/routines.ts).
+function detailKeyLabel(key: string): string {
+  const english = key.replaceAll("_", " ");
+  if (!isMn()) return english;
+  switch (key) {
+    case "title": return tx("Title");
+    case "source": return tx("Source");
+    case "status": return tx("Status");
+    case "kind": return tx("Kind");
+    case "reason": return tx("Reason");
+    default: return english;
+  }
+}
+
+// source = ROUTINE_RUN_SOURCES, kind = ROUTINE_TRIGGER_KINDS, status = ROUTINE_RUN_STATUSES,
+// reason = routine.run_skipped-ийн шалтгаан. en дээр formatDetailValue-тай ижил гаралт.
+function detailValueLabel(key: string, value: unknown): string {
+  const english = formatDetailValue(value);
+  if (!isMn() || typeof value !== "string") return english;
+  switch (key) {
+    case "source": return xoRoutineRunSourceLabel(value);
+    case "kind": return xoTriggerKindLabel(value);
+    case "status": return xoStatusLabel(value, value);
+    case "reason":
+      switch (value) {
+        case "paused": return tx("Paused");
+        case "no_external_activity": return tx("No external activity");
+        case "worktree_execution_cutoff": return tx("Worktree execution cutoff");
+        default: return english;
+      }
+    default: return english;
+  }
 }
 
 function formatDetailValue(value: unknown): string {

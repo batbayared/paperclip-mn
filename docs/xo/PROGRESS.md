@@ -1,5 +1,29 @@
 # XO ахицын бүртгэл
 
+## Ү6 7.29 Activity, change receipt, UserProfile, routine/secret/recovery-ийн түүхий enum (2026-10-16)
+
+Зорилго: 7.28-ын үлдэгдлээс activity-ийн тайлбар, асуудлын өөрчлөлтийн баримт, профайлын үйл явдал, routine/нууц/сэргээлтийн түүхий enum-ийг орчуулах. en гаралт хуучнаараа.
+
+BASE 7ab43397b.
+
+| Хэсэг | Агуулга |
+|---|---|
+| Засвар | activity-format (status/priority утга, «user {{id}}»), issue-change-receipt (талбарын шошго, status/priority/workMode утга), UserProfile (event.action, entityType, HeroStat hint), RoutineActivityRow (detail түлхүүр ба source/kind/status/reason утга), SecretBindingPicker (provider, нууцын төлөв), IssueRecoveryActionCard (monitor_only), TaskChatBubble (verification reasonCode, гарчиг) |
+| Засвар (tsc) | PipelineSettings: 7.28-д export хийгдээгүй xoIsMn-ийг импортолсныг resolveLocale() шалгалтаар сольсон; 7ab43397b дээр tsc унадаг байсан |
+| Шинэ орчуулга | 20 түлхүүр |
+| Каталог | +20 түлхүүр (11657) |
+| Хөтчийн шалгалт | хийгээгүй: 3110 сервер унтарсан хэвээр |
+| Шалгалт | xo:i18n check OK (11657), xo:i18n:test 440, UI 626/6591, tsc цэвэр, brand 477/147 |
+
+Санаатай орхисон:
+- external-objects, review-policy, attention: мэдэгдэх утгууд аль хэдийн хамрагдсан, зөвхөн тодорхойгүй утгын fallback үлдсэн.
+- SecretBindingPicker: AWS Secrets Manager, GCP Secret Manager, Vault брэнд нэр тул латинаар.
+- Нэр нь мэдэгдэхгүй action/reason-ийн fallback (action.replace) хэвээр.
+
+Үлдэгдэл:
+- Pipelines.tsx / PipelineSettings.tsx-ийн JSX доторх англи текст, lib/pipeline-item-detail.ts-ийн humanizePipelineItemStatus.
+- 7.22–7.29-ийн хөтчийн шалгалт сервер асаасны дараа.
+
 ## Ү6 7.28 BoardChat feed, sidebar, status card-ын үлдэгдэл (2026-10-16)
 
 Зорилго: 7.27-ын үлдэгдлээс бүтнээрээ англи үлдсэн FeedCard ба цөөн тооны түүхий enum-ийг орчуулах. en гаралт хуучнаараа.

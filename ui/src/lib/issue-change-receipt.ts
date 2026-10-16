@@ -1,5 +1,7 @@
 import { xoLocaleDateTime } from "@/xo/date-format";
+import { i18n } from "@/i18n";
 import { tx } from "@/i18n/xo";
+import { xoRoutineHistoryValueLabel, xoStatusLabel } from "@/xo/labels";
 import type { IssueChangeReceiptEntry } from "@paperclipai/shared";
 import { formatReviewPolicyValue } from "./review-policy";
 
@@ -72,7 +74,7 @@ function knownFieldLabel(field: string): string | null {
 
 /** Human label for a changed field, e.g. `assigneeAgentId` → "Assignee". */
 export function issueChangeFieldLabel(field: string): string {
-  const known = knownFieldLabel(field);
+  const known = knownFieldLabel(field) ?? xoBaseFieldLabel(field);
   if (known) return known;
   // camelCase / snake_case → "Sentence case".
   const spaced = field
@@ -81,6 +83,40 @@ export function issueChangeFieldLabel(field: string): string {
     .toLowerCase()
     .trim();
   return spaced.charAt(0).toUpperCase() + spaced.slice(1);
+}
+
+// XO: mn-д л ашиглагдана; en дээр доорх camelCase fallback байт ижил хэвээр.
+function xoIsMn(): boolean {
+  return (i18n.resolvedLanguage ?? i18n.language ?? "").startsWith("mn");
+}
+
+function xoBaseFieldLabel(field: string): string | null {
+  if (!xoIsMn()) return null;
+  switch (field) {
+    case "status": return tx("Status");
+    case "priority": return tx("Priority");
+    case "title": return tx("Title");
+    case "description": return tx("Description");
+    default: return null;
+  }
+}
+
+/** XO: issue-ийн enum утга (ISSUE_STATUSES, ISSUE_PRIORITIES, ISSUE_WORK_MODES). */
+function xoEnumValueLabel(field: string | undefined, value: string, english: string): string {
+  if (!xoIsMn()) return english;
+  switch (field) {
+    case "status": return xoStatusLabel(value, english);
+    case "priority": return xoRoutineHistoryValueLabel(value);
+    case "workMode":
+      switch (value) {
+        case "standard": return tx("Auto mode");
+        case "planning": return tx("Plan mode");
+        case "ask": return tx("Ask mode");
+        case "skill_test": return tx("Skill test");
+        default: return english;
+      }
+    default: return english;
+  }
 }
 
 const VALUE_PREVIEW_BUDGET = 72;
@@ -126,7 +162,7 @@ export function formatIssueChangeValue(
     if (isIsoTimestamp(trimmed)) return xoLocaleDateTime(new Date(trimmed));
     if (looksLikeId(trimmed)) return shortenId(trimmed);
     const humanized = trimmed.includes(" ") ? trimmed : trimmed.replace(/_/g, " ");
-    return truncate(humanized);
+    return truncate(xoEnumValueLabel(options.field, trimmed, humanized));
   }
 
   // Objects (execution policy, workspace settings) are structural — the receipt

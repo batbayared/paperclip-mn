@@ -21,9 +21,42 @@ import {
   providerDisplayName,
   relativeTime,
 } from "../lib/utils";
+import { i18n } from "@/i18n";
 import { tx } from "@/i18n/xo";
+import { formatActivityVerb } from "../lib/activity-format";
 
 const NO_COMPANY = "__none__";
+
+// XO: mn-д л орчуулна; en дээр upstream-ийн түүхий утга байт ижил хэвээр.
+function xoIsMn(): boolean {
+  return (i18n.resolvedLanguage ?? i18n.language ?? "").startsWith("mn");
+}
+
+function activityActionLabel(action: string): string {
+  const english = action.replaceAll("_", " ");
+  if (!xoIsMn()) return english;
+  // Мөрийн үйл үг ("сэтгэгдэл бичлээ:") объектгүй ганцаараа харагдах тул төгсгөлийн ":"-г авна.
+  return formatActivityVerb(action).replace(/:\s*$/, "");
+}
+
+function activityEntityTypeLabel(entityType: string): string {
+  if (!xoIsMn()) return entityType;
+  switch (entityType) {
+    case "issue": return tx("task");
+    case "agent": return tx("agent");
+    case "project": return tx("project");
+    case "goal": return tx("goal");
+    case "approval": return tx("approval");
+    case "company": return tx("organization");
+    case "routine": return tx("routine");
+    case "heartbeat_run": return tx("run");
+    case "company_skill": return tx("skill");
+    case "tool_connection": return tx("connection");
+    case "secret": return tx("secret");
+    case "folder": return tx("folder");
+    default: return entityType.replaceAll("_", " ");
+  }
+}
 
 function initials(name: string | null | undefined) {
   const value = name?.trim() || "User";
@@ -288,10 +321,10 @@ export function UserProfile() {
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          <HeroStat label="All-time tokens" value={formatTokens(allTimeTokens)} hint={formatCents(allTime?.costCents ?? 0) + " spent"} />
-          <HeroStat label="Completed" value={formatNumber(allTime?.completedIssues ?? 0)} hint={allTime ? `${completionRate(allTime)} rate` : undefined} />
-          <HeroStat label="Open assigned" value={formatNumber(allTime?.assignedOpenIssues ?? 0)} hint={`${formatNumber(allTime?.createdIssues ?? 0)} created`} />
-          <HeroStat label="7-day actions" value={formatNumber(last7?.activityCount ?? 0)} hint={`${formatNumber(last7?.commentCount ?? 0)} comments`} />
+          <HeroStat label="All-time tokens" value={formatTokens(allTimeTokens)} hint={tx("{{amount}} spent", { amount: formatCents(allTime?.costCents ?? 0) })} />
+          <HeroStat label="Completed" value={formatNumber(allTime?.completedIssues ?? 0)} hint={allTime ? tx("{{rate}} rate", { rate: completionRate(allTime) }) : undefined} />
+          <HeroStat label="Open assigned" value={formatNumber(allTime?.assignedOpenIssues ?? 0)} hint={tx("{{importedCount}} created", { importedCount: formatNumber(allTime?.createdIssues ?? 0) })} />
+          <HeroStat label="7-day actions" value={formatNumber(last7?.activityCount ?? 0)} hint={tx("{{n}} comments", { n: formatNumber(last7?.commentCount ?? 0) })} />
         </div>
       </section>
 
@@ -342,9 +375,9 @@ export function UserProfile() {
               {data.recentActivity.map((event) => (
                 <li key={event.id} className="grid gap-2 py-2.5 sm:grid-cols-(--gtc-17) sm:items-center">
                   <div className="min-w-0">
-                    <div className="truncate text-sm">{event.action.replaceAll("_", " ")}</div>
+                    <div className="truncate text-sm">{activityActionLabel(event.action)}</div>
                     <div className="truncate text-xs text-muted-foreground">
-                      {event.entityType} · {event.entityId.slice(0, 12)}
+                      {activityEntityTypeLabel(event.entityType)} · {event.entityId.slice(0, 12)}
                     </div>
                   </div>
                   <span className="text-xs tabular-nums text-muted-foreground sm:justify-self-end">{relativeTime(event.createdAt)}</span>

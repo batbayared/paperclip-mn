@@ -1,6 +1,7 @@
 import { xoLocaleDateTime } from "@/xo/date-format";
 import { tx } from "@/i18n/xo";
-import { xoIsMn, xoStatusLabel } from "@/xo/labels";
+import { xoStatusLabel } from "@/xo/labels";
+import { resolveLocale } from "@/xo/locale";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -208,7 +209,7 @@ function parseStageSectionKey(value: string | null): StageSectionKey | null {
 
 /** XO: execution-workspace status in the reuse picker; English stays the raw value. */
 function executionWorkspaceStatusLabel(status: string): string {
-  if (!xoIsMn()) return status;
+  if (resolveLocale() !== "mn") return status;
   if (status === "cleanup_failed") return tx("Cleanup failed");
   return xoStatusLabel(status, status);
 }

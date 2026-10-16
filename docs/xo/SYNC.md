@@ -259,6 +259,21 @@ Gates (2026-10-14): xo:i18n:check OK 5894, xo:i18n:test 11 / 129, tsc 0, vitest 
 - company-members.ts-ийн «Board» шошго.
 - en-д ConnectionSetupFlow-ийн брэнд «XO» гэж гарна (en байт ижил зарчмаас ухамсартай гажсан).
 
+## Ү6 7.29-д хөндсөн upstream файлууд
+
+Activity, change receipt, UserProfile, routine/secret/recovery-ийн түүхий enum. BASE 7ab43397b.
+
+| Файл | Өөрчлөлт |
+|---|---|
+| ui/src/lib/activity-format.ts | humanizeValue kind (status/priority) авдаг; mn үед xoStatusLabel / xoRoutineHistoryValueLabel; user fallback → tx |
+| ui/src/lib/issue-change-receipt.ts | mn үед талбарын шошго ба status/priority/workMode утга орчуулна |
+| ui/src/pages/UserProfile.tsx | event.action, entityType шошго; HeroStat hint → tx |
+| ui/src/components/RoutineActivityRow.tsx | detailKeyLabel, detailValueLabel |
+| ui/src/components/SecretBindingPicker.tsx | secretProviderLabel; нууцын төлөв → xoStatusLabel |
+| ui/src/components/IssueRecoveryActionCard.tsx | wake policy fallback-д monitor_only |
+| ui/src/components/task-chat/TaskChatBubble.tsx | verificationReasonLabel; гарчиг → tx |
+| ui/src/pages/PipelineSettings.tsx | locale шалгалтыг resolveLocale()-оор (tsc засвар) |
+
 ## Ү6 7.28-д хөндсөн upstream файлууд
 
 BoardChat feed, sidebar, status card-ын үлдэгдэл. BASE e31a08ecc.
