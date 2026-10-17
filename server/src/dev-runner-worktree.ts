@@ -1,6 +1,7 @@
 import { existsSync, lstatSync, readFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import { readBrandEnv } from "@paperclipai/shared/xo-brand-env";
 import { resolveDefaultBrandWorktreesDir } from "./home-paths.js";
 import { hasVerifiedWorktreeSeedManifest } from "./worktree-seed-manifest.js";
 
@@ -79,7 +80,7 @@ function resolveHomeAwarePath(value: string): string {
 }
 
 function resolveDefaultWorktreeHome(env: NodeJS.ProcessEnv): string {
-  const explicit = env.PAPERCLIP_WORKTREES_DIR?.trim();
+  const explicit = readBrandEnv("WORKTREES_DIR", env)?.trim();
   return explicit ? path.resolve(expandHomePrefix(explicit)) : resolveDefaultBrandWorktreesDir();
 }
 

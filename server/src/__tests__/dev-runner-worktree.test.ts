@@ -141,6 +141,28 @@ describe("dev-runner worktree env bootstrap", () => {
     expect(env.PAPERCLIP_INSTANCE_ID).toBe("feature-worktree");
   });
 
+  it("honors XO_WORKTREES_DIR when repairing stale migrated paths", () => {
+    const root = createTempRoot("paperclip-dev-runner-worktree-xo-env-");
+    const worktreesDir = path.join(root, ".xo-worktrees");
+    fs.mkdirSync(path.join(root, ".paperclip"), { recursive: true });
+    fs.writeFileSync(path.join(root, ".git"), "gitdir: /tmp/paperclip/.git/worktrees/feature\n", "utf8");
+    fs.writeFileSync(path.join(root, ".paperclip", "config.json"), "{}\n", "utf8");
+    fs.writeFileSync(
+      resolveWorktreeEnvFilePath(root),
+      [
+        "PAPERCLIP_HOME=/old/home/.paperclip-worktrees",
+        "PAPERCLIP_CONFIG=/old/home/.paperclip-worktrees/feature/.paperclip/config.json",
+        "",
+      ].join("\n"),
+      "utf8",
+    );
+
+    const env: NodeJS.ProcessEnv = { XO_WORKTREES_DIR: worktreesDir };
+    bootstrapDevRunnerWorktreeEnv(root, env);
+
+    expect(env.PAPERCLIP_HOME).toBe(worktreesDir);
+  });
+
   it("reports uninitialized linked worktrees so dev runner can fail fast", () => {
     const root = createTempRoot("paperclip-dev-runner-worktree-missing-");
     fs.writeFileSync(path.join(root, ".git"), "gitdir: /tmp/paperclip/.git/worktrees/feature\n", "utf8");
