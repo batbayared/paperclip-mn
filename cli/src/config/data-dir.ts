@@ -1,4 +1,5 @@
 import path from "node:path";
+import { readBrandEnv } from "@paperclipai/shared/xo-brand-env";
 import {
   expandHomePrefix,
   resolveDefaultConfigPath,
@@ -30,7 +31,7 @@ export function applyDataDirOverride(
   process.env.XO_HOME = resolvedDataDir;
 
   if (support.hasConfigOption) {
-    const hasConfigOverride = Boolean(options.config?.trim()) || Boolean(process.env.PAPERCLIP_CONFIG?.trim());
+    const hasConfigOverride = Boolean(options.config?.trim()) || Boolean(readBrandEnv("CONFIG")?.trim());
     if (!hasConfigOverride) {
       const instanceId = resolvePaperclipInstanceId(options.instance);
       process.env.PAPERCLIP_INSTANCE_ID = instanceId;
@@ -41,7 +42,7 @@ export function applyDataDirOverride(
   }
 
   if (support.hasContextOption) {
-    const hasContextOverride = Boolean(options.context?.trim()) || Boolean(process.env.PAPERCLIP_CONTEXT?.trim());
+    const hasContextOverride = Boolean(options.context?.trim()) || Boolean(readBrandEnv("CONTEXT")?.trim());
     if (!hasContextOverride) {
       process.env.PAPERCLIP_CONTEXT = resolveDefaultContextPath();
       process.env.XO_CONTEXT = process.env.PAPERCLIP_CONTEXT;

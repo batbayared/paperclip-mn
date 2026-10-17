@@ -81,8 +81,6 @@ describe("applyDataDirOverride", () => {
 
   it("--data-dir beats an ambient XO_HOME by also setting XO_*", () => {
     process.env.XO_HOME = "/a";
-    process.env.XO_CONFIG = "/a/config.json";
-    process.env.XO_CONTEXT = "/a/context.json";
     process.env.XO_INSTANCE_ID = "ambient";
 
     applyDataDirOverride(
@@ -96,5 +94,33 @@ describe("applyDataDirOverride", () => {
     expect(process.env.XO_INSTANCE_ID).toBe(process.env.PAPERCLIP_INSTANCE_ID);
     expect(process.env.XO_CONFIG).toBe(process.env.PAPERCLIP_CONFIG);
     expect(process.env.XO_CONTEXT).toBe(process.env.PAPERCLIP_CONTEXT);
+  });
+});
+
+describe("applyDataDirOverride with XO_ overrides", () => {
+  beforeEach(() => {
+    process.env = { ...ORIGINAL_ENV };
+    delete process.env.PAPERCLIP_CONFIG;
+    delete process.env.PAPERCLIP_CONTEXT;
+    delete process.env.XO_CONFIG;
+    delete process.env.XO_CONTEXT;
+  });
+
+  afterEach(() => {
+    process.env = { ...ORIGINAL_ENV };
+  });
+
+  it("keeps an explicit XO_CONFIG instead of deriving one from --data-dir", () => {
+    process.env.XO_CONFIG = "/custom/xo-config.json";
+    applyDataDirOverride({ dataDir: "/tmp/xo-data" }, { hasConfigOption: true });
+    expect(process.env.XO_CONFIG).toBe("/custom/xo-config.json");
+    expect(process.env.PAPERCLIP_CONFIG).toBeUndefined();
+  });
+
+  it("keeps an explicit XO_CONTEXT", () => {
+    process.env.XO_CONTEXT = "/custom/xo-context.json";
+    applyDataDirOverride({ dataDir: "/tmp/xo-data" }, { hasContextOption: true });
+    expect(process.env.XO_CONTEXT).toBe("/custom/xo-context.json");
+    expect(process.env.PAPERCLIP_CONTEXT).toBeUndefined();
   });
 });
