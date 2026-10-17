@@ -14,6 +14,7 @@ import {
   withWorktreePortRegistryLockSync,
   writeWorktreePortRegistry,
 } from "@paperclipai/shared/worktree-port-registry";
+import { resolveDefaultBrandWorktreesDir } from "./home-paths.js";
 import { resolvePaperclipConfigPath, resolvePaperclipEnvPath } from "./paths.js";
 import { rewriteUrlPort } from "./url-utils.js";
 
@@ -143,7 +144,7 @@ function resolveWorktreeRuntimeContext(
     nonEmpty(stablePersistedEnv.PAPERCLIP_HOME) ??
       nonEmpty(env.PAPERCLIP_HOME) ??
       nonEmpty(env.PAPERCLIP_WORKTREES_DIR) ??
-      "~/.paperclip-worktrees",
+      resolveDefaultBrandWorktreesDir(),
   );
   const instanceRoot = path.resolve(homeDir, "instances", instanceId);
 

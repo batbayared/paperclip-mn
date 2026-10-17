@@ -360,6 +360,7 @@ write_fallback_worktree_config() {
   SOURCE_ENV_PATH="$source_env_path" \
   WORKTREE_INSTANCE_ID="$worktree_instance_id" \
   PAPERCLIP_WORKTREES_DIR="${PAPERCLIP_WORKTREES_DIR:-}" \
+  XO_WORKTREES_DIR="${XO_WORKTREES_DIR:-}" \
   node <<'EOF'
 const fs = require("node:fs");
 const os = require("node:os");
@@ -463,7 +464,8 @@ async function main() {
   const paperclipDir = process.env.PAPERCLIP_DIR;
   const sourceConfigPath = process.env.SOURCE_CONFIG_PATH;
   const sourceEnvPath = process.env.SOURCE_ENV_PATH;
-  const worktreeHome = path.resolve(expandHomePrefix(nonEmpty(process.env.PAPERCLIP_WORKTREES_DIR) ?? "~/.paperclip-worktrees"));
+  const brandWorktreesDefault = [".xo-worktrees", ".paperclip-worktrees"].map((d) => path.join(os.homedir(), d)).find((d) => fs.existsSync(d)) ?? path.join(os.homedir(), ".xo-worktrees");
+  const worktreeHome = path.resolve(expandHomePrefix(nonEmpty(process.env.XO_WORKTREES_DIR) ?? nonEmpty(process.env.PAPERCLIP_WORKTREES_DIR) ?? brandWorktreesDefault));
   const instanceId = process.env.WORKTREE_INSTANCE_ID;
   if (!/^[A-Za-z0-9_-]+$/.test(instanceId ?? "")) {
     throw new Error("WORKTREE_INSTANCE_ID is missing or unsafe");

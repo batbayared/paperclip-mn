@@ -1,6 +1,7 @@
 import { existsSync, lstatSync, readFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import { resolveDefaultBrandWorktreesDir } from "./home-paths.js";
 import { hasVerifiedWorktreeSeedManifest } from "./worktree-seed-manifest.js";
 
 function parseEnvFile(contents: string): Record<string, string> {
@@ -78,7 +79,8 @@ function resolveHomeAwarePath(value: string): string {
 }
 
 function resolveDefaultWorktreeHome(env: NodeJS.ProcessEnv): string {
-  return path.resolve(expandHomePrefix(env.PAPERCLIP_WORKTREES_DIR?.trim() || "~/.paperclip-worktrees"));
+  const explicit = env.PAPERCLIP_WORKTREES_DIR?.trim();
+  return explicit ? path.resolve(expandHomePrefix(explicit)) : resolveDefaultBrandWorktreesDir();
 }
 
 function repairStaleMigratedWorktreeEnvEntries(

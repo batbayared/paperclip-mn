@@ -3,6 +3,7 @@ const PATH_SEGMENT_RE = /^[a-zA-Z0-9_-]+$/;
 const FRIENDLY_PATH_SEGMENT_RE = /[^a-zA-Z0-9._-]+/g;
 import {
   expandHomePrefix,
+  resolveDefaultBrandWorktreesDir,
   resolveDefaultBackupDir as resolveSharedDefaultBackupDir,
   resolveDefaultEmbeddedPostgresDir as resolveSharedDefaultEmbeddedPostgresDir,
   resolveDefaultLogsDir as resolveSharedDefaultLogsDir,
@@ -17,6 +18,7 @@ import {
 
 export {
   expandHomePrefix,
+  resolveDefaultBrandWorktreesDir,
   resolveHomeAwarePath,
   resolvePaperclipHomeDir,
   resolvePaperclipInstanceId,

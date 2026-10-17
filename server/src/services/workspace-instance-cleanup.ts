@@ -2,12 +2,11 @@ import { execFile } from "node:child_process";
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import fs from "node:fs/promises";
-import os from "node:os";
 import path from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
 import { promisify } from "node:util";
 import { parse as parseEnvContents } from "dotenv";
-import { expandHomePrefix } from "../home-paths.js";
+import { expandHomePrefix, resolveDefaultBrandWorktreesDir } from "../home-paths.js";
 import type { WorkspaceOperationRecorder } from "./workspace-operations.js";
 
 const execFileAsync = promisify(execFile);
@@ -237,7 +236,7 @@ function resolveManagedInstancesDir(worktreesDir?: string): string {
     expandHomePrefix(
       worktreesDir?.trim()
       || process.env.PAPERCLIP_WORKTREES_DIR?.trim()
-      || path.join(os.homedir(), ".paperclip-worktrees"),
+      || resolveDefaultBrandWorktreesDir(),
     ),
   );
   return path.join(managedWorktreesDir, "instances");
