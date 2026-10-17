@@ -96,7 +96,8 @@ describe("native XO keys", () => {
 
 describe("mirrorPaperclipEnvToXo blank values", () => {
   it("does not copy blank PAPERCLIP_ values", () => {
-    const out = mirrorPaperclipEnvToXo({ PAPERCLIP_HOME: "  ", PAPERCLIP_RUN_ID: "r1" });
+    const env: Record<string, string | undefined> = { PAPERCLIP_HOME: "  ", PAPERCLIP_RUN_ID: "r1" };
+    const out = mirrorPaperclipEnvToXo(env);
     expect(out.XO_HOME).toBeUndefined();
     expect(out.XO_RUN_ID).toBe("r1");
   });
