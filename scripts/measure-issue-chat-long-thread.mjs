@@ -12,8 +12,15 @@ const url = companyPrefix
   : `${baseUrl}/tests/perf/long-thread`;
 const origin = new URL(url).origin;
 
+function resolveBrandHome() {
+  const fromEnv = (process.env.XO_HOME || "").trim() || (process.env.PAPERCLIP_HOME || "").trim();
+  if (fromEnv) return fromEnv.replace(/^~(?=\/|$)/, os.homedir());
+  const candidates = [".xo", ".paperclip"].map((d) => path.join(os.homedir(), d));
+  return candidates.find((d) => fs.existsSync(d)) ?? candidates[0];
+}
+
 function loadBoardToken() {
-  const authPath = path.resolve(os.homedir(), ".paperclip/auth.json");
+  const authPath = path.resolve(resolveBrandHome(), "auth.json");
   try {
     const auth = JSON.parse(fs.readFileSync(authPath, "utf-8"));
     const credentials = auth.credentials || {};

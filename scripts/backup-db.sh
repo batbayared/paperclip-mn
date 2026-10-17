@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Backup the configured Paperclip database to the configured backup directory
-# (default: ~/.paperclip/instances/<instance-id>/data/backups)
+# (default: <XO home>/instances/<instance-id>/data/backups; XO home = ~/.xo, legacy ~/.paperclip)
 #
 # Usage:
 #   ./scripts/backup-db.sh

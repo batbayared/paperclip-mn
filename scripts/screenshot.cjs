@@ -2,7 +2,7 @@
 /**
  * Screenshot utility for Paperclip UI.
  *
- * Reads the board token from ~/.paperclip/auth.json and injects it as a
+ * Reads the board token from <XO home>/auth.json (~/.xo or legacy ~/.paperclip) and injects it as a
  * Bearer header so Playwright can access authenticated pages.
  *
  * Usage:
@@ -38,8 +38,15 @@ if (!rawUrl) {
 }
 
 // --- Auth ----------------------------------------------------------------
+function resolveBrandHome() {
+  const fromEnv = (process.env.XO_HOME || "").trim() || (process.env.PAPERCLIP_HOME || "").trim();
+  if (fromEnv) return fromEnv.replace(/^~(?=\/|$)/, os.homedir());
+  const candidates = [".xo", ".paperclip"].map((d) => path.join(os.homedir(), d));
+  return candidates.find((d) => fs.existsSync(d)) ?? candidates[0];
+}
+
 function loadBoardToken() {
-  const authPath = path.resolve(os.homedir(), ".paperclip/auth.json");
+  const authPath = path.resolve(resolveBrandHome(), "auth.json");
   try {
     const auth = JSON.parse(fs.readFileSync(authPath, "utf-8"));
     const creds = auth.credentials || {};
@@ -53,7 +60,7 @@ function loadBoardToken() {
 
 const cred = loadBoardToken();
 if (!cred) {
-  console.error("No board token found in ~/.paperclip/auth.json");
+  console.error("No board token found in <XO home>/auth.json (~/.xo or legacy ~/.paperclip)");
   process.exit(1);
 }
 
