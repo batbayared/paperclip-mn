@@ -28,7 +28,7 @@ Gates (2026-10-17):
 - vitest (shared/src, cli/src, server xo тестүүд, adapter-utils xo тестүүд): TMPDIR realpath-тай 145 файл, 1283 тест бүгд давсан; үгүй бол 22 унана (доорх мэдэгдэж буй).
 - xo:brand-scan OK (65 файл, 116 hit, baseline-аас дээш байхгүй); xo:i18n:check OK keys=11664; xo:i18n:test 440; scan.test.mjs 3/3.
 
-Мэдэгдэж буй унаалт (өмнөөс байсан, орчны): macOS-д /var нь /private/var-ийн symlink тул packages/shared worktree-seed-source.test.ts (8), cli worktree.test.ts (14) ба workspace cleanup тестүүд унана. TMPDIR=$(realpath "$TMPDIR") тавихад давна.
+Мэдэгдэж буй унаалт (өмнөөс байсан, орчны): macOS-д /var нь /private/var-ийн symlink тул packages/shared worktree-seed-source.test.ts (8), cli worktree.test.ts (14) ба server workspace cleanup тестүүд унана. TMPDIR=$(realpath "$TMPDIR") тавихад давна. Үүнээс гадна server-ийн 8 тест файл (cli-invocation-safety, cursor-local-adapter-environment, cursor-local-execute, file-delivery-bridges, paperclip-issue-update-helper, paperclip-skill-utils, native-codex-runner.integration, runtime-exposure/broker-client) realpath TMPDIR-тэй ч унана; ef898baf0-ийн эх кодоор ажиллуулахад мөн адил унасан тул энэ салбартай холбоогүй. issue-attachment-routes тогтворгүй.
 
 Үлдэгдэл (энд засаагүй):
 - scripts/kill-workspaces.sh:72 нь $HOME/.paperclip-worktrees-ийг хатуу бичсэн.
