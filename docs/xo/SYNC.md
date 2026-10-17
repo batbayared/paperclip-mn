@@ -17,7 +17,7 @@
 6. Толь шинэчлэх: `pnpm xo:i18n:extract && pnpm xo:i18n:check` → шинэ/өөрчлөгдсөн түлхүүрийг `ui/src/i18n/xo/mn.json`-д орчуул, `check` OK болтол.
 6а. Серверийн толь: `pnpm xo:i18n:extract:server && pnpm xo:i18n:check:server` (Tier-1 серверийн мессеж орчуулагдсан эсэх).
 6б. Брэнд скан: `pnpm xo:brand-scan`. Унавал upstream шинэ "Paperclip" мөр оруулсан: хэрэглэгчид харагдах бол XO болго эсвэл каталогоор дамжуул; зөвшөөрөгдөх бол `node scripts/xo-brand/scan.mjs --update`.
-6в. Upstream шинэ `startsWith("PAPERCLIP_")` шүүлтүүр эсвэл `".paperclip"` гэрийн замыг нэмсэн эсэхийг шалга: `git diff <өмнөх-tag>..<шинэ-tag> | grep -n 'startsWith("PAPERCLIP_")\|homedir(), ".paperclip"'`. Олдвол isBrandRuntimeEnvKey / resolveDefaultBrandHomeDir руу шилжүүл.
+6в. Upstream шинэ `startsWith("PAPERCLIP_")` шүүлтүүр эсвэл `".paperclip"` гэрийн замыг нэмсэн эсэхийг шалга: `git diff <өмнөх-tag>..<шинэ-tag> | grep -n 'startsWith("PAPERCLIP_")\|homedir(), ".paperclip"'`. Олдвол isBrandRuntimeEnvKey / resolveDefaultBrandHomeDir руу шилжүүл. Мөн шинэ `".paperclip-worktrees"` литерал → `resolveDefaultBrandWorktreesDir()`; schema-ийн шинэ `"~/.paperclip/instances/default/` анхдагч → `"~/.xo/instances/default/`.
 7. Шалгалт: `pnpm --filter @paperclipai/ui typecheck && (cd ui && pnpm exec vitest run) && pnpm build && pnpm test:e2e`
 8. Таг: `git tag "xo-$TAG" && git push origin xo-main "xo-$TAG"` (ED зөвшөөрсний дараа).
 9. `docs/xo/SYNC.md`-ийн доорх түүхэнд мөр нэм.
@@ -562,6 +562,25 @@ Gates (2026-10-14): xo:i18n:check OK 5914, xo:i18n:test 12 / 131, tsc 0, xo:bran
 | `cli/package.json` | А | шинэ bin `xo` (`paperclipai` хэвээр) |
 | `package.json` | А | `xo:brand-scan` скрипт |
 | `server/src/onboarding-assets/ceo/AGENTS.md`, `ceo/HEARTBEAT.md`, `default/AGENTS.md`, `first-task/brief.md`, `first-task/greeting.md` | А | XO_ нэр, брэнд текст |
+| `packages/shared/src/home-paths.ts` | А2 | resolveDefaultBrandWorktreesDir(): XO_WORKTREES_DIR > ~/.xo-worktrees; хуучин ~/.paperclip-worktrees байвал fallback · conflict: upstream-ийг аваад `.paperclip-worktrees` литералыг resolveDefaultBrandWorktreesDir() руу шилжүүл |
+| `packages/shared/src/config-schema.ts` | А2 | schema-ийн анхдагч зам `~/.paperclip/instances/default/...` → `~/.xo/instances/default/...` (хэрэглэгчийн config-д тодорхой бичсэн зам хэвээр) · conflict: upstream-ийг аваад анхдагч литералыг `~/.xo/`-д буцаа |
+| `packages/shared/src/config-schema.test.ts, cli/src/__tests__/home-paths.test.ts` | А2 | шинэ анхдагч замд тааруулсан · conflict: upstream-ийг аваад хүлээгдэх замыг `~/.xo`-д засна |
+| `cli/src/config/data-dir.ts` | А2 | `--data-dir` нь XO_CONFIG/XO_CONTEXT-ийг мөн тохируулна (PAPERCLIP_* хамт) · conflict: XO_* тохируулалтыг дахин нэм |
+| `cli/src/commands/client/context.ts, cli/src/commands/client/common.ts` | А2 | контекст/config замыг readBrandEnv-ээр уншина (XO_CONTEXT, XO_CONFIG) · conflict: process.env.PAPERCLIP_* шууд уншсан мөрийг readBrandEnv руу буцаа |
+| `cli/src/commands/routines.ts` | А2 | help текстэд `~/.xo` · conflict: upstream-ийг аваад текстийг дахин солино |
+| `cli/src/commands/worktree.ts` | А2 | help текст `~/.xo`; worktree гэрийн анхдагч resolveDefaultBrandWorktreesDir() · conflict: `.paperclip-worktrees` литерал, `~/.paperclip` help текстийг дахин солино |
+| `cli/src/commands/worktree-lib.ts` | А2 | worktree гэрийн анхдагч ~/.xo-worktrees, хуучин нь fallback · conflict: resolveDefaultBrandWorktreesDir() ашигла |
+| `cli/src/__tests__/data-dir.test.ts` | А2 | XO_CONFIG/XO_CONTEXT шалгалт нэмсэн · conflict: upstream тестийг аваад XO_ нэмэлтийг дахин нэм |
+| `server/src/home-paths.ts` | А2 | worktree гэр: resolveDefaultBrandWorktreesDir() · conflict: зөрчилд upstream + XO дуудлага |
+| `server/src/worktree-config.ts` | А2 | worktree гэрийн анхдагч брэнд-мэдрэмтгий · conflict: зөрчилд upstream + XO дуудлага |
+| `server/src/dev-runner-worktree.ts` | А2 | worktree гэр XO_WORKTREES_DIR-ийг readBrandEnv-ээр хүндэтгэнэ · conflict: readBrandEnv дуудлагыг буцаа |
+| `server/src/__tests__/dev-runner-worktree.test.ts` | А2 | XO_WORKTREES_DIR тест · conflict: upstream-ийг аваад дахин нэм |
+| `server/src/services/workspace-instance-cleanup.ts` | А2 | цэвэрлэгээний worktree гэр брэнд-мэдрэмтгий · conflict: зөрчилд upstream + XO дуудлага |
+| `server/src/services/effective-run-config-fingerprints.ts` | А2 | хоосон утгатай ба XO_-ээр эхэлсэн орчны түлхүүрийг брэнд шүүлтүүрт зөв авна (Ү3-А2 Task 4) · conflict: isBrandRuntimeEnvKey дуудлагыг буцаа |
+| `scripts/provision-worktree.sh` | А2 | worktree гэрийн анхдагч ~/.xo-worktrees · conflict: XO_WORKTREES_DIR/хуучин fallback-ийг буцаа |
+| `scripts/backup-db.sh, scripts/measure-issue-chat-long-thread.mjs, scripts/screenshot.cjs` | А2 | auth.json ба backup-ийг брэнд гэрээс (XO_HOME > PAPERCLIP_HOME > ~/.xo > ~/.paperclip) уншина · conflict: upstream-ийг аваад гэрийн зам тооцоог дахин нэм |
+
+Ү3-А2 (брэнд үлдэгдэл) нэмэлт: `packages/shared/src/xo-brand-env.ts`, түүний тест, `server/src/services/xo-brand-filters.test.ts`, `*.xo.test.ts` нь XO-ийн өөрийн файл тул хүснэгтэд ороогүй. **Fingerprint:** Ү3-А2 Task 4 (хоосон утгыг mirror-оос алгасах, XO_ эх түлхүүрийг шүүлтүүрт хадгалах) effective-run-config fingerprint-ийг ганц удаа өөрчилнө; upgrade-ийн дараа одоо ажиллаж буй run нэг удаа fingerprint таарахгүй гэж харагдаж болно.
 
 Upstream тестүүд (`cli/src/__tests__/data-dir.test.ts`, `packages/adapter-utils/src/acpx-engine/execute.test.ts`, `packages/shared/src/home-paths.test.ts`, `server/src/services/onboarding-greeting.test.ts`, `server/src/services/onboarding-first-task-assets.test.ts`, `server/src/__tests__/issue-onboarding-first-task-routes.test.ts`) мөн засвартай.
 

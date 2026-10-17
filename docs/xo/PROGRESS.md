@@ -1,5 +1,41 @@
 # XO ахицын бүртгэл
 
+## Ү3-А2 Брэндийн үлдэгдэл: Paperclip → XO (2026-10-17)
+
+Зорилго: Ү3-А-ийн дараа үлдсэн ~/.paperclip, .paperclip-worktrees, PAPERCLIP_* шууд уншилтыг XO_*-руу шилжүүлж fallback хадгалах. ED Subagent-Driven гүйцэтгэлийг сонгосон.
+
+BASE ef898baf0, HEAD d2aef61e8 (docs commit-ээс өмнө).
+
+| Commit | Агуулга |
+|---|---|
+| 174b4ed47 | Task 1: config schema ба home-paths ~/.xo анхдагч |
+| ddf9a247c | Task 2: worktree гэр ~/.xo-worktrees, хуучин fallback |
+| 114891b8c | Task 3: CLI data-dir XO_CONFIG/XO_CONTEXT, help текст ~/.xo |
+| 9ce0b7e25 | Task 4: env mirror-оос хоосон утга алгасах, XO_ түлхүүр шүүлтүүрт |
+| 67ecd4bae | Task 5: scripts auth.json/backup брэнд гэрээс |
+| 29912a6cc | тестийн төрөл засвар |
+| d2aef61e8 | dev-runner-worktree.ts XO_WORKTREES_DIR-ийг readBrandEnv-ээр |
+
+ED-ийн шийдвэр (D1–D4, санал болгосноор):
+- D1: «paperclipai <cmd>» CLI сануулгын текстийг хөндөхгүй.
+- D2: Rust runner-ийн XO fallback хойшилсон.
+- D3: service нэр, User-Agent, JWT issuer, MCP нэрийг хөндөхгүй.
+- D4: багц, DB, cookie, localStorage, header дотоод хэвээр.
+
+Анхаарах: Task 4 нь effective-run-config fingerprint-ийг ганц удаа өөрчилнө (хоосон «XO_»/«PAPERCLIP_» түлхүүр, брэнд runtime env шүүлт), upgrade-ийн дараа одоо ажиллаж буй run нэг fingerprint таарахгүй гэж харагдаж болно.
+
+Gates (2026-10-17):
+- vitest (shared/src, cli/src, server xo тестүүд, adapter-utils xo тестүүд): TMPDIR realpath-тай 145 файл, 1283 тест бүгд давсан; үгүй бол 22 унана (доорх мэдэгдэж буй).
+- xo:brand-scan OK (65 файл, 116 hit, baseline-аас дээш байхгүй); xo:i18n:check OK keys=11664; xo:i18n:test 440; scan.test.mjs 3/3.
+
+Мэдэгдэж буй унаалт (өмнөөс байсан, орчны): macOS-д /var нь /private/var-ийн symlink тул packages/shared worktree-seed-source.test.ts (8), cli worktree.test.ts (14) ба workspace cleanup тестүүд унана. TMPDIR=$(realpath "$TMPDIR") тавихад давна.
+
+Үлдэгдэл (энд засаагүй):
+- scripts/kill-workspaces.sh:72 нь $HOME/.paperclip-worktrees-ийг хатуу бичсэн.
+- cli worktree.ts help текст «Source PAPERCLIP_HOME» (мөр ~4452–4536).
+- packages/adapter-utils/src/server-utils.ts:205 «Invalid PAPERCLIP_INSTANCE_ID» мессеж.
+- Ажиллаж буй instance-ийн шалгалт (pnpm dev:once, /api/health, embedded postgres зам) ED хийнэ; энд хийгээгүй.
+
 ## Ү6 7.30 Pipelines, routine жагсаалт, watchdog-ийн үлдэгдэл (2026-10-16)
 
 Зорилго: 7.29-ийн үлдэгдлээс Pipelines-ийн transform хамардаггүй текст, routine жагсаалтын төлөв, watchdog-ийн цэвэрлэгээний үр дүнг орчуулах. en гаралт хуучнаараа.
