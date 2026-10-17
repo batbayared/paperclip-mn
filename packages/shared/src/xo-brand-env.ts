@@ -14,6 +14,7 @@ export function brandEnvSuffix(key: string): string | null {
 }
 
 export function isBrandRuntimeEnvKey(key: string): boolean {
+  if (XO_NATIVE_ENV_KEYS.has(key)) return false;
   return brandEnvSuffix(key) !== null;
 }
 
@@ -49,7 +50,7 @@ export function applyXoEnvAliases(env: Env = process.env): void {
 export function mirrorPaperclipEnvToXo<T extends Env>(env: T): T {
   const out: Env = { ...env };
   for (const [key, value] of Object.entries(env)) {
-    if (!key.startsWith(LEGACY_PREFIX) || value === undefined) continue;
+    if (!key.startsWith(LEGACY_PREFIX) || value === undefined || value.trim() === "") continue;
     out[XO_PREFIX + key.slice(LEGACY_PREFIX.length)] = value;
   }
   return out as T;

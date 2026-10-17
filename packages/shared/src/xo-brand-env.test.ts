@@ -85,3 +85,19 @@ describe("mirrorPaperclipEnvToXo", () => {
     expect(out.XO_TASK_ID).toBe("new");
   });
 });
+
+describe("native XO keys", () => {
+  it("are not brand runtime keys", () => {
+    expect(isBrandRuntimeEnvKey("XO_I18N_TRANSFORM")).toBe(false);
+    expect(isBrandRuntimeEnvKey("XO_SCREENSHOTS")).toBe(false);
+    expect(isBrandRuntimeEnvKey("XO_HOME")).toBe(true);
+  });
+});
+
+describe("mirrorPaperclipEnvToXo blank values", () => {
+  it("does not copy blank PAPERCLIP_ values", () => {
+    const out = mirrorPaperclipEnvToXo({ PAPERCLIP_HOME: "  ", PAPERCLIP_RUN_ID: "r1" });
+    expect(out.XO_HOME).toBeUndefined();
+    expect(out.XO_RUN_ID).toBe("r1");
+  });
+});

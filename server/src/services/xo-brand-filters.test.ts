@@ -14,4 +14,10 @@ describe("sanitizeRuntimeServiceBaseEnv", () => {
     expect(out.XO_HOME).toBeUndefined();
     expect(out.XO_INSTANCE_ID).toBeUndefined();
   });
+
+  it("keeps native XO_ keys", () => {
+    const out = sanitizeRuntimeServiceBaseEnv({ XO_I18N_TRANSFORM: "1", XO_HOME: "/x" });
+    expect(out.XO_I18N_TRANSFORM).toBe("1");
+    expect(out.XO_HOME).toBeUndefined();
+  });
 });
