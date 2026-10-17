@@ -49,6 +49,28 @@ expand_home() {
   fi
 }
 
+# XO_<name> wins over PAPERCLIP_<name>; blank XO_ counts as unset (mirrors readBrandEnv in
+# packages/shared/src/xo-brand-env.ts). Prints nothing when neither is set.
+brand_env() {
+  local xo_var="XO_$1" legacy_var="PAPERCLIP_$1"
+  local xo_value="${!xo_var:-}"
+  if [[ -n "${xo_value//[[:space:]]/}" ]]; then
+    printf '%s\n' "$xo_value"
+  else
+    printf '%s\n' "${!legacy_var:-}"
+  fi
+}
+
+# Default brand home: ~/.xo, else legacy ~/.paperclip if only that exists (mirrors resolveBrandHome
+# in scripts/screenshot.cjs and packages/shared/src/home-paths.ts).
+default_brand_home() {
+  if [[ ! -d "$HOME/.xo" && -d "$HOME/.paperclip" ]]; then
+    printf '%s\n' "$HOME/.paperclip"
+  else
+    printf '%s\n' "$HOME/.xo"
+  fi
+}
+
 runtime_dirs=()
 declare -A seen_runtime_dirs=()
 
@@ -62,14 +84,21 @@ append_runtime_dir() {
   fi
 }
 
-paperclip_home="$(expand_home "${PAPERCLIP_HOME:-$HOME/.paperclip}")"
-paperclip_instance_id="${PAPERCLIP_INSTANCE_ID:-default}"
+paperclip_home="$(brand_env HOME)"
+paperclip_home="$(expand_home "${paperclip_home:-$(default_brand_home)}")"
+paperclip_instance_id="$(brand_env INSTANCE_ID)"
+paperclip_instance_id="${paperclip_instance_id:-default}"
+worktrees_dir="$(brand_env WORKTREES_DIR)"
+worktrees_dir="${worktrees_dir:+$(expand_home "$worktrees_dir")}"
 append_runtime_dir "$paperclip_home/instances/$paperclip_instance_id/runtime-services"
 
 if [[ "${PAPERCLIP_KILL_WORKSPACES_ONLY_CURRENT:-}" != "1" ]]; then
   for dir in \
+    "$HOME"/.xo/instances/*/runtime-services \
+    "$HOME"/.xo-worktrees/instances/*/runtime-services \
     "$HOME"/.paperclip/instances/*/runtime-services \
     "$HOME"/.paperclip-worktrees/instances/*/runtime-services \
+    ${worktrees_dir:+"$worktrees_dir"/instances/*/runtime-services} \
     "$REPO_ROOT"/.paperclip/instances/*/runtime-services \
     "$REPO_ROOT"/.paperclip/runtime-services/instances/*/runtime-services
   do

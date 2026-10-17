@@ -577,7 +577,8 @@ Gates (2026-10-14): xo:i18n:check OK 5914, xo:i18n:test 12 / 131, tsc 0, xo:bran
 | `server/src/__tests__/dev-runner-worktree.test.ts` | А2 | XO_WORKTREES_DIR тест · conflict: upstream-ийг аваад дахин нэм |
 | `server/src/services/workspace-instance-cleanup.ts` | А2 | цэвэрлэгээний worktree гэр брэнд-мэдрэмтгий · conflict: зөрчилд upstream + XO дуудлага |
 | `server/src/services/effective-run-config-fingerprints.ts` | А2 | хоосон утгатай ба XO_-ээр эхэлсэн орчны түлхүүрийг брэнд шүүлтүүрт зөв авна (Ү3-А2 Task 4) · conflict: isBrandRuntimeEnvKey дуудлагыг буцаа |
-| `scripts/provision-worktree.sh` | А2 | worktree гэрийн анхдагч ~/.xo-worktrees · conflict: XO_WORKTREES_DIR/хуучин fallback-ийг буцаа |
+| `scripts/provision-worktree.sh` | А2 | worktree гэрийн анхдагч ~/.xo-worktrees; seed эх тохиргооны fallback XO_CONFIG/XO_HOME/XO_INSTANCE_ID > PAPERCLIP_* > ~/.xo (хоосон XO_ = тавиагүй) · conflict: XO_WORKTREES_DIR/хуучин fallback, brand_env/default_brand_home-ийг буцаа |
+| `scripts/kill-workspaces.sh` | А2 | runtime-services хайх хавтсанд ~/.xo, ~/.xo-worktrees, XO_WORKTREES_DIR нэмсэн (хуучин ~/.paperclip* хэвээр), гэр XO_HOME > PAPERCLIP_HOME > анхдагч · conflict: upstream-ийг аваад brand_env/default_brand_home ба XO scan dir-үүдийг дахин нэм |
 | `scripts/backup-db.sh` | А2 | зөвхөн нэг тайлбар мөр (анхдагч backup зам: `<XO home>/instances/...`, XO home = ~/.xo, хуучин ~/.paperclip) · conflict: энгийн, upstream-ийг аваад тайлбарыг дахин нэм |
 | `scripts/measure-issue-chat-long-thread.mjs, scripts/screenshot.cjs` | А2 | auth.json-ийг брэнд гэрээс (XO_HOME > PAPERCLIP_HOME > ~/.xo > ~/.paperclip) уншина · conflict: upstream-ийг аваад гэрийн зам тооцоог дахин нэм |
 

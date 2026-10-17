@@ -3,8 +3,33 @@ set -euo pipefail
 
 base_cwd="${PAPERCLIP_WORKSPACE_BASE_CWD:?PAPERCLIP_WORKSPACE_BASE_CWD is required}"
 worktree_cwd="${PAPERCLIP_WORKSPACE_CWD:?PAPERCLIP_WORKSPACE_CWD is required}"
-paperclip_home="${PAPERCLIP_HOME:-$HOME/.paperclip}"
-paperclip_instance_id="${PAPERCLIP_INSTANCE_ID:-default}"
+# XO_<name> wins over PAPERCLIP_<name>; blank XO_ counts as unset (mirrors readBrandEnv in
+# packages/shared/src/xo-brand-env.ts). Prints nothing when neither is set.
+brand_env() {
+  local xo_var="XO_$1" legacy_var="PAPERCLIP_$1"
+  local xo_value="${!xo_var:-}"
+  if [[ -n "${xo_value//[[:space:]]/}" ]]; then
+    printf '%s\n' "$xo_value"
+  else
+    printf '%s\n' "${!legacy_var:-}"
+  fi
+}
+
+# Default brand home: ~/.xo, else legacy ~/.paperclip if only that exists (mirrors resolveBrandHome
+# in scripts/screenshot.cjs and packages/shared/src/home-paths.ts).
+default_brand_home() {
+  if [[ ! -d "$HOME/.xo" && -d "$HOME/.paperclip" ]]; then
+    printf '%s\n' "$HOME/.paperclip"
+  else
+    printf '%s\n' "$HOME/.xo"
+  fi
+}
+
+paperclip_home="$(brand_env HOME)"
+paperclip_home="${paperclip_home:-$(default_brand_home)}"
+paperclip_instance_id="$(brand_env INSTANCE_ID)"
+paperclip_instance_id="${paperclip_instance_id:-default}"
+source_config_env="$(brand_env CONFIG)"
 paperclip_dir="$worktree_cwd/.paperclip"
 worktree_config_path="$paperclip_dir/config.json"
 worktree_env_path="$paperclip_dir/.env"
@@ -52,7 +77,7 @@ if [[ ! -e "$source_config_path" && ! -L "$source_config_path" ]]; then
   # A base workspace that is a plain checkout carries no instance config of its own.
   # Fall back to the control plane's own registered instance config, which is process
   # state this workspace cannot rewrite.
-  source_config_path="${PAPERCLIP_CONFIG:-$paperclip_home/instances/$paperclip_instance_id/config.json}"
+  source_config_path="${source_config_env:-$paperclip_home/instances/$paperclip_instance_id/config.json}"
 fi
 if [[ ! -f "$source_config_path" || -L "$source_config_path" ]]; then
   echo "Registered Paperclip seed source config is missing or is not a canonical file: $source_config_path" >&2
