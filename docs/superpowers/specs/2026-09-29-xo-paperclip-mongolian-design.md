@@ -6,7 +6,7 @@
 
 Paperclip (MIT, paperclipai/paperclip) нээлттэй эхийн агент удирдлагын системийг суурь болгон **XO** брэндтэй монгол бүтээгдэхүүн гаргана. Апп-ын интерфэйс монголоор, маркетингийн вэбсайт монголоор, эхний 1-2 пилот харилцагчид өөрийн Mac дээрээс хаалттай сүлжээгээр хүргэнэ. Агент адаптеруудаас Claude Code ба Codex-ийг эхэлж бүрэн ажиллагаатай болгоно.
 
-Хамаарахгүй: docs/CLI/SDK-ийн орчуулга (англи хэвээр), олон нийтэд нээлттэй SaaS deploy, төлбөрийн систем, шинэ функц нэмэх, upstream-ийн package/env/CLI нэршлийг өөрчлөх.
+Хамаарахгүй: docs/CLI/SDK-ийн орчуулга (англи хэвээр), олон нийтэд нээлттэй SaaS deploy, төлбөрийн систем, шинэ функц нэмэх. (Package/env/CLI-ийн нэршлийг өөрчлөх нь анх хамаарахгүй байсан; ED 2026-10-01-нд хүрээнд оруулсан, §10.2.)
 
 ## 2. Батлагдсан шийдвэрүүд
 
@@ -136,8 +136,38 @@ Paperclip (MIT, paperclipai/paperclip) нээлттэй эхийн агент у
 - Гэрийн хавтас: XO_HOME > PAPERCLIP_HOME > ~/.xo (байвал) > ~/.paperclip (байвал) > ~/.xo (шинэ суулгалт). Өгөгдөл зөөхгүй, migrate команд байхгүй. Репо доторх <repo>/.paperclip хавтас хэвээр.
 - CLI: xo bin нэмэгдэнэ, paperclipai bin хэвээр үлдэнэ.
 - Хэвээр үлдэх дотоод нэрс: @paperclipai/* багц, DB нэр/role, хэрэгжсэн migration, cookie угтвар, wire id, MCP tool нэр, skill түлхүүр, localStorage түлхүүр, x-paperclip-* header, adapter-уудын «Paperclip runtime note» prompt.
-- UI доторх хатуу кодлогдсон англи «Paperclip» мөрүүдийг (~163 файл) Ү3-А гараар засахгүй. Брэнд скан (scripts/xo-brand/scan.mjs) тэдгээрийг baseline-аар тоолж, Ү3-Б үлдэгдэл ба T2-ийн оролт болгоно.
+- UI доторх хатуу кодлогдсон англи «Paperclip» мөрүүдийг (~163 файл) Ү3-А гараар засаагүй; брэнд скан (scripts/xo-brand/scan.mjs) тэдгээрийг baseline-аар тоолсон. Дараа нь UI брэнд солилт (ef898baf0) хэрэглэгчид харагдах мөрүүдийг XO болгож baseline-ийг багасгасан (§10.2).
 - Хүлээлт: 4–6 ажлын өдөр; сар бүрийн upstream синк 1 өдрөөс бага хэвээр.
+
+### 10.2 Брэнд (ED шийдвэр 2026-10-01)
+
+**Шийдвэр.** ED 2026-10-01-нд «Paperclip»-ийг XO болгож бүх газар солихоор шийдсэн, кодыг оруулаад: @paperclipai багц, PAPERCLIP_* орчны хувьсагч, CLI, DB нэр. Энэ нь анхны «Хөндөхгүй» дүрмийг (§1 «Хамаарахгүй», §10 тэмдэглэл) дарна. Үүнээс хойш «Paperclip» нэрийг хадгалах заалт энэ spec-д хүчингүй; хэвээр үлдэх зүйлс нь доорх «Үлдсэн» жагсаалтад л байна.
+
+**Үндэслэл ба эрсдэл.** Бүтээгдэхүүн бүхэлдээ XO нэртэй, хэрэглэгч Paperclip нэр харахгүй байх нь шийдвэрийн үндэс. Эрсдэл: upstream sync-ийн зөрчил ихсэнэ (§18). ED үүнийг мэдсээр сонгосон.
+
+**Нийцлийн дүрэм.**
+- Орчны хувьсагч: XO_* үндсэн, хуучин PAPERCLIP_* fallback-аар уншигдана. XO_X ба PAPERCLIP_X хоёул байвал XO_X ялна; хоосон XO_X-ийг байхгүйд тооцно.
+- Гэрийн хавтас: ~/.xo үндсэн, хуучин ~/.paperclip fallback (дараалал §10.1). Worktree хавтас: ~/.xo-worktrees, байхгүй бол хуучин ~/.paperclip-worktrees. Өгөгдөл зөөхгүй, migrate команд байхгүй тул одоо ажиллаж буй instance эвдрэхгүй.
+- CLI: xo bin үндсэн, paperclipai bin хэвээр.
+- Агентын child процесс хоёр нэрээр авна (PAPERCLIP_X бүрд XO_X хуулбар).
+- Хэрэглэгчийн config-д тодорхой бичигдсэн ~/.paperclip/... замыг дахин чиглүүлэхгүй; зөвхөн schema-ийн анхдагч ~/.xo болсон.
+
+**Хэрэгжилт.**
+- Ү3-А: 5747075b5, хаалт ed3a88d3d (план docs/superpowers/plans/2026-10-12-xo-y3-a-brand.md): XO_ ба PAPERCLIP_ хөрвүүлгийн төв модуль, гэрийн хавтас, xo bin, server мессеж ба onboarding asset.
+- UI брэнд солилт: ef898baf0 (2026-10-17, push хийгдсэн): UI эх код, i18n каталог, тестэд хэрэглэгчид харагдах «Paperclip»-ийг «XO» болгосон (144 файл). Брэнд скан baseline 160 файл/552 тохиолдлоос 65 файл/116 тохиолдол болсон.
+- Ү3-А2: ef898baf0..292050b9b, нийт 11 commit (план docs/superpowers/plans/2026-10-17-xo-y3-a2-brand-leftovers.md): config schema ба home-paths-ийн ~/.xo анхдагч, ~/.xo-worktrees, CLI data-dir (XO_CONFIG/XO_CONTEXT), env mirror-ийн хоосон утга, скриптийн auth.json ба backup зам. Эцсийн хяналтын засвар 05fd90a49 (M1–M9 ба kill-workspaces.sh bash 3.2). origin/xo-main-д push хийгдсэн.
+- Sync-д: docs/xo/SYNC.md-д Ү3-А ба Ү3-А2-ийн хөндсөн upstream файл бүр, алхам 6б (pnpm xo:brand-scan), 6в (upstream шинэ PAPERCLIP_ шүүлтүүр, .paperclip замын шалгалт) бүртгэлтэй.
+
+**Хойшлуулсан.** D2: Rust runner (packages/paperclip-runner) дахь XO fallback. Cargo байхгүй тул шалгах боломжгүй, одоо env mirror-оор XO_* хүрдэг.
+
+**Үлдсэн (хөндөөгүй, ED Ү3-А2-д зөвшөөрсөн D1, D3, D4).**
+- D1: CLI-ийн «paperclipai <cmd>» зөвлөмжийн текст (1385 тохиолдол/170 файл); xo ба paperclipai хоёр bin аль аль нь ажиллана.
+- D3: service нэр (systemd/launchd), User-Agent, JWT issuer, MCP server нэр.
+- D4: @paperclipai/* багц, DB нэр/role, cookie угтвар, localStorage түлхүүр, x-paperclip-* header, skill түлхүүр, adapter-уудын «Paperclip runtime note» prompt.
+- PAPERCLIP_* орчны хувьсагч нөөц хэлбэрээр хэвээр (кодод шууд уншигдах 700 гаруй цэг alias-аар ажиллана).
+- Repo доторх <repo>/.paperclip хавтас.
+- lucide-react-ийн Paperclip icon (хавсралтын дүрс; брэнд биш).
+- GitHub-ийн «Install Paperclip» мөр: GitHub-ийн алдааны мессежтэй тааруулахаар литерал хэвээр (ConnectionSetupFlow).
 
 ## 11. L2: Server мессеж (Ү3)
 
@@ -211,6 +241,7 @@ XO build-д upstream telemetry анхдагчаар унтраалттай (serv
 | Sync-ийн дараа validator унах | mn.json-д upstream түлхүүр нэмэх алхам; build өөрөө сануулна |
 | L2 fetch wrapper олон цэгтэй | Толь бичгийг pushToast орчмын helper дээр шилжүүлнэ |
 | Брэнд/лиценз | MIT мэдэгдэл хэвээр; Paperclip-ийн лого, бичвэр ашиглахгүй; гэрчлэл зохиохгүй |
+| Брэнд солилтоос upstream sync-ийн зөрчил ихсэх (ED шийдвэр 2026-10-01) | ED мэдсээр сонгосон (§10.2); SYNC.md-д хөндсөн файл бүрийн бүртгэл, алхам 6б ба 6в, pnpm xo:brand-scan |
 
 ## 17. Тест ба чанарын хаалт
 
@@ -224,7 +255,7 @@ XO build-д upstream telemetry анхдагчаар унтраалттай (serv
 
 | Хэсэг | Зөрчлийн магадлал |
 |---|---|
-| .tsx эх файл | 0 (хөндөөгүй) |
+| .tsx эх файл | Ү2-Ү3-Б хүртэл 0 (хөндөөгүй); UI брэнд солилт ef898baf0 (§10.2) 144 файл хөндсөн тул дунд, sync бүрд xo:brand-scan |
 | S багц ~12 файл | бага, гараар |
 | xo/*.json, scripts/xo-i18n, docs/xo | 0 (upstream-д байхгүй) |
 | Орчуулга | текст өөрчлөгдсөн түлхүүр дахин орчуулна (status.json) |
