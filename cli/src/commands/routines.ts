@@ -14,6 +14,7 @@ import {
 } from "@paperclipai/db";
 import { eq, inArray } from "drizzle-orm";
 import { loadPaperclipEnvFile } from "../config/env.js";
+import { expandHomePrefix } from "../config/home.js";
 import { readConfig, resolveConfigPath } from "../config/store.js";
 
 type RoutinesDisableAllOptions = {
@@ -119,6 +120,8 @@ async function ensureEmbeddedPostgres(dataDir: string, preferredPort: number): P
   }
   await prepareEmbeddedPostgresNativeRuntime();
 
+  // Schema default is "~/.xo/..."; expand it like the server does.
+  dataDir = expandHomePrefix(dataDir);
   const postmasterPidFile = path.resolve(dataDir, "postmaster.pid");
   const runningPid = readRunningPostmasterPid(postmasterPidFile);
   if (runningPid) {

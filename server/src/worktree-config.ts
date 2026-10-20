@@ -9,6 +9,7 @@ import {
   type PaperclipConfig,
 } from "@paperclipai/shared";
 import { updateEnvFileContents, writeEnvFileAtomicallyIfChanged } from "@paperclipai/shared/env-file";
+import { readBrandEnv } from "@paperclipai/shared/xo-brand-env";
 import {
   readWorktreePortRegistry,
   withWorktreePortRegistryLockSync,
@@ -143,7 +144,7 @@ function resolveWorktreeRuntimeContext(
   const homeDir = resolveHomeAwarePath(
     nonEmpty(stablePersistedEnv.PAPERCLIP_HOME) ??
       nonEmpty(env.PAPERCLIP_HOME) ??
-      nonEmpty(env.PAPERCLIP_WORKTREES_DIR) ??
+      nonEmpty(readBrandEnv("WORKTREES_DIR", env)) ??
       resolveDefaultBrandWorktreesDir(),
   );
   const instanceRoot = path.resolve(homeDir, "instances", instanceId);

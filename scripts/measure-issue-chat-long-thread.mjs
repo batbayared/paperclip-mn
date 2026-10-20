@@ -12,6 +12,8 @@ const url = companyPrefix
   : `${baseUrl}/tests/perf/long-thread`;
 const origin = new URL(url).origin;
 
+// Mirrors resolveDefaultBrandHomeDir in packages/shared/src/home-paths.ts (and the other copy in
+// scripts/screenshot.cjs); scripts cannot import @paperclipai/shared at runtime, so keep them in sync.
 function resolveBrandHome() {
   const fromEnv = (process.env.XO_HOME || "").trim() || (process.env.PAPERCLIP_HOME || "").trim();
   if (fromEnv) return fromEnv.replace(/^~(?=\/|$)/, os.homedir());

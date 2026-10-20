@@ -117,6 +117,13 @@ describe("applyDataDirOverride with XO_ overrides", () => {
     expect(process.env.PAPERCLIP_CONFIG).toBeUndefined();
   });
 
+  it("keeps an explicit legacy PAPERCLIP_CONFIG when XO_CONFIG is unset", () => {
+    process.env.PAPERCLIP_CONFIG = "/legacy/config.json";
+    applyDataDirOverride({ dataDir: "/tmp/xo-data" }, { hasConfigOption: true });
+    expect(process.env.PAPERCLIP_CONFIG).toBe("/legacy/config.json");
+    expect(process.env.XO_CONFIG).toBeUndefined();
+  });
+
   it("keeps an explicit XO_CONTEXT", () => {
     process.env.XO_CONTEXT = "/custom/xo-context.json";
     applyDataDirOverride({ dataDir: "/tmp/xo-data" }, { hasContextOption: true });

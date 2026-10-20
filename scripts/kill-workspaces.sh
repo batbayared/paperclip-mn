@@ -72,14 +72,16 @@ default_brand_home() {
 }
 
 runtime_dirs=()
-declare -A seen_runtime_dirs=()
+# Newline-delimited membership sets instead of `declare -A`: macOS ships bash 3.2,
+# which has no associative arrays.
+seen_runtime_dirs=$'\n'
 
 append_runtime_dir() {
   local dir="$1"
   [[ -d "$dir" ]] || return 0
   dir="$(cd "$dir" && pwd)"
-  if [[ -z "${seen_runtime_dirs[$dir]:-}" ]]; then
-    seen_runtime_dirs["$dir"]=1
+  if [[ "$seen_runtime_dirs" != *$'\n'"$dir"$'\n'* ]]; then
+    seen_runtime_dirs+="$dir"$'\n'
     runtime_dirs+=("$dir")
   fi
 }
@@ -118,7 +120,9 @@ fi
 
 record_lines=()
 if [[ ${#runtime_dirs[@]} -gt 0 ]]; then
-  mapfile -t record_lines < <(node - "${runtime_dirs[@]}" <<'NODE'
+  while IFS= read -r record_line; do
+    record_lines+=("$record_line")
+  done < <(node - "${runtime_dirs[@]}" <<'NODE'
 const fs = require("node:fs");
 const path = require("node:path");
 
@@ -202,7 +206,7 @@ display_lines=()
 target_keys=()
 target_types=()
 target_ids=()
-declare -A seen_target_keys=()
+seen_target_keys=$'\n'
 
 for line in "${record_lines[@]}"; do
   IFS=$'\x1f' read -r file service_key service_name pid pgid port cwd url runtime_service_id <<< "$line"
@@ -224,8 +228,8 @@ for line in "${record_lines[@]}"; do
 
   active_files+=("$file")
   target_key="$target_type:$target_id"
-  if [[ -z "${seen_target_keys[$target_key]:-}" ]]; then
-    seen_target_keys["$target_key"]=1
+  if [[ "$seen_target_keys" != *$'\n'"$target_key"$'\n'* ]]; then
+    seen_target_keys+="$target_key"$'\n'
     target_keys+=("$target_key")
     target_types+=("$target_type")
     target_ids+=("$target_id")

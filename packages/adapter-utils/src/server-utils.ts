@@ -202,7 +202,7 @@ export function resolvePaperclipInstanceRootForAdapter(
     readBrandEnv("INSTANCE_ID", env)?.trim() ||
     DEFAULT_PAPERCLIP_INSTANCE_ID;
   if (!PATH_SEGMENT_RE.test(instanceId))
-    throw new Error(`Invalid PAPERCLIP_INSTANCE_ID '${instanceId}'.`);
+    throw new Error(`Invalid XO_INSTANCE_ID / PAPERCLIP_INSTANCE_ID '${instanceId}'.`);
   return path.resolve(homeDir, "instances", instanceId);
 }
 

@@ -1,8 +1,9 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
+  expandHomePrefix,
   resolveBrandHomeLiteral,
   resolveDefaultBrandWorktreesDir,
   resolvePaperclipInstanceId,
@@ -15,6 +16,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  vi.restoreAllMocks();
   fs.rmSync(userHome, { recursive: true, force: true });
 });
 
@@ -69,5 +71,16 @@ describe("resolveBrandHomeLiteral", () => {
 describe("resolvePaperclipInstanceId", () => {
   it("names both env vars in the error", () => {
     expect(() => resolvePaperclipInstanceId("bad id")).toThrow("Invalid XO_INSTANCE_ID / PAPERCLIP_INSTANCE_ID 'bad id'.");
+  });
+});
+
+describe("expandHomePrefix", () => {
+  it("routes brand literals through resolveBrandHomeLiteral", () => {
+    vi.spyOn(os, "homedir").mockReturnValue(userHome);
+    fs.mkdirSync(path.join(userHome, ".paperclip"));
+    expect(expandHomePrefix("~/.xo/instances/default/db")).toBe(
+      path.join(userHome, ".paperclip", "instances", "default", "db"),
+    );
+    expect(expandHomePrefix("~/other")).toBe(path.join(userHome, "other"));
   });
 });

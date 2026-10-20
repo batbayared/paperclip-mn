@@ -6,6 +6,7 @@ import path from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
 import { promisify } from "node:util";
 import { parse as parseEnvContents } from "dotenv";
+import { readBrandEnv } from "@paperclipai/shared/xo-brand-env";
 import { expandHomePrefix, resolveDefaultBrandWorktreesDir } from "../home-paths.js";
 import type { WorkspaceOperationRecorder } from "./workspace-operations.js";
 
@@ -235,7 +236,7 @@ function resolveManagedInstancesDir(worktreesDir?: string): string {
   const managedWorktreesDir = path.resolve(
     expandHomePrefix(
       worktreesDir?.trim()
-      || process.env.PAPERCLIP_WORKTREES_DIR?.trim()
+      || readBrandEnv("WORKTREES_DIR")?.trim()
       || resolveDefaultBrandWorktreesDir(),
     ),
   );

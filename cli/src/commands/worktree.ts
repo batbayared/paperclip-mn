@@ -1117,6 +1117,8 @@ export async function ensureEmbeddedPostgres(
   }
   await prepareEmbeddedPostgresNativeRuntime();
 
+  // Schema default is "~/.xo/..."; expand it like the server does.
+  dataDir = expandHomePrefix(dataDir);
   const postmasterPidFile = path.resolve(dataDir, "postmaster.pid");
   const runningPid = readRunningPostmasterPid(postmasterPidFile);
   if (runningPid) {
@@ -3266,7 +3268,9 @@ function resolveRunningEmbeddedPostgresPid(config: PaperclipConfig): number | nu
   if (config.database.mode !== "embedded-postgres") {
     return null;
   }
-  return readRunningPostmasterPid(path.resolve(config.database.embeddedPostgresDataDir, "postmaster.pid"));
+  return readRunningPostmasterPid(
+    path.resolve(expandHomePrefix(config.database.embeddedPostgresDataDir), "postmaster.pid"),
+  );
 }
 
 async function collectMergePlan(input: {
@@ -4449,7 +4453,7 @@ export function registerWorktreeCommands(program: Command): void {
     .option("--instance <id>", "Explicit isolated instance id")
     .option("--home <path>", `Home root for worktree instances (env: XO_WORKTREES_DIR or PAPERCLIP_WORKTREES_DIR, default: ${DEFAULT_WORKTREE_HOME})`)
     .option("--from-config <path>", "Source config.json to seed from")
-    .option("--from-data-dir <path>", "Source PAPERCLIP_HOME used when deriving the source config")
+    .option("--from-data-dir <path>", "Source XO home (XO_HOME / PAPERCLIP_HOME) used when deriving the source config")
     .option("--from-instance <id>", "Source instance id when deriving the source config", "default")
     .option("--server-port <port>", "Preferred server port", (value) => Number(value))
     .option("--db-port <port>", "Preferred embedded Postgres port", (value) => Number(value))
@@ -4466,7 +4470,7 @@ export function registerWorktreeCommands(program: Command): void {
     .option("--instance <id>", "Explicit isolated instance id")
     .option("--home <path>", `Home root for worktree instances (env: XO_WORKTREES_DIR or PAPERCLIP_WORKTREES_DIR, default: ${DEFAULT_WORKTREE_HOME})`)
     .option("--from-config <path>", "Source config.json to seed from")
-    .option("--from-data-dir <path>", "Source PAPERCLIP_HOME used when deriving the source config")
+    .option("--from-data-dir <path>", "Source XO home (XO_HOME / PAPERCLIP_HOME) used when deriving the source config")
     .option("--from-instance <id>", "Source instance id when deriving the source config", "default")
     .option("--server-port <port>", "Preferred server port", (value) => Number(value))
     .option("--db-port <port>", "Preferred embedded Postgres port", (value) => Number(value))
@@ -4488,7 +4492,7 @@ export function registerWorktreeCommands(program: Command): void {
     .description("Seed a seed-pending worktree database exactly once from its source instance")
     .option("-c, --config <path>", "Path to the target worktree config file")
     .option("--from-config <path>", "Source config.json to seed from (defaults to the seed-pending marker)")
-    .option("--from-data-dir <path>", "Source PAPERCLIP_HOME used when deriving the source config")
+    .option("--from-data-dir <path>", "Source XO home (XO_HOME / PAPERCLIP_HOME) used when deriving the source config")
     .option("--from-instance <id>", "Source instance id when deriving the source config")
     .option("--preserve-live-work", "Do not quarantine copied agent work or workspace runtime services", false)
     .action(worktreeEnsureSeededCommand);
@@ -4518,7 +4522,7 @@ export function registerWorktreeCommands(program: Command): void {
     .option("--from <worktree>", "Source worktree path, directory name, branch name, or current")
     .option("--to <worktree>", "Target worktree path, directory name, branch name, or current (defaults to current)")
     .option("--from-config <path>", "Source config.json to seed from")
-    .option("--from-data-dir <path>", "Source PAPERCLIP_HOME used when deriving the source config")
+    .option("--from-data-dir <path>", "Source XO home (XO_HOME / PAPERCLIP_HOME) used when deriving the source config")
     .option("--from-instance <id>", "Source instance id when deriving the source config")
     .option("--seed-mode <mode>", "Seed profile: minimal or full (default: full)", "full")
     .option("--preserve-live-work", "Do not quarantine copied agent work or workspace runtime services in the seeded worktree", false)
@@ -4533,7 +4537,7 @@ export function registerWorktreeCommands(program: Command): void {
     .option("--branch <name>", "Existing branch/worktree selector to repair, or a branch name to create under .paperclip/worktrees")
     .option("--home <path>", `Home root for worktree instances (env: XO_WORKTREES_DIR or PAPERCLIP_WORKTREES_DIR, default: ${DEFAULT_WORKTREE_HOME})`)
     .option("--from-config <path>", "Source config.json to seed from")
-    .option("--from-data-dir <path>", "Source PAPERCLIP_HOME used when deriving the source config")
+    .option("--from-data-dir <path>", "Source XO home (XO_HOME / PAPERCLIP_HOME) used when deriving the source config")
     .option("--from-instance <id>", "Source instance id when deriving the source config (default: default)")
     .option("--seed-mode <mode>", "Seed profile: minimal or full (default: minimal)", "minimal")
     .option("--preserve-live-work", "Do not quarantine copied agent work or workspace runtime services in the seeded worktree", false)

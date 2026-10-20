@@ -38,6 +38,8 @@ if (!rawUrl) {
 }
 
 // --- Auth ----------------------------------------------------------------
+// Mirrors resolveDefaultBrandHomeDir in packages/shared/src/home-paths.ts (and the other copy in
+// scripts/measure-issue-chat-long-thread.mjs); scripts cannot import @paperclipai/shared at runtime, so keep them in sync.
 function resolveBrandHome() {
   const fromEnv = (process.env.XO_HOME || "").trim() || (process.env.PAPERCLIP_HOME || "").trim();
   if (fromEnv) return fromEnv.replace(/^~(?=\/|$)/, os.homedir());
