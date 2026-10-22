@@ -336,6 +336,8 @@ const SKIP_DIRS = new Set([
   "coverage",
   ".paperclip",
   "tmp",
+  // XO: gitignored local agent-workflow scratch (SDD reports, brainstorms), not guidance.
+  ".superpowers",
 ]);
 
 const SKIP_PATH_PREFIXES = [

@@ -8,6 +8,7 @@ pub mod acpx_provider_session;
 pub mod acpx_provider_state;
 pub mod acpx_sidecar_transport;
 pub mod aws_agentcore_provider;
+mod brand_env;
 pub mod claude_managed_provider;
 pub mod codex_provider;
 mod codex_startup_trust;

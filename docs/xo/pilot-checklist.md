@@ -1,0 +1,86 @@
+# XO пилотын бэлтгэлийн хуудас (Ү5)
+
+Ү5-ын D2–D6 ажлыг ED-ийн Mac дээр хийхэд дагах дараалал. Нууц түлхүүр, нууц үг, бүртгэл, DNS-ийг ED өөрөө оруулна.
+
+## 1. Mac бэлтгэл (D2)
+
+- [ ] Унтахгүй байх: `sudo pmset -c sleep 0 disksleep 0` (цэнэглэгчтэй үед). Дэлгэц унтаж болно.
+- [ ] Чөлөөт зай ≥ 20 GB: `df -h /Users/Shared`.
+- [ ] Release tag: `git tag xo-v2026.10.DD && git push origin xo-v2026.10.DD` (push бүрд ED зөвшөөрнө).
+- [ ] Пилотын хавтас home-оос гадна:
+
+```bash
+sudo mkdir -p /Users/Shared/xo/logs /Users/Shared/xo-backups
+sudo chown -R "$USER" /Users/Shared/xo /Users/Shared/xo-backups
+chmod 700 /Users/Shared/xo /Users/Shared/xo-backups
+```
+
+- [ ] Instance:
+
+```bash
+export XO_HOME=/Users/Shared/xo
+export XO_INSTANCE_ID=xo-pilot
+pnpm paperclipai onboard
+```
+
+## 2. Агентын санах ойн тусгаарлалт (D4)
+
+**Асуудал** (2026-10-12, CMP-4): пилот агент операторын ~/.claude/CLAUDE.md дахь хувийн зааврыг дагасан.
+
+**Шинэ олдвор** (2026-10-22, код уншиж тогтоосон, туршаагүй): managed AI холболттой агентад claude-local adapter `--setting-sources user` дамжуулдаг (packages/adapters/claude-local/src/server/execute.ts:885, acp.ts:631). Энэ нь хэрэглэгчийн түвшний тохиргоог, өөрөөр хэлбэл агентыг ажиллуулж буй OS хэрэглэгчийн ~/.claude-г уншуулна. Тэгэхээр XO_HOME-ийг /Users/Shared/xo руу зөөх нь төслийн түвшний CLAUDE.md-ийн алхалтыг таслах ч хэрэглэгчийн ~/.claude/CLAUDE.md-ийг таслахгүй байх магадлалтай.
+
+Сонголтууд, найдвартай байдлын дарааллаар:
+
+1. **Тусдаа OS хэрэглэгч** (жишээ `xo`), өөрийн хоосон HOME-тэй. XO server-ийг тэр хэрэглэгчээр ажиллуулна. Баталгаатай, гэхдээ тохируулга их.
+2. **Server процессод CLAUDE_CONFIG_DIR тавих:** `CLAUDE_CONFIG_DIR=/Users/Shared/xo/claude-config` (хоосон хавтас, CLAUDE.md-гүй). Managed холболт API түлхүүр хэрэглэдэг тул операторын нэвтрэлт шаардахгүй. Хялбар, гэхдээ доорх тестээр батлах ёстой.
+
+**Тусгаарлалтын тест** (сонголтоо хийсний дараа заавал):
+
+- [ ] Пилот компанид нэг богино task үүсгэ: «Чиний ачаалсан CLAUDE.md файлуудын замыг жагсаа, агуулгыг бүү хуул».
+- [ ] Хариунд /Users/batbayardavaanyam/.claude/CLAUDE.md эсвэл Монгол хэлний дүрэм гарч ирвэл тусгаарлалт ажиллаагүй.
+- [ ] Үр дүнг энэ файлд огноотой тэмдэглэ.
+
+## 3. Нөөцлөлт (D3)
+
+- **Цаг тутмын DB dump:** server өөрөө хийдэг (database.backup: анхдагч 60 минут, 30 хоног; PAPERCLIP_DB_BACKUP_* хувьсагчаар өөрчилнө). Dump: `<instance>/data/backups/*.sql.gz`.
+- **Өдөр тутмын хуулбар:** scripts/xo-ops/daily-backup.sh. Шинэ dump авч, instance-ийн файлуудыг (secrets мастер түлхүүр, компанийн storage, workspaces, run log) /Users/Shared/xo-backups/YYYY-MM-DD руу хуулж, 14 хоногоос хуучныг устгана. Ажиллаж буй postgres хавтсыг (db/) хуулдаггүй.
+- 2026-10-22-нд y3-close instance дээр туршсан: dump 697 KB, хуулбар 2.5 MB.
+- [ ] Хуулбарыг Mac-аас гадагш (гадаад диск эсвэл шифрлэсэн cloud) гаргах эсэхийг ED шийднэ. secrets/ хавтас мастер түлхүүртэй тул шифрлэлтгүй cloud руу бүү хуул.
+
+**Сэргээлтийн дасгал (D6):**
+
+```bash
+gunzip -c /Users/Shared/xo-backups/YYYY-MM-DD/instance/data/backups/<файл>.sql.gz | psql "postgres://paperclip:paperclip@127.0.0.1:<туршилтын порт>/paperclip"
+```
+
+- [ ] Туршилтын instance руу сэргээж, компани, агент, issue харагдаж байгааг шалга.
+- [ ] secrets/ хавтсыг хамт сэргээгээгүй бол нууц утгууд уншигдахгүйг баталгаажуул.
+
+## 4. Health check (D3)
+
+- scripts/xo-ops/healthcheck.sh: /api/health-ийг шалгаж, дараалсан 3 алдааны дараа macOS мэдэгдэл гаргана. XO_LAUNCHD_LABEL тавьсан бол тэр launchd job-ийг дахин эхлүүлнэ.
+- Порт пилотод өөр бол XO_HEALTH_URL-ийг тохируул (анхдагч http://127.0.0.1:3100/api/health).
+
+## 5. launchd суулгах
+
+Загварууд: scripts/xo-ops/launchd/. __REPO__ ба __NODE_BIN__-ийг орлуулаад:
+
+```bash
+NODE_BIN="$(dirname "$(which node)")"; REPO="$HOME/dev/paperclip-mn"
+for f in backup health; do
+  sed -e "s#__REPO__#$REPO#g" -e "s#__NODE_BIN__#$NODE_BIN#g" \
+    "$REPO/scripts/xo-ops/launchd/com.ateamgpt.xo.$f.plist" > "$HOME/Library/LaunchAgents/com.ateamgpt.xo.$f.plist"
+  launchctl bootstrap "gui/$(id -u)" "$HOME/Library/LaunchAgents/com.ateamgpt.xo.$f.plist"
+done
+```
+
+- [ ] Шалгах: `launchctl print gui/$(id -u)/com.ateamgpt.xo.health | grep -E "state|last exit"`.
+- [ ] Лог: /Users/Shared/xo/logs/{backup,health}.log.
+- Server-ийг өөрийг нь launchd job болгох (D2) ажил тусдаа; тэгвэл health plist-д XO_LAUNCHD_LABEL нэм.
+
+## 6. Пилотын өмнөх эцсийн шалгалт
+
+- [ ] Tailscale-ээр гаднаас нэвтрэх (D1, ED).
+- [ ] Пилот хэрэглэгч бүрд компани, урилга, 20–50 USD төсөв (D5).
+- [ ] 24 цаг тасралтгүй ажиллаж, health.log-д алдаагүй (D6).
+- [ ] Дор хаяж нэг өдрийн хуулбар үүсч, сэргээлтийн дасгал амжилттай (D6).

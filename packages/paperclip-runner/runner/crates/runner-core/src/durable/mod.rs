@@ -29,6 +29,7 @@ pub const PROTOCOL: &str = "paperclip.runner";
 pub const PROTOCOL_MIN_VERSION: u64 = 1;
 pub const PROTOCOL_VERSION: u64 = 2;
 pub const BOOTSTRAP_TICKET_ENV: &str = "PAPERCLIP_RUNNER_BOOTSTRAP_TICKET";
+pub const XO_BOOTSTRAP_TICKET_ENV: &str = "XO_RUNNER_BOOTSTRAP_TICKET";
 const MAX_OUTBOX_BYTES: usize = 512 * 1024 * 1024;
 const MAX_FRAME_BYTES: usize = 16 * 1024 * 1024;
 
@@ -93,7 +94,10 @@ impl BootstrapTicket {
 }
 
 pub fn capture_bootstrap_ticket() -> Result<Option<BootstrapTicket>, DurableRunnerError> {
-    let value = match std::env::var(BOOTSTRAP_TICKET_ENV) {
+    // XO_RUNNER_BOOTSTRAP_TICKET is preferred; BOOTSTRAP_TICKET_ENV stays as fallback.
+    let key = crate::brand_env::brand_env_key("RUNNER_BOOTSTRAP_TICKET")
+        .unwrap_or_else(|| BOOTSTRAP_TICKET_ENV.to_string());
+    let value = match std::env::var(&key) {
         Ok(value) => value,
         Err(std::env::VarError::NotPresent) => return Ok(None),
         Err(error) => {
@@ -103,6 +107,7 @@ pub fn capture_bootstrap_ticket() -> Result<Option<BootstrapTicket>, DurableRunn
         }
     };
     std::env::remove_var(BOOTSTRAP_TICKET_ENV);
+    std::env::remove_var(XO_BOOTSTRAP_TICKET_ENV);
     BootstrapTicket::new(value).map(Some)
 }
 

@@ -776,7 +776,8 @@ impl SupervisedProcess {
         .into_iter()
         .chain(additional_environment_keys.iter().copied())
         {
-            if let Some(value) = std::env::var_os(key) {
+            // Children keep the PAPERCLIP_* name; the runner reads XO_* first.
+            if let Some(value) = crate::brand_env::read_env_with_brand_fallback(key) {
                 command.env(key, value);
             }
         }

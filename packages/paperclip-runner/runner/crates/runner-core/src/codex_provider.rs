@@ -166,9 +166,8 @@ struct ProviderTraceSink {
 
 impl ProviderTraceSink {
     fn from_environment() -> Option<Self> {
-        let trace_path = std::env::var_os("PAPERCLIP_PROVIDER_TRACE_PATH")?;
-        let max_bytes = std::env::var("PAPERCLIP_PROVIDER_TRACE_MAX_BYTES")
-            .ok()
+        let trace_path = crate::brand_env::read_brand_env_os("PROVIDER_TRACE_PATH")?;
+        let max_bytes = crate::brand_env::read_brand_env("PROVIDER_TRACE_MAX_BYTES")
             .and_then(|value| value.parse::<usize>().ok())
             .filter(|value| *value > 0)
             .unwrap_or(DEFAULT_PROVIDER_TRACE_MAX_BYTES);
@@ -826,10 +825,11 @@ impl CodexProvider {
             ));
         }
         let authorized_tools = authorized_tools.into_iter().collect::<Vec<_>>();
+        let externally_sandboxed_env =
+            crate::brand_env::read_brand_env("RUNNER_EXTERNAL_SANDBOX").as_deref() == Some("1");
         let permission_profile = codex_permission_profile(
             &config.provider,
-            config.externally_sandboxed
-                || std::env::var("PAPERCLIP_RUNNER_EXTERNAL_SANDBOX").as_deref() == Ok("1"),
+            config.externally_sandboxed || externally_sandboxed_env,
         );
         let (dynamic_tools, authorized_tool_ids) =
             codex_dynamic_tools(authorized_tools.iter().cloned())?;
