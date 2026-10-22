@@ -7,15 +7,15 @@
 - [ ] Унтахгүй байх: `sudo pmset -c sleep 0 disksleep 0` (цэнэглэгчтэй үед). Дэлгэц унтаж болно.
 - [ ] Чөлөөт зай ≥ 20 GB: `df -h /Users/Shared`.
 - [ ] Release tag: `git tag xo-v2026.10.DD && git push origin xo-v2026.10.DD` (push бүрд ED зөвшөөрнө).
-- [ ] Пилотын хавтас home-оос гадна:
+- [x] Пилотын хавтас home-оос гадна (2026-10-22, sudo-гүй үүссэн; claude-config хавтсыг мөн үүсгэ):
 
 ```bash
-sudo mkdir -p /Users/Shared/xo/logs /Users/Shared/xo-backups
+sudo mkdir -p /Users/Shared/xo/logs /Users/Shared/xo/claude-config /Users/Shared/xo-backups
 sudo chown -R "$USER" /Users/Shared/xo /Users/Shared/xo-backups
 chmod 700 /Users/Shared/xo /Users/Shared/xo-backups
 ```
 
-- [ ] Instance:
+- [x] Instance (2026-10-22, `onboard -y --no-install-service`; loopback 127.0.0.1:3100, DB порт 54329):
 
 ```bash
 export XO_HOME=/Users/Shared/xo
@@ -32,7 +32,7 @@ pnpm paperclipai onboard
 Сонголтууд, найдвартай байдлын дарааллаар:
 
 1. **Тусдаа OS хэрэглэгч** (жишээ `xo`), өөрийн хоосон HOME-тэй. XO server-ийг тэр хэрэглэгчээр ажиллуулна. Баталгаатай, гэхдээ тохируулга их.
-2. **Server процессод CLAUDE_CONFIG_DIR тавих:** `CLAUDE_CONFIG_DIR=/Users/Shared/xo/claude-config` (хоосон хавтас, CLAUDE.md-гүй). Managed холболт API түлхүүр хэрэглэдэг тул операторын нэвтрэлт шаардахгүй. Хялбар, гэхдээ доорх тестээр батлах ёстой.
+2. **Server процессод CLAUDE_CONFIG_DIR тавих** (2026-10-22-нд сонгож, server plist-д тавьсан; тест хүлээгдэж байна): `CLAUDE_CONFIG_DIR=/Users/Shared/xo/claude-config` (хоосон хавтас, CLAUDE.md-гүй). Managed холболт API түлхүүр хэрэглэдэг тул операторын нэвтрэлт шаардахгүй. Хялбар, гэхдээ доорх тестээр батлах ёстой.
 
 **Тусгаарлалтын тест** (сонголтоо хийсний дараа заавал):
 
@@ -76,7 +76,19 @@ done
 
 - [ ] Шалгах: `launchctl print gui/$(id -u)/com.ateamgpt.xo.health | grep -E "state|last exit"`.
 - [ ] Лог: /Users/Shared/xo/logs/{backup,health}.log.
-- Server-ийг өөрийг нь launchd job болгох (D2) ажил тусдаа; тэгвэл health plist-д XO_LAUNCHD_LABEL нэм.
+- Health plist-д `XO_LAUNCHD_LABEL=com.ateamgpt.xo.server` нэмбэл health алдаа гарахад server-ийг дахин эхлүүлнэ.
+
+**Server job (D2).** com.ateamgpt.xo.server.plist нь `run --instance xo-pilot`-ийг XO_HOME, CLAUDE_CONFIG_DIR (D4), PAPERCLIP_SERVICE_MANAGED=1-тэй ажиллуулна; RunAtLoad + KeepAlive. CLI-ийн `--install-service`-ийг хэрэглэхгүй: тэр нь ~/.local/bin/paperclipai shim шаарддаг, CLAUDE_CONFIG_DIR дамжуулдаггүй. Суулгахын өмнө гараар асаасан server-ээ зогсоо (порт 3100, 54329).
+
+```bash
+f=server
+sed -e "s#__REPO__#$REPO#g" -e "s#__NODE_BIN__#$NODE_BIN#g" \
+  "$REPO/scripts/xo-ops/launchd/com.ateamgpt.xo.$f.plist" > "$HOME/Library/LaunchAgents/com.ateamgpt.xo.$f.plist"
+launchctl bootstrap "gui/$(id -u)" "$HOME/Library/LaunchAgents/com.ateamgpt.xo.$f.plist"
+```
+
+- [x] Суусан (2026-10-22): state = running, `/api/health` → ok. Лог: /Users/Shared/xo/logs/server.log.
+- Зогсоох: `launchctl bootout gui/$(id -u)/com.ateamgpt.xo.server`. Шинэ код татсны дараа: `launchctl kickstart -k gui/$(id -u)/com.ateamgpt.xo.server`.
 
 ## 6. Пилотын өмнөх эцсийн шалгалт
 

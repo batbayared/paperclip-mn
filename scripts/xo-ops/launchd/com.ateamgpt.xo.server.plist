@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Template. Install: see docs/xo/pilot-checklist.md. Replace __REPO__ and __NODE_BIN__. -->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.ateamgpt.xo.server</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>__NODE_BIN__/node</string>
+    <string>__REPO__/cli/node_modules/tsx/dist/cli.mjs</string>
+    <string>__REPO__/cli/src/index.ts</string>
+    <string>run</string>
+    <string>--instance</string>
+    <string>xo-pilot</string>
+  </array>
+  <key>WorkingDirectory</key>
+  <string>__REPO__</string>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>__NODE_BIN__:/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    <key>XO_HOME</key>
+    <string>/Users/Shared/xo</string>
+    <key>XO_INSTANCE_ID</key>
+    <string>xo-pilot</string>
+    <!-- D4: empty Claude config dir so agents never load the operator's ~/.claude -->
+    <key>CLAUDE_CONFIG_DIR</key>
+    <string>/Users/Shared/xo/claude-config</string>
+    <key>PAPERCLIP_SERVICE_MANAGED</key>
+    <string>1</string>
+    <key>TMPDIR</key>
+    <string>/tmp</string>
+  </dict>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <true/>
+  <key>ThrottleInterval</key>
+  <integer>10</integer>
+  <key>ExitTimeOut</key>
+  <integer>300</integer>
+  <key>StandardOutPath</key>
+  <string>/Users/Shared/xo/logs/server.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/Shared/xo/logs/server.log</string>
+</dict>
+</plist>
